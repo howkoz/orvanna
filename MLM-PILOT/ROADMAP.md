@@ -102,10 +102,11 @@ math is untouched by design. Full rules: `docs\COMP-PLAN-SPEC.md` v1.2.
 
 ## Next small step
 
-Phases 1-2 CLOSED 2026-08-13: both gates PASS (verifier 0 HIGH / 2 MEDIUM / 7 LOW;
-QA 38 of 41 applicable rows passed, 0 HIGH). Punch list before Phase 3: fix seed
-enrollment-vs-first-order plausibility (290 members), harden the finalized-run
-immutability trigger to also block INSERT, reconcile the cycle-trigger location note
-in the genealogy decision doc, then apply migrations + seed to the cloud project
-(mlm-pilot, ref oiyibdczkokegaxkwulv). Then Phase 3: mlm-comp-engineer builds the
-commission engine against the worked example.
+Phase 3 CLOSED 2026-08-13, both gates PASS (verifier: independent six-month
+recomputation matched the cloud to the cent, 0 HIGH; QA: 38 of 42 rows, 0 HIGH).
+Comp plan v1.3 same evening (Howard: "Gate it"): qualification required to hold any
+rank above Member; engine migration 009 deployed, all six months rerun and
+refinalized (Feb 11,906.00 / Mar 13,434.00 / Apr 14,636.00 / May 16,507.20 /
+Jun 17,749.20 / Jul 20,669.20), v1.2 runs kept as frozen superseded history.
+NOW RUNNING: Phase 4, mlm-site-builder builds the portal in `site\` against the
+seven public demo views. Then: visual QA + both gates, then Phase 5 (orvanna.io).

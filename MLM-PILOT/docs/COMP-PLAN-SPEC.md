@@ -1,12 +1,12 @@
-# MLM Pilot Compensation Plan Specification, version v1.2
+# MLM Pilot Compensation Plan Specification, version v1.3
 
-As of 2026-08-13 (v1.2, adds CUSTOMER ACCOUNTS per Howard: customers buy through a
-referring member and their volume rolls up to that member at purchase time; customers
-never earn. v1.1 same day locked the agent product and the 100 PV gate). The engine
-math is UNCHANGED from v1.1: customer purchases are booked onto the referring member's
-account (schema spec, orders.customer_id), so every formula below already covers them.
-mlm-comp-engineer must reproduce section 7 exactly; mlm-verifier recomputes it
-independently.
+As of 2026-08-13 (v1.3, Howard's ruling on the Phase 3 verifier's finding: a member
+must be QUALIFIED, SV >= 100, to HOLD any rank above Member; deployed and all six
+months rerun same day. v1.2 added customer accounts: customers buy through a referring
+member and their volume rolls up at purchase time; customers never earn. v1.1 locked
+the agent product and the 100 PV gate). The worked example is unchanged by v1.3 (its
+only high-rank holders were already qualified). mlm-comp-engineer must reproduce
+section 7 exactly; mlm-verifier recomputes it independently.
 
 Acronym key: Multi-Level Marketing (MLM), Personal Volume (PV), Sales Volume (SV),
 Commissionable Volume (CV), Team Volume (TV), Software as a Service (SaaS),
@@ -78,10 +78,13 @@ leg "contains a Builder" when ANY member in the leg earned that rank this month.
 | Rank | Requirements (all must hold, same month) | Paid depth |
 |---|---|---|
 | Member | enrolled | 1 |
-| Builder | SV >= 100 AND >= 2 active legs | 2 |
-| Leader | TV >= 2,500 AND >= 3 active legs | 3 |
-| Director | TV >= 10,000 AND >= 2 legs each containing a Builder (or higher) | 4 |
-| Executive | TV >= 40,000 AND >= 2 legs each containing a Leader (or higher) | 5 |
+| Builder | QUALIFIED (SV >= 100) AND >= 2 active legs | 2 |
+| Leader | QUALIFIED AND TV >= 2,500 AND >= 3 active legs | 3 |
+| Director | QUALIFIED AND TV >= 10,000 AND >= 2 legs each containing a Builder (or higher) | 4 |
+| Executive | QUALIFIED AND TV >= 40,000 AND >= 2 legs each containing a Leader (or higher) | 5 |
+
+(v1.3: the QUALIFIED requirement on Leader, Director, and Executive is Howard's ruling
+of 2026-08-13; before that, team volume and legs alone could hold a high rank.)
 
 A member holds the HIGHEST rank whose requirements they meet. Evaluation is
 deterministic and non-circular: Builder depends only on qualification; Leader on TV
@@ -215,3 +218,7 @@ either; both are breakage by design.
    purchases (a level-0 percentage on customer CV, on top of the volume roll-up)?
    Default for v1: no, roll-up only; a retail commission is a one-line engine change
    later if wanted.
+6. ~~(raised by the Phase 3 verifier)~~ DECIDED by Howard 2026-08-13: "Gate it."
+   Qualification (SV >= 100) is required to HOLD any rank above Member. Delivered as
+   v1.3 (engine migration 009), all six months rerun and refinalized; the v1.2 runs
+   remain as frozen superseded history.

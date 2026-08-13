@@ -120,7 +120,7 @@ so the spec version pins them.
 |---|---|---|
 | id | bigint identity | PK |
 | period | date | first day of the paid month |
-| spec_version | text | not null, 'v1.0' for this spec |
+| spec_version | text | not null; the engine stamps the comp plan version it computed under (currently 'v1.2') |
 | status | text | check in ('running','final','superseded') |
 | started_at / finished_at | timestamptz | |
 | notes | text | free text: why the run exists |

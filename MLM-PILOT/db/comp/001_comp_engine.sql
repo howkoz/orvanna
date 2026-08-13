@@ -1,9 +1,11 @@
 -- Comp engine 001: commission run engine, in-database functions
 -- Project: MLM Pilot (Orvanna persona, personal project)
 -- Date: 2026-08-13
--- Spec: docs\COMP-PLAN-SPEC.md version v1.2, math identical to v1.1; v1.2 adds
--- upstream customer attribution only (customer orders book onto the referring
--- member's account before this engine ever runs). (Contract; section 7 is the
+-- Spec: docs\COMP-PLAN-SPEC.md version v1.3. v1.3 (Howard's ruling 2026-08-13,
+-- from the Phase 3 verifier's finding): qualification (SV >= 100) is required
+-- to HOLD any rank above Member, so leader_flag, director_flag, and
+-- executive_flag all carry the qualified test. v1.2 added upstream customer
+-- attribution only; v1.1 fixed the math. (Contract; section 7 is the
 --       acceptance test), docs\SCHEMA-SPEC.md (table shapes),
 --       docs\decisions\2026-08-13-genealogy-representation.md (per-run level map).
 -- Requires: migrations 001..005 applied. Run as the service role or database
@@ -103,7 +105,7 @@ begin
     -- Step 0: the run row. Status stays 'running' for the whole computation;
     -- fn_finalize_run is the only path to 'final'.
     insert into app.commission_runs (period, spec_version, status, started_at, notes)
-    values (v_period, 'v1.2', 'running', clock_timestamp(),
+    values (v_period, 'v1.3', 'running', clock_timestamp(),
             'engine run for period ' || to_char(v_period, 'YYYY-MM'))
     returning id into v_run_id;
 
@@ -209,7 +211,7 @@ begin
                b.qualified,
                coalesce(al.n_active_legs, 0)                          as n_active_legs,
                (b.qualified and coalesce(al.n_active_legs, 0) >= 2)   as builder_flag,
-               (b.tv >= 2500.00 and coalesce(al.n_active_legs, 0) >= 3) as leader_flag
+               (b.qualified and b.tv >= 2500.00 and coalesce(al.n_active_legs, 0) >= 3) as leader_flag
         from base b
         left join active_leg_counts al on al.member_id = b.member_id
     ),
@@ -238,7 +240,7 @@ begin
     ),
     flags_d as (
         select f.*,
-               (f.tv >= 10000.00
+               (f.qualified and f.tv >= 10000.00
                 and coalesce(dl.n_legs_with_builder_plus, 0) >= 2) as director_flag
         from flags_bl f
         left join director_leg_counts dl on dl.member_id = f.member_id
@@ -256,7 +258,7 @@ begin
     ),
     flags_e as (
         select f.*,
-               (f.tv >= 40000.00
+               (f.qualified and f.tv >= 40000.00
                 and coalesce(el.n_legs_with_leader_plus, 0) >= 2) as executive_flag
         from flags_d f
         left join executive_leg_counts el on el.member_id = f.member_id

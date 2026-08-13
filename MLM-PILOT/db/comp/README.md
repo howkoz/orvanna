@@ -222,3 +222,16 @@ members with earnings > 0 = M1, M2, M3, M8 = 4. All match section 7.4.
    invisible to the public interface roles, no demo view reads it. Migration
    003's blanket grant to the demo reader role predates this table; parity
    was intentionally NOT added since no view needs it.
+
+## Post-gate corrections (2026-08-13, after the Phase 3 verifier PASS)
+
+1. The engine stamps spec_version 'v1.2' (comp plan v1.2; math identical to
+   v1.1, customer attribution happens upstream). Citations of v1.1 elsewhere in
+   this README and in 002_worked_example_test.sql refer to when the rules were
+   fixed and are historical, not drift.
+2. Open question 3 above is RESOLVED: migrations 006 (immutability hardening,
+   extended to superseded runs) and 007 (customers) exist and are deployed to
+   the live project along with 001 through 005 and the engine (008).
+3. Verifier note accepted as theoretical only: a commission line could round to
+   0.00 when rate times CV falls below 0.005, which no v1 catalog price can
+   produce.
