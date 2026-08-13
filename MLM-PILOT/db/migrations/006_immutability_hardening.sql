@@ -46,9 +46,9 @@ begin
     from app.commission_runs r
     where r.id = new.run_id;
 
-    if v_status = 'final' then
-        raise exception '% on %.% is not allowed: run % is final (statements are immutable)',
-            tg_op, tg_table_schema, tg_table_name, new.run_id;
+    if v_status in ('final', 'superseded') then
+        raise exception '% on %.% is not allowed: run % is % (statements are immutable history)',
+            tg_op, tg_table_schema, tg_table_name, new.run_id, v_status;
     end if;
 
     return new;
@@ -64,3 +64,35 @@ create trigger run_member_results_no_write_into_final
     before insert or update of run_id on app.run_member_results
     for each row
     execute function app.reject_write_into_final_run();
+
+-- ---------------------------------------------------------------------------
+-- Architect ruling 2026-08-13 (engine builder's flag): SUPERSEDED runs are
+-- statement history too. A rerun replaces a final run for PAYMENT purposes,
+-- but the superseded run's rows remain the auditable record of what was once
+-- published and must stay frozen. Both guard functions therefore treat
+-- 'final' and 'superseded' identically. The redefinition below upgrades the
+-- migration 002 function in place (002 itself is gate-approved history and is
+-- not edited; forward migrations may redefine functions).
+-- ---------------------------------------------------------------------------
+create or replace function app.reject_write_when_run_final()
+returns trigger
+language plpgsql
+as $$
+declare
+    v_status text;
+begin
+    select r.status into v_status
+    from app.commission_runs r
+    where r.id = old.run_id;
+
+    if v_status in ('final', 'superseded') then
+        raise exception '% on %.% is not allowed: run % is % (statements are immutable history)',
+            tg_op, tg_table_schema, tg_table_name, old.run_id, v_status;
+    end if;
+
+    if tg_op = 'DELETE' then
+        return old;
+    end if;
+    return new;
+end;
+$$;

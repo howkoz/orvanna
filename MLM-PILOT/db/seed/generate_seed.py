@@ -4,9 +4,11 @@
 Run with:  py generate_seed.py     (from db\\seed\\)
 
 Produces, in db\\seed\\output\\:
-  products.csv, members.csv, subscriptions.csv, orders.csv, order_lines.csv
+  products.csv, members.csv, customers.csv, subscriptions.csv, orders.csv,
+  order_lines.csv
   load_seed.sql                (Postgres loader for the pack above)
-  worked_example_members.csv, worked_example_subscriptions.csv,
+  worked_example_members.csv, worked_example_customers.csv,
+  worked_example_subscriptions.csv,
   worked_example_orders.csv, worked_example_order_lines.csv
   worked_example_expected_member_results.csv
   worked_example_expected_commission_lines.csv
@@ -35,18 +37,35 @@ Dataset shape (per the Phase 1/2 brief):
     of the month, with order lines copying price and volume points.
   - Enrollment plausibility rule (generator v2, fixes verifier finding M1):
     a subscription's start_month is never earlier than the first day of the
-    month FOLLOWING enrollment when the member enrolled after the 1st of a
-    month; members enrolled exactly on the 1st may start that same month.
+    month FOLLOWING enrollment when the account enrolled after the 1st of a
+    month; accounts enrolled exactly on the 1st may start that same month.
     Orders are stamped the 1st of the month at midnight, so this guarantees
-    no member's order predates their enrollment date. Members who enroll
+    no order predates its buyer's enrollment date. Accounts that enroll
     after the 1st of the final enrollment month (2026-07) start billing
     2026-08, outside the history window, and therefore have no orders.
+    The rule applies to member subscriptions (the member's enrolled_on) and
+    to customer subscriptions (the CUSTOMER's enrolled_on) alike.
+  - Customers (generator v3, spec v1.2): roughly 35 to 50 percent of active
+    distributors have 1 to 4 customers (a few outliers hold more). Customer
+    subscriptions follow the same lifecycle mechanics (clamped starts, some
+    churn), and every customer order is BOOKED with member_id = the
+    referring member's account, buyer_role = 'retail_customer', and
+    customer_id = the actual buyer (the attribution rule). A seller
+    archetype holds ZERO personal subscriptions and 2 or 3 customers with
+    one 50-point support agent each: qualification resting entirely on
+    volume sold, never bought. Customer subscriptions are internal to the
+    generator (the schema's subscriptions table is member-only); only the
+    generated customers and orders are exported.
   - Target realism: 40 to 65 percent of member-months qualified
     (monthly volume >= 100).
 
-The worked example files reproduce COMP-PLAN-SPEC.md v1.1 section 7 exactly
+The worked example files reproduce COMP-PLAN-SPEC.md v1.2 section 7 exactly
 (10 members M1-M10, one month, company sales volume (SV) 2,700.00,
-commissionable volume (CV) 2,160.00, payout 264.00, members paid 4). They are the comp engine's acceptance dataset and
+commissionable volume (CV) 2,160.00, payout 264.00, members paid 4). Per
+v1.2, M4's two support agents are held by M4's customers C1 and C2
+(OC-000001, OC-000002); their orders book onto M4's account as
+'retail_customer', and every expected result is UNCHANGED, which is the
+point of the attribution rule. They are the comp engine's acceptance dataset and
 must be loaded into an EMPTY database, never on top of the 1,000-member pack.
 """
 
@@ -77,13 +96,27 @@ P_CHAIN = 0.50                   # probability of attaching to a recent joiner
 RECENT_WINDOW = 90               # "recent joiner" pool size
 
 # Holdings mix
+# (retuned in generator v3: customer volume lifts the qualified share, so
+# personal-subscription density comes down to keep the share mid-band)
 WHALE_COUNT = 12                 # hold 10+ agents
-P_STARTER = 0.26                 # single support agent, never qualified
-P_STANDARD = 0.58                # 1 to 3 agents
+P_STARTER = 0.35                 # single support agent, never qualified
+P_STANDARD = 0.49                # 1 to 3 agents
 # remainder (~0.16) are builders: 2 to 5 agents with upgrades
 
 # Churn probabilities per subscription, by archetype
 CHURN_P = {"starter": 0.35, "standard": 0.26, "builder": 0.12, "whale": 0.04}
+
+# Customers (generator v3, spec v1.2)
+SELLER_COUNT = 40                # members with zero personal spend who
+                                 # qualify only through customer volume
+SELLER_ENROLL_MONTH_MAX = 18     # seller pool cutoff so their customers
+                                 # can still bill inside the history window
+SELLER_CUSTOMER_ENROLL_CAP = 20  # latest enrollment month for a seller's
+                                 # customers
+SELLER_CUSTOMER_CHURN_P = 0.10
+P_HAS_CUSTOMERS = 0.42           # share of active non-seller distributors
+                                 # holding at least one customer
+CUSTOMER_CHURN_P = 0.30
 
 BASE_YEAR = 2024
 BASE_MONTH = 8                   # month index 0 = 2024-08
@@ -224,15 +257,23 @@ def build_members(rng):
 
 
 def assign_archetypes(rng, enroll_month, supers):
-    """Archetype per member index: starter / standard / builder / whale."""
+    """Archetype per member index: starter / standard / builder / whale /
+    seller. Sellers (generator v3) hold zero personal subscriptions and
+    qualify only through customer volume."""
     whale_pool = [i for i in range(1, N_MEMBERS) if enroll_month[i] <= 15]
     whales = set(rng.sample(whale_pool, WHALE_COUNT))
+    seller_pool = [i for i in range(1, N_MEMBERS)
+                   if i not in supers and i not in whales
+                   and enroll_month[i] <= SELLER_ENROLL_MONTH_MAX]
+    sellers = set(rng.sample(seller_pool, SELLER_COUNT))
     archetype = {}
     for i in range(N_MEMBERS):
         if i == 0 or i in supers:
             archetype[i] = "builder"   # root and supers behave like builders
         elif i in whales:
             archetype[i] = "whale"
+        elif i in sellers:
+            archetype[i] = "seller"
         else:
             r = rng.random()
             if r < P_STARTER:
@@ -274,8 +315,10 @@ def build_subscriptions(rng, enroll_month, enroll_day, archetype, products):
                      "cancel_month": cancel})
 
     for i in range(N_MEMBERS):
-        e = enroll_month[i]
         kind = archetype[i]
+        if kind == "seller":
+            continue   # zero personal spend; their customers carry them
+        e = enroll_month[i]
         churn_p = CHURN_P[kind]
         first_start = e if rng.random() < 0.85 else e + 1
 
@@ -286,10 +329,10 @@ def build_subscriptions(rng, enroll_month, enroll_day, archetype, products):
             first_domain = rng.random() < 0.72
             add(i, (domain_ids if first_domain else support_ids)[rng.randrange(6)],
                 1, first_start, churn_p)
-            if rng.random() < 0.55:   # upgrade: a second agent later
+            if rng.random() < 0.46:   # upgrade: a second agent later
                 add(i, (domain_ids if rng.random() < 0.5 else support_ids)[rng.randrange(6)],
                     1, e + rng.randint(0, 6), churn_p)
-            if rng.random() < 0.18:   # a third
+            if rng.random() < 0.15:   # a third
                 add(i, (domain_ids if rng.random() < 0.5 else support_ids)[rng.randrange(6)],
                     1, e + rng.randint(1, 8), churn_p)
 
@@ -340,30 +383,136 @@ def close_dormant_accounts(members, subscriptions):
     return closed
 
 
-def build_orders(subscriptions, products):
-    """One order per active subscription per history month, dated the first."""
+def build_customers(rng, members, enroll_month, enroll_day, archetype, products):
+    """Customer accounts and their subscriptions (generator v3, spec v1.2).
+
+    Customers attach to ONE referring member and never join the genealogy.
+    Roughly 35 to 50 percent of active non-seller distributors hold 1 to 4
+    customers (a few outliers hold more). Sellers hold exactly 2 or 3
+    customers with one 50-point support agent each: qualification resting
+    entirely on volume sold. A customer never enrolls before their referring
+    member, and customer subscription starts are clamped by the enrollment
+    plausibility rule using the CUSTOMER's enrolled_on. Customer
+    subscriptions stay internal to the generator; only customers and their
+    generated orders are exported."""
+    domain_ids = [p["id"] for p in products if p["tier"] == "domain"]
+    support_ids = [p["id"] for p in products if p["tier"] == "support"]
+    customers, cust_subs = [], []
+    cid = 0
+
+    def add_customer(member_idx, enroll_cap):
+        nonlocal cid
+        cid += 1
+        first = FIRST_NAMES[rng.randrange(len(FIRST_NAMES))]
+        last = LAST_NAMES[rng.randrange(len(LAST_NAMES))]
+        em = rng.randint(enroll_month[member_idx], enroll_cap)
+        lo_day = enroll_day[member_idx] if em == enroll_month[member_idx] else 1
+        day = rng.randint(lo_day, days_in(em))
+        customers.append({
+            "id": cid,
+            "customer_code": f"OC-{cid:06d}",
+            "display_name": f"{first} {last}",
+            "email": f"{first.lower()}.{last.lower()}.c{cid}@example.com",
+            "referring_member_id": member_idx + 1,
+            "enrolled_on": date_in_month(em, day),
+            "status": "active",  # may flip to closed after churn is known
+        })
+        return cid, (em if day == 1 else em + 1)   # id, plausibility floor
+
+    def add_cust_sub(customer_id, member_idx, product_id, start_idx, churn_p):
+        start_idx = min(start_idx, ENROLL_MONTH_COUNT)
+        cancel = ""
+        if rng.random() < churn_p:
+            cancel_idx = rng.randint(start_idx + 1, ENROLL_MONTH_COUNT + 3)
+            cancel = month_first(cancel_idx)
+        cust_subs.append({"customer_id": customer_id,
+                          "member_id": member_idx + 1,
+                          "product_id": product_id, "quantity": 1,
+                          "start_month": month_first(start_idx),
+                          "cancel_month": cancel})
+
+    for i in range(N_MEMBERS):
+        if archetype[i] == "seller":
+            n = 2 if rng.random() < 0.75 else 3
+            for _ in range(n):
+                c, floor_idx = add_customer(i, SELLER_CUSTOMER_ENROLL_CAP)
+                add_cust_sub(c, i, support_ids[rng.randrange(6)],
+                             floor_idx, SELLER_CUSTOMER_CHURN_P)
+        elif members[i]["status"] == "active" and rng.random() < P_HAS_CUSTOMERS:
+            if rng.random() < 0.03:
+                n = rng.randint(5, 8)                    # outliers
+            else:
+                n = rng.choices([1, 2, 3, 4], weights=[46, 30, 16, 8], k=1)[0]
+            for _ in range(n):
+                c, floor_idx = add_customer(i, ENROLL_MONTH_COUNT - 1)
+                n_subs = 1 if rng.random() < 0.70 else 2
+                for k in range(n_subs):
+                    pool = support_ids if rng.random() < 0.60 else domain_ids
+                    start = floor_idx if k == 0 else floor_idx + rng.randint(0, 2)
+                    add_cust_sub(c, i, pool[rng.randrange(6)], start,
+                                 CUSTOMER_CHURN_P)
+    return customers, cust_subs
+
+
+def close_dormant_customers(customers, cust_subs):
+    """Mirror of close_dormant_accounts for customer accounts."""
+    cutoff = month_first(21)  # 2026-05-01
+    by_cust = {}
+    for s in cust_subs:
+        by_cust.setdefault(s["customer_id"], []).append(s)
+    closed = 0
+    for c in customers:
+        subs = by_cust.get(c["id"], [])
+        if subs and all(s["cancel_month"] and s["cancel_month"] <= cutoff
+                        for s in subs):
+            c["status"] = "closed"
+            closed += 1
+    return closed
+
+
+def build_orders(subscriptions, cust_subs, products):
+    """One order per active subscription per history month, dated the first.
+
+    Member subscriptions book as buyer_role 'member' with customer_id null.
+    Customer subscriptions book onto the REFERRING member's account as
+    buyer_role 'retail_customer' with customer_id = the actual buyer: the
+    attribution rule (schema spec v1.2). The commission engine aggregates
+    account volume and never needs to know customers exist."""
     price = {p["id"]: p["price"] for p in products}
     volume = {p["id"]: p["volume_points"] for p in products}
     orders, lines = [], []
     oid = lid = 0
+
+    def emit(member_id, product_id, quantity, first, buyer_role, customer_id):
+        nonlocal oid, lid
+        oid += 1
+        orders.append({"id": oid, "member_id": member_id,
+                       "buyer_role": buyer_role, "customer_id": customer_id,
+                       "ordered_at": f"{first} 00:00:00+00",
+                       "volume_month": first, "status": "completed"})
+        lid += 1
+        lines.append({"id": lid, "order_id": oid,
+                      "product_id": product_id, "quantity": quantity,
+                      "unit_price": price[product_id],
+                      "unit_volume": volume[product_id]})
+
+    def active(s, first):
+        if s["start_month"] > first:
+            return False
+        if s["cancel_month"] and s["cancel_month"] <= first:
+            return False
+        return True
+
     for m in range(HISTORY_FIRST_MONTH, HISTORY_LAST_MONTH + 1):
         first = month_first(m)
         for s in subscriptions:
-            if s["start_month"] > first:
-                continue
-            if s["cancel_month"] and s["cancel_month"] <= first:
-                continue
-            oid += 1
-            orders.append({"id": oid, "member_id": s["member_id"],
-                           "buyer_role": "member",
-                           "ordered_at": f"{first} 00:00:00+00",
-                           "volume_month": first, "status": "completed"})
-            lid += 1
-            lines.append({"id": lid, "order_id": oid,
-                          "product_id": s["product_id"],
-                          "quantity": s["quantity"],
-                          "unit_price": price[s["product_id"]],
-                          "unit_volume": volume[s["product_id"]]})
+            if active(s, first):
+                emit(s["member_id"], s["product_id"], s["quantity"], first,
+                     "member", "")
+        for s in cust_subs:
+            if active(s, first):
+                emit(s["member_id"], s["product_id"], s["quantity"], first,
+                     "retail_customer", s["customer_id"])
     return orders, lines
 
 
@@ -375,12 +524,17 @@ WE_TREE = {  # member -> sponsor (None = root)
     "M1": None, "M2": "M1", "M3": "M1", "M4": "M1", "M5": "M2", "M6": "M2",
     "M7": "M3", "M8": "M3", "M9": "M5", "M10": "M8",
 }
-# member -> list of (sku, quantity); D1..D6 / S1..S6 per catalog order
+# member -> list of holdings. A holding is (sku, quantity) when the member
+# holds it personally, or (sku, quantity, customer_code) when one of the
+# member's CUSTOMERS holds it (spec v1.2): the order still books onto the
+# member's account (buyer_role 'retail_customer', customer_id set), so every
+# expected number below is unchanged. That is the attribution rule's point.
 WE_SUBS = {
     "M1": [("AGT-D-001", 1), ("AGT-D-003", 1)],                      # Payment + Pricing
     "M2": [("AGT-D-001", 1), ("AGT-S-001", 1)],                      # Payment + Software Engineer
     "M3": [("AGT-D-002", 1)],                                        # Shipping
-    "M4": [("AGT-S-002", 1), ("AGT-S-003", 1)],                      # QA + Secretary
+    "M4": [("AGT-S-002", 1, "OC-000001"),                            # QA, held by customer C1
+           ("AGT-S-003", 1, "OC-000002")],                           # Secretary, held by customer C2
     "M5": [("AGT-S-005", 1)],                                        # Accounting
     "M6": [("AGT-D-005", 1), ("AGT-S-006", 1)],                      # Marketing + Customer Care
     "M7": [(f"AGT-D-{i:03d}", 2) for i in range(1, 7)]               # 12 domain
@@ -389,6 +543,12 @@ WE_SUBS = {
     "M9": [("AGT-D-001", 1), ("AGT-D-002", 1), ("AGT-D-003", 1)],    # 3 domain
     "M10": [("AGT-S-003", 1)],                                       # Secretary
 }
+# Customers of the worked example (spec v1.2 section 7.1, the M4 note):
+# id, customer_code, label, referring member
+WE_CUSTOMERS = [
+    (1, "OC-000001", "C1", "M4"),
+    (2, "OC-000002", "C2", "M4"),
+]
 # Expected per-member results, straight from spec section 7.1 / 7.2 / 7.4
 WE_EXPECTED_RESULTS = [
     # member, sv, cv, qualified, tv, rank, paid_depth, total_earned
@@ -441,25 +601,42 @@ def build_worked_example(products):
                         "sponsor_id": "" if s is None else code_to_id[s],
                         "enrolled_on": "2026-01-01", "status": "active"})
 
+    customers = []
+    cust_code_to_id = {}
+    for cid, ccode, label, ref in WE_CUSTOMERS:
+        cust_code_to_id[ccode] = cid
+        customers.append({"id": cid, "customer_code": ccode,
+                          "display_name": f"Worked Example {label}",
+                          "email": f"{label.lower()}@example.com",
+                          "referring_member_id": code_to_id[ref],
+                          "enrolled_on": "2026-01-01", "status": "active"})
+
     subs, orders, lines = [], [], []
     sid = oid = lid = 0
     for c in codes:
-        for sku, qty in WE_SUBS[c]:
+        for holding in WE_SUBS[c]:
+            sku, qty = holding[0], holding[1]
+            cust_code = holding[2] if len(holding) > 2 else None
             pid = sku_to_id[sku]
-            sid += 1
-            subs.append({"id": sid, "member_id": code_to_id[c],
-                         "product_id": pid, "quantity": qty,
-                         "start_month": WE_MONTH, "cancel_month": ""})
+            if cust_code is None:
+                # member-held: a real row in the subscriptions table
+                sid += 1
+                subs.append({"id": sid, "member_id": code_to_id[c],
+                             "product_id": pid, "quantity": qty,
+                             "start_month": WE_MONTH, "cancel_month": ""})
             oid += 1
             orders.append({"id": oid, "member_id": code_to_id[c],
-                           "buyer_role": "member",
+                           "buyer_role": ("member" if cust_code is None
+                                          else "retail_customer"),
+                           "customer_id": ("" if cust_code is None
+                                           else cust_code_to_id[cust_code]),
                            "ordered_at": f"{WE_MONTH} 00:00:00+00",
                            "volume_month": WE_MONTH, "status": "completed"})
             lid += 1
             lines.append({"id": lid, "order_id": oid, "product_id": pid,
                           "quantity": qty, "unit_price": price[pid],
                           "unit_volume": volume[pid]})
-    return members, subs, orders, lines
+    return members, customers, subs, orders, lines
 
 
 # ---------------------------------------------------------------------------
@@ -491,11 +668,11 @@ def insert_block(out, table, columns, rows, value_fn, batch=500):
         out.write(";\n\n")
 
 
-def write_loader(path, title, products, members, subs, orders, lines):
+def write_loader(path, title, products, members, customers, subs, orders, lines):
     out = io.StringIO()
     out.write(f"-- {title}\n")
     out.write(f"-- Generated by generate_seed.py, seed = {SEED}. Do not hand-edit;\n")
-    out.write("-- rerun the generator instead. Requires migrations 001..005 applied.\n")
+    out.write("-- rerun the generator instead. Requires migrations 001..007 applied.\n")
     out.write("-- Run as the service role (or database owner); RLS blocks anon writes.\n\n")
     out.write("begin;\n\n")
 
@@ -516,6 +693,16 @@ def write_loader(path, title, products, members, subs, orders, lines):
                             sql_lit(r["sponsor_id"]) if r["sponsor_id"] != "" else "null",
                             f"date {sql_lit(r['enrolled_on'])}", sql_lit(r["status"])])
 
+    insert_block(out, "app.customers",
+                 ["id", "customer_code", "display_name", "email",
+                  "referring_member_id", "enrolled_on", "status"],
+                 customers,
+                 lambda r: [sql_lit(r["id"]), sql_lit(r["customer_code"]),
+                            sql_lit(r["display_name"]), sql_lit(r["email"]),
+                            sql_lit(r["referring_member_id"]),
+                            f"date {sql_lit(r['enrolled_on'])}",
+                            sql_lit(r["status"])])
+
     insert_block(out, "app.subscriptions",
                  ["id", "member_id", "product_id", "quantity", "start_month",
                   "cancel_month"],
@@ -526,11 +713,12 @@ def write_loader(path, title, products, members, subs, orders, lines):
                             "null" if r["cancel_month"] == "" else f"date {sql_lit(r['cancel_month'])}"])
 
     insert_block(out, "app.orders",
-                 ["id", "member_id", "buyer_role", "ordered_at", "volume_month",
-                  "status"],
+                 ["id", "member_id", "buyer_role", "customer_id", "ordered_at",
+                  "volume_month", "status"],
                  orders,
                  lambda r: [sql_lit(r["id"]), sql_lit(r["member_id"]),
                             sql_lit(r["buyer_role"]),
+                            "null" if r["customer_id"] == "" else sql_lit(r["customer_id"]),
                             f"timestamptz {sql_lit(r['ordered_at'])}",
                             f"date {sql_lit(r['volume_month'])}",
                             sql_lit(r["status"])])
@@ -544,7 +732,8 @@ def write_loader(path, title, products, members, subs, orders, lines):
                             r["unit_price"], r["unit_volume"]])
 
     out.write("-- Re-align identity sequences with the explicit ids above.\n")
-    for t in ["products", "members", "subscriptions", "orders", "order_lines"]:
+    for t in ["products", "members", "customers", "subscriptions", "orders",
+              "order_lines"]:
         out.write(f"select setval(pg_get_serial_sequence('app.{t}', 'id'), "
                   f"(select max(id) from app.{t}));\n")
     out.write("\ncommit;\n")
@@ -571,7 +760,10 @@ def main():
     archetype = assign_archetypes(rng, enroll_month, supers)
     subs = build_subscriptions(rng, enroll_month, enroll_day, archetype, products)
     closed = close_dormant_accounts(members, subs)
-    orders, lines = build_orders(subs, products)
+    customers, cust_subs = build_customers(rng, members, enroll_month,
+                                           enroll_day, archetype, products)
+    closed_customers = close_dormant_customers(customers, cust_subs)
+    orders, lines = build_orders(subs, cust_subs, products)
 
     # Main pack
     write_csv(OUT_DIR / "products.csv",
@@ -580,31 +772,38 @@ def main():
     write_csv(OUT_DIR / "members.csv",
               ["id", "member_code", "display_name", "email", "sponsor_id",
                "enrolled_on", "status"], members)
+    write_csv(OUT_DIR / "customers.csv",
+              ["id", "customer_code", "display_name", "email",
+               "referring_member_id", "enrolled_on", "status"], customers)
     write_csv(OUT_DIR / "subscriptions.csv",
               ["id", "member_id", "product_id", "quantity", "start_month",
                "cancel_month"], subs)
     write_csv(OUT_DIR / "orders.csv",
-              ["id", "member_id", "buyer_role", "ordered_at", "volume_month",
-               "status"], orders)
+              ["id", "member_id", "buyer_role", "customer_id", "ordered_at",
+               "volume_month", "status"], orders)
     write_csv(OUT_DIR / "order_lines.csv",
               ["id", "order_id", "product_id", "quantity", "unit_price",
                "unit_volume"], lines)
     write_loader(OUT_DIR / "load_seed.sql",
                  "MLM Pilot seed loader: 12 products, 1,000 members, "
-                 "subscriptions, 6 months of orders",
-                 products, members, subs, orders, lines)
+                 "customers, subscriptions, 6 months of orders",
+                 products, members, customers, subs, orders, lines)
 
     # Worked example (acceptance dataset)
-    we_members, we_subs, we_orders, we_lines = build_worked_example(products)
+    (we_members, we_customers, we_subs, we_orders,
+     we_lines) = build_worked_example(products)
     write_csv(OUT_DIR / "worked_example_members.csv",
               ["id", "member_code", "display_name", "email", "sponsor_id",
                "enrolled_on", "status"], we_members)
+    write_csv(OUT_DIR / "worked_example_customers.csv",
+              ["id", "customer_code", "display_name", "email",
+               "referring_member_id", "enrolled_on", "status"], we_customers)
     write_csv(OUT_DIR / "worked_example_subscriptions.csv",
               ["id", "member_id", "product_id", "quantity", "start_month",
                "cancel_month"], we_subs)
     write_csv(OUT_DIR / "worked_example_orders.csv",
-              ["id", "member_id", "buyer_role", "ordered_at", "volume_month",
-               "status"], we_orders)
+              ["id", "member_id", "buyer_role", "customer_id", "ordered_at",
+               "volume_month", "status"], we_orders)
     write_csv(OUT_DIR / "worked_example_order_lines.csv",
               ["id", "order_id", "product_id", "quantity", "unit_price",
                "unit_volume"], we_lines)
@@ -624,30 +823,36 @@ def main():
               [dict(zip(["period", "total_sv", "total_cv", "total_payout",
                          "members_paid"], r)) for r in WE_EXPECTED_COMPANY])
     write_loader(OUT_DIR / "load_worked_example.sql",
-                 "MLM Pilot ACCEPTANCE loader: COMP-PLAN-SPEC v1.1 section 7 "
+                 "MLM Pilot ACCEPTANCE loader: COMP-PLAN-SPEC v1.2 section 7 "
                  "worked example. Load into an EMPTY database only (ids start "
                  "at 1 and would collide with the main pack).",
-                 products, we_members, we_subs, we_orders, we_lines)
+                 products, we_members, we_customers, we_subs, we_orders,
+                 we_lines)
 
     # Manifest (deterministic: no wall-clock values)
-    csv_files = ["products.csv", "members.csv", "subscriptions.csv",
+    csv_files = ["products.csv", "members.csv", "customers.csv",
+                 "subscriptions.csv",
                  "orders.csv", "order_lines.csv", "load_seed.sql",
-                 "worked_example_members.csv", "worked_example_subscriptions.csv",
+                 "worked_example_members.csv", "worked_example_customers.csv",
+                 "worked_example_subscriptions.csv",
                  "worked_example_orders.csv", "worked_example_order_lines.csv",
                  "worked_example_expected_member_results.csv",
                  "worked_example_expected_commission_lines.csv",
                  "worked_example_expected_company.csv",
                  "load_worked_example.sql"]
     kinds = {k: sum(1 for i in archetype if archetype[i] == k)
-             for k in ("starter", "standard", "builder", "whale")}
+             for k in ("starter", "standard", "builder", "whale", "seller")}
     with open(OUT_DIR / "_manifest.txt", "w", newline="", encoding="utf-8") as f:
-        f.write("MLM Pilot seed manifest (generate_seed.py, generator v2, "
-                "enrollment plausibility rule)\n")
+        f.write("MLM Pilot seed manifest (generate_seed.py, generator v3, "
+                "customer accounts + enrollment plausibility rule)\n")
         f.write(f"seed = {SEED}\n")
         f.write(f"members = {len(members)} (closed accounts: {closed})\n")
+        f.write(f"customers = {len(customers)} "
+                f"(closed accounts: {closed_customers})\n")
         f.write(f"archetypes = {kinds}\n")
         f.write(f"max tree depth = {max(depth)}\n")
-        f.write(f"subscriptions = {len(subs)}\n")
+        f.write(f"subscriptions = {len(subs)} (member-held; customer "
+                f"subscriptions are internal to the generator)\n")
         f.write(f"orders = {len(orders)}\n")
         f.write(f"order_lines = {len(lines)}\n")
         f.write(f"history months = {month_first(HISTORY_FIRST_MONTH)} .. "
@@ -660,10 +865,14 @@ def main():
 
     print(f"seed = {SEED}")
     print(f"members = {len(members)} (closed: {closed})")
+    print(f"customers = {len(customers)} (closed: {closed_customers})")
     print(f"archetypes = {kinds}")
+    print(f"distributors with customers = "
+          f"{len(set(c['referring_member_id'] for c in customers))}")
     print(f"max depth = {max(depth)}")
     print(f"top frontlines = {sorted(children, reverse=True)[:10]}")
-    print(f"subscriptions = {len(subs)}")
+    print(f"subscriptions = {len(subs)} member-held; "
+          f"customer subscriptions (internal) = {len(cust_subs)}")
     print(f"orders = {len(orders)}; order_lines = {len(lines)}")
     print(f"output -> {OUT_DIR}")
 

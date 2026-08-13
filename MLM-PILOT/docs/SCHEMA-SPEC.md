@@ -138,7 +138,7 @@ untouched. Unique partial index: only one run per period may be 'final'.
 | sv | numeric(12,2) | that month's personal sales volume |
 | cv | numeric(12,2) | round half up (0.80 times sv, 2 decimals) |
 | tv | numeric(14,2) | subtree SV, exclusive of self (comp plan spec section 2) |
-| is_active | boolean | sv >= 50 |
+| is_active | boolean | sv >= 100 (the v1.1 single qualification gate; this cell originally said 50, corrected 2026-08-13 after the engine builder flagged the stale v1.0 wording) |
 | rank_earned | text | FK ranks |
 | paid_depth | int | copied from rank at run time |
 | total_earned | numeric(12,2) | sum of the member's lines in this run |
@@ -159,9 +159,12 @@ untouched. Unique partial index: only one run per period may be 'final'.
 
 Index: (run_id, earner_id). IMMUTABILITY: triggers reject INSERT, UPDATE, and DELETE
 on commission_lines and run_member_results whenever the referenced run's status is
-'final' (the INSERT check validates NEW.run_id), so a finalized statement can neither
-change, shrink, NOR silently grow. (Spec corrected 2026-08-13 after the verifier gate
-caught that the original wording allowed INSERT; migration update due before Phase 3.)
+'final' OR 'superseded' (the INSERT check validates NEW.run_id), so a finalized
+statement can neither change, shrink, NOR silently grow, and a superseded run stays
+frozen as the auditable record of what was once published. (Spec corrected 2026-08-13
+twice: the verifier gate caught that the original wording allowed INSERT; the engine
+builder caught that superseded runs became mutable again. Both delivered in
+migration 006.)
 
 ## 2. Row-Level Security intent
 

@@ -16,11 +16,20 @@ no file is ever deleted) and prints the sanity report:
   - churn rate
   - realism bars: qualified share 40 to 65 percent, depth histogram not
     degenerate, at least 3 members with large frontlines
+  - customers (spec v1.2): the attribution check (buyer_role
+    'retail_customer' if and only if customer_id is set) holds on every
+    order row, every customer's referring member exists, zero customer
+    orders predate the customer's enrollment, the share of distributors
+    with customers sits in the 35 to 50 percent band, and the seed
+    contains members who qualify on customer volume alone (the M4
+    scenario: zero personal spend, qualified through customers)
 
-It also validates the worked example CSVs against COMP-PLAN-SPEC v1.1
+It also validates the worked example CSVs against COMP-PLAN-SPEC v1.2
 section 7: per-member sales volume (SV) and commissionable volume (CV), team
 volume (TV) recomputed from the tree, and the expected company totals
-(SV 2,700.00, CV 2,160.00, payout 264.00, members paid 4).
+(SV 2,700.00, CV 2,160.00, payout 264.00, members paid 4). The v1.2 M4
+scenario (M4's volume held by customers C1 and C2) flows through the same
+checks because customer orders book onto the referring member's account.
 
 Exit code 0 = every check passed; 1 = at least one check failed.
 """
@@ -62,12 +71,17 @@ def main():
          "{'id':'BIGINT','sku':'VARCHAR','name':'VARCHAR','tier':'VARCHAR',"
          "'price':'DECIMAL(10,2)','volume_points':'DECIMAL(10,2)',"
          "'commissionable_value':'DECIMAL(10,2)'}")
+    load("customers", "customers.csv",
+         "{'id':'BIGINT','customer_code':'VARCHAR','display_name':'VARCHAR',"
+         "'email':'VARCHAR','referring_member_id':'BIGINT',"
+         "'enrolled_on':'DATE','status':'VARCHAR'}")
     load("subscriptions", "subscriptions.csv",
          "{'id':'BIGINT','member_id':'BIGINT','product_id':'BIGINT',"
          "'quantity':'INTEGER','start_month':'DATE','cancel_month':'DATE'}")
     load("orders", "orders.csv",
          "{'id':'BIGINT','member_id':'BIGINT','buyer_role':'VARCHAR',"
-         "'ordered_at':'VARCHAR','volume_month':'DATE','status':'VARCHAR'}")
+         "'customer_id':'BIGINT','ordered_at':'VARCHAR',"
+         "'volume_month':'DATE','status':'VARCHAR'}")
     load("order_lines", "order_lines.csv",
          "{'id':'BIGINT','order_id':'BIGINT','product_id':'BIGINT',"
          "'quantity':'INTEGER','unit_price':'DECIMAL(10,2)',"
@@ -77,9 +91,14 @@ def main():
          "{'id':'BIGINT','member_code':'VARCHAR','display_name':'VARCHAR',"
          "'email':'VARCHAR','sponsor_id':'BIGINT','enrolled_on':'DATE',"
          "'status':'VARCHAR'}")
+    load("we_customers", "worked_example_customers.csv",
+         "{'id':'BIGINT','customer_code':'VARCHAR','display_name':'VARCHAR',"
+         "'email':'VARCHAR','referring_member_id':'BIGINT',"
+         "'enrolled_on':'DATE','status':'VARCHAR'}")
     load("we_orders", "worked_example_orders.csv",
          "{'id':'BIGINT','member_id':'BIGINT','buyer_role':'VARCHAR',"
-         "'ordered_at':'VARCHAR','volume_month':'DATE','status':'VARCHAR'}")
+         "'customer_id':'BIGINT','ordered_at':'VARCHAR',"
+         "'volume_month':'DATE','status':'VARCHAR'}")
     load("we_order_lines", "worked_example_order_lines.csv",
          "{'id':'BIGINT','order_id':'BIGINT','product_id':'BIGINT',"
          "'quantity':'INTEGER','unit_price':'DECIMAL(10,2)',"
@@ -236,8 +255,70 @@ def main():
     check("meaningful minority hold a single support agent",
           single_support >= 100, f"count = {single_support}")
 
+    # ---------------- customers (spec v1.2) ----------------
+    print("\n-- Customers (spec v1.2) --")
+    n_customers = q1("select count(*) from customers")
+    with_cust = q1("select count(distinct referring_member_id) from customers")
+    active_members = q1("select count(*) from members where status = 'active'")
+    cust_share = 100.0 * with_cust / active_members
+    print(f"total customers: {n_customers}")
+    print(f"distributors with customers: {with_cust} of {active_members} "
+          f"active ({cust_share:.1f} percent)")
+
+    attr_bad = q1("select count(*) from orders where "
+                  "(buyer_role = 'retail_customer') <> (customer_id is not null)")
+    we_attr_bad = q1("select count(*) from we_orders where "
+                     "(buyer_role = 'retail_customer') <> (customer_id is not null)")
+    check("attribution check holds on every order row (both packs)",
+          attr_bad == 0 and we_attr_bad == 0,
+          f"violations = {attr_bad} main + {we_attr_bad} worked example")
+
+    ref_missing = q1("select count(*) from customers c left join members m "
+                     "on m.id = c.referring_member_id where m.id is null")
+    we_ref_missing = q1("select count(*) from we_customers c left join "
+                        "we_members m on m.id = c.referring_member_id "
+                        "where m.id is null")
+    check("every customer's referring member exists (both packs)",
+          ref_missing == 0 and we_ref_missing == 0,
+          f"missing = {ref_missing} main + {we_ref_missing} worked example")
+
+    early_cust = q1("""
+        select count(*) from orders o
+        join customers c on c.id = o.customer_id
+        where cast(substr(o.ordered_at, 1, 10) as date) < c.enrolled_on
+    """)
+    check("zero customer orders before the customer's enrollment",
+          early_cust == 0, f"violations = {early_cust}")
+
+    check("share of distributors with customers between 35 and 50 percent",
+          35.0 <= cust_share <= 50.0, f"{cust_share:.1f} percent")
+
+    mm_split = con.execute("""
+        with mm as (
+            select o.member_id, o.volume_month,
+                   sum(l.quantity * l.unit_volume) as sv,
+                   sum(case when o.buyer_role = 'member'
+                            then l.quantity * l.unit_volume else 0 end) as personal_sv
+            from orders o join order_lines l on l.order_id = o.id
+            where o.status = 'completed'
+            group by o.member_id, o.volume_month
+        )
+        select count(*) filter (where sv >= 100),
+               count(*) filter (where sv >= 100 and personal_sv < 100),
+               count(distinct member_id)
+                   filter (where sv >= 100 and personal_sv = 0)
+        from mm
+    """).fetchone()
+    qual_mm, decisive_mm, m4_members = mm_split
+    print(f"qualified member-months where customer volume was decisive "
+          f"(personal volume alone < 100): {decisive_mm} of {qual_mm} "
+          f"({100.0 * decisive_mm / qual_mm:.1f} percent)")
+    check("M4-scenario members exist (a qualified month with zero personal "
+          "spend, customer volume 100+)", m4_members >= 10,
+          f"members = {m4_members}")
+
     # ---------------- worked example validation ----------------
-    print("\n-- Worked example (COMP-PLAN-SPEC v1.1 section 7) --")
+    print("\n-- Worked example (COMP-PLAN-SPEC v1.2 section 7) --")
     mismatches = con.execute("""
         with sv as (
             select o.member_id, sum(l.quantity * l.unit_volume) as sv

@@ -1,26 +1,29 @@
-MLM Pilot seed manifest (generate_seed.py, generator v2, enrollment plausibility rule)
+MLM Pilot seed manifest (generate_seed.py, generator v3, customer accounts + enrollment plausibility rule)
 seed = 20260813
-members = 1000 (closed accounts: 73)
-archetypes = {'starter': 268, 'standard': 559, 'builder': 161, 'whale': 12}
+members = 1000 (closed accounts: 80)
+customers = 840 (closed accounts: 30)
+archetypes = {'starter': 327, 'standard': 472, 'builder': 149, 'whale': 12, 'seller': 40}
 max tree depth = 12
-subscriptions = 2007
-orders = 7968
-order_lines = 7968
+subscriptions = 1820 (member-held; customer subscriptions are internal to the generator)
+orders = 10460
+order_lines = 10460
 history months = 2026-02-01 .. 2026-07-01
 Rerunning the generator with this seed regenerates every file below byte for byte.
 
 sha256 per file:
   966c2a1a330365d3407a90a2add814827a02c7d822550db51f9d4b39b1bc757e  products.csv
-  6b965bcda3ae2fc5a7a83f88a20737be63953ff7c262608218dfe7fba603b0d8  members.csv
-  90e54902277b18445ff33e2aa16883a691017d06468bff74b0c79f6432355a34  subscriptions.csv
-  cd0a5a2c4ba0f3cf70da170a5d62643a747ecb404fd653f5cd8390033477b5f0  orders.csv
-  0f53a20d07603aebc96c2b7f71d94f33aeb0ca5423b984b065acf639757cbd1a  order_lines.csv
-  d038898275c5907ba8514b3640ed001c5a2ef28767b9c2628a7092e21b1bac51  load_seed.sql
+  768f96682efd5eb309c8b7d79ffbb69dddc52040c217425a944a47ba32fa7527  members.csv
+  8122c0041ab367b1b37fbb9599745edbf2d2476214576555dfbe00b70fe8c4e4  customers.csv
+  cf6b68c4f12e85b96a78d630a0050f982d2352d4704786189d6921cf8521a164  subscriptions.csv
+  b01c33251e8935e4db62790b229075159582b446c8a684d896737d321ae5af3c  orders.csv
+  3fc1f85e77e1f80ec7dcc7ced97c2b203e3766fb4dbf73e314446d7775ca94a8  order_lines.csv
+  d0674087b496230401755ffe6189fe7889eecc8f91fa215a754e767f55d2cd2f  load_seed.sql
   9d6a9e46d1fcc52127bb1dccdca10da5536d97e1b30da33be8727777d7122f58  worked_example_members.csv
-  17f335e135240c05e818ee752c543b56f70e5c21b0520404facd12bb974c05fa  worked_example_subscriptions.csv
-  b9d7aca0631320d2bf7a2c3c79586987e5f4e9f55f6f9b32910fa410a9a8d635  worked_example_orders.csv
+  701e6736447380ff3b6f5b037773be5915ddf5da9109ad3cc15f76c664432f8d  worked_example_customers.csv
+  37d56763cd205eef6aab22abd1f8229c55ec8dd5ea3ee0566061e0fce8e61dd3  worked_example_subscriptions.csv
+  81ae952cc6f73b1ac5be516ca8cf0c25e1a51314571ca6d30bfd04b5d9fba389  worked_example_orders.csv
   739115ac27085a7e43ce353ae8206166d16bf26c781cc0d6e614d858c16a188f  worked_example_order_lines.csv
   624eed06187c9e3e7aca9f3670bb4b6ecd891ed969c6d28d171c5afe844166d5  worked_example_expected_member_results.csv
   072924ed99a29cfa55a98666517b705a7f64977c3bc44076785d20edb77ce719  worked_example_expected_commission_lines.csv
   59cc90e7d535ba1df7bc347ff2d25b2b6fa0c489391a79d4b9a5f4ec6a17792f  worked_example_expected_company.csv
-  ac499c81e632d88579b433cbcf101831a68674866fb9dd56af1b2457a759a8ab  load_worked_example.sql
+  1d6d4fdd619a501457b698249892b3c366db8e6e274efd247ee12bcec58e0a8b  load_worked_example.sql
