@@ -88,9 +88,10 @@ orders (autoship) moved from the v2 parking lot INTO v1. Full rules:
    (Personal type, Free plan) created under Howard's howkoz Supabase login. The
    mlm-pilot project gets created inside it at Phase 1 deploy time. Free tier is
    plenty for v1; no Pro upgrade needed.
-3. Branding decision, needed by Phase 4 (site build): keep the Globex Wellness persona
-   on the pages, or brand the portal as Orvanna to match the domain. Both are safe
-   (both are Howard's own IP, zero Unicity either way).
+3. ~~Branding decision~~ DECIDED 2026-08-13: the portal brands as **Orvanna**, matching
+   the domain. Logo locked same day: Hex Team badge + engineered uppercase wordmark
+   (final kit in `..\brand\`: light, dark, header, app icon, favicon). The product
+   line inside the demo is the AI agent marketplace.
 
 ## Next small step
 

@@ -1,0 +1,11 @@
+id,member_code,display_name,email,sponsor_id,enrolled_on,status
+1,M1,Worked Example M1,m1@example.com,,2026-01-01,active
+2,M2,Worked Example M2,m2@example.com,1,2026-01-01,active
+3,M3,Worked Example M3,m3@example.com,1,2026-01-01,active
+4,M4,Worked Example M4,m4@example.com,1,2026-01-01,active
+5,M5,Worked Example M5,m5@example.com,2,2026-01-01,active
+6,M6,Worked Example M6,m6@example.com,2,2026-01-01,active
+7,M7,Worked Example M7,m7@example.com,3,2026-01-01,active
+8,M8,Worked Example M8,m8@example.com,3,2026-01-01,active
+9,M9,Worked Example M9,m9@example.com,5,2026-01-01,active
+10,M10,Worked Example M10,m10@example.com,8,2026-01-01,active

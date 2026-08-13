@@ -1,0 +1,11 @@
+member_code,sv,cv,qualified,tv,rank_earned,paid_depth,total_earned
+M1,200.00,160.00,true,2500.00,leader,3,114.00
+M2,150.00,120.00,true,500.00,member,1,16.00
+M3,100.00,80.00,true,1650.00,builder,2,130.00
+M4,100.00,80.00,true,0.00,member,1,0.00
+M5,50.00,40.00,false,300.00,member,1,0.00
+M6,150.00,120.00,true,0.00,member,1,0.00
+M7,1500.00,1200.00,true,0.00,member,1,0.00
+M8,100.00,80.00,true,50.00,member,1,4.00
+M9,300.00,240.00,true,0.00,member,1,0.00
+M10,50.00,40.00,false,0.00,member,1,0.00

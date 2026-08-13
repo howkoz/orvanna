@@ -1,0 +1,13 @@
+id,sku,name,tier,price,volume_points,commissionable_value
+1,AGT-D-001,Payment Agent,domain,100.00,100.00,
+2,AGT-D-002,Shipping Agent,domain,100.00,100.00,
+3,AGT-D-003,Pricing Agent,domain,100.00,100.00,
+4,AGT-D-004,Inventory Agent,domain,100.00,100.00,
+5,AGT-D-005,Marketing Agent,domain,100.00,100.00,
+6,AGT-D-006,Tax Agent,domain,100.00,100.00,
+7,AGT-S-001,Software Engineer,support,50.00,50.00,
+8,AGT-S-002,Quality Assurance,support,50.00,50.00,
+9,AGT-S-003,Secretary,support,50.00,50.00,
+10,AGT-S-004,Chief Executive,support,50.00,50.00,
+11,AGT-S-005,Accounting,support,50.00,50.00,
+12,AGT-S-006,Customer Care,support,50.00,50.00,

@@ -1,0 +1,26 @@
+MLM Pilot seed manifest (generate_seed.py)
+seed = 20260813
+members = 1000 (closed accounts: 75)
+archetypes = {'starter': 268, 'standard': 559, 'builder': 161, 'whale': 12}
+max tree depth = 12
+subscriptions = 1977
+orders = 8222
+order_lines = 8222
+history months = 2026-02-01 .. 2026-07-01
+Rerunning the generator with this seed regenerates every file below byte for byte.
+
+sha256 per file:
+  966c2a1a330365d3407a90a2add814827a02c7d822550db51f9d4b39b1bc757e  products.csv
+  749cf37d0ce4162269e9a81e5890047e11fd3ea9a68c16f0f356023bf298d9c5  members.csv
+  8ef88578dc5f199595fc54c0cb9d10a2e1874c6714dad3ea117ebfa9e4f5d7d4  subscriptions.csv
+  da6df9ef58ed8aad66b6fa97f31d5dcbb73e023c21597e87652fdc77f50dfdb0  orders.csv
+  1b66a08833a17779bc6ad479068f2dc7d300611a117fac1563ab5095d78133b4  order_lines.csv
+  f08a93c4c1d0e7989ec36d9b2b00751930bd10b8420bbea857a87ad79dc46859  load_seed.sql
+  9d6a9e46d1fcc52127bb1dccdca10da5536d97e1b30da33be8727777d7122f58  worked_example_members.csv
+  17f335e135240c05e818ee752c543b56f70e5c21b0520404facd12bb974c05fa  worked_example_subscriptions.csv
+  b9d7aca0631320d2bf7a2c3c79586987e5f4e9f55f6f9b32910fa410a9a8d635  worked_example_orders.csv
+  739115ac27085a7e43ce353ae8206166d16bf26c781cc0d6e614d858c16a188f  worked_example_order_lines.csv
+  624eed06187c9e3e7aca9f3670bb4b6ecd891ed969c6d28d171c5afe844166d5  worked_example_expected_member_results.csv
+  072924ed99a29cfa55a98666517b705a7f64977c3bc44076785d20edb77ce719  worked_example_expected_commission_lines.csv
+  59cc90e7d535ba1df7bc347ff2d25b2b6fa0c489391a79d4b9a5f4ec6a17792f  worked_example_expected_company.csv
+  ac499c81e632d88579b433cbcf101831a68674866fb9dd56af1b2457a759a8ab  load_worked_example.sql

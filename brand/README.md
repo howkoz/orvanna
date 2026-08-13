@@ -15,5 +15,19 @@ variants get made once a direction is picked.
 | logo-4-hex-team.svg | Hex Team | badge: a hub agent coordinating a team inside a hexagon; works as app icon alone |
 | logo-5-ascent.svg | Ascent | three rank chevrons climbing; the summit chevron is lit |
 
-Pick one direction and the next pass produces: dark-background variant, square app
-icon / favicon crop, and size tests (16 px favicon up to hero banner).
+## DECIDED 2026-08-13: direction B won (Hex Team badge + engineered uppercase)
+
+Howard picked the Hex Team badge with the engineered wordmark (uppercase, wide
+tracking, monoline geometry). Final files, all lettering drawn as pure paths so no
+font needs to be installed anywhere:
+
+| File | Use |
+|---|---|
+| logo-final-primary.svg | light backgrounds (documents, light pages) |
+| logo-final-dark.svg | dark backgrounds (the portal's default theme) |
+| logo-header-dark.svg | site header (transparent background, dark-theme colors) |
+| icon-square.svg | app icon (128 grid, indigo tile) |
+| favicon.svg | browser tab (hexagon + lit hub only, reads at 16 px) |
+
+The five round-1 concepts above stay archived for reference. The Network Ring
+(concept 1) is reserved as an interior motif for the My Team tree page.
