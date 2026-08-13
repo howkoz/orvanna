@@ -73,8 +73,10 @@ comp variant, order placement UI, KPI prism dashboard.
    Howard's flagship personal project, so decide then whether the pilot sits at the apex
    (orvanna.io) or on a subdomain (for example demo.orvanna.io) keeping the apex free
    for Orvanna itself. Either works on free hosting.
-2. Create the personal Supabase org (2 minutes, personal email) before Phase 1 deploy;
-   the schema can be written and tested locally first regardless.
+2. ~~Create the personal Supabase org~~ DONE 2026-08-13: organization "Orvanna"
+   (Personal type, Free plan) created under Howard's howkoz Supabase login. The
+   mlm-pilot project gets created inside it at Phase 1 deploy time. Free tier is
+   plenty for v1; no Pro upgrade needed.
 3. Branding decision, needed by Phase 4 (site build): keep the Globex Wellness persona
    on the pages, or brand the portal as Orvanna to match the domain. Both are safe
    (both are Howard's own IP, zero Unicity either way).
