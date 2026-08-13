@@ -52,7 +52,28 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |
 
-v2 parking lot: real auth (magic links), enrollment flow, autoship simulation, binary
+Phase 4.5 (added 2026-08-13, Howard): STAFF VIEW TOGGLE. A header button, no login,
+demo-appropriate: OFF = the customer/member facing portal as built; ON = the customer
+service facing view, same shell but deeper panels: customer directory (with synthetic
+emails), order history with receipts (which customer bought what), subscription states
+(start, cancel, churn), per-member service timeline. Ships as new v_cs_* views
+(migration 010) readable by the anon key, which is safe ONLY because every byte is
+synthetic; in a real deployment the button becomes a staff login. Built after Howard's
+input on the Phase 4 portal.
+
+Phase 6 (queued 2026-08-13, Howard; starts AFTER he reviews the Phase 4 site):
+HYPERSWITCH AS THE PAYMENT ORCHESTRATOR. The pilot's subscription checkout runs
+through HyperSwitch (open-source payment orchestration) in TEST MODE: test cards only,
+no real money ever, order rows gain payment status from the orchestrator's responses.
+Strategic beat: this fuses the two Orvanna products, the MLM Pilot becomes the first
+demo merchant OF the Orvanna platform vision (PLATFORM\ is built around the
+HyperSwitch core + neutral vault + pluggable 3-D Secure). Already in hand: a local
+HyperSwitch sandbox at C:\hs (Docker, localhost:9000, currently parked), the fourteen
+PLATFORM model documents, and connector-adapter notes. Fence note: HyperSwitch is
+open source, clean for personal use; employer-side vendor evaluations stay on the
+work side.
+
+v2 parking lot: real auth (magic links), enrollment flow, binary
 comp variant, order placement UI, KPI prism dashboard.
 
 ## Product concept (LOCKED 2026-08-13)
