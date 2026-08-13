@@ -85,9 +85,13 @@ orders (autoship) moved from the v2 parking lot INTO v1. Full rules:
    (orvanna.io) or on a subdomain (for example demo.orvanna.io) keeping the apex free
    for Orvanna itself. Either works on free hosting.
 2. ~~Create the personal Supabase org~~ DONE 2026-08-13: organization "Orvanna"
-   (Personal type, Free plan) created under Howard's howkoz Supabase login. The
-   mlm-pilot project gets created inside it at Phase 1 deploy time. Free tier is
-   plenty for v1; no Pro upgrade needed.
+   created under Howard's howkoz Supabase login, on the PRO plan (Howard's deliberate
+   choice, $25/month base; the first project's $10/month compute is typically absorbed
+   by Pro's included credit). Project **mlm-pilot** created by Howard the same day:
+   ref oiyibdczkokegaxkwulv, region us-west-2, Postgres 17, ACTIVE_HEALTHY. The
+   claude.ai Supabase connector is granted to the Orvanna org (note: single-org grant;
+   the work org is out of connector view until switched back). Migrations deploy here
+   after the Phase 1 gates pass.
 3. ~~Branding decision~~ DECIDED 2026-08-13: the portal brands as **Orvanna**, matching
    the domain. Logo locked same day: Hex Team badge + engineered uppercase wordmark
    (final kit in `..\brand\`: light, dark, header, app icon, favicon). The product
