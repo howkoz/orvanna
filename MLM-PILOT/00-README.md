@@ -56,6 +56,7 @@ The Council (seven-persona vetting) runs inline before each phase; verdicts file
 ## Key documents
 
 - `ROADMAP.md`: phases, v1 scope, council verdict, next small step (protect momentum)
+- `docs\FIGMA-VISUAL-PACK.md`: the end-to-end "Whole Machine" Figma board (how everything fits, 16 numbered steps)
 - `db\` : migrations and seed scripts (created in Phase 1)
 - `site\` : the website (created in Phase 3)
 - `docs\decisions\` : one file per decision, dated
