@@ -33,12 +33,20 @@ Dataset shape (per the Phase 1/2 brief):
     every subscription active that month (start_month <= m < cancel_month,
     null cancel_month = active) produces exactly one order dated the first
     of the month, with order lines copying price and volume points.
+  - Enrollment plausibility rule (generator v2, fixes verifier finding M1):
+    a subscription's start_month is never earlier than the first day of the
+    month FOLLOWING enrollment when the member enrolled after the 1st of a
+    month; members enrolled exactly on the 1st may start that same month.
+    Orders are stamped the 1st of the month at midnight, so this guarantees
+    no member's order predates their enrollment date. Members who enroll
+    after the 1st of the final enrollment month (2026-07) start billing
+    2026-08, outside the history window, and therefore have no orders.
   - Target realism: 40 to 65 percent of member-months qualified
     (monthly volume >= 100).
 
 The worked example files reproduce COMP-PLAN-SPEC.md v1.1 section 7 exactly
-(10 members M1-M10, one month, company SV 2,700.00, CV 2,160.00, payout
-264.00, members paid 4). They are the comp engine's acceptance dataset and
+(10 members M1-M10, one month, company sales volume (SV) 2,700.00,
+commissionable volume (CV) 2,160.00, payout 264.00, members paid 4). They are the comp engine's acceptance dataset and
 must be loaded into an EMPTY database, never on top of the 1,000-member pack.
 """
 
@@ -212,7 +220,7 @@ def build_members(rng):
             "enrolled_on": date_in_month(enroll_month[i], enroll_day[i]),
             "status": "active",  # may flip to closed after churn is known
         })
-    return rows, enroll_month, depth, children, supers
+    return rows, enroll_month, enroll_day, depth, children, supers
 
 
 def assign_archetypes(rng, enroll_month, supers):
@@ -236,8 +244,15 @@ def assign_archetypes(rng, enroll_month, supers):
     return archetype
 
 
-def build_subscriptions(rng, enroll_month, archetype, products):
-    """Subscription rows with lifecycles. Product ids: 1..6 domain, 7..12 support."""
+def build_subscriptions(rng, enroll_month, enroll_day, archetype, products):
+    """Subscription rows with lifecycles. Product ids: 1..6 domain, 7..12 support.
+
+    Enrollment plausibility rule (generator v2): every start_month is clamped
+    to the member's earliest plausible billing month, which is the enrollment
+    month when the member enrolled on the 1st, otherwise the month after
+    enrollment. Orders are stamped the 1st at midnight, so without the clamp
+    a mid-month enrollee's first order would predate their enrollment date
+    (verifier finding M1)."""
     domain_ids = [p["id"] for p in products if p["tier"] == "domain"]
     support_ids = [p["id"] for p in products if p["tier"] == "support"]
     rows = []
@@ -246,7 +261,9 @@ def build_subscriptions(rng, enroll_month, archetype, products):
     def add(member_idx, product_id, qty, start_idx, churn_p):
         nonlocal sub_id
         sub_id += 1
-        start_idx = min(start_idx, ENROLL_MONTH_COUNT - 1)
+        e = enroll_month[member_idx]
+        floor_idx = e if enroll_day[member_idx] == 1 else e + 1
+        start_idx = max(min(start_idx, ENROLL_MONTH_COUNT - 1), floor_idx)
         cancel = ""
         if rng.random() < churn_p:
             cancel_idx = rng.randint(start_idx + 1, ENROLL_MONTH_COUNT + 3)
@@ -550,9 +567,9 @@ def main():
     rng = random.Random(SEED)
 
     products = build_products()
-    members, enroll_month, depth, children, supers = build_members(rng)
+    members, enroll_month, enroll_day, depth, children, supers = build_members(rng)
     archetype = assign_archetypes(rng, enroll_month, supers)
-    subs = build_subscriptions(rng, enroll_month, archetype, products)
+    subs = build_subscriptions(rng, enroll_month, enroll_day, archetype, products)
     closed = close_dormant_accounts(members, subs)
     orders, lines = build_orders(subs, products)
 
@@ -624,7 +641,8 @@ def main():
     kinds = {k: sum(1 for i in archetype if archetype[i] == k)
              for k in ("starter", "standard", "builder", "whale")}
     with open(OUT_DIR / "_manifest.txt", "w", newline="", encoding="utf-8") as f:
-        f.write("MLM Pilot seed manifest (generate_seed.py)\n")
+        f.write("MLM Pilot seed manifest (generate_seed.py, generator v2, "
+                "enrollment plausibility rule)\n")
         f.write(f"seed = {SEED}\n")
         f.write(f"members = {len(members)} (closed accounts: {closed})\n")
         f.write(f"archetypes = {kinds}\n")

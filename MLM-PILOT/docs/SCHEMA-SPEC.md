@@ -47,6 +47,21 @@ Engineer, Quality Assurance, Secretary, ...). PV equals dollars one to one in v1
 | volume_points | numeric(10,2) | not null; drives SV and rank |
 | commissionable_value | numeric(10,2) | null in v1 (forward compatibility: the price / volume points / commissionable value triple stays independent; v1 computes CV as 80 percent of SV at member-month level instead) |
 
+### app.customers (added v1.2, 2026-08-13: customer accounts per Howard)
+| Column | Type | Rules |
+|---|---|---|
+| id | bigint identity | PK |
+| customer_code | text | unique, not null; public-safe handle like "OC-000123" |
+| display_name | text | not null; synthetic |
+| email | text | not null; synthetic @example.com; NEVER exposed by any view |
+| referring_member_id | bigint | FK app.members(id), not null; the distributor this customer buys through |
+| enrolled_on | date | not null |
+| status | text | check in ('active','closed') |
+
+Customers are NOT members: they never appear in the genealogy, never qualify, never
+hold rank, never earn. Their purchases exist to roll volume up to their referring
+member (see orders below). Index: (referring_member_id). Ships as migration 007.
+
 ### app.subscriptions (added in spec update, same day: the product is SaaS)
 | Column | Type | Rules |
 |---|---|---|
@@ -68,7 +83,8 @@ generated orders. Index: (member_id).
 |---|---|---|
 | id | bigint identity | PK |
 | member_id | bigint | FK members, not null |
-| buyer_role | text | check in ('member','preferred_customer','retail_customer'); default 'member' (v1 seeds only 'member'; column exists for v2) |
+| buyer_role | text | check in ('member','preferred_customer','retail_customer'); default 'member'. ACTIVE from v1.2: 'retail_customer' marks a customer purchase |
+| customer_id | bigint | null; FK app.customers(id) (added v1.2, migration 007). THE ATTRIBUTION RULE: a customer's order is booked with member_id = the REFERRING MEMBER's account (volume rolls up at purchase time) and customer_id = the actual buyer (the receipt stays auditable). CHECK: (buyer_role = 'retail_customer') = (customer_id IS NOT NULL). The commission engine needs NO knowledge of customers: it aggregates account volume exactly as before |
 | ordered_at | timestamptz | not null |
 | volume_month | date | not null; always the FIRST day of the month the order counts toward; stamped at creation from ordered_at in Coordinated Universal Time (UTC); never recomputed later |
 | status | text | check in ('completed','refunded'); v1 seeds only 'completed' |
@@ -167,6 +183,8 @@ caught that the original wording allowed INSERT; migration update due before Pha
 | v_demo_member_months | member_code, period, sv, cv, tv, is_active, rank_earned (from final runs) |
 | v_demo_statements | period, earner member_code, level, source member_code, source_cv, rate, amount |
 | v_demo_company | per final run: period, total_sv, total_cv, total_payout, members_paid, rank distribution counts |
+| v_demo_customers (v1.2) | customer_code, display_name, referring member_code, enrolled_on |
+| v_demo_customer_volume (v1.2) | member_code, volume_month, customer_sv (the slice of that member's SV that came from customer purchases; computed from orders where buyer_role = 'retail_customer') |
 
 Every view filters to runs with status 'final'. The site footer's data-basis line reads
 from v_demo_company (period + run id).

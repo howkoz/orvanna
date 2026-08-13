@@ -1,9 +1,12 @@
-# MLM Pilot Compensation Plan Specification, version v1.1
+# MLM Pilot Compensation Plan Specification, version v1.2
 
-As of 2026-08-13 (v1.1, same day as v1.0: product concept locked to digital agent
-subscriptions and the qualification gate moved from 50 to 100 volume points, both per
-Howard; the v1.0 worked example was rebuilt accordingly). mlm-comp-engineer must
-reproduce section 7 exactly; mlm-verifier recomputes it independently.
+As of 2026-08-13 (v1.2, adds CUSTOMER ACCOUNTS per Howard: customers buy through a
+referring member and their volume rolls up to that member at purchase time; customers
+never earn. v1.1 same day locked the agent product and the 100 PV gate). The engine
+math is UNCHANGED from v1.1: customer purchases are booked onto the referring member's
+account (schema spec, orders.customer_id), so every formula below already covers them.
+mlm-comp-engineer must reproduce section 7 exactly; mlm-verifier recomputes it
+independently.
 
 Acronym key: Multi-Level Marketing (MLM), Personal Volume (PV), Sales Volume (SV),
 Commissionable Volume (CV), Team Volume (TV), Software as a Service (SaaS),
@@ -28,10 +31,21 @@ month. Churn = the subscription is cancelled and generates nothing from its canc
 month onward. (The schema's subscriptions table and the seed generator implement
 this; the comp engine only ever sees the generated orders.)
 
+**Customers (v1.2):** anyone may buy agents as a CUSTOMER attached to one referring
+member, without joining the genealogy. The customer's order is booked onto the
+referring member's account (tagged buyer_role 'retail_customer' with the customer's
+identity on the order for the receipt), so its full PV counts in that member's SV:
+qualification, CV, TV, and upline pay all include it automatically. Customers never
+qualify, never hold rank, and never earn commissions. Rationale on the record: this
+also means a member's qualification can rest on volume SOLD, not only volume bought,
+the plain-dealing property regulators look for.
+
 ## 2. Volumes
 
-- **SV (personal, monthly):** sum of PV across the member's completed orders in that
-  volume month. Two decimals.
+- **SV (personal, monthly):** sum of PV across ALL completed orders booked to the
+  member's account in that volume month, whether bought by the member themselves
+  (buyer_role 'member') or by one of their customers (buyer_role 'retail_customer').
+  Two decimals.
 - **CV (personal, monthly):** 0.80 times SV, rounded half up to 2 decimals. CV is the
   base every commission percentage applies to.
 - **TV (monthly):** the sum of SV of every member STRICTLY BELOW the member in the
@@ -122,7 +136,7 @@ M1 -> M2, M3, M4; M2 -> M5, M6; M3 -> M7, M8; M5 -> M9; M8 -> M10.
 | M1 | Payment + Pricing (2 domain) | 200.00 | 160.00 | yes | 2,500.00 |
 | M2 | Payment + Software Engineer | 150.00 | 120.00 | yes | 500.00 |
 | M3 | Shipping (1 domain) | 100.00 | 80.00 | yes (boundary) | 1,650.00 |
-| M4 | QA + Secretary (2 support) | 100.00 | 80.00 | yes (boundary) | 0.00 |
+| M4 | QA + Secretary (2 support), both held by M4's CUSTOMERS C1 and C2 (v1.2 note: identical math, the volume books to M4's account) | 100.00 | 80.00 | yes (boundary) | 0.00 |
 | M5 | Accounting (1 support) | 50.00 | 40.00 | NO | 300.00 |
 | M6 | Marketing + Customer Care | 150.00 | 120.00 | yes | 0.00 |
 | M7 | agency stack: 12 domain + 6 support | 1,500.00 | 1,200.00 | yes | 0.00 |
@@ -197,3 +211,7 @@ either; both are breakage by design.
    Retention or highest-achieved titles are v2 candidates. Confirm monthly-pure for v1?
 4. Source volume pays upline regardless of the source member's own qualification
    (decided in section 5). Confirm? Default: yes, it pays.
+5. (v1.2) Should the referring member ALSO earn a direct retail commission on customer
+   purchases (a level-0 percentage on customer CV, on top of the volume roll-up)?
+   Default for v1: no, roll-up only; a retail commission is a one-line engine change
+   later if wanted.

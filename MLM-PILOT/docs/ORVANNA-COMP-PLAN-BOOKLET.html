@@ -63,7 +63,7 @@
   </div>
 
   <div>
-    <span class="stamp">Version 1.1</span>
+    <span class="stamp">Version 1.2</span>
     <span class="stamp">Effective month: 2026-08</span>
     <span class="stamp">One canonical document</span>
   </div>
@@ -91,6 +91,15 @@
     <tr><td><strong>Support agents</strong></td><td>staff roles that assist the business</td><td>Software Engineer, Quality Assurance, Secretary, Chief Executive, Accounting, Customer Care</td><td class="num">$50.00</td><td class="num">50</td></tr>
   </table>
 
+  <h3>Customers</h3>
+  <p>Anyone can enjoy Orvanna agents WITHOUT joining the program, as a customer of one
+  referring member. A customer subscribes at the same prices, and the full PV of every
+  customer purchase counts toward the referring member's Sales Volume automatically:
+  it helps that member qualify, feeds their upline's Team Volume, and is paid on by
+  the upline like any other volume. Customers themselves never pay a joining fee,
+  never hold a rank, and never earn commissions; their receipts always name them as
+  the buyer.</p>
+
   <h2 id="glossary">2. Every term, defined</h2>
   <table>
     <tr><th>Term</th><th>Definition</th></tr>
@@ -114,7 +123,7 @@
     <li><strong>Your sponsor's leg count includes you.</strong> Rank requirements count ACTIVE legs, and your leg is active for your sponsor only when you are qualified.</li>
   </ol>
   <p>A member holding a single support agent (50 PV) stays enrolled and keeps their team, but is not qualified: no check that month, and their sponsor loses that leg for rank purposes. Qualification resets every month; every month stands alone.</p>
-  <div class="warn"><strong>Plain-dealing note.</strong> In this version qualification comes from your own subscriptions. A future version adds customer sales so qualification can rest on volume you SELL, not only volume you buy; the order system already carries the buyer-type field for it.</div>
+  <div class="callout"><strong>Two roads to 100.</strong> Your own subscriptions and your customers' subscriptions count the same. A member with zero personal spend and two customer-held support agents (2 times 50 PV) is fully qualified: qualification can rest entirely on volume you SELL, not volume you buy.</div>
 
   <h2 id="ranks">4. Ranks</h2>
   <p>Ranks recompute from scratch every month: you are what you did this month. You hold the HIGHEST rank whose requirements you fully meet. Every threshold is inclusive ("or more").</p>
@@ -197,7 +206,7 @@
     <tr><td>M1</td><td>Payment + Pricing (2 domain)</td><td class="num">200.00</td><td class="num">160.00</td><td>yes</td><td class="num">2,500.00</td><td><strong>Leader</strong> (TV exactly 2,500)</td><td class="num">3</td></tr>
     <tr><td>M2</td><td>Payment + Software Engineer</td><td class="num">150.00</td><td class="num">120.00</td><td>yes</td><td class="num">500.00</td><td>Member (only 1 active leg)</td><td class="num">1</td></tr>
     <tr><td>M3</td><td>Shipping (1 domain)</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">1,650.00</td><td><strong>Builder</strong></td><td class="num">2</td></tr>
-    <tr><td>M4</td><td>Quality Assurance + Secretary</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M4</td><td>Quality Assurance + Secretary, both held by M4's customers</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
     <tr><td>M5</td><td>Accounting (1 support)</td><td class="num">50.00</td><td class="num">40.00</td><td><strong>NO</strong></td><td class="num">300.00</td><td>Member</td><td class="num">1, earns nothing</td></tr>
     <tr><td>M6</td><td>Marketing + Customer Care</td><td class="num">150.00</td><td class="num">120.00</td><td>yes</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
     <tr><td>M7</td><td>agency stack, 12 domain + 6 support</td><td class="num">1,500.00</td><td class="num">1,200.00</td><td>yes</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
@@ -257,11 +266,12 @@
     <tr><th>Version</th><th>Date</th><th>What changed</th></tr>
     <tr><td>1.0</td><td>2026-08-13</td><td>First complete plan: level pay 10/5/5/3/2, five ranks, 50 PV activity gate, generic product.</td></tr>
     <tr><td>1.1</td><td>2026-08-13</td><td>Product locked to AI-agent subscriptions (domain $100 / support $50). Single qualification gate moved to 100 PV, doing both jobs (paid + active leg). Worked example rebuilt.</td></tr>
+    <tr><td>1.2</td><td>2026-08-13</td><td>Customer accounts added: customers buy through a referring member, their full PV rolls up to that member's Sales Volume at purchase time, and they never earn commissions. Qualification can now rest on customer sales.</td></tr>
   </table>
   <p>This booklet is the ONLY member-facing statement of the plan. If any other page or message disagrees with it, this document and its version stamp govern. Rule changes take effect at the start of a stated month, never retroactively.</p>
 
   <footer>
-    Orvanna Compensation Plan, version 1.1, effective 2026-08. Synthetic demonstration program: 1,000 simulated accounts, no real earnings. Source of truth for the engine: COMP-PLAN-SPEC.md v1.1, same numbers, same worked example.
+    Orvanna Compensation Plan, version 1.2, effective 2026-08. Synthetic demonstration program: simulated accounts, no real earnings. Source of truth for the engine: COMP-PLAN-SPEC.md v1.2, same numbers, same worked example.
   </footer>
 </div>
 </body>

@@ -63,8 +63,11 @@ at $100.00 / 100 Personal Volume (PV); SUPPORT agents (Software Engineer, Qualit
 Assurance, Secretary, Chief Executive, Accounting, ...) at $50.00 / 50 PV.
 Commission-qualified month = 100+ PV of subscriptions (one gate for being paid AND
 for counting as an active leg). Because the product is a subscription, recurring
-orders (autoship) moved from the v2 parking lot INTO v1. Full rules:
-`docs\COMP-PLAN-SPEC.md` v1.1.
+orders (autoship) moved from the v2 parking lot INTO v1. v1.2 (same day, per Howard):
+CUSTOMER ACCOUNTS: customers buy through a referring member, their full PV rolls up
+to that member's account at purchase time (books as retail_customer orders on the
+member with the customer on the receipt), customers never earn or rank; the engine
+math is untouched by design. Full rules: `docs\COMP-PLAN-SPEC.md` v1.2.
 
 ## Comp plan v1 (superseded by docs\COMP-PLAN-SPEC.md v1.1; kept as the original draft)
 
