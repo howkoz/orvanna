@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 140" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="460" height="140" fill="#FFFFFF"/>
+  <!-- The O as an orbit; one agent riding it -->
+  <circle cx="100" cy="70" r="38" fill="none" stroke="#4F46E5" stroke-width="8"/>
+  <circle cx="127" cy="43" r="12" fill="#FFFFFF"/>
+  <circle cx="127" cy="43" r="7" fill="#22D3EE"/>
+  <text x="170" y="84" font-size="42" font-weight="700" fill="#0F172A" letter-spacing="1">orvanna</text>
+</svg>

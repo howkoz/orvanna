@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 140" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="460" height="140" fill="#FFFFFF"/>
+  <!-- The ascent: three rank chevrons climbing, summit lit -->
+  <polyline points="62,102 100,80 138,102" fill="none" stroke="#4F46E5" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="62,76 100,54 138,76" fill="none" stroke="#4F46E5" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.62"/>
+  <polyline points="62,50 100,28 138,50" fill="none" stroke="#22D3EE" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="170" y="84" font-size="42" font-weight="700" fill="#0F172A" letter-spacing="1">orvanna</text>
+</svg>

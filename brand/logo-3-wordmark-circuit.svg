@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 140" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="460" height="140" fill="#FFFFFF"/>
+  <!-- Pure wordmark; the underline is the upline: a circuit stepping up to a node -->
+  <text x="60" y="76" font-size="46" font-weight="700" fill="#4F46E5" letter-spacing="1.5">orvanna</text>
+  <path d="M 62 96 L 240 96 L 240 88 L 320 88 L 320 80 L 380 80" fill="none" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="388" cy="80" r="6.5" fill="#22D3EE"/>
+</svg>
