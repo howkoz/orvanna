@@ -10,6 +10,7 @@
 
 | Folder | What it is |
 |---|---|
+| `LIBRARY\` | **The front door to every document.** Start at `LIBRARY\00-INDEX.md`: company docs (profile, team), brand, all technical docs indexed with one canonical home each. |
 | `PLATFORM\` | The Orvanna flagship: a universal payment-orchestration product concept. Charter, tracker, 14 model documents, roadmap, demos. Moved from the job workspace's orchestrator folder 2026-08-13. |
 | `MLM-PILOT\` | Working direct-selling (multi-level marketing, MLM) prototype: 1,000 synthetic accounts, Supabase database, commission engine, demo portal. Deploys to orvanna.io. |
 | `.claude\agents\` | The six-agent development team for the pilot (architect, database engineer, compensation engineer, site builder, verifier, quality assurance). |
