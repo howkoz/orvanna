@@ -48,10 +48,13 @@ truncate table
     app.commission_runs,
     app.order_lines,
     app.orders,
+    app.customers,
     app.subscriptions,
     app.members,
     app.products
 restart identity;
+-- (app.customers added 2026-08-13 at deploy: this script predated migration
+-- 007; customers reference members, so the truncate needs them in the list.)
 
 reset app.allow_reset;
 

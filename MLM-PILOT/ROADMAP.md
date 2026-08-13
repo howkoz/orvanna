@@ -47,7 +47,7 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | 0 | Scaffold, guardrails, team, roadmap | (main session) | DONE 2026-08-13 |
 | 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (cloud apply pending) |
 | 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (subscriptions model) |
-| 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | |
+| 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | BUILT + DEPLOYED 2026-08-13: worked example passed on live Postgres (3x zero mismatches); full seed loaded (24,295 rows); SIX months run and FINALIZED (Feb-Jul 2026, payout 12,014.00 growing to 20,669.20, ~15 percent of CV); gates grading |
 | 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | |
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |

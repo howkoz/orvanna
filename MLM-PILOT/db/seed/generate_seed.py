@@ -114,7 +114,7 @@ SELLER_ENROLL_MONTH_MAX = 18     # seller pool cutoff so their customers
 SELLER_CUSTOMER_ENROLL_CAP = 20  # latest enrollment month for a seller's
                                  # customers
 SELLER_CUSTOMER_CHURN_P = 0.10
-P_HAS_CUSTOMERS = 0.42           # share of active non-seller distributors
+P_HAS_CUSTOMERS = 0.38           # share of active non-seller distributors
                                  # holding at least one customer
 CUSTOMER_CHURN_P = 0.30
 
@@ -326,7 +326,7 @@ def build_subscriptions(rng, enroll_month, enroll_day, archetype, products):
             add(i, support_ids[rng.randrange(6)], 1, first_start, churn_p)
 
         elif kind == "standard":
-            first_domain = rng.random() < 0.72
+            first_domain = rng.random() < 0.64
             add(i, (domain_ids if first_domain else support_ids)[rng.randrange(6)],
                 1, first_start, churn_p)
             if rng.random() < 0.46:   # upgrade: a second agent later
