@@ -55,7 +55,18 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 v2 parking lot: real auth (magic links), enrollment flow, autoship simulation, binary
 comp variant, order placement UI, KPI prism dashboard.
 
-## Comp plan v1 (architect refines in Phase 1)
+## Product concept (LOCKED 2026-08-13)
+
+Digital AI agents sold as monthly Software as a Service (SaaS) subscriptions, fully
+fictional under the Globex persona: DOMAIN agents (Payment, Shipping, Pricing, ...)
+at $100.00 / 100 Personal Volume (PV); SUPPORT agents (Software Engineer, Quality
+Assurance, Secretary, Chief Executive, Accounting, ...) at $50.00 / 50 PV.
+Commission-qualified month = 100+ PV of subscriptions (one gate for being paid AND
+for counting as an active leg). Because the product is a subscription, recurring
+orders (autoship) moved from the v2 parking lot INTO v1. Full rules:
+`docs\COMP-PLAN-SPEC.md` v1.1.
+
+## Comp plan v1 (superseded by docs\COMP-PLAN-SPEC.md v1.1; kept as the original draft)
 
 - Unilevel, paid 5 levels deep; depth unlocked by rank.
 - Volumes: personal sales volume (SV) per month; team volume (TV) = SV of entire

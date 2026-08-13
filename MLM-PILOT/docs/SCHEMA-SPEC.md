@@ -32,14 +32,36 @@ genealogy (see decision document 2026-08-13-genealogy-representation.md).
 Constraint: a trigger rejects cycles (walking up from sponsor must reach a root).
 
 ### app.products
+The catalog is DIGITAL AI AGENTS sold as monthly subscriptions (comp plan spec
+section 1): domain agents at $100.00 / 100 volume points (Payment Agent, Shipping
+Agent, Pricing Agent, ...), support agents at $50.00 / 50 volume points (Software
+Engineer, Quality Assurance, Secretary, ...). PV equals dollars one to one in v1.
+
 | Column | Type | Rules |
 |---|---|---|
 | id | bigint identity | PK |
 | sku | text | unique, not null |
 | name | text | not null |
+| tier | text | check in ('domain','support') |
 | price | numeric(10,2) | not null; what the buyer pays |
 | volume_points | numeric(10,2) | not null; drives SV and rank |
 | commissionable_value | numeric(10,2) | null in v1 (forward compatibility: the price / volume points / commissionable value triple stays independent; v1 computes CV as 80 percent of SV at member-month level instead) |
+
+### app.subscriptions (added in spec update, same day: the product is SaaS)
+| Column | Type | Rules |
+|---|---|---|
+| id | bigint identity | PK |
+| member_id | bigint | FK members, not null |
+| product_id | bigint | FK products, not null |
+| quantity | integer | not null, check > 0, default 1 |
+| start_month | date | not null; first of month the subscription begins billing |
+| cancel_month | date | null while active; first of month it STOPS billing (exclusive end) |
+
+One row per member-agent subscription. On the first day of each month, every
+subscription where start_month <= month < cancel_month (or cancel_month is null)
+generates exactly one order (below) for that volume month. In v1 the SEED performs
+this generation when it fabricates history; the engine and site only ever read the
+generated orders. Index: (member_id).
 
 ### app.orders
 | Column | Type | Rules |
