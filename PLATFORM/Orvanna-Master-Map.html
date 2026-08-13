@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orvanna Master Map</title>
+<style>
+  :root{
+    --bg:#0e131f; --panel:#161d2c; --panel2:#1d2738; --line:#2b3850;
+    --ink:#e8edf6; --muted:#93a0b5; --accent:#3b82f6; --accent2:#60a5fa;
+    --done:#22c55e; --doing:#f59e0b; --next:#a78bfa; --todo:#475569;
+    --chip:#101728;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+  header h1{margin:0 0 4px;font-size:26px;letter-spacing:.3px}
+  header p{margin:0;color:var(--muted);font-size:14px}
+  .badge{display:inline-block;margin-top:10px;padding:4px 10px;border:1px solid var(--line);
+    border-radius:999px;color:var(--accent2);font-size:12px;background:var(--chip)}
+  h2{font-size:16px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;
+    margin:34px 0 12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  /* SVG flow */
+  .flow svg{width:100%;height:auto;display:block}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  /* roadmap */
+  .phase{margin:16px 0}
+  .phase h3{margin:0 0 10px;font-size:14px;color:var(--ink)}
+  .phase h3 small{color:var(--muted);font-weight:400}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .node{cursor:pointer;border:1px solid var(--line);background:var(--panel2);border-radius:10px;
+    padding:9px 12px;min-width:150px;display:flex;align-items:center;gap:9px;transition:.15s;
+    flex:1 1 160px;max-width:230px}
+  .node:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .node .s{width:10px;height:10px;border-radius:50%;flex:none}
+  .node .t{font-size:13px}
+  .node .id{color:var(--muted);font-size:11px;margin-right:2px}
+  .node.sel{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(59,130,246,.25)}
+  .st-done .s{background:var(--done)} .st-doing .s{background:var(--doing)}
+  .st-next .s{background:var(--next)} .st-todo .s{background:var(--todo)}
+  .st-done{opacity:.95} .st-todo{opacity:.62}
+  .youhere{margin-left:6px;font-size:10px;color:var(--doing);border:1px solid var(--doing);
+    border-radius:6px;padding:1px 5px}
+  /* detail panel */
+  #detail{margin-top:16px;background:var(--panel2);border:1px dashed var(--line);border-radius:12px;
+    padding:16px;min-height:64px;font-size:14px;color:var(--ink)}
+  #detail .dh{font-weight:600;margin-bottom:4px}
+  #detail .dm{color:var(--muted);font-size:13px}
+  .foot{margin-top:30px;color:var(--muted);font-size:12px;text-align:center}
+  .pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:8px}
+  .pill{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+  .pill b{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Orvanna &nbsp;Master Map</h1>
+    <p>The whole model in one screen, and exactly where we are on it.</p>
+    <span class="badge" id="progress">progress loading...</span>
+  </header>
+
+  <h2>1. The model, one payment end to end</h2>
+  <div class="card flow">
+    <svg viewBox="0 0 960 360" role="img" aria-labelledby="ft fd">
+      <title id="ft">Orvanna payment flow</title>
+      <desc id="fd">A payment is routed to the best processor, charged with a network token from our own vault, authenticated with 3DS if needed, and retried or rerouted on recoverable declines.</desc>
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7c8aa3"/>
+        </marker>
+      </defs>
+      <!-- happy path -->
+      <g font-family="inherit">
+        <!-- Shopper -->
+        <rect x="20" y="120" width="120" height="62" rx="11" fill="#1d2738" stroke="#2b3850"/>
+        <text x="80" y="148" text-anchor="middle" fill="#e8edf6" font-size="14" font-weight="600">Shopper</text>
+        <text x="80" y="166" text-anchor="middle" fill="#93a0b5" font-size="11">checks out</text>
+        <!-- Route -->
+        <rect x="180" y="112" width="140" height="78" rx="12" fill="#13233f" stroke="#3b82f6"/>
+        <text x="250" y="140" text-anchor="middle" fill="#dbe7ff" font-size="14" font-weight="700">Route (F1)</text>
+        <text x="250" y="158" text-anchor="middle" fill="#9fb6d8" font-size="11">pick best processor</text>
+        <!-- Vault credential -->
+        <rect x="360" y="112" width="170" height="78" rx="12" fill="#1d2738" stroke="#2b3850"/>
+        <text x="445" y="138" text-anchor="middle" fill="#e8edf6" font-size="13" font-weight="600">Our Vault (F4)</text>
+        <text x="445" y="156" text-anchor="middle" fill="#93a0b5" font-size="11">token first, PAN backup</text>
+        <text x="445" y="172" text-anchor="middle" fill="#6fb6ff" font-size="10">(F2)</text>
+        <!-- 3DS -->
+        <rect x="570" y="120" width="96" height="62" rx="11" fill="#1d2738" stroke="#2b3850"/>
+        <text x="618" y="146" text-anchor="middle" fill="#e8edf6" font-size="13" font-weight="600">3DS (F5)</text>
+        <text x="618" y="164" text-anchor="middle" fill="#93a0b5" font-size="11">if required</text>
+        <!-- Authorize -->
+        <rect x="706" y="112" width="140" height="78" rx="12" fill="#1d2738" stroke="#2b3850"/>
+        <text x="776" y="140" text-anchor="middle" fill="#e8edf6" font-size="13" font-weight="600">Authorize</text>
+        <text x="776" y="158" text-anchor="middle" fill="#93a0b5" font-size="11">at best processor</text>
+        <!-- Done -->
+        <rect x="876" y="120" width="64" height="62" rx="11" fill="#10301f" stroke="#22c55e"/>
+        <text x="908" y="155" text-anchor="middle" fill="#7ef0a8" font-size="13" font-weight="700">Done</text>
+        <!-- arrows -->
+        <line x1="140" y1="151" x2="178" y2="151" stroke="#7c8aa3" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="320" y1="151" x2="358" y2="151" stroke="#7c8aa3" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="530" y1="151" x2="568" y2="151" stroke="#7c8aa3" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="666" y1="151" x2="704" y2="151" stroke="#7c8aa3" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="846" y1="151" x2="874" y2="151" stroke="#7c8aa3" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- retry loop -->
+        <path d="M776,190 C776,250 250,250 250,192" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+        <text x="513" y="244" text-anchor="middle" fill="#f6b756" font-size="11">decline -&gt; retry, then PAN, then reroute (F2, F3)</text>
+        <text x="513" y="262" text-anchor="middle" fill="#7c8aa3" font-size="10">hard decline or dead subscription -&gt; stop</text>
+        <!-- always-on layers -->
+        <rect x="20" y="300" width="920" height="44" rx="10" fill="#101728" stroke="#2b3850"/>
+        <text x="36" y="327" fill="#93a0b5" font-size="12">Always-on layers around the flow:</text>
+        <text x="250" y="327" fill="#cdd8ea" font-size="12">Operator console (F7)</text>
+        <text x="430" y="327" fill="#cdd8ea" font-size="12">Observability (F9)</text>
+        <text x="590" y="327" fill="#cdd8ea" font-size="12">Regional + residency (F8)</text>
+        <text x="785" y="327" fill="#cdd8ea" font-size="12">Connector cert (F6)</text>
+      </g>
+    </svg>
+    <div class="pillars">
+      <div class="pill"><b>Own it:</b> open core you can rent then own</div>
+      <div class="pill"><b>Isolate it:</b> your own single-tenant instance</div>
+      <div class="pill"><b>Reach it:</b> widest practical connector list</div>
+      <div class="pill"><b>Own the token:</b> neutral vault, portable</div>
+    </div>
+  </div>
+
+  <h2>2. The build, end to end &nbsp;-&nbsp; and where we are</h2>
+  <div class="card">
+    <div id="roadmap"></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--done)"></i> done</span>
+      <span><i class="dot" style="background:var(--doing)"></i> in progress</span>
+      <span><i class="dot" style="background:var(--next)"></i> next up</span>
+      <span><i class="dot" style="background:var(--todo)"></i> not started</span>
+    </div>
+    <div id="detail"><div class="dh">Click any step to see what it is.</div>
+      <div class="dm">Green is built and in the Orvanna folder. Purple is the next link on the chain.</div></div>
+  </div>
+
+  <div class="foot">Orvanna is Howard's. Unicity is the use case (Globex Wellness persona), never the owner.<br>
+    This map updates as we build. Last updated 2026-06-15.</div>
+</div>
+
+<script>
+const steps = [
+  {phase:'A. Concept (Stage 0)', items:[
+    {id:'00', name:'Charter', status:'done', d:'The ground rules: why we are building Orvanna, what is in and out of scope, and the rule that keeps it cleanly yours (public research only, no employer data).'},
+    {id:'01', name:'Best-in-class blueprint', status:'done', d:'The heart of the model: the single best answer for each of the eight layers, taken from the four orchestrators we evaluated, with a source line behind every pick.'},
+    {id:'02', name:'Concept (investor)', status:'done', d:'The investor-facing story in plain English: the problem, the vision, why it is defensible, the staged low-risk plan, and an honest list of the hard parts.'},
+    {id:'P', name:'Use-case persona', status:'done', d:'Globex Wellness, a fictional global subscription company that stands in for the type of customer Orvanna serves, so we design and pitch with no real company name or data.'},
+  ]},
+  {phase:'B. System design (model every step)', items:[
+    {id:'03', name:'PBV spec', status:'done', d:'The engineering backbone: nine features, each written as Purpose (why it exists), Behavior (trigger to outcome), and Verify (how to prove it works). No code, only outcomes.'},
+    {id:'MAP', name:'Master map (this)', status:'done', d:'This page: the whole model in one screen plus the live progress tracker. Green is built, purple is next, and it updates as we go.'},
+    {id:'04', name:'Architecture model', status:'done', d:'The components and how they connect (core, vault, 3DS, console, infra), built on the connector-adapter pattern so the core speaks one language and every provider is a thin plug. No one-offs.'},
+    {id:'05', name:'Payment lifecycle', status:'done', d:'One payment traced end to end through every state, with all the branches: token fallback, 3DS, retry and reroute, and stop. A charge-once key means the retrying can never double-bill.'},
+    {id:'06', name:'Data model', status:'done', d:'The things the system knows (customer, card, token, payment, attempt, processor, result) and how they link. Key rule: the core holds only references, the vault holds the real card data.'},
+    {id:'07', name:'Routing engine', status:'done', d:'The brain: how it picks the best processor (eligible, then healthy, then ranked), the recovery ladder it climbs on a decline, and the honest logic that retries real declines but never chases dead subscriptions.'},
+    {id:'08', name:'Vault + tokens', status:'done', d:'The safe: a neutral, separate vault holds the card number and a portable network token registered under our control, so we own the data and use the same token at any processor. Token first, card number as backup.'},
+    {id:'09', name:'3DS model', status:'done', d:'The doorman: bank-led shopper authentication when a card or region requires it, frictionless or a challenge, and swappable like a connector. Recurring charges are usually exempt, which matters for subscriptions.'},
+    {id:'10', name:'Connector adapter', status:'done', d:'The universal plug: one standard interface (authorize, capture, refund, void, tokenize, status) that every provider adapter implements, plus a certification gate before a connector goes live. Adding a provider becomes a known, repeatable job.'},
+    {id:'11', name:'Operator console', status:'done', d:'The control panel: a non-engineer can change routing, retries, and processor status with no code, see live health, and trace any payment. Guardrails block unsafe changes.'},
+    {id:'12', name:'Infra + AWS', status:'done', d:'Where it runs: US-central by default, with a local node only when a law forces data to stay in-country or distance to a processor hurts speed. Volume alone never triggers a region.'},
+    {id:'13', name:'Security + PCI', status:'done', d:'The locks: because the real card number lives only in the neutral vault, the core stays out of the heaviest PCI scope. Plus encryption, roles, and an audit trail, with a clear split of who is responsible.'},
+    {id:'14', name:'Observability + ops', status:'done', d:'The cameras: watch every payment end to end and every processor live, auto-act on trouble (deprioritize a failing processor, alert the owner), and the honest answer to keeping the machine healthy 24/7.'},
+    {id:'14B', name:'Reconciliation', status:'done', d:'The proof: a payment is not done at "approved", it is done when the money is proven. A three-way match (our ledger vs the processor settlement file vs the bank deposit) ties out, and anything that disagrees becomes an exception worked in the console. Two views off one engine: the platform (us) and the merchant. Added during Phase B review.'},
+  ]},
+  {phase:'C. Build and business', items:[
+    {id:'15', name:'Build plan', status:'next', d:'The first Phase C step: what to stand up first on the open-source core, in what order, with milestones. Paused until you have reviewed all of Phase B.'},
+    {id:'16', name:'Cost + team', status:'todo', d:'What it actually takes to build and, just as important, to run each stage. The honest staffing and money picture.'},
+    {id:'17', name:'Business + pricing', status:'todo', d:'How Orvanna makes money: the tiers, and the flat (not percentage) pricing principle that refuses to punish a customer for growing recurring revenue.'},
+    {id:'18', name:'Go-to-market', status:'todo', d:'The first real customer, the wedge we lead with (ownership and honest pricing), and how we prove it works.'},
+    {id:'19', name:'Risk register', status:'todo', d:'Every hard part named openly, with its mitigation and who owns it. The upkeep risk is the headline one.'},
+  ]},
+  {phase:'D. Prove it', items:[
+    {id:'20', name:'Prototype', status:'todo', d:'A working slice running in the sandbox: the core plus one connector, the external vault, 3DS, and the console. Proof, not slides.'},
+    {id:'DEMO', name:'Investor demo', status:'todo', d:'An interactive five-minute walkthrough the investor can click through, in the same style as this map.'},
+  ]},
+];
+
+const labels={done:'st-done',doing:'st-doing',next:'st-next',todo:'st-todo'};
+const root=document.getElementById('roadmap');
+let total=0, done=0;
+steps.forEach(ph=>{
+  const block=document.createElement('div'); block.className='phase';
+  const h=document.createElement('h3'); h.textContent=ph.phase; block.appendChild(h);
+  const row=document.createElement('div'); row.className='row';
+  ph.items.forEach(it=>{
+    total++; if(it.status==='done') done++;
+    const n=document.createElement('div'); n.className='node '+labels[it.status];
+    n.innerHTML='<span class="s"></span><span class="t"><span class="id">'+it.id+'</span> '+it.name+'</span>'+
+      (it.status==='next'?'<span class="youhere">you are here next</span>':'');
+    n.onclick=()=>{
+      document.querySelectorAll('.node').forEach(x=>x.classList.remove('sel'));
+      n.classList.add('sel');
+      document.getElementById('detail').innerHTML=
+        '<div class="dh">'+it.id+' &middot; '+it.name+' &middot; <span style="color:var(--muted)">'+it.status+'</span></div>'+
+        '<div class="dm">'+it.d+'</div>';
+    };
+    row.appendChild(n);
+  });
+  block.appendChild(row); root.appendChild(block);
+});
+document.getElementById('progress').textContent='Phases A + B complete. Paused before Phase C for Howard’s review. '+done+' of '+total+' steps built.';
+</script>
+</body>
+</html>

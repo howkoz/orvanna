@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Orvanna - Flows</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0a0e1a;--panel:#131a2a;--panel-2:#1c2440;--border:#2a3450;--text:#e8edf7;--text-dim:#94a3b8;
+    --red:#ef4444;--green:#22c55e;--blue:#3b82f6;--blue-dim:#1e3a8a;--yellow:#f59e0b;--purple:#a855f7}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:1.5;overflow-x:hidden}
+  body{background:radial-gradient(ellipse at top left,rgba(59,130,246,0.07),transparent 50%),radial-gradient(ellipse at bottom right,rgba(245,158,11,0.06),transparent 50%),var(--bg);min-height:100vh}
+  nav.topbar{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:13px 32px;display:flex;align-items:center;justify-content:space-between}
+  nav.topbar .title{font-size:16px;font-weight:800;letter-spacing:.6px}
+  nav.topbar .title .accent{color:var(--blue)}
+  nav.topbar .crumb{font-size:12px;color:var(--text-dim)}
+  .hero{text-align:center;padding:30px 32px 8px;max-width:1100px;margin:0 auto}
+  .hero h1{font-size:clamp(22px,2.6vw,32px);font-weight:800;letter-spacing:-.4px;line-height:1.15;background:linear-gradient(135deg,#fff 30%,var(--blue) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{margin-top:12px;color:var(--text-dim);font-size:15px;max-width:800px;margin-left:auto;margin-right:auto}
+  .tab-bar{position:sticky;top:51px;z-index:90;background:rgba(10,14,26,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap}
+  .tab-bar-inner{max-width:1600px;margin:0 auto;display:flex;padding:0 16px;align-items:center}
+  .tab-btn{flex:0 0 auto;background:transparent;border:none;color:var(--text-dim);padding:16px 16px;cursor:pointer;font-size:13.5px;font-weight:700;border-bottom:3px solid transparent;transition:.2s;font-family:inherit}
+  .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.03)}
+  .tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:rgba(59,130,246,.06)}
+  .tab-btn .num{display:inline-block;background:var(--panel-2);color:var(--text-dim);padding:2px 8px;border-radius:10px;font-size:11px;margin-right:8px;font-weight:800;min-width:22px;text-align:center}
+  .tab-btn.active .num{background:var(--blue);color:#fff}
+  .tab-page{display:none;max-width:1600px;margin:0 auto;padding:34px 32px}
+  .tab-page.active{display:block}
+  .tab-header{margin-bottom:22px}
+  .tab-header .badge{display:inline-block;background:var(--panel-2);color:var(--blue);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1.2px;margin-bottom:12px;text-transform:uppercase}
+  .tab-header h2{font-size:24px;font-weight:800;margin-bottom:8px}
+  .tab-header p{color:var(--text-dim);max-width:860px}
+  .demo-grid{display:grid;grid-template-columns:1fr 340px;gap:18px}
+  @media(max-width:1000px){.demo-grid{grid-template-columns:1fr}}
+  .sim-canvas{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .sim-canvas svg{width:100%;height:auto;display:block}
+  .control-panel{display:flex;flex-direction:column;gap:12px}
+  .cp-title{font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);font-weight:800}
+  .scenario-group{display:flex;flex-wrap:wrap;gap:8px}
+  .action{cursor:pointer;border:1px solid var(--border);background:var(--panel-2);color:var(--text);border-radius:10px;padding:10px 13px;font-size:13px;font-weight:700;transition:.15s;flex:1 1 auto;font-family:inherit}
+  .action:hover{border-color:var(--blue);background:#243056;transform:translateY(-1px)}
+  .action.run{background:linear-gradient(135deg,var(--blue-dim),#243056);border-color:var(--blue)}
+  .action.reset{background:transparent;border-color:#334155;color:#94a3b8;flex:0 1 auto}
+  .action.reset:hover{border-color:#64748b;background:#0f1626;color:#e2e8f0}
+  .sim-log{background:#070b14;border:1px solid var(--border);border-radius:12px;padding:12px;height:300px;overflow-y:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+  .log-line{padding:3px 0;color:var(--text-dim);border-bottom:1px solid #11192b}
+  .log-line.info{color:#8fb6ff}.log-line.success{color:#86efac}.log-line.warn{color:#fcd34d}.log-line.error{color:#fca5a5}.log-line.purple{color:#d8b4fe}
+  .facts-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  @media(max-width:760px){.facts-panel{grid-template-columns:1fr}}
+  .fact-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .fact-card h4{font-size:14px;color:var(--blue);margin-bottom:10px}
+  .fact-card.invest h4{color:var(--yellow)}
+  .fact-card ul{margin:0;padding-left:18px}
+  .fact-card li{margin:6px 0;font-size:13px;color:var(--text-dim)}
+  .fact-card.invest li{color:#e7d9b0}
+  .fineprint{max-width:1600px;margin:30px auto 50px;padding:18px 32px;color:var(--text-dim);font-size:12px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <div class="title"><span class="accent">ORVANNA</span> Flows</div>
+  <div class="crumb">every flow, end to end | Globex Wellness is fictional | codename</div>
+</nav>
+<div class="hero">
+  <h1>Every Orvanna flow, in one place</h1>
+  <p>This is the whole payment story laid out so nothing hides. Click through each flow and watch one transaction
+  move. If a step is missing, you will see the gap. Nothing here is live money.</p>
+</div>
+<div class="tab-bar"><div class="tab-bar-inner">
+  <button class="tab-btn active" data-tab="e2e"><span class="num">1</span>End to End</button>
+  <button class="tab-btn" data-tab="vault"><span class="num">2</span>Vault &amp; Token</button>
+  <button class="tab-btn" data-tab="tds"><span class="num">3</span>3DS</button>
+  <button class="tab-btn" data-tab="retry"><span class="num">4</span>Honest Retry</button>
+  <button class="tab-btn" data-tab="conn"><span class="num">5</span>Connect a Processor</button>
+  <button class="tab-btn" data-tab="recon"><span class="num">6</span>Reconciliation</button>
+</div></div>
+
+<!-- ===== TAB 1: END TO END ===== -->
+<div class="tab-page active" data-page="e2e">
+  <div class="tab-header"><span class="badge">Flow 1 - the whole thing</span>
+    <h2>End-to-end payment</h2>
+    <p>The five zones of a payment: the shopper starts it, our neutral vault turns the card into a token, the
+    routing core picks a processor, the processor approves it, and we settle and report. The card never enters
+    Orvanna itself. Watch a payment run all the way through.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-e2e" viewBox="0 0 1200 480" role="img" aria-label="End to end payment flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="e-happy">Run a payment</button>
+        <button class="action" id="e-decline">With a decline (retry)</button>
+        <button class="action" id="e-3ds">With 3DS</button>
+        <button class="action reset" id="e-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-e2e"><div class="log-line">Press Run a payment.</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>Five zones: Initiation, Vault, Orchestrator, Provider, Settlement.</li>
+      <li>The vault owns the raw card. The orchestrator only ever sees tokens.</li>
+      <li>A decline loops back to the routing core to retry or reroute.</li>
+      <li>A response path tells the shopper the result; settlement reconciles the money.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>Card data sits in a separate vault, so Orvanna stays out of the heaviest PCI scope.</li>
+      <li>One clean path serves every market. Add a market without redrawing this picture.</li>
+      <li>Every box here is a model we have already designed, not a hope.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: VAULT & TOKEN ===== -->
+<div class="tab-page" data-page="vault">
+  <div class="tab-header"><span class="badge">Flow 2 - own the card</span>
+    <h2>Vault and the token we own</h2>
+    <p>The first time a shopper pays, their card goes into a neutral vault we control, and a network token is
+    created under OUR name. That is what makes the token portable: we can hand the same token to any processor,
+    and switch processors without ever re-collecting a card.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-vault" viewBox="0 0 1100 440" role="img" aria-label="Vault and token flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="v-store">Store a card</button>
+        <button class="action" id="v-charge">Charge (token first)</button>
+        <button class="action" id="v-pan">Token fails, use card</button>
+        <button class="action" id="v-switch">Switch processor</button>
+        <button class="action reset" id="v-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-vault"><div class="log-line">Press Store a card.</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>The PAN (real card number) is stored only in the neutral vault.</li>
+      <li>The network token is provisioned under OUR token-requestor control, so it is portable.</li>
+      <li>At charge time the token is tried first; the card is the backup.</li>
+      <li>The networks keep the token fresh when the card is reissued.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>We own our payment data. No processor can hold our tokens hostage.</li>
+      <li>Switching or adding a processor needs zero card re-collection.</li>
+      <li>The token must be ours, not the acquirer's. That is the make-or-break we verify with each vault.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: 3DS ===== -->
+<div class="tab-page" data-page="tds">
+  <div class="tab-header"><span class="badge">Flow 3 - authenticate</span>
+    <h2>3DS, standalone and pluggable</h2>
+    <p>When a card or a region requires it, the shopper is authenticated by their bank first (3DS), then the
+    payment routes to the best processor. The 3DS provider is a plug-in: swap it and nothing else in the flow
+    changes. Recurring charges are usually exempt, which matters a lot for subscriptions.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-tds" viewBox="0 0 1100 420" role="img" aria-label="3DS flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="d-fric">Frictionless</button>
+        <button class="action" id="d-chal">Challenge</button>
+        <button class="action" id="d-skip">Not required</button>
+        <button class="action reset" id="d-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-tds"><div class="log-line">Press a scenario.</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>Authenticate first (Model A), then route to the best processor.</li>
+      <li>Frictionless passes silently; a challenge asks the shopper to confirm.</li>
+      <li>The authentication result rides along into the authorization.</li>
+      <li>The 3DS provider is swappable, like a connector.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>We meet regional mandates without being locked to one 3DS vendor.</li>
+      <li>A passed challenge can shift fraud liability to the bank.</li>
+      <li>Subscriptions are not dragged through 3DS on every renewal.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: HONEST RETRY ===== -->
+<div class="tab-page" data-page="retry">
+  <div class="tab-header"><span class="badge">Flow 4 - our edge</span>
+    <h2>Honest retry</h2>
+    <p>Every orchestrator retries declines. Ours is honest: it fights hard for payments that are actually
+    recoverable, and it refuses to waste attempts and fees on customers who are already gone.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-retry" viewBox="0 0 1100 420" role="img" aria-label="Honest retry flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="r-soft">Soft decline (recover)</button>
+        <button class="action" id="r-hard">Hard decline (stop)</button>
+        <button class="action" id="r-dead">Dead subscription (stop)</button>
+        <button class="action reset" id="r-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-retry"><div class="log-line">Press a scenario.</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>Soft decline (timeout, do-not-honor): retry token, then card, then another processor.</li>
+      <li>Hard decline (stolen, closed account): stop at once, no retry.</li>
+      <li>Dead subscription (past the failed-streak limit): stop, unrecoverable.</li>
+      <li>A charge-once key means recovery can never double-bill.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>Recovery is real money, not a vanity number.</li>
+      <li>We do not burn fees or annoy banks chasing the unrecoverable.</li>
+      <li>This honesty layer is original to us, built on our own dead-sub analysis.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ===== TAB 5: CONNECT A PROCESSOR ===== -->
+<div class="tab-page" data-page="conn">
+  <div class="tab-header"><span class="badge">Flow 5 - grow coverage</span>
+    <h2>Connect a processor</h2>
+    <p>Adding a processor is not a custom project, it is a repeatable job. Build one small adapter to our
+    standard interface, run it through certification, and it goes live. This is what makes "add a market" a
+    known, priceable unit of work.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-conn" viewBox="0 0 1100 400" role="img" aria-label="Connector onboarding flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="c-pass">Build and certify (pass)</button>
+        <button class="action" id="c-fail">Certify (fail)</button>
+        <button class="action reset" id="c-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-conn"><div class="log-line">Press Build and certify.</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>The core speaks one interface: authorize, capture, refund, void, tokenize, status.</li>
+      <li>Each processor gets one thin adapter that translates that interface to its API.</li>
+      <li>Certification (sandbox) must pass before any live traffic.</li>
+      <li>Adapters are sourced from the open core, reference libraries, or the processor docs.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>Coverage grows predictably, a known cost per processor.</li>
+      <li>No vendor lock-in: we own every adapter we build.</li>
+      <li>"Add a market" becomes a business line, not a mystery.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ===== TAB 6: RECONCILIATION ===== -->
+<div class="tab-page" data-page="recon">
+  <div class="tab-header"><span class="badge">Flow 6 - prove the money</span>
+    <h2>Reconciliation, for us and the merchant</h2>
+    <p>Approved is not the same as paid. Reconciliation matches three independent records, our ledger, the
+    processor's settlement file, and the actual bank deposit, until they agree. Anything that does not agree
+    drops into an exception queue a human works. One engine, two views: the platform (us) and the merchant.</p></div>
+  <div class="demo-grid">
+    <div class="sim-canvas"><svg id="svg-recon" viewBox="0 0 1100 440" role="img" aria-label="Reconciliation three-way match flow"></svg></div>
+    <div class="control-panel">
+      <div class="cp-title">Run it</div>
+      <div class="scenario-group">
+        <button class="action run" id="rc-clean">Match (clean)</button>
+        <button class="action" id="rc-exc">Find an exception</button>
+        <button class="action reset" id="rc-reset">Reset</button>
+      </div>
+      <div class="cp-title">Live log</div>
+      <div class="sim-log" id="log-recon"><div class="log-line">Press Match (clean).</div></div>
+    </div>
+  </div>
+  <div class="facts-panel">
+    <div class="fact-card"><h4>How it works</h4><ul>
+      <li>Three-way match: our event ledger, the processor settlement file, and the bank deposit.</li>
+      <li>Agree within tolerance, tie-out clean. Disagree, it becomes an exception in the console.</li>
+      <li>Checked at three levels: each transaction, each payout, and the period close.</li>
+      <li>The engine is its own subsystem; the console is just where a human works the exceptions.</li>
+    </ul></div>
+    <div class="fact-card invest"><h4>Why this matters for the investor</h4><ul>
+      <li>One reconciled view across every processor is a headline reason a merchant switches.</li>
+      <li>Our own books tie out, so recovery and approval claims are provable, not asserted.</li>
+      <li>We adopt HyperSwitch's recon module and add the bank leg, not a build from scratch.</li>
+    </ul></div>
+  </div>
+</div>
+
+<footer class="fineprint">
+  Howard Koziara - Orvanna (codename) - Flows, June 2026<br/>
+  Globex Wellness is a fictional company. No real company data is used.<br/>
+  Plain path: C:\Users\howar\Desktop\Desktop\CLAUDE-WORK\payment-projects\ORCHESTRATOR + VAULT + 3DS\ORCHESTRATOR\ORVANNA\Orvanna-Flows.html
+</footer>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+function log(id,msg,type){const el=document.getElementById(id);const d=document.createElement('div');d.className='log-line '+(type||'');d.textContent=msg;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function clearLog(id,msg){document.getElementById(id).innerHTML='<div class="log-line">'+(msg||'')+'</div>';}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function animateDot(svg,path,color,duration){duration=duration||1000;return new Promise(res=>{
+  const dot=document.createElementNS(NS,'circle');dot.setAttribute('r','6.5');dot.setAttribute('fill',color);
+  dot.setAttribute('style','filter:drop-shadow(0 0 9px '+color+');opacity:.97');dot.setAttribute('cx',path[0][0]);dot.setAttribute('cy',path[0][1]);
+  svg.appendChild(dot);const start=performance.now();const segs=path.length-1;
+  // resilient ticker: smooth frames when visible, timer fallback when the page is hidden/blurred
+  // (browsers pause requestAnimationFrame on hidden pages, which would freeze the dot mid-flight)
+  const tick=fn=>document.hidden?setTimeout(()=>fn(performance.now()),16):requestAnimationFrame(fn);
+  function step(t){const p=Math.min((t-start)/duration,1);const tot=p*segs;const i=Math.min(Math.floor(tot),segs-1);const f=tot-i;
+    dot.setAttribute('cx',path[i][0]+(path[i+1][0]-path[i][0])*f);dot.setAttribute('cy',path[i][1]+(path[i+1][1]-path[i][1])*f);
+    if(p<1)tick(step);else{dot.remove();res();}}
+  tick(step);});}
+const DEFS='<defs><filter id="soft" x="-30%" y="-40%" width="160%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.45"/></filter></defs>';
+function node(x,y,label,fill,stroke,text,width,sub){width=width||120;const h=sub?54:40;
+  return '<rect x="'+(x-width/2)+'" y="'+(y-h/2)+'" width="'+width+'" height="'+h+'" rx="12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,.55))"/>'+
+    '<text x="'+x+'" y="'+(sub?y-5:y+5)+'" fill="'+text+'" font-size="12.5" font-weight="800" text-anchor="middle">'+label+'</text>'+
+    (sub?'<text x="'+x+'" y="'+(y+13)+'" fill="'+text+'" font-size="10" opacity="0.78" text-anchor="middle">'+sub+'</text>':'');}
+function diamond(x,y,label,fill,stroke,text){const r=42;
+  return '<polygon points="'+x+','+(y-r)+' '+(x+r)+','+y+' '+x+','+(y+r)+' '+(x-r)+','+y+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="2" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,.55))"/>'+
+    '<text x="'+x+'" y="'+(y+4)+'" fill="'+text+'" font-size="11" font-weight="800" text-anchor="middle">'+label+'</text>';}
+function line(x1,y1,x2,y2,color,op,dash){return '<path d="M '+x1+' '+y1+' L '+x2+' '+y2+'" stroke="'+color+'" stroke-width="2" fill="none" opacity="'+(op||0.6)+'"'+(dash?' stroke-dasharray="6 5"':'')+'/>';}
+const C={slate:['#1e293b','#94a3b8','#e2e8f0'],blue:['#15233f','#3b82f6','#dbeafe'],blue2:['#1e40af','#60a5fa','#dbeafe'],
+  gold:['#3a2606','#f59e0b','#fde68a'],green:['#0f3d22','#22c55e','#bbf7d0'],purple:['#2a1a4a','#a855f7','#e9d5ff'],
+  red:['#3a0f12','#ef4444','#fecaca'],gray:['#11182b','#475569','#cbd5e1']};
+function N(x,y,l,c,w,sub){return node(x,y,l,c[0],c[1],c[2],w,sub);}
+
+/* ===== TAB 1: END TO END ===== */
+function drawE2E(active){const svg=document.getElementById('svg-e2e');let s=DEFS;
+  const zones=[['INITIATION',40,250,'#1e293b'],['VAULT',300,250,'#0f3d22'],['ORCHESTRATOR',560,250,'#15233f'],['PROVIDER',820,250,'#11182b'],['SETTLEMENT',1010,250,'#3a2606']];
+  // zone bands
+  const bands=[[40,236],[300,236],[560,236],[820,176],[1010,176]];
+  s+='<rect x="30" y="60" width="240" height="360" rx="14" fill="#0e1626" stroke="#1c2742"/>';
+  s+='<rect x="285" y="60" width="240" height="360" rx="14" fill="#0c1a12" stroke="#173a26"/>';
+  s+='<rect x="540" y="60" width="245" height="360" rx="14" fill="#0c1424" stroke="#172642"/>';
+  s+='<rect x="800" y="60" width="190" height="360" rx="14" fill="#0c111f" stroke="#1a2233"/>';
+  s+='<rect x="1005" y="60" width="170" height="360" rx="14" fill="#1c1405" stroke="#3a2606"/>';
+  const lab=[['INITIATION',150],['VAULT',405],['ORCHESTRATOR',662],['PROVIDER',895],['SETTLE',1090]];
+  lab.forEach(z=>{s+='<text x="'+z[1]+'" y="86" fill="#5b6b86" font-size="11" font-weight="800" letter-spacing="1.2" text-anchor="middle">'+z[0]+'</text>';});
+  // connecting lines (spine)
+  s+=line(150,300,150,250,'#2a3450');
+  s+=line(150,250,405,250,'#2a3450');s+=line(405,250,662,250,'#2a3450');s+=line(662,250,895,250,'#2a3450');s+=line(895,250,1090,250,'#2a3450');
+  s+=line(662,250,662,330,'#2a3450',0.5,true);
+  // decline loop
+  s+='<path d="M 895 290 Q 780 380 662 340" stroke="#ef4444" stroke-width="2" fill="none" opacity="0.55" stroke-dasharray="6 5"/>';
+  s+='<text x="770" y="392" fill="#fca5a5" font-size="10" text-anchor="middle">decline -> retry</text>';
+  // response path
+  s+='<path d="M 1090 230 Q 1090 130 980 130" stroke="#3b82f6" stroke-width="2" fill="none" opacity="0.45" stroke-dasharray="6 5"/>';
+  s+=N(900,130,'Shopper notified',C.blue,150,'webhook result');
+  // nodes
+  s+=N(150,330,'Customer',C.slate,120);
+  s+=N(150,250,'Globex + Orvanna',C.blue,150,'starts payment');
+  s+=N(405,200,'Neutral vault',C.green,150,'tokenize');
+  s+=N(405,300,'Network token',C.green,150,'ours, portable');
+  s+=N(662,200,'Routing core',C.blue,160,'risk, route, rules');
+  s+=N(662,330,'Honest retry',C.gold,150,'token>card>other');
+  s+=N(895,200,'Processor',C.gray,150,'best one');
+  s+=N(895,300,'Approved?',C.gold,150);
+  s+=N(1090,200,'Capture + settle',C.gold,150);
+  s+=N(1090,310,'Reconcile',C.gold,150,'+ analytics');
+  svg.innerHTML=s;}
+async function runE2E(kind){const svg=document.getElementById('svg-e2e');drawE2E();clearLog('log-e2e','Running: '+kind);
+  const b='#3b82f6',g='#22c55e',y='#f59e0b',p='#a855f7';
+  log('log-e2e','Shopper starts a payment.','info');
+  await animateDot(svg,[[150,330],[150,250]],b);
+  await animateDot(svg,[[150,250],[405,250],[405,210]],b);
+  log('log-e2e','Card goes to the neutral vault. A portable network token is made under our control.','info');
+  await animateDot(svg,[[405,250],[662,250],[662,210]],g);
+  log('log-e2e','Routing core picks the best processor (token only, never the raw card).','info');
+  if(kind==='With 3DS'){log('log-e2e','3DS required: shopper authenticates first (see the 3DS tab).','purple');await sleep(500);}
+  await animateDot(svg,[[662,210],[895,210]],b);
+  if(kind==='With a decline (retry)'){
+    log('log-e2e','Processor soft-declines.','warn');
+    await animateDot(svg,[[895,290],[780,360],[662,330]],y);
+    log('log-e2e','Honest retry reroutes to another processor...','warn');
+    await animateDot(svg,[[662,330],[895,210]],g);
+  }
+  log('log-e2e','Approved.','success');
+  await animateDot(svg,[[895,250],[1090,250],[1090,210]],g);
+  log('log-e2e','Captured and settled. Reconciled, analytics updated.','success');
+  await animateDot(svg,[[1090,210],[1090,140],[975,130]],b);
+  log('log-e2e','Shopper gets the result. One charge, done.','success');}
+
+/* ===== TAB 2: VAULT & TOKEN ===== */
+function drawVault(){const svg=document.getElementById('svg-vault');let s=DEFS;
+  s+=line(150,150,300,150,'#2a3450');s+=line(360,150,500,90,'#2a3450');s+=line(360,150,500,210,'#2a3450');
+  s+=line(560,90,560,90,'#2a3450');
+  s+=line(620,150,760,150,'#2a3450');s+=line(820,150,960,150,'#2a3450');
+  s+='<path d="M 500 210 Q 660 300 820 180" stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.4" stroke-dasharray="6 5"/>';
+  s+='<text x="660" y="300" fill="#fcd34d" font-size="10" text-anchor="middle">card is the backup</text>';
+  s+=N(90,150,'Shopper',C.slate,120,'enters card once');
+  s+=N(300,150,'Neutral vault',C.green,150,'we control it');
+  s+=N(560,90,'PAN stored',C.gray,150,'in vault only');
+  s+=N(560,210,'Network token',C.green,160,'under OUR name');
+  s+=N(720,150,'Orvanna',C.blue,140,'asks by reference');
+  s+=N(960,150,'Processor',C.gray,150,'gets the token');
+  svg.innerHTML=s;}
+async function runVault(kind){const svg=document.getElementById('svg-vault');drawVault();clearLog('log-vault','Running: '+kind);
+  const b='#3b82f6',g='#22c55e',y='#f59e0b';
+  if(kind==='Store a card'){
+    log('log-vault','Shopper enters a card for the first time.','info');
+    await animateDot(svg,[[150,150],[300,150]],b);
+    log('log-vault','Vault stores the real card number (PAN).','info');
+    await animateDot(svg,[[360,150],[500,90]],b);
+    log('log-vault','Vault provisions a network token under OUR token-requestor control.','success');
+    await animateDot(svg,[[360,150],[500,210]],g);
+    log('log-vault','Done. We hold a portable token. The core only ever sees a reference.','success');return;}
+  if(kind==='Charge (token first)'){
+    log('log-vault','Time to charge. Orvanna asks the vault by reference.','info');
+    await animateDot(svg,[[720,150],[560,210]],g);
+    log('log-vault','Token returned. Sent to the processor.','info');
+    await animateDot(svg,[[560,210],[720,150],[960,150]],g);
+    log('log-vault','Approved on the token. The raw card never left the vault.','success');return;}
+  if(kind==='Token fails, use card'){
+    log('log-vault','Token sent, but this issuer is not token-ready.','warn');
+    await animateDot(svg,[[720,150],[960,150]],g);
+    log('log-vault','Declined for a token reason. Falling back to the card from the vault...','warn');
+    await animateDot(svg,[[560,210],[700,250],[820,180],[960,150]],y);
+    log('log-vault','Approved on the card. We owned that second chance.','success');return;}
+  if(kind==='Switch processor'){
+    log('log-vault','We add a new processor.','info');
+    await animateDot(svg,[[720,150],[560,210]],g);
+    log('log-vault','Same token, handed to the NEW processor.','success');
+    await animateDot(svg,[[560,210],[720,150],[960,150]],g);
+    log('log-vault','Approved. Zero cards re-collected. That is what owning the token buys us.','success');return;}}
+
+/* ===== TAB 3: 3DS ===== */
+function drawTds(){const svg=document.getElementById('svg-tds');let s=DEFS;
+  s+=line(150,200,218,200,'#2a3450');s+=line(302,200,360,200,'#2a3450');
+  s+=line(440,200,560,200,'#2a3450');s+=line(440,200,440,300,'#2a3450',0.6,true);
+  s+=line(620,200,760,200,'#2a3450');s+=line(840,200,960,200,'#2a3450');
+  s+=N(90,200,'Payment ready',C.blue,130);
+  s+=diamond(260,200,'3DS?','#2a1a4a','#a855f7','#e9d5ff');
+  s+=N(440,200,'3DS provider',C.purple,150,'ACS, swappable');
+  s+=N(440,320,'Challenge',C.purple,140,'shopper confirms');
+  s+=N(620,200,'Auth result',C.green,150,'cryptogram');
+  s+=N(790,200,'Routing core',C.blue,150,'best processor');
+  s+=N(960,200,'Authorize',C.gray,140);
+  svg.innerHTML=s;}
+async function runTds(kind){const svg=document.getElementById('svg-tds');drawTds();clearLog('log-tds','Running: '+kind);
+  const b='#3b82f6',g='#22c55e',p='#a855f7';
+  log('log-tds','Payment is ready. Does it need 3DS?','info');
+  await animateDot(svg,[[150,200],[218,200]],b);
+  if(kind==='Not required'){
+    log('log-tds','No mandate, low risk. Skip 3DS.','info');
+    await animateDot(svg,[[302,200],[790,200]],b);
+    log('log-tds','Straight to routing and authorize. Done.','success');return;}
+  log('log-tds','Yes. Authenticate first (standalone Model A).','purple');
+  await animateDot(svg,[[302,200],[440,200]],p);
+  if(kind==='Challenge'){
+    log('log-tds','Challenge: shopper confirms in their banking app...','purple');
+    await animateDot(svg,[[440,200],[440,300]],p);await sleep(500);
+    log('log-tds','Confirmed.','success');
+    await animateDot(svg,[[440,320],[620,200]],g);
+  }else{
+    log('log-tds','Frictionless: the bank approves silently.','success');
+    await animateDot(svg,[[440,200],[620,200]],g);
+  }
+  log('log-tds','Authentication result attached.','success');
+  await animateDot(svg,[[620,200],[790,200]],b);
+  log('log-tds','Routed to the best processor and authorized. Done.','success');}
+
+/* ===== TAB 4: HONEST RETRY ===== */
+function drawRetry(){const svg=document.getElementById('svg-retry');let s=DEFS;
+  s+=line(180,210,258,210,'#2a3450');
+  s+=line(342,210,440,110,'#2a3450');s+=line(342,210,440,210,'#2a3450');s+=line(342,210,440,310,'#2a3450');
+  s+=line(520,110,660,110,'#2a3450');
+  s+='<path d="M 660 110 Q 760 110 760 160 Q 760 210 700 210" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.5" stroke-dasharray="6 5"/>';
+  s+=N(110,210,'Decline',C.red,120);
+  s+=diamond(300,210,'What kind?','#11182b','#475569','#cbd5e1');
+  s+=N(470,110,'Soft',C.gold,120,'recoverable');
+  s+=N(470,210,'Hard',C.red,120,'stolen, closed');
+  s+=N(470,310,'Dead sub',C.red,130,'streak past limit');
+  s+=N(640,110,'Retry / reroute',C.green,150,'token>card>other');
+  s+=N(660,210,'STOP',C.gray,110,'no retry');
+  s+=N(660,310,'STOP',C.gray,110,'unrecoverable');
+  svg.innerHTML=s;}
+async function runRetry(kind){const svg=document.getElementById('svg-retry');drawRetry();clearLog('log-retry','Running: '+kind);
+  const g='#22c55e',y='#f59e0b',r='#ef4444';
+  log('log-retry','A charge is declined. Classify it.','info');
+  await animateDot(svg,[[180,210],[258,210]],'#94a3b8');
+  if(kind==='Soft decline (recover)'){
+    log('log-retry','Soft (timeout / do-not-honor). Recoverable.','warn');
+    await animateDot(svg,[[342,210],[440,110]],y);
+    await animateDot(svg,[[520,110],[640,110]],g);
+    log('log-retry','Retry the token, then the card, then another processor...','warn');
+    await animateDot(svg,[[700,160],[660,210],[470,210]],g);
+    log('log-retry','Approved on the reroute. Charge-once means no double-bill. Real money recovered.','success');return;}
+  if(kind==='Hard decline (stop)'){
+    log('log-retry','Hard (stolen / closed account). Not recoverable.','error');
+    await animateDot(svg,[[342,210],[440,210]],r);
+    await animateDot(svg,[[530,210],[660,210]],'#94a3b8');
+    log('log-retry','Stop now. Retrying would burn fees and annoy the bank.','info');return;}
+  if(kind==='Dead subscription (stop)'){
+    log('log-retry','This subscription is past the failed-streak limit. The customer is gone.','error');
+    await animateDot(svg,[[342,210],[440,310]],r);
+    await animateDot(svg,[[535,310],[660,310]],'#94a3b8');
+    log('log-retry','Stop. We do not chase the unrecoverable. That honesty keeps our numbers true.','info');return;}}
+
+/* ===== TAB 5: CONNECT A PROCESSOR ===== */
+function drawConn(){const svg=document.getElementById('svg-conn');let s=DEFS;
+  s+=line(180,200,258,200,'#2a3450');s+=line(382,200,460,200,'#2a3450');
+  s+=line(560,200,640,120,'#2a3450');s+=line(560,200,640,280,'#2a3450');
+  s+=N(110,200,'New processor',C.blue,140);
+  s+=N(320,200,'Build adapter',C.blue2,150,'to one interface');
+  s+=diamond(510,200,'Certify?','#11182b','#475569','#cbd5e1');
+  s+=N(700,120,'LIVE',C.green,130,'selectable in routing');
+  s+=N(700,280,'TEST only',C.red,140,'no live traffic');
+  s+='<text x="320" y="300" fill="#5b6b86" font-size="11" text-anchor="middle">interface: authorize . capture . refund . void . tokenize . status</text>';
+  svg.innerHTML=s;}
+async function runConn(kind){const svg=document.getElementById('svg-conn');drawConn();clearLog('log-conn','Running: '+kind);
+  const b='#3b82f6',g='#22c55e',r='#ef4444';
+  log('log-conn','We need a new processor live.','info');
+  await animateDot(svg,[[180,200],[258,200]],b);
+  log('log-conn','Build one thin adapter to our standard interface (not a custom project).','info');
+  await animateDot(svg,[[382,200],[468,200]],b);
+  log('log-conn','Run the certification suite in sandbox: authorize, capture, refund, void, declines.','info');
+  await sleep(500);
+  if(kind==='Build and certify (pass)'){
+    log('log-conn','All cases pass.','success');
+    await animateDot(svg,[[560,200],[640,120]],g);
+    log('log-conn','Marked LIVE. Now selectable in routing rules. A known, repeatable job.','success');return;}
+  log('log-conn','A required case fails.','error');
+  await animateDot(svg,[[560,200],[640,280]],r);
+  log('log-conn','Stays in TEST. Cannot take live traffic until it passes. That is the quality gate.','warn');}
+
+/* ===== TAB 6: RECONCILIATION ===== */
+function drawRecon(){const svg=document.getElementById('svg-recon');let s=DEFS;
+  s+=line(232,100,400,190,'#2a3450');s+=line(240,210,400,210,'#2a3450');s+=line(240,320,400,232,'#2a3450');
+  s+=line(560,195,700,130,'#2a3450');s+=line(560,225,700,300,'#2a3450');
+  s+=N(155,100,'Our ledger',C.blue,150,'captured $100');
+  s+=N(155,210,'Processor file',C.gray,170,'cleared $100, fee $2.90');
+  s+=N(155,320,'Bank deposit',C.gold,165,'deposited $97.10');
+  s+=N(480,210,'Match engine',C.purple,160,'three-way');
+  s+=N(785,130,'Tie-out clean',C.green,165,'no action');
+  s+=N(785,300,'Exception queue',C.red,185,'worked in console');
+  s+='<text x="785" y="400" fill="#5b6b86" font-size="11" text-anchor="middle">one engine, two views: platform (us) + merchant (the user)</text>';
+  svg.innerHTML=s;}
+async function runRecon(kind){const svg=document.getElementById('svg-recon');drawRecon();clearLog('log-recon','Running: '+kind);
+  const b='#3b82f6',g='#22c55e',y='#f59e0b',r='#ef4444',gr='#94a3b8';
+  log('log-recon','A settlement file lands. Pull our ledger and the bank deposit.','info');
+  await animateDot(svg,[[230,100],[400,190]],b);
+  await animateDot(svg,[[240,210],[400,210]],gr);
+  await animateDot(svg,[[240,320],[400,232]],y);
+  log('log-recon','Three-way match running...','info');await sleep(300);
+  if(kind==='Match (clean)'){
+    log('log-recon','Our $100 capture, processor cleared $100 less $2.90 fee, bank shows $97.10. All three agree.','success');
+    await animateDot(svg,[[560,195],[700,130]],g);
+    log('log-recon','Tie-out clean. Nothing to work. Both views, us and the merchant, show paid.','success');return;}
+  log('log-recon','Mismatch: we captured $100, the processor only settled $96. A $4 short-pay.','warn');
+  await animateDot(svg,[[560,225],[700,300]],r);
+  log('log-recon','It drops into the exception queue. A human works it in the console. That is the honest part.','info');}
+
+/* ===== wire up ===== */
+const renderers={e2e:()=>drawE2E(),vault:drawVault,tds:drawTds,retry:drawRetry,conn:drawConn,recon:drawRecon};
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  const t=btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelector('.tab-page[data-page="'+t+'"]').classList.add('active');
+  if(renderers[t])renderers[t]();
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+document.getElementById('e-happy').addEventListener('click',()=>runE2E('Run a payment'));
+document.getElementById('e-decline').addEventListener('click',()=>runE2E('With a decline (retry)'));
+document.getElementById('e-3ds').addEventListener('click',()=>runE2E('With 3DS'));
+document.getElementById('v-store').addEventListener('click',()=>runVault('Store a card'));
+document.getElementById('v-charge').addEventListener('click',()=>runVault('Charge (token first)'));
+document.getElementById('v-pan').addEventListener('click',()=>runVault('Token fails, use card'));
+document.getElementById('v-switch').addEventListener('click',()=>runVault('Switch processor'));
+document.getElementById('d-fric').addEventListener('click',()=>runTds('Frictionless'));
+document.getElementById('d-chal').addEventListener('click',()=>runTds('Challenge'));
+document.getElementById('d-skip').addEventListener('click',()=>runTds('Not required'));
+document.getElementById('r-soft').addEventListener('click',()=>runRetry('Soft decline (recover)'));
+document.getElementById('r-hard').addEventListener('click',()=>runRetry('Hard decline (stop)'));
+document.getElementById('r-dead').addEventListener('click',()=>runRetry('Dead subscription (stop)'));
+document.getElementById('c-pass').addEventListener('click',()=>runConn('Build and certify (pass)'));
+document.getElementById('c-fail').addEventListener('click',()=>runConn('Certify (fail)'));
+// Reset buttons: redraw the clean diagram and clear the log (also clears any stalled dot)
+document.getElementById('e-reset').addEventListener('click',()=>{drawE2E();clearLog('log-e2e','Press Run a payment.');});
+document.getElementById('v-reset').addEventListener('click',()=>{drawVault();clearLog('log-vault','Press Store a card.');});
+document.getElementById('d-reset').addEventListener('click',()=>{drawTds();clearLog('log-tds','Press a scenario.');});
+document.getElementById('r-reset').addEventListener('click',()=>{drawRetry();clearLog('log-retry','Press a scenario.');});
+document.getElementById('c-reset').addEventListener('click',()=>{drawConn();clearLog('log-conn','Press Build and certify.');});
+document.getElementById('rc-clean').addEventListener('click',()=>runRecon('Match (clean)'));
+document.getElementById('rc-exc').addEventListener('click',()=>runRecon('Find an exception'));
+document.getElementById('rc-reset').addEventListener('click',()=>{drawRecon();clearLog('log-recon','Press Match (clean).');});
+Object.keys(renderers).forEach(k=>{try{renderers[k]();}catch(e){}});
+</script>
+</body>
+</html>
