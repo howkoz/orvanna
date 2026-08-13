@@ -141,8 +141,11 @@ untouched. Unique partial index: only one run per period may be 'final'.
 | amount | numeric(12,2) | round half up (rate times source_cv, 2 decimals) |
 | payout_type | text | 'unilevel_level_pay' in v1 (forward compatibility: multiple payout types per run in v2) |
 
-Index: (run_id, earner_id). IMMUTABILITY: a trigger rejects UPDATE and DELETE on
-commission_lines and run_member_results when their run's status is 'final'.
+Index: (run_id, earner_id). IMMUTABILITY: triggers reject INSERT, UPDATE, and DELETE
+on commission_lines and run_member_results whenever the referenced run's status is
+'final' (the INSERT check validates NEW.run_id), so a finalized statement can neither
+change, shrink, NOR silently grow. (Spec corrected 2026-08-13 after the verifier gate
+caught that the original wording allowed INSERT; migration update due before Phase 3.)
 
 ## 2. Row-Level Security intent
 

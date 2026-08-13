@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orvanna Compensation Plan, version 1.1</title>
+<style>
+  :root{
+    --indigo:#4F46E5; --cyan:#22D3EE; --ink:#0F172A; --muted:#5B6472;
+    --paper:#FFFFFF; --tint:#EEF0FF; --line:#D8DCE5; --warn:#FFF7DB; --warnline:#C9A227;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI', Arial, sans-serif; background:#E9EBF2; color:var(--ink); line-height:1.55;}
+  .page{max-width:880px; margin:24px auto; background:var(--paper); padding:56px 64px; box-shadow:0 2px 14px rgba(15,23,42,.12);}
+  h1{font-size:34px; letter-spacing:1px;}
+  h2{font-size:22px; color:var(--indigo); margin:40px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--tint); letter-spacing:.5px;}
+  h3{font-size:16px; margin:20px 0 8px;}
+  p{margin:10px 0;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:14.5px;}
+  th{background:var(--indigo); color:#fff; text-align:left; padding:9px 12px; font-weight:600;}
+  td{border:1px solid var(--line); padding:8px 12px;}
+  tr:nth-child(even) td{background:#F7F8FC;}
+  .num{text-align:right; font-variant-numeric:tabular-nums;}
+  .brand{display:flex; align-items:center; gap:20px; margin-bottom:10px;}
+  .wordmark{font-size:40px; font-weight:600; letter-spacing:9px; color:var(--ink);}
+  .stamp{display:inline-block; background:var(--tint); border:1px solid var(--indigo); color:var(--indigo); font-weight:600; padding:4px 14px; border-radius:20px; font-size:13px; margin:6px 8px 6px 0;}
+  .callout{background:var(--tint); border-left:5px solid var(--indigo); padding:14px 18px; margin:16px 0; border-radius:0 8px 8px 0;}
+  .warn{background:var(--warn); border-left:5px solid var(--warnline); padding:14px 18px; margin:16px 0; border-radius:0 8px 8px 0;}
+  .small{font-size:13px; color:var(--muted);}
+  .figure{margin:18px 0; text-align:center;}
+  .figure svg{max-width:100%; height:auto;}
+  ol,ul{margin:10px 0 10px 26px;}
+  li{margin:6px 0;}
+  .toc a{color:var(--indigo); text-decoration:none;}
+  .toc li{margin:4px 0;}
+  footer{margin-top:44px; padding-top:14px; border-top:2px solid var(--tint); font-size:12.5px; color:var(--muted);}
+  @media print{
+    body{background:#fff;}
+    .page{box-shadow:none; margin:0; padding:36px 44px; max-width:none;}
+    h2{page-break-after:avoid;}
+    table, .figure, .callout, .warn{page-break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brand">
+    <svg width="86" height="86" viewBox="0 0 60 60" aria-label="Orvanna badge">
+      <polygon points="30,3 55.4,17.5 55.4,46.5 30,61 4.6,46.5 4.6,17.5" fill="none" stroke="#4F46E5" stroke-width="5" stroke-linejoin="round" transform="translate(0,-2)"/>
+      <line x1="30" y1="28" x2="30" y2="13" stroke="#4F46E5" stroke-width="2.4"/>
+      <line x1="30" y1="28" x2="18" y2="38" stroke="#4F46E5" stroke-width="2.4"/>
+      <line x1="30" y1="28" x2="42" y2="38" stroke="#4F46E5" stroke-width="2.4"/>
+      <circle cx="30" cy="13" r="4" fill="#4F46E5"/>
+      <circle cx="18" cy="38" r="4" fill="#4F46E5"/>
+      <circle cx="42" cy="38" r="4" fill="#4F46E5"/>
+      <circle cx="30" cy="28" r="4.8" fill="#22D3EE"/>
+    </svg>
+    <div>
+      <div class="wordmark">ORVANNA</div>
+      <div style="font-size:19px; color:var(--muted); letter-spacing:2px;">COMPENSATION PLAN</div>
+    </div>
+  </div>
+
+  <div>
+    <span class="stamp">Version 1.1</span>
+    <span class="stamp">Effective month: 2026-08</span>
+    <span class="stamp">One canonical document</span>
+  </div>
+
+  <div class="warn"><strong>Demonstration document.</strong> Orvanna's member program is a working prototype with synthetic data. Every number on these pages is real to the demo's commission engine and to nothing else: no actual earnings, members, or payments exist. Figures shown are never a promise of income.</div>
+
+  <h2 id="toc">Contents</h2>
+  <ol class="toc">
+    <li><a href="#products">The products: AI agents</a></li>
+    <li><a href="#glossary">Every term, defined</a></li>
+    <li><a href="#qualify">Qualifying each month</a></li>
+    <li><a href="#ranks">Ranks</a></li>
+    <li><a href="#pay">How you get paid: level pay</a></li>
+    <li><a href="#example">A complete example month, to the cent</a></li>
+    <li><a href="#calendar">The operational calendar</a></li>
+    <li><a href="#changes">Cancellations, refunds, and reruns</a></li>
+    <li><a href="#versions">Versions and changes</a></li>
+  </ol>
+
+  <h2 id="products">1. The products: AI agents</h2>
+  <p>Orvanna sells digital AI agents as monthly subscriptions. There is nothing to ship and nothing to stock. Each subscription bills monthly and carries Personal Volume (PV), the plan's point value. PV equals dollars, one for one.</p>
+  <table>
+    <tr><th>Tier</th><th>What they do</th><th>Examples</th><th class="num">Price / month</th><th class="num">PV / month</th></tr>
+    <tr><td><strong>Domain agents</strong></td><td>run one business function end to end</td><td>Payment Agent, Shipping Agent, Pricing Agent, Inventory Agent, Marketing Agent, Tax Agent</td><td class="num">$100.00</td><td class="num">100</td></tr>
+    <tr><td><strong>Support agents</strong></td><td>staff roles that assist the business</td><td>Software Engineer, Quality Assurance, Secretary, Chief Executive, Accounting, Customer Care</td><td class="num">$50.00</td><td class="num">50</td></tr>
+  </table>
+
+  <h2 id="glossary">2. Every term, defined</h2>
+  <table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>Personal Volume (PV)</strong></td><td>The point value of a product. One dollar of subscription equals one PV.</td></tr>
+    <tr><td><strong>Sales Volume (SV)</strong></td><td>Your own total PV in one calendar month, across all your subscriptions.</td></tr>
+    <tr><td><strong>Commissionable Volume (CV)</strong></td><td>The base commissions are paid on: exactly 80 percent of SV, rounded half up to 2 decimals. Nothing else is ever the base.</td></tr>
+    <tr><td><strong>Sponsor</strong></td><td>The member who enrolled you. Your sponsor's sponsor is level 2 above you, and so on.</td></tr>
+    <tr><td><strong>Leg</strong></td><td>One member you personally sponsored, together with everyone below them.</td></tr>
+    <tr><td><strong>Active leg</strong></td><td>A leg whose FIRST member (the one you sponsored) is qualified this month. Deeper activity does not rescue an unqualified frontline.</td></tr>
+    <tr><td><strong>Team Volume (TV)</strong></td><td>The total SV of everyone strictly below you this month. Your own SV is not included.</td></tr>
+    <tr><td><strong>Qualified</strong></td><td>SV of 100 or more this month. See section 3.</td></tr>
+    <tr><td><strong>Level</strong></td><td>Plain distance in the sponsorship tree. The people you sponsored are level 1 to you; theirs are level 2; and so on. Levels never skip or compress in this version.</td></tr>
+    <tr><td><strong>Commission run</strong></td><td>The monthly calculation batch. Versioned, numbered, and locked once final.</td></tr>
+  </table>
+
+  <h2 id="qualify">3. Qualifying each month</h2>
+  <div class="callout"><strong>The one gate: 100 PV.</strong> A month counts for you when your own SV is 100 or more. Exactly 100 qualifies. One domain agent does it, two support agents do it, any mix reaching 100 does it.</div>
+  <p>Being qualified does two things at once:</p>
+  <ol>
+    <li><strong>You can be paid.</strong> Commissions for a month are paid only to members qualified in that month. An unqualified month means no check, with no exceptions and no makeup later.</li>
+    <li><strong>Your sponsor's leg count includes you.</strong> Rank requirements count ACTIVE legs, and your leg is active for your sponsor only when you are qualified.</li>
+  </ol>
+  <p>A member holding a single support agent (50 PV) stays enrolled and keeps their team, but is not qualified: no check that month, and their sponsor loses that leg for rank purposes. Qualification resets every month; every month stands alone.</p>
+  <div class="warn"><strong>Plain-dealing note.</strong> In this version qualification comes from your own subscriptions. A future version adds customer sales so qualification can rest on volume you SELL, not only volume you buy; the order system already carries the buyer-type field for it.</div>
+
+  <h2 id="ranks">4. Ranks</h2>
+  <p>Ranks recompute from scratch every month: you are what you did this month. You hold the HIGHEST rank whose requirements you fully meet. Every threshold is inclusive ("or more").</p>
+  <table>
+    <tr><th>Rank</th><th>Requirements, all in the same month</th><th class="num">Paid depth</th></tr>
+    <tr><td>Member</td><td>enrolled</td><td class="num">1 level</td></tr>
+    <tr><td>Builder</td><td>SV 100+ AND 2 or more active legs</td><td class="num">2 levels</td></tr>
+    <tr><td>Leader</td><td>TV 2,500+ AND 3 or more active legs</td><td class="num">3 levels</td></tr>
+    <tr><td>Director</td><td>TV 10,000+ AND 2 or more legs each containing a Builder (or higher)</td><td class="num">4 levels</td></tr>
+    <tr><td>Executive</td><td>TV 40,000+ AND 2 or more legs each containing a Leader (or higher)</td><td class="num">5 levels</td></tr>
+  </table>
+  <p class="small">"A leg containing a Builder" means anyone in that leg, at any depth, earned Builder or higher this month.</p>
+
+  <h2 id="pay">5. How you get paid: level pay</h2>
+  <p>Each month you earn a percentage of the CV of every member within your PAID DEPTH (set by your rank, table above). The percentages by level:</p>
+  <table>
+    <tr><th>Level below you</th><th class="num">1</th><th class="num">2</th><th class="num">3</th><th class="num">4</th><th class="num">5</th></tr>
+    <tr><td>Percent of that member's CV</td><td class="num">10%</td><td class="num">5%</td><td class="num">5%</td><td class="num">3%</td><td class="num">2%</td></tr>
+  </table>
+  <p>Followed through one domain agent subscription: $100.00 of revenue is 100 PV, which is 80.00 CV. The five levels above the buyer can earn at most 8.00 + 4.00 + 4.00 + 2.40 + 1.60 = <strong>20.00, that is 20 percent of revenue</strong>. In practice less is paid out, because:</p>
+  <ul>
+    <li>an unqualified upline member earns nothing (their share is simply not paid);</li>
+    <li>an upline member whose paid depth stops short of the buyer's level is not paid for it;</li>
+    <li>there is NO compression: missed shares never roll to anyone else.</li>
+  </ul>
+  <p>Every commission line is rounded half up to 2 decimals at the line level. Totals are sums of rounded lines. The buyer's OWN qualification never matters for the upline: all CV pays upward, whoever generated it.</p>
+
+  <h2 id="example">6. A complete example month, to the cent</h2>
+  <p>Ten members, one month. Arrows show who sponsored whom.</p>
+  <div class="figure">
+  <svg viewBox="0 0 760 430" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+    <line x1="380" y1="86" x2="170" y2="130" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="380" y1="86" x2="405" y2="130" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="380" y1="86" x2="620" y2="130" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="170" y1="184" x2="95" y2="228" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="170" y1="184" x2="245" y2="228" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="405" y1="184" x2="415" y2="228" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="405" y1="184" x2="580" y2="228" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="95" y1="282" x2="95" y2="326" stroke="#9AA3B2" stroke-width="1.5"/>
+    <line x1="580" y1="282" x2="580" y2="326" stroke="#9AA3B2" stroke-width="1.5"/>
+    <g font-size="11.5">
+      <rect x="310" y="40" width="140" height="46" rx="7" fill="#EEF0FF" stroke="#4F46E5" stroke-width="2"/>
+      <text x="380" y="59" text-anchor="middle" font-weight="bold">M1 · LEADER</text>
+      <text x="380" y="76" text-anchor="middle">SV 200 · earns 114.00</text>
+      <rect x="100" y="138" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="170" y="157" text-anchor="middle" font-weight="bold">M2 · Member</text>
+      <text x="170" y="174" text-anchor="middle">SV 150 · earns 16.00</text>
+      <rect x="335" y="138" width="140" height="46" rx="7" fill="#E7F6FB" stroke="#22A6C9" stroke-width="2"/>
+      <text x="405" y="157" text-anchor="middle" font-weight="bold">M3 · BUILDER</text>
+      <text x="405" y="174" text-anchor="middle">SV 100 · earns 130.00</text>
+      <rect x="550" y="138" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="620" y="157" text-anchor="middle" font-weight="bold">M4 · Member</text>
+      <text x="620" y="174" text-anchor="middle">SV 100 · earns 0</text>
+      <rect x="25" y="236" width="140" height="46" rx="7" fill="#FDE8E6" stroke="#C0392B" stroke-width="2"/>
+      <text x="95" y="255" text-anchor="middle" font-weight="bold">M5 · NOT QUALIFIED</text>
+      <text x="95" y="272" text-anchor="middle">SV 50 · earns 0</text>
+      <rect x="175" y="236" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="245" y="255" text-anchor="middle" font-weight="bold">M6 · Member</text>
+      <text x="245" y="272" text-anchor="middle">SV 150 · earns 0</text>
+      <rect x="345" y="236" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="415" y="255" text-anchor="middle" font-weight="bold">M7 · Member</text>
+      <text x="415" y="272" text-anchor="middle">SV 1,500 · earns 0</text>
+      <rect x="510" y="236" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="580" y="255" text-anchor="middle" font-weight="bold">M8 · Member</text>
+      <text x="580" y="272" text-anchor="middle">SV 100 · earns 4.00</text>
+      <rect x="25" y="334" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="95" y="353" text-anchor="middle" font-weight="bold">M9 · Member</text>
+      <text x="95" y="370" text-anchor="middle">SV 300 · earns 0</text>
+      <rect x="510" y="334" width="140" height="46" rx="7" fill="#F7F8FC" stroke="#9AA3B2" stroke-width="1.5"/>
+      <text x="580" y="353" text-anchor="middle" font-weight="bold">M10 · Member</text>
+      <text x="580" y="370" text-anchor="middle">SV 50 · earns 0</text>
+    </g>
+    <text x="380" y="415" text-anchor="middle" font-size="12" fill="#5B6472">M1 hits Leader at exactly TV 2,500. M2 misses Builder because leg M5 is not qualified. M10's 50 PV still pays upline.</text>
+  </svg>
+  </div>
+
+  <h3>6.1 Volumes and qualification</h3>
+  <table>
+    <tr><th>Member</th><th>Subscriptions held</th><th class="num">SV</th><th class="num">CV (80%)</th><th>Qualified?</th><th class="num">TV</th><th>Rank</th><th class="num">Paid depth</th></tr>
+    <tr><td>M1</td><td>Payment + Pricing (2 domain)</td><td class="num">200.00</td><td class="num">160.00</td><td>yes</td><td class="num">2,500.00</td><td><strong>Leader</strong> (TV exactly 2,500)</td><td class="num">3</td></tr>
+    <tr><td>M2</td><td>Payment + Software Engineer</td><td class="num">150.00</td><td class="num">120.00</td><td>yes</td><td class="num">500.00</td><td>Member (only 1 active leg)</td><td class="num">1</td></tr>
+    <tr><td>M3</td><td>Shipping (1 domain)</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">1,650.00</td><td><strong>Builder</strong></td><td class="num">2</td></tr>
+    <tr><td>M4</td><td>Quality Assurance + Secretary</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M5</td><td>Accounting (1 support)</td><td class="num">50.00</td><td class="num">40.00</td><td><strong>NO</strong></td><td class="num">300.00</td><td>Member</td><td class="num">1, earns nothing</td></tr>
+    <tr><td>M6</td><td>Marketing + Customer Care</td><td class="num">150.00</td><td class="num">120.00</td><td>yes</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M7</td><td>agency stack, 12 domain + 6 support</td><td class="num">1,500.00</td><td class="num">1,200.00</td><td>yes</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M8</td><td>Software Engineer + Accounting</td><td class="num">100.00</td><td class="num">80.00</td><td>yes, boundary</td><td class="num">50.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M9</td><td>Payment + Shipping + Pricing</td><td class="num">300.00</td><td class="num">240.00</td><td>yes</td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+    <tr><td>M10</td><td>Secretary (1 support)</td><td class="num">50.00</td><td class="num">40.00</td><td><strong>NO</strong></td><td class="num">0.00</td><td>Member</td><td class="num">1</td></tr>
+  </table>
+
+  <h3>6.2 Every commission line in the run</h3>
+  <table>
+    <tr><th>Earner</th><th>Source</th><th class="num">Level</th><th class="num">Source CV</th><th class="num">Rate</th><th class="num">Amount</th></tr>
+    <tr><td>M1</td><td>M2</td><td class="num">1</td><td class="num">120.00</td><td class="num">10%</td><td class="num">12.00</td></tr>
+    <tr><td>M1</td><td>M3</td><td class="num">1</td><td class="num">80.00</td><td class="num">10%</td><td class="num">8.00</td></tr>
+    <tr><td>M1</td><td>M4</td><td class="num">1</td><td class="num">80.00</td><td class="num">10%</td><td class="num">8.00</td></tr>
+    <tr><td>M1</td><td>M5</td><td class="num">2</td><td class="num">40.00</td><td class="num">5%</td><td class="num">2.00</td></tr>
+    <tr><td>M1</td><td>M6</td><td class="num">2</td><td class="num">120.00</td><td class="num">5%</td><td class="num">6.00</td></tr>
+    <tr><td>M1</td><td>M7</td><td class="num">2</td><td class="num">1,200.00</td><td class="num">5%</td><td class="num">60.00</td></tr>
+    <tr><td>M1</td><td>M8</td><td class="num">2</td><td class="num">80.00</td><td class="num">5%</td><td class="num">4.00</td></tr>
+    <tr><td>M1</td><td>M9</td><td class="num">3</td><td class="num">240.00</td><td class="num">5%</td><td class="num">12.00</td></tr>
+    <tr><td>M1</td><td>M10</td><td class="num">3</td><td class="num">40.00</td><td class="num">5%</td><td class="num">2.00</td></tr>
+    <tr><td>M2</td><td>M5</td><td class="num">1</td><td class="num">40.00</td><td class="num">10%</td><td class="num">4.00</td></tr>
+    <tr><td>M2</td><td>M6</td><td class="num">1</td><td class="num">120.00</td><td class="num">10%</td><td class="num">12.00</td></tr>
+    <tr><td>M3</td><td>M7</td><td class="num">1</td><td class="num">1,200.00</td><td class="num">10%</td><td class="num">120.00</td></tr>
+    <tr><td>M3</td><td>M8</td><td class="num">1</td><td class="num">80.00</td><td class="num">10%</td><td class="num">8.00</td></tr>
+    <tr><td>M3</td><td>M10</td><td class="num">2</td><td class="num">40.00</td><td class="num">5%</td><td class="num">2.00</td></tr>
+    <tr><td>M8</td><td>M10</td><td class="num">1</td><td class="num">40.00</td><td class="num">10%</td><td class="num">4.00</td></tr>
+  </table>
+
+  <h3>6.3 The month's totals</h3>
+  <table>
+    <tr><th>Earner</th><th class="num">Statement total</th></tr>
+    <tr><td>M1 (Leader, paid 3 deep)</td><td class="num">114.00</td></tr>
+    <tr><td>M2 (Member, paid 1 deep)</td><td class="num">16.00</td></tr>
+    <tr><td>M3 (Builder, paid 2 deep)</td><td class="num">130.00</td></tr>
+    <tr><td>M8 (Member, paid 1 deep)</td><td class="num">4.00</td></tr>
+    <tr><td>everyone else</td><td class="num">0.00</td></tr>
+  </table>
+  <div class="callout"><strong>Company totals:</strong> 2,700.00 SV in, 2,160.00 CV, <strong>264.00 paid</strong> to 4 of 10 members. That is 12.22 percent of CV and 9.78 percent of revenue. Unpaid by design (breakage): M5's would-be 24.00 (not qualified) and M2's level 2 reach (12.00, beyond paid depth 1).</div>
+
+  <h2 id="calendar">7. The operational calendar</h2>
+  <ul>
+    <li><strong>Volume month:</strong> every order is stamped with its volume month at creation, in Coordinated Universal Time (UTC). Subscription orders always stamp the 1st of the month. The stamp never moves afterward.</li>
+    <li><strong>Cutoff:</strong> a calendar month's volume is complete when the month ends. Nothing enters a closed month.</li>
+    <li><strong>The run:</strong> after month end, the commission run computes volumes, qualification, ranks, and every commission line for that month, then is marked FINAL.</li>
+    <li><strong>Finality:</strong> a final run's statements are locked. They cannot be edited, deleted, or quietly added to.</li>
+  </ul>
+
+  <h2 id="changes">8. Cancellations, refunds, and reruns</h2>
+  <ul>
+    <li><strong>Cancelling a subscription</strong> stops its billing and its PV from the next month forward. The months already billed keep their volume.</li>
+    <li><strong>Refunds:</strong> not part of this version. When a future version introduces refunds, the published rule will state exactly how volume and paid commissions claw back. Until then, no refund can occur in the demo.</li>
+    <li><strong>Reruns:</strong> if a finalized month must ever be recomputed, the original run is preserved and marked superseded, and a NEW numbered run is issued. Statements always trace to the exact run that produced them.</li>
+  </ul>
+
+  <h2 id="versions">9. Versions and changes</h2>
+  <table>
+    <tr><th>Version</th><th>Date</th><th>What changed</th></tr>
+    <tr><td>1.0</td><td>2026-08-13</td><td>First complete plan: level pay 10/5/5/3/2, five ranks, 50 PV activity gate, generic product.</td></tr>
+    <tr><td>1.1</td><td>2026-08-13</td><td>Product locked to AI-agent subscriptions (domain $100 / support $50). Single qualification gate moved to 100 PV, doing both jobs (paid + active leg). Worked example rebuilt.</td></tr>
+  </table>
+  <p>This booklet is the ONLY member-facing statement of the plan. If any other page or message disagrees with it, this document and its version stamp govern. Rule changes take effect at the start of a stated month, never retroactively.</p>
+
+  <footer>
+    Orvanna Compensation Plan, version 1.1, effective 2026-08. Synthetic demonstration program: 1,000 simulated accounts, no real earnings. Source of truth for the engine: COMP-PLAN-SPEC.md v1.1, same numbers, same worked example.
+  </footer>
+</div>
+</body>
+</html>

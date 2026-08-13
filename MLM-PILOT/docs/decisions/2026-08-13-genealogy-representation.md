@@ -46,7 +46,8 @@ a run).
 
 ## Consequences
 
-- Migration 001 creates members with sponsor_id, its index, and the cycle-check
-  trigger.
+- Migration 001 creates members with sponsor_id and its index; the cycle-check trigger
+  shipped in migration 002 (001 through 005 apply as one wave before any data loads,
+  so protection is equivalent; deviation noted and accepted by the QA gate 2026-08-13).
 - The comp engine (Phase 3) creates the run-scoped level map as its first step; SV
   rollups and TV aggregation read from that snapshot, never live.

@@ -9,9 +9,9 @@
 ## Ownership guardrails (non-negotiable, same as Orvanna)
 
 - **Personal IP.** Built on Howard's own time, accounts, and domain.
-- **Brand persona: Globex Wellness** (the established generic persona). No Unicity
-  name, data, customer records, or proprietary numbers anywhere in schema, seed data,
-  site copy, or commits.
+- **Brand: Orvanna** (decided 2026-08-13; Howard's own brand, matching orvanna.io; the
+  earlier Globex Wellness placeholder is retired). No Unicity name, data, customer
+  records, or proprietary numbers anywhere in schema, seed data, site copy, or commits.
 - Generic industry terms only: "sales volume" and "team volume" (not Unicity's internal
   report names), "rank", "sponsor", "enrollment".
 - Hosting and database on a PERSONAL Supabase organization (new free org under
@@ -19,16 +19,18 @@
 
 ## What v1 proves (Council-scoped)
 
-A visitor to the domain sees a working member portal for a fake wellness company:
-1,000 members in a realistic unilevel tree, monthly sales volume rolling up the
-genealogy, ranks earned by rules, and a commission run that pays levels with an
+A visitor to the domain sees a working member portal for a fictional AI-agent
+marketplace under the Orvanna brand: members subscribe to digital AI agents (domain
+agents $100 / 100 volume points, support agents $50 / 50), 1,000 members in a
+realistic unilevel tree, subscriptions generating monthly orders, volume rolling up
+the genealogy, ranks earned by rules, and a commission run that pays levels with an
 auditable statement per member. All numbers synthetic, all math real.
 
 ## The stack ($0/month beyond the domain Howard already owns)
 
 | Piece | Choice | Cost |
 |---|---|---|
-| Database + API + auth | Supabase free tier (Postgres, row-level security) | $0 |
+| Database + API + auth | Supabase, Orvanna org on PRO plan (Howard's deliberate choice 2026-08-13; free tier would also carry v1) | $25/month |
 | Website hosting | GitHub Pages or Cloudflare Pages (both free, custom domain free) | $0 |
 | Seed + analytics | Python + DuckDB locally | $0 |
 | Domain | **orvanna.io** (Howard's, received 2026-08-13; apex vs subdomain decided at Phase 5) | already owned |
@@ -58,5 +60,5 @@ The Council (seven-persona vetting) runs inline before each phase; verdicts file
 - `ROADMAP.md`: phases, v1 scope, council verdict, next small step (protect momentum)
 - `docs\FIGMA-VISUAL-PACK.md`: the end-to-end "Whole Machine" Figma board (how everything fits, 16 numbered steps)
 - `db\` : migrations and seed scripts (created in Phase 1)
-- `site\` : the website (created in Phase 3)
+- `site\` : the website (created in Phase 4)
 - `docs\decisions\` : one file per decision, dated

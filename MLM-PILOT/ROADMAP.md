@@ -45,8 +45,8 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | Phase | What ships | Owner agents | Status |
 |---|---|---|---|
 | 0 | Scaffold, guardrails, team, roadmap | (main session) | DONE 2026-08-13 |
-| 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | next |
-| 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | |
+| 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (cloud apply pending) |
+| 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (subscriptions model) |
 | 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | |
 | 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | |
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
@@ -99,6 +99,10 @@ orders (autoship) moved from the v2 parking lot INTO v1. Full rules:
 
 ## Next small step
 
-Phase 1 STARTED 2026-08-13: mlm-architect is producing the schema spec + comp rules
-document, then mlm-db-engineer writes the migrations, then mlm-verifier and mlm-qa
-grade the phase.
+Phases 1-2 CLOSED 2026-08-13: both gates PASS (verifier 0 HIGH / 2 MEDIUM / 7 LOW;
+QA 38 of 41 applicable rows passed, 0 HIGH). Punch list before Phase 3: fix seed
+enrollment-vs-first-order plausibility (290 members), harden the finalized-run
+immutability trigger to also block INSERT, reconcile the cycle-trigger location note
+in the genealogy decision doc, then apply migrations + seed to the cloud project
+(mlm-pilot, ref oiyibdczkokegaxkwulv). Then Phase 3: mlm-comp-engineer builds the
+commission engine against the worked example.
