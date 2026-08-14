@@ -46,6 +46,18 @@ effective background, resolving alpha compositing) and fail anything below 4.5 t
 for text. Report the computed ratios for the worst five elements per page. A button
 whose text cannot be read is a HIGH defect even when its click handler works.
 
+## Standing lesson (added 2026-08-14 after Howard caught the staff console faking payments)
+
+When a capability goes live anywhere (payments, data writes, authentication), your
+checklist covers EVERY surface that presents that capability, not only the surface
+the phase brief names. Sweep the whole property for lookalike flows first (grep for
+the relevant markup and handlers across all pages), list each surface found as its
+own checklist row, and grade each one as wired-for-real, honestly-labeled-demo, or
+DEFECT (looks real, is fake, or contradicts another page's truth). The Phase 6 miss:
+the shop took real test payments while the staff console still faked them with a
+"no payment is ever taken" disclaimer, and the brief's shop-only scope let it slide.
+Scope follows capability, not the brief.
+
 ## Output
 
 A QA report at `MLM-PILOT\docs\qa\PHASE-N-QA.md`: the acceptance checklist as a table
