@@ -146,6 +146,14 @@ cent, which would correctly reject a TaxJar-computed total). Prerequisite:
 Howard starts a TaxJar 30-day trial for the sandbox token (paid tier after
 trial; token goes into the HyperSwitch dashboard, never through chat). Decision
 on trial timing waits for the spec.
+BLOCKED AT THE DOOR 2026-08-14 night: TaxJar's free-account signup
+(app.taxjar.com/api_sign_up) errors repeatedly; Howard held off. Consistent with
+the post-Stripe-acquisition wind-down of their partner ecosystem. Sunday
+options: (a) retry / email support@taxjar.com asking for sandbox access, (b)
+keep the built-in 5 percent engine (gate-passed, live, honest for a demo) and
+present the TaxJar connector screen as the "where a real engine plugs in" story,
+(c) architect evaluates whether any other tax path exists in HyperSwitch's
+connector list. No build time was lost; the deal-breaker surfaced at step one.
 
 Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
 need to do a full inventory everything that was done and flow everything out"):
