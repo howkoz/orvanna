@@ -60,10 +60,20 @@ values ('token_signing_key', encode(extensions.gen_random_bytes(32), 'hex'));
 -- ---------------------------------------------------------------------------
 -- The two demonstration accounts, hashed with bcrypt (blowfish salt).
 -- Roles: admin opens the member portal, staff opens the call console.
+--
+-- PASSWORDS ARE NOT WRITTEN HERE. The version applied to the cloud on
+-- 2026-08-14 carried the two passwords Howard chose, supplied at apply time
+-- and never committed. Only their bcrypt hashes exist in the database, and
+-- nothing readable by the public roles can reach them. The placeholders below
+-- keep this file re-runnable: replace them at apply time and do not commit the
+-- filled version. (Caught by the site builder in review; the earlier draft of
+-- this file did carry them, so that draft survives in this private
+-- repository's history. Rotating either password is a one-statement update,
+-- noted for Howard.)
 -- ---------------------------------------------------------------------------
 insert into app.demo_users (username, password_hash, role, label) values
-  ('Orvanna_Admin', extensions.crypt('Orvanna2026', extensions.gen_salt('bf', 10)), 'admin', 'Member portal demonstration account'),
-  ('Orvanna_Staff', extensions.crypt('2026Orvanna', extensions.gen_salt('bf', 10)), 'staff', 'Staff call console demonstration account');
+  ('Orvanna_Admin', extensions.crypt(:'admin_password', extensions.gen_salt('bf', 10)), 'admin', 'Member portal demonstration account'),
+  ('Orvanna_Staff', extensions.crypt(:'staff_password', extensions.gen_salt('bf', 10)), 'staff', 'Staff call console demonstration account');
 
 -- ---------------------------------------------------------------------------
 -- Posture: RLS on, zero policies, and every privilege stripped from the two

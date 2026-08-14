@@ -25,6 +25,10 @@ REWRITES_ROOT = [
     ("staff.html", "../site/index.html", "portal/index.html"),
 ]
 REWRITES_PORTAL = [
+    # The login link must be rewritten BEFORE the bare index.html rule, because
+    # "../www/login.html" would otherwise survive the earlier substitutions and
+    # trip the leftover check at the end of the build.
+    ("portal/index.html", "../www/login.html", "../login.html"),
     ("portal/index.html", "../www/index.html", "../index.html"),
     ("portal/index.html", "../www/shop.html", "../shop.html"),
     ("portal/index.html", "../www/staff.html", "../staff.html"),
