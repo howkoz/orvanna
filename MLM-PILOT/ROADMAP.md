@@ -48,7 +48,7 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (cloud apply pending) |
 | 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (subscriptions model) |
 | 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | BUILT + DEPLOYED 2026-08-13: worked example passed on live Postgres (3x zero mismatches); full seed loaded (24,295 rows); SIX months run and FINALIZED (Feb-Jul 2026, payout 12,014.00 growing to 20,669.20, ~15 percent of CV); gates grading |
-| 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | |
+| 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | BUILT + Howard-approved + QA PASS 2026-08-13 ("perfect for an office") |
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |
 
@@ -139,5 +139,11 @@ Comp plan v1.3 same evening (Howard: "Gate it"): qualification required to hold 
 rank above Member; engine migration 009 deployed, all six months rerun and
 refinalized (Feb 11,906.00 / Mar 13,434.00 / Apr 14,636.00 / May 16,507.20 /
 Jun 17,749.20 / Jul 20,669.20), v1.2 runs kept as frozen superseded history.
-NOW RUNNING: Phase 4, mlm-site-builder builds the portal in `site\` against the
-seven public demo views. Then: visual QA + both gates, then Phase 5 (orvanna.io).
+Phase 4 SHIPPED: the portal is built, Howard-approved, and QA-passed (live-data spot
+checks to the cent). Phase 4B SHIPPED same evening: the glow-tech corporate site
+(designer round 2: glass panels, living hero constellation, scroll reveals) plus the
+fake login page, which an href census proved is the ONLY door from the corporate page
+into the member area; full-journey QA PASS 35 of 36 (2026-08-13). AWAITING: Howard's
+review of the glow site. Then Phase 4C (Shop), 4D (Enroll), Phase 5 (orvanna.io:
+serve www at root, portal at /portal/, AND repoint login.html's redirect which
+currently targets ../site/, per QA's forward flag), Phase 6 (HyperSwitch).
