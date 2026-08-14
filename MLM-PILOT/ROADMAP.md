@@ -61,6 +61,16 @@ emails), order history with receipts (which customer bought what), subscription 
 synthetic; in a real deployment the button becomes a staff login. Built after Howard's
 input on the Phase 4 portal.
 
+Phase 4B (started 2026-08-13, Howard approved the portal same evening: "perfect for
+an office for a member to review their volume"): THE CORPORATE SITE. The public
+orvanna.io front a visitor hits to LEARN about the company, tech-forward look
+(we sell AI agents), Latin filler for prose, structure per the standard corporate
+archetype (hero, overview with proof numbers, pillars, origin, technology,
+leadership, footer navigation). Built by orvanna-designer (graphic engineer, hired
+this phase) in `www\`. Then Phase 4C: SHOP (the agent catalog as a storefront,
+demo checkout). Then Phase 4D: ENROLL (fictional join flow). At Phase 5 the domain
+serves www\ at the root with the member office at /portal/.
+
 Phase 6 (queued 2026-08-13, Howard; starts AFTER he reviews the Phase 4 site):
 HYPERSWITCH AS THE PAYMENT ORCHESTRATOR. The pilot's subscription checkout runs
 through HyperSwitch (open-source payment orchestration) in TEST MODE: test cards only,
