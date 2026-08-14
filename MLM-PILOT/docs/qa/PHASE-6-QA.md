@@ -146,3 +146,72 @@ QA gate: **PASS** (10 of 10 rows). Phase 6 closes only on BOTH gates; the
 verifier's security-half PASS is already on record, so from the QA side the
 phase is clear to close. M1 should ride with the pending W4/W5 polish, not
 block the gate.
+
+---
+
+# Delta: Staff Console on the Live Rail
+
+Graded by: mlm-qa
+Date: 2026-08-14 (same day, second pass)
+Scope: `staff.html` wired to the same live test-payment rail as the shop
+(public repo commit d628b48, source commit 829f0a3), graded headlessly with
+the same curl recipe, plus a whole-property capability sweep.
+
+Charter acknowledgment, on the record: my charter gained a standing lesson
+from this round because Howard caught what my first pass missed. The shop took
+real test payments while the staff console still faked them behind a "no
+payment is ever taken" line, and I graded only the shop because the brief
+named only the shop. The rule now and from every phase forward: SCOPE FOLLOWS
+CAPABILITY, NOT THE BRIEF. When a capability goes live anywhere, every surface
+that presents that capability gets its own checklist row, graded
+wired-for-real, honestly-labeled-demo, or defect. Delta row 5 below is that
+rule's first execution.
+
+## Delta verdict (read this first)
+
+**PASS.** 5 delta rows executed: 5 PASS, 0 FAIL. 0 HIGH, 0 MEDIUM, 0 LOW new
+defects; 2 observations. The staff channel runs the identical server rail
+(channel tag, referral capture, money math, decline truth, idempotent
+confirm), the deployed staff page carries the three truth-fixed disclaimers
+with the old falsehood gone, and the capability sweep found no payment
+lookalike anywhere on the property that is not either on the rail or an
+honestly labeled demonstration.
+
+## Delta checklist
+
+| # | Row | Evidence | Result |
+|---|---|---|---|
+| D1 | Happy path on the staff channel with a real member code | Order ORV-2026-08-1FEON7, created with channel staff_console and member_code GW-000002 (proven real: v_demo_members returns it as Kai Eastbrook). Paid 4242, confirm-payment returned payment_status succeeded, channel "staff_console", referral_code_entered "GW-000002", total_cents 10500, pv_total 100; HyperSwitch amount_received 10500. list-demo-orders shows created_by_channel staff_console for the row. Evidence limit, stated honestly: the sanitized receipt does not expose member_id, so the resolved-member link itself rests on the coordinator's database evidence (ORV-2026-08-1F9AP5, member_id 50); what I proved from outside is that the code is real, was accepted, and was kept | PASS |
+| D2 | Decline on the staff channel | Order ORV-2026-08-1FFOC8, card 4000 0000 0000 0002: payment_status failed with error_code DC_08 and error_message "Payment declined: Card declined", channel staff_console. Repeat confirm returned a byte-identical receipt (cmp clean), row stayed failed | PASS |
+| D3 | Member-code miss never fails the order | Order ORV-2026-08-1FGE80 created with member_code XX-999999 (proven absent: v_demo_members returns empty). Create returned 200, payment succeeded at total_cents 5250 (1 x Secretary subscription plus tax, matching hand math), and referral_code_entered "XX-999999" survives in the receipt | PASS |
+| D4 | Static checks on the deployed https://orvanna.io/staff.html (53,610 bytes) | LIVE_PAYMENTS = true (line 776). Demonstration card inputs hidden in live mode: applyLiveModeDefaults() hides them at load, the radio change handler keeps them hidden, and both backToOrder() and newCall() re-apply the live defaults AFTER their radio reset, so the demo fields cannot resurface. Card on file radio disabled in live mode with its "demo" chip retained (line 127). The three truth-fixed disclaimers present: header "Payments run on the live TEST rail: test cards only, play money, no real charge is possible" (line 39), place hint "Test mode: the payment runs on the live test rail, play money only" (line 143), confirmation hint "Test mode: a test payment was processed on the sandbox rail; no real money moved" (line 185). The old "No payment is ever taken" text: zero hits. House rules: zero em or en dashes (character scan); Personal Volume (PV), Sales Volume (SV), and Team Volume (TV) expanded in the header disclaimer, which renders before any bare use; all money through fmtMoney with two forced decimals. Decline path consults server truth (staffAfterSdk always calls confirm-payment except for pure in-browser form validation), shows the processor reason, keeps the order lines, and retry is a fresh create. Server order number feeds renderConfirmationView, including the read-aloud token | PASS |
+| D5 | Capability sweep, whole property (new standing rule) | All eight deployed pages fetched live and searched for payment-like markup (card fields, security code, checkout handlers, function calls, HyperLoader). Per surface: shop.html WIRED (graded above); staff.html WIRED (this delta); product.html no payment surface (prices and Add to cart only; capture happens in the shop's wired checkout); index.html no payment surface (one prose sentence about future checkout, no controls); login.html no payment surface, and its fake sign-in is an honestly labeled demonstration ("any credentials continue", "no real authentication"); portal/index.html no payment surface (DEMO MODE pill, synthetic payouts); team.html no payment surface; 404.html no payment surface. Nothing on the property looks like a payment surface while being off the rail | PASS |
+
+## Delta findings
+
+No new defects at any severity.
+
+Observations
+
+- DO1: both staff-channel succeeded payments also landed on connector
+  stripe_test; pretendpay_default has still taken no traffic in any of my
+  passes.
+- DO2: the shared 5 per minute create bucket held comfortably; delta used 3
+  create calls, spaced, bringing my session total to 14 of the 30 per hour.
+
+## Delta orders created (extend the checksum bracket)
+
+| Order number | Purpose | Final status when last seen |
+|---|---|---|
+| ORV-2026-08-1FEON7 | D1 staff happy path, GW-000002 | succeeded |
+| ORV-2026-08-1FFOC8 | D2 staff decline | failed |
+| ORV-2026-08-1FGE80 | D3 member-code miss | succeeded |
+
+Seen but not mine: ORV-2026-08-1F9AP5 (the coordinator's own browser-driven
+staff order, status created, aging candidate).
+
+## Delta phase note
+
+QA delta: **PASS** (5 of 5 rows). Combined with the original 10 of 10, the QA
+gate remains PASS with the staff console now covered on equal footing with the
+shop, per the standing rule that scope follows capability.
