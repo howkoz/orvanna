@@ -49,7 +49,7 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (subscriptions model) |
 | 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | CLOSED 2026-08-13, BOTH GATES PASS (verifier matched all six months to the cent); v1.3 rerun finalized same evening |
 | 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | BUILT + Howard-approved + QA PASS 2026-08-13 ("perfect for an office") |
-| 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
+| 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | (main session, deploy) | SHIPPED 2026-08-14: LIVE at https://orvanna.io. GitHub Pages from public repo github.com/howkoz/orvanna.io (built output only); builder script deploy/build_dist.py assembles www at root + site at /portal/ and rewrites the five cross-folder links; DNS at GoDaddy (4 A records + www CNAME, set by Howard by hand); HTTPS enforced; portal confirmed pulling live Supabase data from the public origin with zero console errors. GitHub access via device-code sign-in (gh CLI, account howkoz). Enroll is PERMANENTLY "coming soon" per Howard 2026-08-14 ("lets keep enroll permanatly coming soon for now"). orvanna.ai is also owned; it gets a Forward Domain redirect to https://orvanna.io (Howard's browser step, pending). QA live-site gate: docs/qa/PHASE-5-QA.md |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |
 
 Phase 4.5 (respecified by Howard 2026-08-14 after approving the shop round: "looks
@@ -72,8 +72,9 @@ orvanna.io front a visitor hits to LEARN about the company, tech-forward look
 archetype (hero, overview with proof numbers, pillars, origin, technology,
 leadership, footer navigation). Built by orvanna-designer (graphic engineer, hired
 this phase) in `www\`. Then Phase 4C: SHOP (the agent catalog as a storefront,
-demo checkout). Then Phase 4D: ENROLL (fictional join flow). At Phase 5 the domain
-serves www\ at the root with the member office at /portal/.
+demo checkout). Then Phase 4D: ENROLL (fictional join flow; ruled PERMANENTLY
+"coming soon" by Howard 2026-08-14, no build planned). At Phase 5 the domain
+serves www\ at the root with the member office at /portal/ (done, see phase table).
 
 Phase 6 (queued 2026-08-13, Howard; starts AFTER he reviews the Phase 4 site):
 HYPERSWITCH AS THE PAYMENT ORCHESTRATOR. The pilot's subscription checkout runs
