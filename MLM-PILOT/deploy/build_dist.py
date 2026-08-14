@@ -147,7 +147,7 @@ def main() -> None:
     if broken:
         fail("broken links: " + "; ".join(broken))
 
-    files = sorted(p for p in DIST.rglob("*") if p.is_file())
+    files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)
     total = sum(p.stat().st_size for p in files)
     digest = hashlib.sha256()
     for p in files:
