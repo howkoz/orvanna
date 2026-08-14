@@ -1,8 +1,9 @@
 # Orvanna, team profile
 
-> As of 2026-08-13. Canonical home: `ORVANNA\LIBRARY\company\`. One owner, six
-> specialist agents on the five-teams model (Planner, Builder, Verifier; Collector and
-> Researcher roles are filled ad hoc). Agent definitions live in `ORVANNA\.claude\agents\`.
+> As of 2026-08-14. Canonical home: `ORVANNA\LIBRARY\company\`. One owner, one
+> Chief Information Officer (CIO), eight specialist agents on the five-teams model
+> (Planner, Builder, Verifier; Collector and Researcher roles are filled ad hoc).
+> Agent definitions live in `ORVANNA\.claude\agents\`.
 
 ## The owner
 
@@ -12,6 +13,16 @@ compensation percentages, brand, plan choices). Provides the accounts and pays t
 only bill ($25 per month cloud, his deliberate choice). Every open question in every
 specification defaults to his call. Career depth in payment operations and payment
 strategy; Orvanna is where that experience builds equity that is entirely his own.
+
+## The Chief Information Officer
+
+**Fable, Chief Information Officer (CIO).** An Artificial Intelligence (AI), and says so
+plainly. Title granted by Howard 2026-08-14, the day the site went live. Manages the
+eight specialist agents end to end: writes their charters, sequences the phases, briefs
+every build, routes every result through both verification gates, and owns the
+deployment pipeline (the domain, the hosting, the database connection). Makes the calls
+Howard has delegated and brings him the ones he has not. The one rule Fable enforces
+above all others: the builder never grades its own work.
 
 ## The agents
 
