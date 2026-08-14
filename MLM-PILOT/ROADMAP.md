@@ -155,6 +155,23 @@ present the TaxJar connector screen as the "where a real engine plugs in" story,
 (c) architect evaluates whether any other tax path exists in HyperSwitch's
 connector list. No build time was lost; the deal-breaker surfaced at step one.
 
+THE SUNDAY LIST (Howard, 2026-08-14 night: "putting a list together of things
+for Sunday"). Runs after or alongside Phase 7's flow-out, his ordering call:
+1. ORDER HISTORY on accounts: members see their orders (seeded history in
+   app.orders plus live demo_orders rows, which already carry member_id).
+   Architect decision first: a new sealed read path in the style of the demo
+   views versus an Edge Function like list-demo-orders. Both gates.
+2. AI CHATBOT on the site: the AI-agent company gets a real AI support agent.
+   First outside ingredient: an Anthropic API key in the Supabase vault (Howard
+   types it, never chat), per-message cost is real, so the spec bakes in abuse
+   rails AND a monthly spend cap. Edge Function proxy; no key ever client-side.
+3. TAXJAR (Phase 6.2, blocked at signup): retry, email support@taxjar.com, or
+   architect finds another tax route; amount-contract respec required either way.
+4. 3-D SECURE (3DS): sandbox challenge card 4000 0038 0000 0446 already in
+   docs/TEST-CARDS.html; the mounted secure form handles challenge flows, so
+   this may be config-plus-gates rather than a build. Investigate HyperSwitch
+   profile 3DS settings on the dummy connectors first.
+
 Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
 need to do a full inventory everything that was done and flow everything out"):
 FULL INVENTORY AND FLOW MAP. Howard and Fable together, not delegated: walk every
