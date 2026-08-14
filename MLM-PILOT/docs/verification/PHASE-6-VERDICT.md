@@ -351,3 +351,23 @@ no secret is anywhere a stranger can read. PASS, with two MEDIUM cleanups
 (view grant hygiene, per-function rate buckets), three LOW notes, and one
 deferred re-check for the coordinator to run after QA's first in-browser
 succeeded payment.
+
+## Coordinator closure of the deferred check (2026-08-14, Fable, Chief Information Officer (CIO))
+
+The verifier deferred one half of check 6: bracketing PAYMENTS THAT SUCCEED with
+finalized-months checksums. Closed as follows, using the verifier's queries:
+
+- BEFORE snapshot (taken before the Quality Assurance (QA) gate ran): commission_lines
+  md5 32c829ac42aec575a3cddcef12b63dcf (22,076 rows), run_member_results
+  md5 c94479b24b9343e25f7f7916807cc2db (12,000 rows), commission_runs final+superseded
+  md5 be716caebab5f1610488d4360670ab93 (12 rows).
+- Activity inside the bracket: the full QA gate (three succeeded payments, one failed,
+  six rail-test creates), Howard's own live decline test, and the coordinator's decline
+  path proof (ORV-2026-08-16STIL, failed with reason). app.demo_orders reached 17 rows,
+  5 succeeded.
+- AFTER snapshot: all three md5 values and row counts IDENTICAL, byte for byte.
+
+Verdict on the deferred item: PASS. Real succeeded test payments cannot alter the
+finalized commission months. With this, and the two MEDIUM fixes verified live
+(migration 011 SELECT-only view grants; scoped per-function rate buckets, proven by
+QA row 9), the verifier gate stands PASS with zero open HIGH or MEDIUM findings.
