@@ -496,3 +496,29 @@ table.stmt {
   .brand-logo { height: 32px; }
   .panel-body { padding: 14px; }
 }
+
+/* ---------- site links (connection points to the corporate site and shop) ---------- */
+.site-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-left: 1px solid var(--line);
+  padding-left: 16px;
+  margin-right: auto;
+}
+.site-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.site-link:hover {
+  color: var(--indigo-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 720px) {
+  .site-links { border-left: none; padding-left: 0; gap: 12px; }
+}
