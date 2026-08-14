@@ -302,3 +302,66 @@ Cart built by real clicks: Ignition Pack x2 plus Constellation x1.
 contrast anywhere is 7.66 to 1 against a 4.5 floor. Pack children behave exactly to
 Howard's spec on all three surfaces with totals and Personal Volume (PV) untouched by
 children. Root reachability, cache stamps, and the full guest checkout all hold.
+
+---
+
+## DELTA 2026-08-14: content writer round 1 gate (prose replaces Latin filler)
+
+Graded by: mlm-qa (the builder never grades its own work). Light delta gate, 12 rows, on
+the content writer's round 1, which touched `www\index.html`, `www\product.html`,
+`www\js\catalog.js` (a PROSE map merged in the products forEach), and `www\shop.html`
+(footer text only).
+
+Method: live document object model (DOM) at http://localhost:9120, verified with injected
+JavaScript reading rendered text and computed layout, real dispatched clicks and input
+events on the actual elements, the console log, and the network request log, at viewport
+1280 wide and 375x812. Source files were scanned independently with a Python character
+and vocabulary scan BEFORE any page was opened, and every price and Personal Volume (PV)
+figure was taken from `js/catalog.js` by hand before comparing against the rendered
+pages. None of the writer's own scans were trusted or reused. Two real orders were
+placed end to end; the cart was left empty afterward so Howard starts clean.
+
+### Rows
+
+| # | Item | Evidence | Grade |
+|---|---|---|---|
+| DC1 | Latin filler gone, rendered | Rendered-text vocabulary scan (lorem, ipsum, dolor, amet, consectetur, and 20 more filler terms) on live index.html plus SEVEN product pages spanning every tier: payment and tax (domain), qa and secretary (support), manager (bundle), ignition and constellation (packs), plus the shop catalog view. Zero hits on every surface | PASS |
+| DC2 | Latin filler gone, source | Independent Python scan of index.html, product.html, shop.html, js/catalog.js, and login.html: zero filler-vocabulary hits in any file | PASS |
+| DC3 | Zero em or en dashes | Source scan: 0 U+2014 and 0 U+2013 across all five files. Rendered scan: 0 of each on index, all seven product pages, and shop. The drawer quantity control uses U+2212 (the minus sign), which is neither | PASS |
+| DC4 | Product prices and PV match catalog.js | All seven product pages read live in subscription mode: payment and tax $100.00 / 100 PV, qa and secretary $50.00 / 50 PV, manager $200.00 / 200 PV, ignition $200.00 / 200 PV, constellation $800.00 / 800 PV. Every figure identical to the catalog.js entries read beforehand | PASS |
+| DC5 | 10x one-time toggle still reprices | Toggle clicked on all seven pages: payment and tax to $1,000.00 / 1,000 PV, qa and secretary to $500.00 / 500 PV, manager and ignition to $2,000.00 / 2,000 PV, constellation to $8,000.00 / 8,000 PV; per-label flips to "one time"; toggling back restored the subscription price on every page | PASS |
+| DC6 | Shop card prices unchanged | Live census of all 16 cards: six domain at $100.00 / 100 PV, six support at $50.00 / 50 PV, Manager and Ignition $200.00 / 200 PV, Momentum $400.00 / 400 PV, Constellation $800.00 / 800 PV; all 16 "Own it outright" hints show the correct 10x figure ($1,000.00 / $500.00 / $2,000.00 x2 / $4,000.00 / $8,000.00) | PASS |
+| DC7 | Commerce journey 1: single agent | Cart cleared, then Marketing Agent added by a real click on its product page (badge 1, toast shown, stored key marketing|sub). Nav cart click landed on shop.html#cart with the drawer OPEN and the correct line: Marketing Agent, Monthly, $100.00 / month, 100 PV, quantity 1. Guest checkout, billing filled: subtotal $100.00, Standard activation free, tax 5 percent $5.00, order total $105.00, 100 PV, all matching hand math. Confirmation ORV-2026-08-0GY6IB, payment method Credit card, cart key removed (null) | PASS |
+| DC8 | Commerce journey 2: bundle regression | Manager Agent added from its product page; drawer opened with Manager Agent, Monthly, $200.00 / month, 200 PV; guest checkout to confirmation ORV-2026-08-0GZJPS, order total $210.00 (200 + 10.00 tax, exact); all three bundle children on the confirmation as Software Engineer, Secretary, Accounting, each "Included $0.00"; cart key removed | PASS |
+| DC9 | Zero console errors on the journeys | Console error count was captured before and after the second full journey and did not grow: both logged errors are the same pre-existing 404, root /favicon.ico from the bare-root redirect page (the known LOW from the 2026-08-14 hotfix delta; not a Sign In or asset failure). Network log: every asset on the touched pages served 200 or 304, including catalog.js?v=4.1, both stylesheets, and the logo on every page load | PASS |
+| DC10 | Charter sweep of the NEW copy | No income or earnings language anywhere in the Network pillar ("Agents do not sell themselves...") or in any of the 16 prose sets in catalog.js; the only "earnings" string anywhere is the mandated disclaimer line. No testimonials from customers and no invented business numbers: the prose across all seven pages rendered ZERO digits; the only rendered figures on index are 12, 1,000, and 6, and on shop and product pages only prices and PV. Acronyms: index expands "artificial intelligence (AI)" in the hero (character 134) before any bare AI; shop hero expands PV at 134 before the first bare PV at 371. Tax Agent page carries the human-approval framing live: "it prepares, it never files on its own", "review and signature", "Your accountant stays the authority" all present in the rendered page | PASS |
+| DC11 | Metrics tile | Renders "12" with the new label "Specialist AI agents, sold solo or in packs". At 1280: all three tiles exactly 166 pixels tall and 329 wide, no overflow in either axis. At 375: tiles stack single-column at full width, no overflow, no element past the right edge (the "12" tile is naturally taller there because its label wraps to two lines, which is correct stacking behavior, not a defect) | PASS |
+| DC12 | Zero horizontal scroll at 375 | index.html: scrollWidth 375 = clientWidth 375, element census found zero boxes past the right edge. product.html?sku=constellation (the longest new prose): scrollWidth 375 = clientWidth 375, zero offenders. The long English prose introduced no layout break | PASS |
+
+### Notes (non-blocking, nothing new opened by the writer)
+
+1. Carried forward, unchanged: product.html still renders the bare "PV" chip in the price
+   row before the expansion note beneath it (LOW 1 of the round-4 report). The writer's
+   round did not touch that block and was not asked to.
+2. Carried forward, unchanged: the bare-root /favicon.ico 404 from the root redirect page
+   (hotfix delta finding 1). Not reachable from any in-page journey on the touched pages.
+3. Observation, not graded as a defect: the index.html origin story carries a pull-quote
+   attributed to the fictional chief executive Auren Vale and spelled-out biographical
+   numbers ("four-person team", "fifteen years"). It is company narrative, not a customer
+   testimonial, and contains no earnings or results claim; flagged only so Howard can
+   veto the quote device if he wants the stricter reading of the no-testimonials rule.
+4. Observation: the leadership bio for Maren Ostrey mentions "the audit trail behind
+   every commission run". That is a statement about the audit system, sits outside the
+   Network pillar and product prose the charter row names, and makes no income promise.
+
+### Delta verdict
+
+**PASS.** 12 rows, 12 PASS, zero defects at any severity introduced by the writer's
+round. The Latin filler is fully gone from source and rendered output; every price and
+PV figure on seven product pages and all 16 shop cards matches js/catalog.js exactly;
+the 10x toggle reprices and restores on every tier; two complete purchase journeys ran
+add-to-cart through confirmation with correct drawer lines, hand-checked totals, bundle
+children intact, cart cleanup, and zero new console errors; the new copy holds the
+charter (no dashes, acronyms expanded first-use per page, no income language, no
+testimonials, no invented figures, human-approval framing on the Tax Agent page); and
+the metrics tile and 375-wide layouts are clean. Nothing regressed.
