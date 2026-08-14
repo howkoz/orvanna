@@ -191,10 +191,26 @@ for Sunday"). Runs after or alongside Phase 7's flow-out, his ordering call:
    receives visitor chat text, so the demo framing must say so plainly.
 3. TAXJAR (Phase 6.2, blocked at signup): retry, email support@taxjar.com, or
    architect finds another tax route; amount-contract respec required either way.
-4. 3-D SECURE (3DS): sandbox challenge card 4000 0038 0000 0446 already in
-   docs/TEST-CARDS.html; the mounted secure form handles challenge flows, so
-   this may be config-plus-gates rather than a build. Investigate HyperSwitch
-   profile 3DS settings on the dummy connectors first.
+4. 3-D SECURE (3DS): STARTED EARLY 2026-08-14 night. Howard connected
+   3DSecure.io as a 3DS provider INSIDE HyperSwitch (connector label
+   threedsecureio_default, merchant connector id mca_ug2mkRXAnzlFCBMDzxM5,
+   status ACTIVE and ENABLED, acquirer merchant id and acquirer BIN
+   registered, webhook endpoint on the HyperSwitch side). Architecture
+   consequence: our code still talks ONLY to HyperSwitch, so the payment
+   functions need no new vendor integration. The 3DSecure.io API key was
+   pasted in chat, so it is burned and should be rotated in the 3DSecure.io
+   dashboard; it lives only in HyperSwitch's connector config and in no
+   repository. Sandbox challenge card already documented:
+   4000 0038 0000 0446 (docs/TEST-CARDS.html).
+   GAP IDENTIFIED BEFORE RESEARCH, by inspection of www\shop.html: our live
+   flow sets return_url to window.location.href but has NO HANDLER for
+   coming BACK from a full-page redirect. A frictionless authentication is
+   invisible and works today; a challenge that redirects the shopper away
+   would return them to a page that does not know which order it was. That
+   return path is the real build. Research report: docs\3DS-RESEARCH.md.
+   Staff console has an extra problem worth an honest answer rather than a
+   pretend one: a challenge asks the CARDHOLDER to authenticate on their own
+   device, which a call taker cannot do for them.
 
 Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
 need to do a full inventory everything that was done and flow everything out"):
