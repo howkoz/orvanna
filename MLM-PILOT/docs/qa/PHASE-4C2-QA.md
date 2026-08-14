@@ -201,3 +201,104 @@ login, portal with zero console errors and zero horizontal scroll at both widths
 Fix before Howard walks the shop: nothing blocking. Fix the ROADMAP paragraph the same
 morning (five minutes), and take the one-line PV-expansion touch-up on product.html when
 convenient.
+
+---
+
+## DELTA 2026-08-14: hotfix re-stamp after Howard's live catches
+
+Graded by: mlm-qa. Short focused pass, 16 rows, on the live pages at localhost:9120
+through the document object model (DOM); the Browser pane was hidden the whole session
+(document.hidden true), so every claim comes from injected JavaScript reading computed
+styles, real dispatched clicks and input events, the console log, and the network log.
+This section applies the NEW standing charter rule for the first time: rendered contrast
+computed from getComputedStyle color against the effective background, alpha-composited
+up the ancestor chain, Web Content Accessibility Guidelines (WCAG) ratio formula, fail
+under 4.5 to 1. One full guest order was placed and hand-checked to the cent. The cart
+was cleared afterward so Howard starts clean.
+
+### D-A. Computed contrast (new standing rule, first outing)
+
+Checkout account step (measured live on the rendered step):
+
+| Element | Text color | Effective background | Ratio | Grade |
+|---|---|---|---|---|
+| Sign in button | rgb(226,232,240) | rgb(6,11,24) | 15.94 | PASS |
+| Continue as guest button | rgb(226,232,240) | rgb(6,11,24) | 15.94 | PASS |
+| Back to the catalog button (#backToShop) | rgb(148,163,184) | rgb(6,11,24) | 7.66 | PASS |
+
+Ten most important interactive elements across shop.html, product.html, login.html
+(worst elements per page included; every measured element is listed or bounded below):
+
+| Element | Ratio | Grade |
+|---|---|---|
+| shop: card Add to cart button | 14.20 | PASS |
+| shop: card product name link | 17.94 | PASS |
+| shop: filter pill, active | 10.47 | PASS |
+| shop: filter pill, inactive | 12.24 | PASS |
+| shop: drawer Checkout button | 10.47 | PASS |
+| shop: drawer Remove button (page worst) | 7.66 | PASS |
+| product: Add to cart button | 14.20 | PASS |
+| product: subscription switch and label | 11.62 and 12.64 | PASS |
+| login: Continue button | 10.47 | PASS |
+| login: field labels (page worst pair 7.66 on back link and note) | 9.86 | PASS |
+
+Additional elements measured, all PASS: drawer quantity buttons 12.64, drawer child
+name links 12.64, Included badge 9.86, Monthly badge 9.69, nav Sign In 7.66, nav cart
+12.64, Back to the catalog link 7.66, footer mail 12.79, payment method buttons 19.27,
+Place order button 10.47, login inputs 15.94. Lowest ratio anywhere: 7.66, comfortably
+above the 4.5 floor. The washed-out-button class of defect Howard caught live is gone
+from every surface measured. One non-defect note: each product card's icon anchor still
+carries the browser default link color rgb(0,0,238), but it contains zero text (only
+the hexagon SVG, which draws its own stroke colors), so text contrast does not apply.
+
+### D-B. Pack children (Howard's spec)
+
+Cart built by real clicks: Ignition Pack x2 plus Constellation x1.
+
+| Row | Evidence | Grade |
+|---|---|---|
+| Parents priced, children $0.00 with Included badge | Drawer: Ignition $400.00 / month 400 PV, Constellation $800.00 / month 800 PV; every child row $0.00 with an Included tag, indented 54 pixels under its parent | PASS |
+| Parent-quantity multiplier on children | Ignition x2 children each show "x 2" (Payment Agent, Customer Care, Secretary); Constellation x1 children show no multiplier, correct for quantity one | PASS |
+| Children in drawer, checkout summary, AND confirmation | All three surfaces render the same child sets: Ignition 3 children, Constellation 7 (Payment, Shipping, Pricing, Inventory, Marketing, Tax, Manager) | PASS |
+| Child names link to product pages | Every child name on all three surfaces is an anchor to product.html?sku=<child>; confirmation row verified in markup (.summary-child .product-name-link) | PASS |
+| Totals and PV unchanged by children, hand-checked | Hand math: 2x200 + 800 = $1,200.00 monthly, $0.00 one time, 1,200 PV. Drawer, checkout, and confirmation all show exactly that; children contribute zero everywhere | PASS |
+
+### D-C. Reachability
+
+| Row | Evidence | Grade |
+|---|---|---|
+| Root /shop.html lands right | GET /shop.html 200, lands on /www/shop.html, "Orvanna Shop", 16 cards | PASS |
+| Root /product.html?sku=tax lands right | 200, lands on /www/product.html?sku=tax, "Tax Agent", Domain agent badge, $100.00, query preserved | PASS |
+| Catalog cards link through | Card name link clicked through to product page in the flow; hrefs product.html?sku=<sku> on all cards | PASS |
+| Cart line name clicks to product page | Real click on the drawer's Ignition Pack name landed on /www/product.html?sku=ignition with the cart intact (badge still 3) | PASS |
+| All css/js includes carry ?v=4.1 | shop.html and product.html: corporate.css?v=4.1, shop.css?v=4.1, catalog.js?v=4.1, confirmed in both DOM and network log | PASS |
+
+### D-D. Regression spot
+
+| Row | Evidence | Grade |
+|---|---|---|
+| Full guest checkout | Guest chosen ("Checking out as a guest..."), billing filled, Priority activation $25.00 selected: tax 5 percent of (1,200 + 25) = $61.25 shown, order total $1,286.25. Digit Tax ID "QA9DELTA": Tax exempt $0.00, order total $1,225.00. Apple Pay: card fields hidden, button "Place order with Apple Pay". Confirmation ORV-2026-08-0B1AVB: all lines and children, Priority activation $25.00, Tax exempt, order total $1,225.00, Payment method Apple Pay, 1,200 PV qualified-month note, renewal sentence "$1,200.00 until cancelled", both disclaimers, cart key removed (null). Every figure matches hand math to the cent | PASS |
+| Zero console errors | Console empty across catalog, cart build, checkout, order, and confirmation. The single 404 logged later was this QA session's own probe of root /login.html (see finding 1), not a page asset; network log shows every asset on in-scope pages at 200 or 304 | PASS |
+| Zero horizontal scroll at 375 | Catalog, open drawer (drawer width exactly 375), and checkout: scrollWidth 375 = clientWidth 375. The only boxes past the right edge were the off-canvas drawer mid-transition, which adds no scroll | PASS |
+
+### Findings (non-blocking)
+
+1. LOW: the root-level convenience redirect covers /shop.html and /product.html but NOT
+   /login.html (404) and was not asked to. In-page Sign In links are relative and resolve
+   to /www/login.html, so no user journey breaks. Fold login.html and index.html into the
+   redirect when Phase 5 moves www to the domain root, or skip it if the Phase 5 restructure
+   makes it moot.
+2. LOW: login.html's stylesheet include is corporate.css with NO ?v=4.1 stamp (shop and
+   product both carry it). If a future hotfix changes corporate.css, a cached stale copy
+   could serve on the login page. One-line touch when next editing login.html.
+3. Catalog composition has shifted since the overnight report (Tax, Shipping, Inventory
+   agents now among the domain six; Ignition = Payment + Customer Care + Secretary).
+   Prices, PV, and pack math all remain internally coherent; noted so the next full gate
+   grades against the current catalog.js, not the overnight one.
+
+### Delta verdict
+
+**PASS.** 16 rows, 16 PASS, zero HIGH or MEDIUM defects, three LOW notes. Lowest computed
+contrast anywhere is 7.66 to 1 against a 4.5 floor. Pack children behave exactly to
+Howard's spec on all three surfaces with totals and Personal Volume (PV) untouched by
+children. Root reachability, cache stamps, and the full guest checkout all hold.
