@@ -52,14 +52,18 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |
 
-Phase 4.5 (added 2026-08-13, Howard): STAFF VIEW TOGGLE. A header button, no login,
-demo-appropriate: OFF = the customer/member facing portal as built; ON = the customer
-service facing view, same shell but deeper panels: customer directory (with synthetic
-emails), order history with receipts (which customer bought what), subscription states
-(start, cancel, churn), per-member service timeline. Ships as new v_cs_* views
-(migration 010) readable by the anon key, which is safe ONLY because every byte is
-synthetic; in a real deployment the button becomes a staff login. Built after Howard's
-input on the Phase 4 portal.
+Phase 4.5 (respecified by Howard 2026-08-14 after approving the shop round: "looks
+amazing great job to the team"; NOW ACTIVE, and Phase 4D Enroll is ON HOLD per the
+same ruling): THE STAFF CALL CONSOLE. The mission framing Howard gave the team: the
+staff member is ON A PHONE CALL and must support the caller end to end. Spec: staff
+enters a MEMBER NUMBER and sees current volume stats and member info (live stats from
+the demo views; contact-style info synthetic/made up for now); then a QUICK ORDER
+flow: products in a dropdown, quantity, subscription versus one-time, payment capture
+suited to a phone order, confirmation number to read aloud. Entry stays Howard's
+earlier ruling: a button, not permissions (in a real deployment it becomes a staff
+login). Designer researches call-center order-entry and customer-relationship screens
+first, then proposes what a call-taker needs on screen. Demonstration philosophy
+unchanged: order placement is fake until Phase 6 wires payments.
 
 Phase 4B (started 2026-08-13, Howard approved the portal same evening: "perfect for
 an office for a member to review their volume"): THE CORPORATE SITE. The public
