@@ -379,7 +379,13 @@
   }
 
   function saveCart() {
-    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (err) { /* storage unavailable: cart lives for the session */ }
+    try {
+      if (Object.keys(cart).length === 0) {
+        localStorage.removeItem(CART_KEY);
+      } else {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      }
+    } catch (err) { /* storage unavailable: cart lives for the session */ }
   }
 
   var cart = loadCart();
@@ -455,6 +461,11 @@
     cart[id] = Math.min((cart[id] || 0) + 1, 99);
     saveCart();
     renderAll();
+
+    /* the drawer opens on add so the PV meter's movement is SEEN:
+       the meter is the shop's teaching moment (coordinator decision,
+       and the storefront pattern the drawer was borrowed from) */
+    openDrawer();
 
     /* button morphs to Added for a beat, badge bumps */
     btn.classList.add('is-added');
@@ -642,8 +653,13 @@
     var y = d.getFullYear();
     var m = String(d.getMonth() + 1);
     if (m.length < 2) m = '0' + m;
-    var n = String(Math.floor(1000 + Math.random() * 9000));
-    return 'ORV-' + y + '-' + m + '-' + n;
+    /* collision-safe without a backend: milliseconds since local
+       midnight in base36, uppercase, padded to a constant six
+       characters. Unique per millisecond, resets each day. */
+    var ms = ((d.getHours() * 60 + d.getMinutes()) * 60 + d.getSeconds()) * 1000 + d.getMilliseconds();
+    var token = ms.toString(36).toUpperCase();
+    while (token.length < 6) token = '0' + token;
+    return 'ORV-' + y + '-' + m + '-' + token;
   }
 
   document.getElementById('checkoutForm').addEventListener('submit', function (e) {
