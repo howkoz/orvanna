@@ -254,3 +254,130 @@ PASS, with one MEDIUM cleanup (strip the "per Howard's rule" comment from
 js/catalog.js line 7) and two LOW awareness notes (personal commit email; a
 long-lived anon key). Optional hardening: turn off email signup, since the demo
 has no real accounts.
+
+---
+
+# DELTA: Team-page round, commit c132f84 (from graded baseline ea4589f)
+
+Grader: mlm-verifier. Date: 2026-08-14, same day, second pass. Scope: the diff
+ea4589f..c132f84 only (one new file, team.html; edits to index.html, shop.html,
+product.html, login.html, staff.html, css/corporate.css, js/catalog.js;
+812 insertions, 19 deletions). Superseding ruling on record: the founder's real
+name ("Howard Koziara, Founder and Owner") now appears on the site BY DESIGN,
+ruled by Howard 2026-08-14, so the Phase 5 generic-persona expectation no longer
+applies to his name specifically.
+
+Acronym key additions for this section: Byte Order Mark (BOM), Chief Information
+Officer (CIO), Scalable Vector Graphics (SVG), Cascading Style Sheets (CSS).
+
+## DELTA VERDICT: PASS
+
+Zero HIGH, zero MEDIUM findings in the delta. The Phase 5 MEDIUM finding is
+CLOSED. Three LOW notes below.
+
+## Point-by-point results, with evidence
+
+1. NO SECRETS INTRODUCED: a grep over the entire `git diff ea4589f..c132f84`
+   output for `snd_`, `pk_snd_`, 64-character hexadecimal strings, `eyJ`-prefixed
+   JSON Web Token (JWT) material, `service_role`, `api_key`, and `secret`
+   returned zero matches. Specifically: no HyperSwitch sandbox key pattern
+   (`snd_` or `pk_snd_`) and no hash-key-like 64-character string entered the
+   repository. The only credential in the repository remains the already-graded
+   Supabase anonymous key, still present in exactly the same two files
+   (`git grep -l` for the key's signature at c132f84 returns only
+   portal/js/app.js and staff.html, both unchanged in content beyond staff.html's
+   stylesheet version query strings).
+
+2. NO EMPLOYER TERMINOLOGY: a case-insensitive grep of the full diff for
+   Unicity, UnityDBStage, Hydra, Teller, ClickUp, PaymentWF, WorldPay, Nuvei,
+   2C2P, Braintree, Gr4vy, and HyperSwitch returned zero matches. The word
+   "supabase" also does not appear anywhere in the diff, confirming point 5
+   below from a second angle.
+
+3. FOUNDER NAME PLACEMENT: `git grep -in "howard|koziara|hkoziara|howkoz"` at
+   c132f84 across all eight touched files returns six hits. Four are the
+   deliberate presentation: team.html lines 65 and 67 (the founder card) and 96
+   (Fable's bio referencing him), and index.html line 340 (the team teaser).
+   Two are HTML comments: team.html line 51 (`<!-- Howard: the one human, the
+   one circle among hexagons -->`, a section label directly annotating the
+   deliberate founder card) and index.html line 347 ("Ruled by Howard
+   2026-08-14" inside the preserved writer-reference block). Recorded as LOW
+   finding D1 below; neither exposes anything the same pages do not already
+   publish deliberately, and the surname appears nowhere outside the intended
+   presentation. The Phase 5 MEDIUM is CLOSED: js/catalog.js line 7 now reads
+   "Billing modes, per the house pricing rule:" (verified in the file at
+   c132f84), and no code comment anywhere names the owner by surname.
+
+4. NO NEW EXTERNAL REQUESTS: the only Uniform Resource Locator (URL) pattern in
+   the added lines is `http://www.w3.org/2000/svg`, which is the SVG XML
+   namespace attribute, an identifier, never fetched by the browser. team.html
+   loads only same-origin assets (css/corporate.css, assets/favicon.svg,
+   assets/logo-header-dark.svg) and its single inline script is an
+   IntersectionObserver scroll-reveal with no network call of any kind. No new
+   script, font, image, endpoint, or tracker anywhere in the diff.
+
+5. ANON KEY USAGE UNCHANGED: portal/js/app.js is not in the diff at all;
+   staff.html's changes are limited to stylesheet or script version bumps
+   (v4.5 to v5.0) and one added nav link to team.html. Same key, same demo-view
+   reads, no new table or view referenced anywhere in the delta.
+
+House-rule sweep of the changed files at c132f84: zero em dashes (U+2014) and
+zero en dashes (U+2013) (ripgrep over all eight files, no matches).
+
+## DELTA findings
+
+### HIGH
+
+None.
+
+### MEDIUM
+
+None.
+
+### LOW
+
+D1. Two shipped HTML comments carry the owner's first name: team.html line 51
+    (a section label on the founder card itself) and index.html line 347, where
+    the retired fictional leadership section is preserved inside a comment
+    marked "WRITER REFERENCE ONLY ... Ruled by Howard 2026-08-14". With the
+    founder publicly named on the same pages by design, this leaks no new
+    personal data; it is flagged because internal editorial process notes
+    ("ruled", dates, writer instructions) ideally do not ship in public page
+    source. One-line cleanups whenever convenient.
+
+D2. The entire retired fictional leadership section (Auren Vale and colleagues,
+    roughly 70 lines) ships commented out inside public index.html as writer
+    reference. Harmless and invisible to visitors, but it is dead weight in a
+    public file and slightly confusing to anyone reading source. Consider
+    moving it to the private source repository, which the README says is the
+    build's source of truth anyway.
+
+D3. js/catalog.js gained a Unicode Byte Order Mark (BOM, bytes EF BB BF) at the
+    start of the file in this commit; no other file has one. Browsers treat a
+    leading BOM in JavaScript as whitespace, so nothing breaks. Cosmetic
+    consistency note only, likely an editor artifact of the comment fix.
+
+## DELTA SHA-256 of the graded artifacts
+
+Graded object: commit `c132f843a5465a59b3fef92dc1cfbe024ae199b0`, Git tree
+`e72a6e83a48c3366ec0a2ad8ca2323fe7c8e2496`. History is now exactly two commits
+(ea4589f then c132f84), still a single `main` branch, no deleted files.
+
+| File (new or changed) | SHA-256 at c132f84 |
+|---|---|
+| team.html | b7383625e5a1760a13d348f4787bbfe3c2697687827089f8ee84d2c0ab0ea476 |
+| index.html | ee7ff42f064b4586d47a4f6d2faa649202df628f4c1e541ff4a12773b36e7b89 |
+| js/catalog.js | 329fdfc8295aa836977508cd0e710a6b9d5bfb2640ee2495937f2eb3dd32e36a |
+| shop.html | f945311a55e1167b4e18f4e8943504cc9acc623bb2c621398851ff47d849d2fe |
+| product.html | cfd9fc8646a764d91f6da77669e6316e03e3de15d2dabbb0eaae6c9723f7e887 |
+| login.html | e65b84091832c52526fef51144f9237799d2e12051c4a240dc76c7a78e97307d |
+| staff.html | 4eba55661c897ddd6fcf3ba6139147ec8788480940d46abf211e7128b073eca9 |
+| css/corporate.css | d82cb3a12d811bb199f21314147d3f1ad783829e4229ec65778da9c4b01e2e59 |
+
+## DELTA bottom line
+
+The team round ships clean: no secret, no employer term, no new external
+request, no change to the anonymous key surface, and the founder's name appears
+where Howard ruled it should and effectively nowhere else (the two comment
+occurrences are first-name-only annotations of that same ruling). The Phase 5
+MEDIUM is closed. DELTA PASS.
