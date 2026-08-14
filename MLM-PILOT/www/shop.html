@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orvanna Shop</title>
-<meta name="description" content="The Orvanna agent catalog: twelve artificial intelligence agents as monthly subscriptions. Demonstration storefront, all data synthetic.">
+<meta name="description" content="The Orvanna agent catalog: artificial intelligence agents, bundles, and packs as monthly subscriptions or one-time purchases. Demonstration storefront, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="css/corporate.css">
 <link rel="stylesheet" href="css/shop.css">
@@ -45,12 +45,13 @@
   <section class="shop-hero">
     <div class="wrap">
       <p class="kicker">The catalog</p>
-      <h1 class="section-title">Twelve agents, one subscription each</h1>
-      <p class="shop-hero-sub">Every agent is a monthly subscription and carries Personal Volume (PV), the number that counts toward your qualified month. Domain agents run a business function end to end. Support agents staff the roles around them.</p>
+      <h1 class="section-title">Agents, bundles, and packs</h1>
+      <p class="shop-hero-sub">Every item is a monthly subscription by default and carries Personal Volume (PV), the number that counts toward your qualified month. Prefer to own an agent outright? Every product page offers a one-time purchase at its full value.</p>
       <div class="filter-row" role="group" aria-label="Filter by tier">
         <button class="filter-pill" type="button" data-filter="all" aria-pressed="true">All</button>
         <button class="filter-pill" type="button" data-filter="domain" aria-pressed="false">Domain</button>
         <button class="filter-pill" type="button" data-filter="support" aria-pressed="false">Support</button>
+        <button class="filter-pill" type="button" data-filter="bundles" aria-pressed="false">Bundles</button>
       </div>
     </div>
   </section>
@@ -77,6 +78,17 @@
     </div>
   </section>
 
+  <section class="tier-band glow-cyan" id="tierBundles">
+    <div class="wrap">
+      <div class="tier-head">
+        <h2 class="tier-title">Bundles and packs</h2>
+        <span class="tier-meta">Curated teams, one subscription</span>
+      </div>
+      <hr class="tier-rule">
+      <div class="product-grid" id="gridBundles"></div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ==================================================
@@ -96,47 +108,195 @@
 
       <div class="checkout-grid">
 
-        <div class="checkout-panel glass" id="checkoutFormPanel">
-          <span class="accent-bar" aria-hidden="true"></span>
-          <h2 class="checkout-panel-title">Billing details</h2>
-          <form id="checkoutForm" novalidate>
-            <label class="field-label" for="memberCode">Member code</label>
-            <input class="field" type="text" id="memberCode" name="memberCode" autocomplete="off" spellcheck="false">
-            <p class="field-hint">Optional. Credits this order to a referring member.</p>
+        <div class="checkout-flow">
 
-            <label class="field-label" for="cardName">Name on card</label>
-            <input class="field" type="text" id="cardName" name="cardName" autocomplete="off" spellcheck="false">
+          <!-- STEP 1: ACCOUNT -->
+          <div class="checkout-panel glass" id="accountPanel">
+            <span class="accent-bar" aria-hidden="true"></span>
+            <h2 class="checkout-panel-title"><span class="step-num">1</span>Account</h2>
 
-            <label class="field-label" for="cardNumber">Card number</label>
-            <input class="field" type="text" id="cardNumber" name="cardNumber" inputmode="numeric" autocomplete="off" spellcheck="false">
-
-            <div class="field-row">
-              <div>
-                <label class="field-label" for="cardExpiry">Expiry</label>
-                <input class="field" type="text" id="cardExpiry" name="cardExpiry" inputmode="numeric" autocomplete="off" spellcheck="false">
-              </div>
-              <div>
-                <label class="field-label" for="cardCode">Security code</label>
-                <input class="field" type="text" id="cardCode" name="cardCode" inputmode="numeric" autocomplete="off" spellcheck="false">
+            <div id="accountChooser">
+              <p class="step-intro">Sign in to use your saved billing address, or continue as a guest.</p>
+              <div class="account-choices">
+                <button class="btn btn-ghost" type="button" id="chooseSignin">Sign in</button>
+                <button class="btn btn-ghost" type="button" id="chooseGuest">Continue as guest</button>
               </div>
             </div>
 
-            <button class="btn btn-solid btn-block" type="submit">Place order</button>
-          </form>
-          <p class="login-note">Demonstration checkout: any values continue, including empty fields.</p>
+            <div id="accountSignin" hidden>
+              <label class="field-label" for="acctUser">Username</label>
+              <input class="field" type="text" id="acctUser" autocomplete="off" spellcheck="false">
+              <label class="field-label" for="acctPass">Password</label>
+              <input class="field" type="password" id="acctPass" autocomplete="off">
+              <div class="account-choices">
+                <button class="btn btn-solid" type="button" id="signinContinue">Continue</button>
+                <button class="btn btn-ghost" type="button" id="signinBack">Back</button>
+              </div>
+              <p class="field-hint hint-loose">Demonstration sign in: any credentials continue.</p>
+            </div>
+
+            <div id="accountDone" hidden>
+              <p class="account-status" id="accountStatus"></p>
+              <button class="link-btn" type="button" id="accountSwitch">Switch</button>
+            </div>
+          </div>
+
+          <div id="checkoutRest" hidden>
+
+            <!-- STEP 2: BILLING ADDRESS -->
+            <div class="checkout-panel glass" id="addressPanel">
+              <span class="accent-bar" aria-hidden="true"></span>
+              <h2 class="checkout-panel-title"><span class="step-num">2</span>Billing address</h2>
+              <label class="field-label" for="billName">Full name</label>
+              <input class="field" type="text" id="billName" autocomplete="off" spellcheck="false">
+              <label class="field-label" for="billStreet">Street address</label>
+              <input class="field" type="text" id="billStreet" autocomplete="off" spellcheck="false">
+              <div class="field-row field-row-3">
+                <div>
+                  <label class="field-label" for="billCity">City</label>
+                  <input class="field" type="text" id="billCity" autocomplete="off" spellcheck="false">
+                </div>
+                <div>
+                  <label class="field-label" for="billState">State</label>
+                  <input class="field" type="text" id="billState" autocomplete="off" spellcheck="false">
+                </div>
+                <div>
+                  <label class="field-label" for="billZip">ZIP</label>
+                  <input class="field" type="text" id="billZip" inputmode="numeric" autocomplete="off" spellcheck="false">
+                </div>
+              </div>
+              <label class="field-label" for="memberCode">Member code</label>
+              <input class="field" type="text" id="memberCode" autocomplete="off" spellcheck="false">
+              <p class="field-hint">Optional. Credits this order to a referring member.</p>
+            </div>
+
+            <!-- STEP 3: ACTIVATION (delivery method for digital goods) -->
+            <div class="checkout-panel glass" id="deliveryPanel">
+              <span class="accent-bar" aria-hidden="true"></span>
+              <h2 class="checkout-panel-title"><span class="step-num">3</span>Activation</h2>
+              <p class="step-intro">Your agents are digital: nothing ships. Choose how fast they come online.</p>
+              <div class="delivery-options" role="radiogroup" aria-label="Activation method">
+                <label class="delivery-option">
+                  <input type="radio" name="delivery" value="priority">
+                  <span class="delivery-body">
+                    <span class="delivery-name">Priority activation</span>
+                    <span class="delivery-desc">Your agents come online immediately</span>
+                  </span>
+                  <span class="delivery-price">$25.00</span>
+                </label>
+                <label class="delivery-option">
+                  <input type="radio" name="delivery" value="standard" checked>
+                  <span class="delivery-body">
+                    <span class="delivery-name">Standard activation</span>
+                    <span class="delivery-desc">Access within 48 hours</span>
+                  </span>
+                  <span class="delivery-price delivery-free">Free</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- STEP 4: PAYMENT -->
+            <div class="checkout-panel glass" id="paymentPanel">
+              <span class="accent-bar" aria-hidden="true"></span>
+              <h2 class="checkout-panel-title"><span class="step-num">4</span>Payment</h2>
+              <p class="step-intro">Express options place the order in one step. Credit card opens the card form.</p>
+
+              <div class="pay-row" role="group" aria-label="Payment method">
+                <button class="pay-btn pay-applepay" type="button" data-pay="applepay" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="7" y="4" width="10" height="16" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                    <line x1="10.5" y1="17.2" x2="13.5" y2="17.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    <path d="M 19 9 a 5 5 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                  </svg>
+                  Apple Pay
+                </button>
+                <button class="pay-btn pay-googlepay" type="button" data-pay="googlepay" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M 4 8.5 a 2.5 2.5 0 0 1 2.5 -2.5 h 11 a 2.5 2.5 0 0 1 2.5 2.5 v 8 a 2.5 2.5 0 0 1 -2.5 2.5 h -11 a 2.5 2.5 0 0 1 -2.5 -2.5 z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M 14 10.5 h 6 v 4 h -6 a 2 2 0 0 1 0 -4 z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <circle cx="15.6" cy="12.5" r="1" fill="currentColor"/>
+                  </svg>
+                  Google Pay
+                </button>
+                <button class="pay-btn pay-paypal" type="button" data-pay="paypal" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M 16 8 a 5 5 0 1 0 1.3 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                    <path d="M 17.6 9.4 L 17.3 12.9 L 14 11.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="11.3" cy="12.6" r="1.1" fill="currentColor"/>
+                  </svg>
+                  PayPal
+                </button>
+                <button class="pay-btn pay-card" type="button" data-pay="card" aria-pressed="true">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="3" y="6" width="18" height="12.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+                    <line x1="3" y1="10.2" x2="21" y2="10.2" stroke="currentColor" stroke-width="1.7"/>
+                    <circle cx="7.4" cy="14.6" r="1.2" fill="currentColor"/>
+                  </svg>
+                  Credit card
+                </button>
+              </div>
+              <p class="pay-note">Demonstration marks, not real payment brands. Nothing is charged.</p>
+
+              <form id="checkoutForm" novalidate>
+                <div id="cardFields">
+                  <label class="field-label" for="cardName">Name on card</label>
+                  <input class="field" type="text" id="cardName" autocomplete="off" spellcheck="false">
+                  <label class="field-label" for="cardNumber">Card number</label>
+                  <input class="field" type="text" id="cardNumber" inputmode="numeric" autocomplete="off" spellcheck="false">
+                  <div class="field-row">
+                    <div>
+                      <label class="field-label" for="cardExpiry">Expiry</label>
+                      <input class="field" type="text" id="cardExpiry" inputmode="numeric" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div>
+                      <label class="field-label" for="cardCode">Security code</label>
+                      <input class="field" type="text" id="cardCode" inputmode="numeric" autocomplete="off" spellcheck="false">
+                    </div>
+                  </div>
+                </div>
+                <p class="wallet-note" id="walletNote" hidden></p>
+                <button class="btn btn-solid btn-block" type="submit" id="placeOrderBtn">Place order</button>
+              </form>
+              <p class="login-note">Demonstration checkout: any values continue, including empty fields.</p>
+            </div>
+
+          </div>
         </div>
 
+        <!-- ORDER SUMMARY (right column) -->
         <div class="checkout-panel glass glass-cyan checkout-summary">
           <span class="accent-bar bar-cyan" aria-hidden="true"></span>
           <h2 class="checkout-panel-title">Order summary</h2>
           <div class="summary-lines" id="checkoutLines"></div>
           <div class="summary-totals">
-            <div class="total-row total-main">
-              <span>Monthly total</span>
-              <span class="total-num" id="checkoutTotal">$0.00</span>
+            <div class="total-row" id="rowOneSub" hidden>
+              <span>Subtotal, one time <span class="row-hint">billed today</span></span>
+              <span class="total-num" id="sumOne">$0.00</span>
+            </div>
+            <div class="total-row" id="rowSubSub" hidden>
+              <span>Subtotal, monthly <span class="row-hint">renews monthly</span></span>
+              <span class="total-num" id="sumSub">$0.00</span>
             </div>
             <div class="total-row">
-              <span>Monthly PV</span>
+              <span>Activation <span class="row-hint" id="sumDeliveryName">Standard</span></span>
+              <span class="total-num" id="sumDelivery">Free</span>
+            </div>
+            <div class="total-row">
+              <span id="taxLabel">Tax <span class="row-hint">5 percent</span></span>
+              <span class="total-num" id="sumTax">$0.00</span>
+            </div>
+            <div class="taxid-row">
+              <label class="field-label" for="taxId">Tax ID</label>
+              <input class="field field-compact" type="text" id="taxId" autocomplete="off" spellcheck="false" placeholder="Optional">
+              <p class="field-hint">A tax ID with any digit removes the 5 percent tax.</p>
+            </div>
+            <div class="total-row total-main">
+              <span>Order total</span>
+              <span class="total-num" id="checkoutTotal">$0.00</span>
+            </div>
+            <p class="summary-foot" id="summaryRenews" hidden>Monthly items renew each month until cancelled.</p>
+            <div class="total-row">
+              <span>Total PV</span>
               <span class="total-pv-num" id="checkoutPv">0 PV</span>
             </div>
           </div>
@@ -175,18 +335,10 @@
 
         <div class="confirm-summary">
           <div class="summary-lines" id="confirmLines"></div>
-          <div class="summary-totals">
-            <div class="total-row total-main">
-              <span>Monthly total</span>
-              <span class="total-num" id="confirmTotal">$0.00</span>
-            </div>
-            <div class="total-row">
-              <span>Monthly PV</span>
-              <span class="total-pv-num" id="confirmPv">0 PV</span>
-            </div>
-          </div>
+          <div class="summary-totals" id="confirmTotals"></div>
         </div>
 
+        <p class="confirm-note" id="confirmRenews" hidden></p>
         <p class="confirm-note" id="confirmQualified"></p>
         <p class="confirm-note">Demonstration checkout: no payment occurred and nothing will be charged.</p>
         <p class="confirm-forward">Payments route through the Orvanna orchestration layer in a later phase.</p>
@@ -219,12 +371,16 @@
       <div class="pv-track"><div class="pv-fill" id="drawerMeterFill"></div></div>
       <p class="pv-meter-note" id="drawerMeterNote">A qualified month needs 100 PV.</p>
     </div>
-    <div class="total-row total-main">
-      <span>Monthly subtotal</span>
-      <span class="total-num" id="drawerSubtotal">$0.00</span>
+    <div class="total-row" id="drawerRowOne" hidden>
+      <span>One time <span class="row-hint">billed today</span></span>
+      <span class="total-num" id="drawerOne">$0.00</span>
+    </div>
+    <div class="total-row" id="drawerRowSub" hidden>
+      <span>Monthly</span>
+      <span class="total-num" id="drawerSub">$0.00</span>
     </div>
     <div class="total-row">
-      <span>Monthly PV</span>
+      <span>Total PV</span>
       <span class="total-pv-num" id="drawerPv">0 PV</span>
     </div>
     <button class="btn btn-solid btn-block" id="checkoutButton" type="button" disabled>Checkout</button>
@@ -295,131 +451,60 @@
   </div>
 </footer>
 
+<script src="js/catalog.js"></script>
 <script>
 /* ============================================================
-   Orvanna shop. Everything runs locally: the catalog is a data
-   array, the cart persists in localStorage, and checkout is a
-   demonstration that never touches a network. No console noise.
+   Orvanna shop, round 4. The catalog lives in js/catalog.js
+   (single source of truth). This script renders the catalog,
+   runs the mode-aware cart (subscription default, one-time via
+   the product page), and the four-step checkout: account,
+   billing address, activation, payment. Everything local,
+   nothing on the network, no console noise.
    ============================================================ */
 (function () {
   'use strict';
 
-  /* ---------- catalog data (prices and PV are the hard facts) ---------- */
+  var O = window.ORVANNA;
+  var fmtMoney = O.fmtMoney;
+  var fmtPv = O.fmtPv;
 
-  var HEX = '<polygon points="32,6 54.5,19 54.5,45 32,58 9.5,45 9.5,19" fill="none" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/>';
-
-  function hexIcon(inner) {
-    return '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' + HEX + inner + '</svg>';
-  }
-
-  var PRODUCTS = [
-    /* Domain agents: $100.00 / 100 Personal Volume (PV) */
-    { id: 'payment', tier: 'domain', name: 'Payment Agent', price: 100, pv: 100,
-      desc: 'Runs checkout, retries, and settlement without a break.',
-      icon: hexIcon('<rect x="20" y="24" width="24" height="17" rx="2.5" fill="none" stroke="#818CF8" stroke-width="2.4"/><line x1="20" y1="30" x2="44" y2="30" stroke="#818CF8" stroke-width="2.4"/><circle cx="26" cy="35.5" r="2" fill="#22D3EE"/>') },
-    { id: 'shipping', tier: 'domain', name: 'Shipping Agent', price: 100, pv: 100,
-      desc: 'Books carriers, tracks parcels, and clears delays.',
-      icon: hexIcon('<path d="M 20 36 h 14 v -9 h -14 z" fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linejoin="round"/><path d="M 34 30 h 6 l 4 4 v 2 h -10 z" fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linejoin="round"/><circle cx="25" cy="39.5" r="2.4" fill="#22D3EE"/><circle cx="38" cy="39.5" r="2.4" fill="#818CF8"/>') },
-    { id: 'pricing', tier: 'domain', name: 'Pricing Agent', price: 100, pv: 100,
-      desc: 'Watches the market and keeps every price sharp.',
-      icon: hexIcon('<line x1="24" y1="41" x2="40" y2="23" stroke="#818CF8" stroke-width="2.4" stroke-linecap="round"/><circle cx="25.5" cy="26.5" r="3.4" fill="none" stroke="#818CF8" stroke-width="2.2"/><circle cx="38.5" cy="38.5" r="3.4" fill="none" stroke="#22D3EE" stroke-width="2.2"/>') },
-    { id: 'inventory', tier: 'domain', name: 'Inventory Agent', price: 100, pv: 100,
-      desc: 'Counts stock and reorders before shelves go bare.',
-      icon: hexIcon('<rect x="21" y="33" width="9.5" height="9.5" fill="none" stroke="#818CF8" stroke-width="2.2" stroke-linejoin="round"/><rect x="33.5" y="33" width="9.5" height="9.5" fill="none" stroke="#818CF8" stroke-width="2.2" stroke-linejoin="round"/><rect x="27" y="21.5" width="9.5" height="9.5" fill="none" stroke="#22D3EE" stroke-width="2.2" stroke-linejoin="round"/>') },
-    { id: 'marketing', tier: 'domain', name: 'Marketing Agent', price: 100, pv: 100,
-      desc: 'Writes, schedules, and measures every campaign.',
-      icon: hexIcon('<circle cx="26" cy="32" r="2.6" fill="#22D3EE"/><path d="M 32 24 a 10.5 10.5 0 0 1 0 16" fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linecap="round"/><path d="M 37 19.5 a 16.5 16.5 0 0 1 0 25" fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linecap="round"/>') },
-    { id: 'tax', tier: 'domain', name: 'Tax Agent', price: 100, pv: 100,
-      desc: 'Files on time in every region you sell.',
-      icon: hexIcon('<line x1="24" y1="40" x2="40" y2="24" stroke="#818CF8" stroke-width="2.4" stroke-linecap="round"/><circle cx="26" cy="26" r="2.6" fill="#818CF8"/><circle cx="38" cy="38" r="2.6" fill="#22D3EE"/><line x1="21" y1="45.5" x2="43" y2="45.5" stroke="#818CF8" stroke-width="2.2" stroke-linecap="round"/>') },
-    /* Support agents: $50.00 / 50 PV */
-    { id: 'engineer', tier: 'support', name: 'Software Engineer', price: 50, pv: 50,
-      desc: 'Ships fixes and features on request.',
-      icon: hexIcon('<path d="M 26 25 L 19.5 32 L 26 39" fill="none" stroke="#818CF8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M 38 25 L 44.5 32 L 38 39" fill="none" stroke="#818CF8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="34" y1="23" x2="30" y2="41" stroke="#22D3EE" stroke-width="2.4" stroke-linecap="round"/>') },
-    { id: 'qa', tier: 'support', name: 'Quality Assurance', price: 50, pv: 50,
-      desc: 'Tests everything twice before customers see it.',
-      icon: hexIcon('<path d="M 22 32.5 L 29.5 40 L 42 25" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>') },
-    { id: 'secretary', tier: 'support', name: 'Secretary', price: 50, pv: 50,
-      desc: 'Keeps the calendar, notes, and follow-ups straight.',
-      icon: hexIcon('<rect x="21" y="23" width="22" height="19" rx="2.5" fill="none" stroke="#818CF8" stroke-width="2.4"/><line x1="21" y1="29.5" x2="43" y2="29.5" stroke="#818CF8" stroke-width="2.2"/><line x1="27" y1="20" x2="27" y2="25" stroke="#818CF8" stroke-width="2.2" stroke-linecap="round"/><line x1="37" y1="20" x2="37" y2="25" stroke="#818CF8" stroke-width="2.2" stroke-linecap="round"/><circle cx="27" cy="35.5" r="2" fill="#22D3EE"/>') },
-    { id: 'executive', tier: 'support', name: 'Chief Executive', price: 50, pv: 50,
-      desc: 'Sets direction and keeps every agent aligned.',
-      icon: hexIcon('<circle cx="32" cy="24.5" r="3.2" fill="#22D3EE"/><circle cx="23" cy="39" r="3" fill="#818CF8"/><circle cx="41" cy="39" r="3" fill="#818CF8"/><line x1="32" y1="27.5" x2="24" y2="36.5" stroke="#818CF8" stroke-width="2.2"/><line x1="32" y1="27.5" x2="40" y2="36.5" stroke="#818CF8" stroke-width="2.2"/>') },
-    { id: 'accounting', tier: 'support', name: 'Accounting', price: 50, pv: 50,
-      desc: 'Balances books to the cent, month after month.',
-      icon: hexIcon('<line x1="24" y1="42" x2="24" y2="33" stroke="#818CF8" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="42" x2="32" y2="26" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="42" x2="40" y2="29.5" stroke="#818CF8" stroke-width="3" stroke-linecap="round"/>') },
-    { id: 'care', tier: 'support', name: 'Customer Care', price: 50, pv: 50,
-      desc: 'Answers customers day and night, in any tone.',
-      icon: hexIcon('<path d="M 23 36 v -3.5 a 9 9 0 0 1 18 0 V 36" fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linecap="round"/><rect x="20.5" y="34" width="5" height="8" rx="2.4" fill="#818CF8"/><rect x="38.5" y="34" width="5" height="8" rx="2.4" fill="#22D3EE"/>') }
-  ];
-
-  var byId = {};
-  PRODUCTS.forEach(function (p) { byId[p.id] = p; });
-
-  /* ---------- money + cart state ---------- */
-
-  var CART_KEY = 'orvannaCart';
-
-  function fmtMoney(n) {
-    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
-  function loadCart() {
-    try {
-      var raw = localStorage.getItem(CART_KEY);
-      if (!raw) return {};
-      var data = JSON.parse(raw);
-      var clean = {};
-      Object.keys(data).forEach(function (id) {
-        var q = parseInt(data[id], 10);
-        if (byId[id] && q > 0) clean[id] = Math.min(q, 99);
-      });
-      return clean;
-    } catch (err) { return {}; }
-  }
-
-  function saveCart() {
-    try {
-      if (Object.keys(cart).length === 0) {
-        localStorage.removeItem(CART_KEY);
-      } else {
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
-      }
-    } catch (err) { /* storage unavailable: cart lives for the session */ }
-  }
-
-  var cart = loadCart();
-
-  function cartTotals() {
-    var money = 0, pv = 0, count = 0;
-    Object.keys(cart).forEach(function (id) {
-      var q = cart[id], p = byId[id];
-      money += p.price * q;
-      pv += p.pv * q;
-      count += q;
-    });
-    return { money: money, pv: pv, count: count };
-  }
+  var cart = O.loadCart();
+  function persist() { O.saveCart(cart); }
 
   /* ---------- catalog render ---------- */
 
+  function badgeFor(p) {
+    if (p.tier === 'domain')  return '<span class="tier-badge badge-domain">Domain</span>';
+    if (p.tier === 'support') return '<span class="tier-badge">Support</span>';
+    if (p.tier === 'bundle')  return '<span class="tier-badge badge-bundle">Bundle</span>';
+    return '<span class="tier-badge badge-bundle">Pack</span>';
+  }
+
+  function includesList(p) {
+    if (!p.includes) return '';
+    return '<div class="product-includes"><span class="includes-label">Includes:</span> ' +
+      p.includes.map(function (sku) { return O.get(sku).name; }).join(', ') +
+      '</div>';
+  }
+
   function productCard(p) {
-    var badgeClass = p.tier === 'domain' ? 'tier-badge badge-domain' : 'tier-badge';
-    var badgeText  = p.tier === 'domain' ? 'Domain' : 'Support';
+    var cyan = (p.tier === 'domain' || p.tier === 'bundle' || p.tier === 'pack');
     return '' +
-      '<article class="product glass' + (p.tier === 'domain' ? ' glass-cyan' : '') + '" data-tier="' + p.tier + '">' +
-        '<span class="accent-bar' + (p.tier === 'domain' ? ' bar-cyan' : '') + '" aria-hidden="true"></span>' +
+      '<article class="product glass' + (cyan ? ' glass-cyan' : '') + '" data-tier="' + p.tier + '">' +
+        '<span class="accent-bar' + (cyan ? ' bar-cyan' : '') + '" aria-hidden="true"></span>' +
         '<div class="product-top">' +
-          '<div class="product-icon" aria-hidden="true">' + p.icon + '</div>' +
-          '<span class="' + badgeClass + '">' + badgeText + '</span>' +
+          '<a class="product-icon" href="product.html?sku=' + p.sku + '" aria-hidden="true" tabindex="-1">' + p.icon + '</a>' +
+          badgeFor(p) +
         '</div>' +
-        '<h3 class="product-name">' + p.name + '</h3>' +
-        '<p class="product-desc">' + p.desc + '</p>' +
+        '<h3 class="product-name"><a class="product-name-link" href="product.html?sku=' + p.sku + '">' + p.name + '</a></h3>' +
+        '<p class="product-desc">' + p.blurb + '</p>' +
+        includesList(p) +
         '<div class="product-price-row">' +
-          '<span class="product-price">' + fmtMoney(p.price) + ' <span class="per">/ month</span></span>' +
-          '<span class="product-pv">' + p.pv + ' PV</span>' +
+          '<span class="product-price">' + fmtMoney(p.sub.price) + ' <span class="per">/ month</span></span>' +
+          '<span class="product-pv">' + fmtPv(p.sub.pv) + '</span>' +
         '</div>' +
-        '<button class="btn-add" type="button" data-add="' + p.id + '" aria-label="Add ' + p.name + ' to cart">' +
+        '<div class="product-once-hint">Own it outright: ' + fmtMoney(p.once.price) + '</div>' +
+        '<button class="btn-add" type="button" data-add="' + p.sku + '" aria-label="Add ' + p.name + ' monthly subscription to cart">' +
           '<span class="add-label-default">Add to cart</span>' +
           '<svg class="add-check" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
             '<path d="M 2.5 8.5 L 6.5 12.5 L 13.5 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' +
@@ -429,45 +514,55 @@
       '</article>';
   }
 
-  document.getElementById('gridDomain').innerHTML =
-    PRODUCTS.filter(function (p) { return p.tier === 'domain'; }).map(productCard).join('');
-  document.getElementById('gridSupport').innerHTML =
-    PRODUCTS.filter(function (p) { return p.tier === 'support'; }).map(productCard).join('');
+  function renderGrid(id, tiers) {
+    document.getElementById(id).innerHTML = O.PRODUCTS
+      .filter(function (p) { return tiers.indexOf(p.tier) >= 0; })
+      .map(productCard).join('');
+  }
+
+  renderGrid('gridDomain', ['domain']);
+  renderGrid('gridSupport', ['support']);
+  renderGrid('gridBundles', ['bundle', 'pack']);
 
   /* ---------- tier filter ---------- */
 
   var pills = document.querySelectorAll('.filter-pill');
-  var tierDomain = document.getElementById('tierDomain');
-  var tierSupport = document.getElementById('tierSupport');
+  var bands = {
+    domain: document.getElementById('tierDomain'),
+    support: document.getElementById('tierSupport'),
+    bundles: document.getElementById('tierBundles')
+  };
 
   pills.forEach(function (pill) {
     pill.addEventListener('click', function () {
       var f = pill.getAttribute('data-filter');
       pills.forEach(function (x) { x.setAttribute('aria-pressed', String(x === pill)); });
-      tierDomain.style.display  = (f === 'all' || f === 'domain')  ? '' : 'none';
-      tierSupport.style.display = (f === 'all' || f === 'support') ? '' : 'none';
+      Object.keys(bands).forEach(function (k) {
+        bands[k].style.display = (f === 'all' || f === k) ? '' : 'none';
+      });
     });
   });
 
-  /* ---------- add to cart with feedback ---------- */
+  /* ---------- add to cart (catalog adds the subscription mode) ---------- */
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   var cartCount = document.getElementById('cartCount');
 
+  function addToCart(sku, mode) {
+    var key = sku + '|' + (mode === 'one' ? 'one' : 'sub');
+    cart[key] = Math.min((cart[key] || 0) + 1, 99);
+    persist();
+    renderAll();
+  }
+
   document.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('[data-add]') : null;
     if (!btn) return;
-    var id = btn.getAttribute('data-add');
-    cart[id] = Math.min((cart[id] || 0) + 1, 99);
-    saveCart();
-    renderAll();
+    addToCart(btn.getAttribute('data-add'), 'sub');
 
-    /* the drawer opens on add so the PV meter's movement is SEEN:
-       the meter is the shop's teaching moment (coordinator decision,
-       and the storefront pattern the drawer was borrowed from) */
+    /* the drawer opens on add so the PV meter's movement is SEEN */
     openDrawer();
 
-    /* button morphs to Added for a beat, badge bumps */
     btn.classList.add('is-added');
     btn.querySelector('.add-label-added').hidden = false;
     if (!reduce.matches) {
@@ -507,30 +602,43 @@
     if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
   });
 
-  /* ---------- cart drawer render ---------- */
+  /* ---------- cart drawer render (mode-aware lines) ---------- */
 
   var drawerBody = document.getElementById('drawerBody');
   var checkoutButton = document.getElementById('checkoutButton');
 
-  var EMPTY_HEX = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' + HEX +
+  var EMPTY_HEX = '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' + O.HEX +
     '<circle cx="32" cy="32" r="4" fill="#22D3EE"/></svg>';
 
-  function lineItem(id) {
-    var p = byId[id], q = cart[id];
+  function modeBadge(mode) {
+    return mode === 'one'
+      ? '<span class="mode-badge mode-one">One-time</span>'
+      : '<span class="mode-badge mode-sub">Monthly</span>';
+  }
+
+  function lineItem(key) {
+    var kp = O.keyParts(key);
+    var p = O.get(kp.sku), q = cart[key];
+    var price = O.priceOf(p, kp.mode) * q;
+    var pv = O.pvOf(p, kp.mode) * q;
+    var priceText = kp.mode === 'one'
+      ? fmtMoney(price) + ' billed once'
+      : fmtMoney(price) + ' / month';
     return '' +
-      '<div class="cart-line" data-line="' + id + '">' +
+      '<div class="cart-line" data-line="' + key + '">' +
         '<div class="line-icon" aria-hidden="true">' + p.icon + '</div>' +
         '<div class="line-info">' +
           '<div class="line-name">' + p.name + '</div>' +
-          '<div class="line-meta">' + fmtMoney(p.price * q) + ' / month, <span class="line-pv">' + (p.pv * q) + ' PV</span></div>' +
+          '<div class="line-badges">' + modeBadge(kp.mode) + '</div>' +
+          '<div class="line-meta">' + priceText + ', <span class="line-pv">' + fmtPv(pv) + '</span></div>' +
         '</div>' +
         '<div class="line-controls">' +
           '<div class="qty-group" aria-label="Quantity for ' + p.name + '">' +
-            '<button class="qty-btn" type="button" data-dec="' + id + '" aria-label="Decrease quantity"' + (q <= 1 ? ' disabled' : '') + '>&#8722;</button>' +
+            '<button class="qty-btn" type="button" data-dec="' + key + '" aria-label="Decrease quantity"' + (q <= 1 ? ' disabled' : '') + '>&#8722;</button>' +
             '<span class="qty-val" aria-live="polite">' + q + '</span>' +
-            '<button class="qty-btn" type="button" data-inc="' + id + '" aria-label="Increase quantity"' + (q >= 99 ? ' disabled' : '') + '>+</button>' +
+            '<button class="qty-btn" type="button" data-inc="' + key + '" aria-label="Increase quantity"' + (q >= 99 ? ' disabled' : '') + '>+</button>' +
           '</div>' +
-          '<button class="line-remove" type="button" data-remove="' + id + '">Remove</button>' +
+          '<button class="line-remove" type="button" data-remove="' + key + '">Remove</button>' +
         '</div>' +
       '</div>';
   }
@@ -543,10 +651,10 @@
     if (!fill) return;
     var pct = Math.min(100, pv);
     fill.style.width = pct + '%';
-    now.textContent = pv + ' / 100 PV';
+    now.textContent = pv.toLocaleString('en-US') + ' / 100 PV';
     if (pv >= 100) {
       meter.classList.add('is-qualified');
-      note.textContent = 'Qualified month reached at ' + pv + ' PV.';
+      note.textContent = 'Qualified month reached at ' + fmtPv(pv) + '.';
     } else {
       meter.classList.remove('is-qualified');
       note.textContent = pv === 0
@@ -556,21 +664,26 @@
   }
 
   function renderDrawer() {
-    var ids = Object.keys(cart);
-    if (ids.length === 0) {
+    var keys = Object.keys(cart);
+    if (keys.length === 0) {
       drawerBody.innerHTML =
         '<div class="cart-empty">' +
           '<div class="empty-hex" aria-hidden="true">' + EMPTY_HEX + '</div>' +
           'Your cart is empty.<br>Add an agent from the catalog to begin.' +
         '</div>';
     } else {
-      drawerBody.innerHTML = ids.map(lineItem).join('');
+      drawerBody.innerHTML = keys.map(lineItem).join('');
     }
-    var t = cartTotals();
-    document.getElementById('drawerSubtotal').textContent = fmtMoney(t.money);
-    document.getElementById('drawerPv').textContent = t.pv + ' PV';
+    var t = O.cartTotals(cart);
+    var rowOne = document.getElementById('drawerRowOne');
+    var rowSub = document.getElementById('drawerRowSub');
+    rowOne.hidden = t.oneMoney === 0;
+    rowSub.hidden = t.subMoney === 0;
+    document.getElementById('drawerOne').textContent = fmtMoney(t.oneMoney);
+    document.getElementById('drawerSub').textContent = fmtMoney(t.subMoney) + ' / month';
+    document.getElementById('drawerPv').textContent = fmtPv(t.pv);
     renderMeter('drawerMeter', t.pv);
-    checkoutButton.disabled = ids.length === 0;
+    checkoutButton.disabled = keys.length === 0;
   }
 
   drawerBody.addEventListener('click', function (e) {
@@ -579,24 +692,24 @@
     var dec = e.target.closest('[data-dec]');
     var rem = e.target.closest('[data-remove]');
     if (inc) {
-      var idI = inc.getAttribute('data-inc');
-      cart[idI] = Math.min(cart[idI] + 1, 99);
+      var kI = inc.getAttribute('data-inc');
+      cart[kI] = Math.min(cart[kI] + 1, 99);
     } else if (dec) {
-      var idD = dec.getAttribute('data-dec');
-      if (cart[idD] > 1) cart[idD] -= 1;
+      var kD = dec.getAttribute('data-dec');
+      if (cart[kD] > 1) cart[kD] -= 1;
     } else if (rem) {
       delete cart[rem.getAttribute('data-remove')];
     } else {
       return;
     }
-    saveCart();
+    persist();
     renderAll();
   });
 
   /* ---------- nav badge ---------- */
 
   function renderBadge() {
-    cartCount.textContent = String(cartTotals().count);
+    cartCount.textContent = String(O.cartTotals(cart).count);
   }
 
   /* ---------- views ---------- */
@@ -614,31 +727,186 @@
     window.scrollTo(0, 0);
   }
 
-  /* ---------- checkout ---------- */
+  /* ============================================================
+     CHECKOUT
+     ============================================================ */
 
-  function summaryLines(targetId) {
-    var ids = Object.keys(cart);
-    document.getElementById(targetId).innerHTML = ids.map(function (id) {
-      var p = byId[id], q = cart[id];
-      return '<div class="summary-line">' +
-        '<span class="sl-name">' + p.name + ' <span class="sl-qty">&times; ' + q + '</span></span>' +
-        '<span class="sl-amt">' + fmtMoney(p.price * q) + '</span>' +
-      '</div>';
-    }).join('');
+  /* ---------- step 1: account ---------- */
+
+  var SYNTHETIC_ADDRESS = {
+    name: 'Jordan Avery',
+    street: '4821 Meridian Loop',
+    city: 'Cedar Falls',
+    state: 'Iowa',
+    zip: '50613'
+  };
+
+  var accountMode = null;  /* null | 'member' | 'guest' */
+
+  var accountChooser = document.getElementById('accountChooser');
+  var accountSignin = document.getElementById('accountSignin');
+  var accountDone = document.getElementById('accountDone');
+  var accountStatus = document.getElementById('accountStatus');
+  var checkoutRest = document.getElementById('checkoutRest');
+
+  function setAccountStage(stage) {
+    accountChooser.hidden = stage !== 'chooser';
+    accountSignin.hidden = stage !== 'signin';
+    accountDone.hidden = stage !== 'done';
+    checkoutRest.hidden = stage !== 'done';
   }
 
-  function renderCheckout() {
-    summaryLines('checkoutLines');
-    var t = cartTotals();
-    document.getElementById('checkoutTotal').textContent = fmtMoney(t.money);
-    document.getElementById('checkoutPv').textContent = t.pv + ' PV';
-    renderMeter('checkoutMeter', t.pv);
+  function setAddress(a) {
+    document.getElementById('billName').value = a.name;
+    document.getElementById('billStreet').value = a.street;
+    document.getElementById('billCity').value = a.city;
+    document.getElementById('billState').value = a.state;
+    document.getElementById('billZip').value = a.zip;
+  }
+
+  document.getElementById('chooseSignin').addEventListener('click', function () {
+    setAccountStage('signin');
+    document.getElementById('acctUser').focus();
+  });
+
+  document.getElementById('chooseGuest').addEventListener('click', function () {
+    accountMode = 'guest';
+    setAddress({ name: '', street: '', city: '', state: '', zip: '' });
+    accountStatus.textContent = 'Checking out as a guest. Enter your billing address below.';
+    setAccountStage('done');
+  });
+
+  document.getElementById('signinContinue').addEventListener('click', function () {
+    accountMode = 'member';
+    setAddress(SYNTHETIC_ADDRESS);
+    accountStatus.textContent = 'Signed in as ' + SYNTHETIC_ADDRESS.name + '. Your saved billing address is filled in below.';
+    setAccountStage('done');
+  });
+
+  document.getElementById('signinBack').addEventListener('click', function () {
+    setAccountStage('chooser');
+  });
+
+  document.getElementById('accountSwitch').addEventListener('click', function () {
+    accountMode = null;
+    setAccountStage('chooser');
+  });
+
+  /* ---------- step 3: activation (delivery method) ---------- */
+
+  var DELIVERY = {
+    priority: { label: 'Priority activation', price: 25 },
+    standard: { label: 'Standard activation', price: 0 }
+  };
+
+  function deliveryChoice() {
+    var checked = document.querySelector('input[name="delivery"]:checked');
+    return checked ? checked.value : 'standard';
+  }
+
+  document.querySelectorAll('input[name="delivery"]').forEach(function (radio) {
+    radio.addEventListener('change', renderSummary);
+  });
+
+  /* ---------- step 4: payment method ---------- */
+
+  var PAY_LABELS = {
+    applepay: 'Apple Pay',
+    googlepay: 'Google Pay',
+    paypal: 'PayPal',
+    card: 'Credit card'
+  };
+
+  var payMethod = 'card';
+  var payButtons = document.querySelectorAll('.pay-btn');
+  var cardFields = document.getElementById('cardFields');
+  var walletNote = document.getElementById('walletNote');
+  var placeOrderBtn = document.getElementById('placeOrderBtn');
+
+  function setPayMethod(method) {
+    payMethod = method;
+    payButtons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-pay') === method));
+    });
+    var isCard = method === 'card';
+    cardFields.hidden = !isCard;
+    walletNote.hidden = isCard;
+    if (!isCard) {
+      walletNote.textContent = PAY_LABELS[method] + ' needs no card details here. Place the order to finish.';
+    }
+    placeOrderBtn.textContent = isCard ? 'Place order' : 'Place order with ' + PAY_LABELS[method];
+  }
+
+  payButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      setPayMethod(b.getAttribute('data-pay'));
+    });
+  });
+
+  /* ---------- tax ---------- */
+
+  var taxIdInput = document.getElementById('taxId');
+  taxIdInput.addEventListener('input', renderSummary);
+
+  function taxExempt() {
+    return /\d/.test(taxIdInput.value);
+  }
+
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  /* ---------- order summary (live) ---------- */
+
+  function summaryLineHtml(key) {
+    var kp = O.keyParts(key);
+    var p = O.get(kp.sku), q = cart[key];
+    var amt = O.priceOf(p, kp.mode) * q;
+    return '<div class="summary-line">' +
+      '<span class="sl-name">' + p.name + ' <span class="sl-qty">&times; ' + q + '</span> ' + modeBadge(kp.mode) + '</span>' +
+      '<span class="sl-amt">' + fmtMoney(amt) + (kp.mode === 'sub' ? '<span class="sl-per"> / mo</span>' : '') + '</span>' +
+    '</div>';
+  }
+
+  function orderMath() {
+    var t = O.cartTotals(cart);
+    var delivery = DELIVERY[deliveryChoice()].price;
+    var taxable = t.oneMoney + t.subMoney + delivery;
+    var tax = taxExempt() ? 0 : round2(taxable * 0.05);
+    var total = round2(taxable + tax);
+    return { t: t, delivery: delivery, tax: tax, total: total };
+  }
+
+  function renderSummary() {
+    document.getElementById('checkoutLines').innerHTML =
+      Object.keys(cart).map(summaryLineHtml).join('');
+
+    var m = orderMath();
+    document.getElementById('rowOneSub').hidden = m.t.oneMoney === 0;
+    document.getElementById('rowSubSub').hidden = m.t.subMoney === 0;
+    document.getElementById('sumOne').textContent = fmtMoney(m.t.oneMoney);
+    document.getElementById('sumSub').textContent = fmtMoney(m.t.subMoney);
+    document.getElementById('sumDeliveryName').textContent = DELIVERY[deliveryChoice()].label.replace(' activation', '');
+    document.getElementById('sumDelivery').textContent = m.delivery === 0 ? 'Free' : fmtMoney(m.delivery);
+    var taxLabel = document.getElementById('taxLabel');
+    if (taxExempt()) {
+      taxLabel.innerHTML = 'Tax exempt';
+      document.getElementById('sumTax').textContent = '$0.00';
+    } else {
+      taxLabel.innerHTML = 'Tax <span class="row-hint">5 percent</span>';
+      document.getElementById('sumTax').textContent = fmtMoney(m.tax);
+    }
+    document.getElementById('checkoutTotal').textContent = fmtMoney(m.total);
+    document.getElementById('summaryRenews').hidden = m.t.subMoney === 0;
+    document.getElementById('checkoutPv').textContent = fmtPv(m.t.pv);
+    renderMeter('checkoutMeter', m.t.pv);
   }
 
   checkoutButton.addEventListener('click', function () {
     if (Object.keys(cart).length === 0) return;
     closeDrawer();
-    renderCheckout();
+    accountMode = null;
+    setAccountStage('chooser');
+    setPayMethod('card');
+    renderSummary();
     showView('checkout');
   });
 
@@ -666,18 +934,44 @@
     e.preventDefault();
     if (Object.keys(cart).length === 0) { showView('catalog'); return; }
 
-    var t = cartTotals();
-    summaryLines('confirmLines');
-    document.getElementById('confirmTotal').textContent = fmtMoney(t.money);
-    document.getElementById('confirmPv').textContent = t.pv + ' PV';
+    var m = orderMath();
+    var choice = deliveryChoice();
+
+    document.getElementById('confirmLines').innerHTML =
+      Object.keys(cart).map(summaryLineHtml).join('');
+
+    var rows = '';
+    if (m.t.oneMoney > 0) {
+      rows += '<div class="total-row"><span>Subtotal, one time <span class="row-hint">billed today</span></span><span class="total-num">' + fmtMoney(m.t.oneMoney) + '</span></div>';
+    }
+    if (m.t.subMoney > 0) {
+      rows += '<div class="total-row"><span>Subtotal, monthly</span><span class="total-num">' + fmtMoney(m.t.subMoney) + '</span></div>';
+    }
+    rows += '<div class="total-row"><span>' + DELIVERY[choice].label + '</span><span class="total-num">' + (m.delivery === 0 ? 'Free' : fmtMoney(m.delivery)) + '</span></div>';
+    rows += taxExempt()
+      ? '<div class="total-row"><span>Tax exempt</span><span class="total-num">$0.00</span></div>'
+      : '<div class="total-row"><span>Tax <span class="row-hint">5 percent</span></span><span class="total-num">' + fmtMoney(m.tax) + '</span></div>';
+    rows += '<div class="total-row total-main"><span>Order total</span><span class="total-num">' + fmtMoney(m.total) + '</span></div>';
+    rows += '<div class="total-row"><span>Payment method</span><span class="total-num">' + PAY_LABELS[payMethod] + '</span></div>';
+    rows += '<div class="total-row"><span>Total PV</span><span class="total-pv-num">' + fmtPv(m.t.pv) + '</span></div>';
+    document.getElementById('confirmTotals').innerHTML = rows;
+
+    var renews = document.getElementById('confirmRenews');
+    if (m.t.subMoney > 0) {
+      renews.hidden = false;
+      renews.textContent = 'Your subscription items renew monthly at ' + fmtMoney(m.t.subMoney) + ' until cancelled.';
+    } else {
+      renews.hidden = true;
+    }
+
     document.getElementById('orderNumber').textContent = orderNumber();
-    document.getElementById('confirmQualified').textContent = t.pv >= 100
-      ? 'This order carries ' + t.pv + ' PV: a qualified month.'
-      : 'This order carries ' + t.pv + ' PV of the 100 PV qualified month.';
+    document.getElementById('confirmQualified').textContent = m.t.pv >= 100
+      ? 'This order carries ' + fmtPv(m.t.pv) + ': a qualified month.'
+      : 'This order carries ' + fmtPv(m.t.pv) + ' of the 100 PV qualified month.';
 
     /* the order is placed: the cart clears */
     cart = {};
-    saveCart();
+    persist();
     renderAll();
     showView('confirm');
   });
@@ -690,6 +984,11 @@
   }
 
   renderAll();
+
+  /* product.html sends its View cart link here with #cart */
+  if (window.location.hash === '#cart') {
+    openDrawer();
+  }
 })();
 </script>
 

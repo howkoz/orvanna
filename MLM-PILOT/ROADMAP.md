@@ -83,6 +83,23 @@ PLATFORM model documents, and connector-adapter notes. Fence note: HyperSwitch i
 open source, clean for personal use; employer-side vendor evaluations stay on the
 work side.
 
+Phase 4C.2 (Howard's morning feedback round, 2026-08-14, after "Amazing job... works
+with no errors"): (1) every product gets a PRODUCT PAGE (filler prose under
+business-benefit headings, add to cart on page); (2) SUBSCRIPTION DEFAULT with a
+one-time toggle: unchecking subscription flips a domain agent to $1,000.00 at
+1,000 PV (Howard's value-anchoring play; support agents follow the same 10x rule at
+$500.00 / 500 PV, coordinator's call, adjustable); (3) research how real stores flag
+and word subscriptions (terminology + flag placement) before building; (4) VARIANTS:
+a parent "Manager Agent" bundling 2-3 support agents as children, plus three digital
+packs, even-number pricing with PV = price; (5) CHECKOUT: sign in or continue as
+guest, synthetic United States billing address on sign-in, and a delivery-method
+style choice for digital goods: immediate access $25.00 versus free access within
+48 hours; (6) TAX: flat 5 percent displayed, removed when a Tax ID field contains
+any digit; (7) PAYMENT METHODS: Apple Pay, Google Pay, PayPal, credit card, all
+demonstration-only, drawn as generic marks (no copied logos). NOTE: all of 4C.2 is
+shop display-layer; the database and engine learn about one-time purchases, packs,
+and tax when checkout becomes real in Phase 6.
+
 v2 parking lot: real auth (magic links), enrollment flow, binary
 comp variant, order placement UI, KPI prism dashboard.
 
