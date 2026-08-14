@@ -11,6 +11,12 @@ Primary Key (PK), Foreign Key (FK).
 
 Design target: 1,000 members seeded, every choice must still work at 100,000.
 
+Pointer (2026-08-14): the Phase 6 schema delta, tables `app.demo_orders` and
+`app.demo_rate_events` (migration 010), is specified by the architect in
+`PHASE-6-SPEC.md` section 2, not here. Those tables stand apart from the engine
+by construction and no view in section 3 reads them; this document remains the
+spec for the engine schema and the seven `v_demo_*` views.
+
 ## 1. Tables
 
 All tables live in schema `app` (not `public`), RLS ON from the first migration.
