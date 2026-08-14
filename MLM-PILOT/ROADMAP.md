@@ -87,6 +87,18 @@ HyperSwitch sandbox at C:\hs (Docker, localhost:9000, currently parked), the fou
 PLATFORM model documents, and connector-adapter notes. Fence note: HyperSwitch is
 open source, clean for personal use; employer-side vendor evaluations stay on the
 work side.
+ARCHITECTURE DECIDED 2026-08-14 (Howard: "i want to do option B"): the HOSTED
+route. The live site at orvanna.io takes test payments for ANY visitor, powered by
+HyperSwitch's hosted sandbox (app.hyperswitch.io, test mode) rather than a Docker
+copy on Howard's machine. Consequences: (a) a small server piece is required
+because a static site cannot hold secret keys, plan is Supabase Edge Functions on
+the existing mlm-pilot project (they hold the HyperSwitch secret key and the
+service-role write path); (b) order rows from real test payments get written by
+that server piece, the sealed read-only posture of the public anon key stays
+untouched; (c) Howard creates the HyperSwitch sandbox account himself (credentials
+never pass through Claude; connect via publishable/secret keys pasted into
+Supabase secrets, not into chat); (d) the local C:\hs Docker install stays parked,
+work-side. Starts after the team page ships.
 
 Phase 4C.2 (Howard's morning feedback round, 2026-08-14, after "Amazing job... works
 with no errors"): (1) every product gets a PRODUCT PAGE (filler prose under
