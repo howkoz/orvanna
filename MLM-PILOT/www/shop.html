@@ -6,8 +6,8 @@
 <title>Orvanna Shop</title>
 <meta name="description" content="The Orvanna agent catalog: artificial intelligence agents, bundles, and packs as monthly subscriptions or one-time purchases. Demonstration storefront, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<link rel="stylesheet" href="css/corporate.css">
-<link rel="stylesheet" href="css/shop.css">
+<link rel="stylesheet" href="css/corporate.css?v=4.1">
+<link rel="stylesheet" href="css/shop.css?v=4.1">
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
@@ -451,7 +451,7 @@
   </div>
 </footer>
 
-<script src="js/catalog.js"></script>
+<script src="js/catalog.js?v=4.1"></script>
 <script>
 /* ============================================================
    Orvanna shop, round 4. The catalog lives in js/catalog.js
@@ -616,6 +616,23 @@
       : '<span class="mode-badge mode-sub">Monthly</span>';
   }
 
+  /* bundle and pack children: indented display rows, one per
+     included agent, each $0.00 (the parent's price carries the
+     whole bundle, and the parent's PV carries all the PV). The
+     parent quantity shows once per child as a multiplier. */
+  function childRows(p, q) {
+    if (!p.includes) return '';
+    return '<div class="cart-children">' + p.includes.map(function (childSku) {
+      var c = O.get(childSku);
+      return '<div class="cart-child">' +
+        '<a class="child-name" href="product.html?sku=' + c.sku + '">' + c.name + '</a>' +
+        (q > 1 ? '<span class="child-qty">&times; ' + q + '</span>' : '') +
+        '<span class="child-amt">$0.00</span>' +
+        '<span class="child-tag">Included</span>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
   function lineItem(key) {
     var kp = O.keyParts(key);
     var p = O.get(kp.sku), q = cart[key];
@@ -625,10 +642,10 @@
       ? fmtMoney(price) + ' billed once'
       : fmtMoney(price) + ' / month';
     return '' +
-      '<div class="cart-line" data-line="' + key + '">' +
+      '<div class="cart-line' + (p.includes ? ' has-children' : '') + '" data-line="' + key + '">' +
         '<div class="line-icon" aria-hidden="true">' + p.icon + '</div>' +
         '<div class="line-info">' +
-          '<div class="line-name">' + p.name + '</div>' +
+          '<div class="line-name"><a class="product-name-link" href="product.html?sku=' + p.sku + '">' + p.name + '</a></div>' +
           '<div class="line-badges">' + modeBadge(kp.mode) + '</div>' +
           '<div class="line-meta">' + priceText + ', <span class="line-pv">' + fmtPv(pv) + '</span></div>' +
         '</div>' +
@@ -640,7 +657,8 @@
           '</div>' +
           '<button class="line-remove" type="button" data-remove="' + key + '">Remove</button>' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      childRows(p, q);
   }
 
   function renderMeter(prefix, pv) {
@@ -860,10 +878,24 @@
     var kp = O.keyParts(key);
     var p = O.get(kp.sku), q = cart[key];
     var amt = O.priceOf(p, kp.mode) * q;
-    return '<div class="summary-line">' +
-      '<span class="sl-name">' + p.name + ' <span class="sl-qty">&times; ' + q + '</span> ' + modeBadge(kp.mode) + '</span>' +
+    var html = '<div class="summary-line">' +
+      '<span class="sl-name"><a class="product-name-link" href="product.html?sku=' + p.sku + '">' + p.name + '</a> <span class="sl-qty">&times; ' + q + '</span> ' + modeBadge(kp.mode) + '</span>' +
       '<span class="sl-amt">' + fmtMoney(amt) + (kp.mode === 'sub' ? '<span class="sl-per"> / mo</span>' : '') + '</span>' +
     '</div>';
+    /* bundle and pack children, $0.00 each: the parent line above
+       already carries the full price and the full PV */
+    if (p.includes) {
+      html += p.includes.map(function (childSku) {
+        var c = O.get(childSku);
+        return '<div class="summary-line summary-child">' +
+          '<span class="sl-name"><a class="product-name-link" href="product.html?sku=' + c.sku + '">' + c.name + '</a>' +
+          (q > 1 ? ' <span class="sl-qty">&times; ' + q + '</span>' : '') +
+          ' <span class="child-tag">Included</span></span>' +
+          '<span class="sl-amt">$0.00</span>' +
+        '</div>';
+      }).join('');
+    }
+    return html;
   }
 
   function orderMath() {

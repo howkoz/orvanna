@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Orvanna Product</title>
+<!-- Root-level convenience redirect: the real page lives in www/.
+     The sku query string is carried across by the script below;
+     the meta refresh is the no-script fallback (lands on the
+     first product). -->
+<meta http-equiv="refresh" content="0; url=./www/product.html">
+<script>window.location.replace('./www/product.html' + window.location.search);</script>
+</head>
+<body>
+<p><a href="./www/product.html">Continue to the Orvanna product page</a></p>
+</body>
+</html>

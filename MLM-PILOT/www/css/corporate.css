@@ -118,6 +118,12 @@ section { scroll-margin-top: 84px; }
 /* ---------- buttons: lit ---------- */
 
 .btn {
+  /* .btn is used on <a> AND <button>. A bare <button> brings the
+     browser's own widget styling: a light-gray ButtonFace fill and
+     the system font. Neither is reset by the classes below unless
+     we do it here, which is why the ghost buttons once rendered as
+     light pills with light text (round 4.1 hotfix). */
+  font: inherit;
   display: inline-block;
   padding: 12px 26px;
   font-size: 0.86rem;
@@ -127,6 +133,8 @@ section { scroll-margin-top: 84px; }
   text-decoration: none;
   border-radius: 8px;
   border: 1.5px solid transparent;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
   transition: transform 0.16s ease, background-color 0.16s ease,
               border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
@@ -144,14 +152,19 @@ section { scroll-margin-top: 84px; }
 }
 
 .btn-ghost {
-  border-color: rgba(129, 140, 248, 0.5);
   color: #E2E8F0;
+  background: linear-gradient(180deg, rgba(13, 20, 38, 0.85), rgba(6, 11, 24, 0.85));
+  border-color: rgba(129, 140, 248, 0.55);
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.14),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .btn-ghost:hover {
   border-color: var(--cyan);
   color: var(--cyan);
+  background: linear-gradient(180deg, rgba(13, 20, 38, 0.95), rgba(6, 11, 24, 0.95));
   transform: translateY(-2px);
-  box-shadow: 0 0 22px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* ============================================================

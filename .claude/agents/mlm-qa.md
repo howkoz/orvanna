@@ -37,6 +37,15 @@ a benefit of the doubt.
    expanded on first use, zero Unicity data or terminology, no real personal data, no
    secrets in committed files.
 
+## Standing lesson (added 2026-08-14 after Howard caught washed-out buttons QA passed)
+
+When grading web pages with the Browser pane hidden, DOM presence is NOT visual
+proof. For every interactive element (buttons, links, badges, form fields) you MUST
+compute rendered contrast from computed styles (getComputedStyle color versus
+effective background, resolving alpha compositing) and fail anything below 4.5 to 1
+for text. Report the computed ratios for the worst five elements per page. A button
+whose text cannot be read is a HIGH defect even when its click handler works.
+
 ## Output
 
 A QA report at `MLM-PILOT\docs\qa\PHASE-N-QA.md`: the acceptance checklist as a table
