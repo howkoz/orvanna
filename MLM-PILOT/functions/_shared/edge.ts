@@ -148,7 +148,12 @@ export interface RateLimitVerdict {
 export async function checkRateLimit(
   ipHash: string,
   opts: RateLimitOptions,
+  scope = "shared",
 ): Promise<RateLimitVerdict> {
+  /* Scope keeps each function's bucket separate (Phase 6 verifier
+     MEDIUM 2): confirm polling must never consume the create
+     budget for the same visitor. The ledger key is scope:hash. */
+  const key = `${scope}:${ipHash}`;
   const client = await getPool().connect();
   try {
     const minuteRow = await client.queryObject<{ request_count: number }>(
@@ -156,7 +161,7 @@ export async function checkRateLimit(
          from app.demo_rate_events
         where ip_hash = $1
           and window_start = date_trunc('minute', now())`,
-      [ipHash],
+      [key],
     );
     const minuteCount = minuteRow.rows[0]?.request_count ?? 0;
     if (minuteCount >= opts.perMinute) {
@@ -172,7 +177,7 @@ export async function checkRateLimit(
            from app.demo_rate_events
           where ip_hash = $1
             and window_start > now() - interval '1 hour'`,
-        [ipHash],
+        [key],
       );
       const hourCount = hourRow.rows[0]?.total ?? 0;
       if (hourCount >= opts.perHour) {
@@ -185,7 +190,7 @@ export async function checkRateLimit(
        values ($1, date_trunc('minute', now()), 1)
        on conflict (ip_hash, window_start)
        do update set request_count = app.demo_rate_events.request_count + 1`,
-      [ipHash],
+      [key],
     );
 
     /* Opportunistic ledger hygiene (spec 2.3): occasionally drop

@@ -89,7 +89,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   /* ---- rails: rate limit, then circuit breaker ---- */
   const ipHash = await callerIpHash(req);
-  const verdict = await checkRateLimit(ipHash, { perMinute: 5, perHour: 30 });
+  const verdict = await checkRateLimit(ipHash, { perMinute: 5, perHour: 30 }, "create");
   if (!verdict.allowed) {
     return errorResponse(
       req,

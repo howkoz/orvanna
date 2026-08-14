@@ -117,7 +117,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   }
 
   const ipHash = await callerIpHash(req);
-  const verdict = await checkRateLimit(ipHash, { perMinute: 20 });
+  const verdict = await checkRateLimit(ipHash, { perMinute: 20 }, "confirm");
   if (!verdict.allowed) {
     return errorResponse(
       req,
