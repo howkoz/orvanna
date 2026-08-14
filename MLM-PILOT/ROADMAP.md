@@ -110,8 +110,14 @@ every git repository (no push risk); he deletes it himself once the vault holds
 the fresh keys. (Update: Howard later moved the key folder INSIDE ORVANNA as
 ORVANNA\HyperSwitch\; it is gitignore-fenced and verified never committed.)
 PHASE 6 OPENED 2026-08-14 evening (Howard: "team page is stellar!! Open Phase 6").
-mlm-architect is writing docs\PHASE-6-SPEC.md first; build follows the spec's
-work packages through both gates.
+BUILT AND LIVE THE SAME EVENING: spec (PHASE-6-SPEC.md) -> migration 010 applied
+(demo_orders + rate ledger, sealed) -> three Edge Functions deployed and
+smoke-tested -> Howard loaded the vault (4 secrets) and created two dummy
+connectors (pretendpay_default, stripe_test_default) -> FIRST PAYMENT EVER:
+ORV-2026-08-158WRU, $105.00, succeeded via stripe_test, amount verified to the
+cent, recorded in demo_orders -> LIVE_PAYMENTS flag shipped to orvanna.io
+(commit b9e6936; flag confirmed in the live page). Test cards only, real money
+impossible by construction. Gates running: verifier (spec 6.1) then QA (6.2).
 
 Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
 need to do a full inventory everything that was done and flow everything out"):
