@@ -119,6 +119,16 @@ cent, recorded in demo_orders -> LIVE_PAYMENTS flag shipped to orvanna.io
 (commit b9e6936; flag confirmed in the live page). Test cards only, real money
 impossible by construction. Gates running: verifier (spec 6.1) then QA (6.2).
 
+Phase 6.2 (queued 2026-08-14, Howard: "we should apply the taxjar engine to the
+site"): REAL TAX ENGINE via HyperSwitch's Tax Processor connector (TaxJar).
+Architect-first, because it moves tax computation from our create-payment mirror
+into the orchestrator: the spec must redefine the amount-verification contract
+(today the server rejects any charge that does not equal its own math to the
+cent, which would correctly reject a TaxJar-computed total). Prerequisite:
+Howard starts a TaxJar 30-day trial for the sandbox token (paid tier after
+trial; token goes into the HyperSwitch dashboard, never through chat). Decision
+on trial timing waits for the spec.
+
 Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
 need to do a full inventory everything that was done and flow everything out"):
 FULL INVENTORY AND FLOW MAP. Howard and Fable together, not delegated: walk every
