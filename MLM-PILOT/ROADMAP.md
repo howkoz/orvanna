@@ -45,9 +45,9 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
 | Phase | What ships | Owner agents | Status |
 |---|---|---|---|
 | 0 | Scaffold, guardrails, team, roadmap | (main session) | DONE 2026-08-13 |
-| 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (cloud apply pending) |
+| 1 | Schema spec + migrations + RLS on personal Supabase | mlm-architect then mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13; cloud-applied same day (migrations 001-009 live) |
 | 2 | Seed generator + 1,000 members + 6 months of orders | mlm-db-engineer | BUILT + BOTH GATES PASS 2026-08-13 (subscriptions model) |
-| 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | BUILT + DEPLOYED 2026-08-13: worked example passed on live Postgres (3x zero mismatches); full seed loaded (24,295 rows); SIX months run and FINALIZED (Feb-Jul 2026, payout 12,014.00 growing to 20,669.20, ~15 percent of CV); gates grading |
+| 3 | Comp engine (rollup, ranks, commission run + receipts) | mlm-comp-engineer | CLOSED 2026-08-13, BOTH GATES PASS (verifier matched all six months to the cent); v1.3 rerun finalized same evening |
 | 4 | Portal site (4 member pages + admin) on free hosting | mlm-site-builder | BUILT + Howard-approved + QA PASS 2026-08-13 ("perfect for an office") |
 | 5 | Domain wired (orvanna.io: DNS + HTTPS), demo polish | mlm-site-builder | |
 | V | TWO gates close each phase: correctness (recomputed math, security) and quality assurance (acceptance checklist, everything works end to end) | mlm-verifier + mlm-qa | continuous |
@@ -98,9 +98,10 @@ orders (autoship) moved from the v2 parking lot INTO v1. v1.2 (same day, per How
 CUSTOMER ACCOUNTS: customers buy through a referring member, their full PV rolls up
 to that member's account at purchase time (books as retail_customer orders on the
 member with the customer on the receipt), customers never earn or rank; the engine
-math is untouched by design. Full rules: `docs\COMP-PLAN-SPEC.md` v1.2.
+math is untouched by design. v1.3 (Howard: "Gate it"): qualification required to hold
+any rank above Member. Full rules: `docs\COMP-PLAN-SPEC.md` v1.3.
 
-## Comp plan v1 (superseded by docs\COMP-PLAN-SPEC.md v1.1; kept as the original draft)
+## Comp plan v1 (superseded by docs\COMP-PLAN-SPEC.md, now v1.3; kept as the original draft)
 
 - Unilevel, paid 5 levels deep; depth unlocked by rank.
 - Volumes: personal sales volume (SV) per month; team volume (TV) = SV of entire
@@ -143,7 +144,16 @@ Phase 4 SHIPPED: the portal is built, Howard-approved, and QA-passed (live-data 
 checks to the cent). Phase 4B SHIPPED same evening: the glow-tech corporate site
 (designer round 2: glass panels, living hero constellation, scroll reveals) plus the
 fake login page, which an href census proved is the ONLY door from the corporate page
-into the member area; full-journey QA PASS 35 of 36 (2026-08-13). AWAITING: Howard's
-review of the glow site. Then Phase 4C (Shop), 4D (Enroll), Phase 5 (orvanna.io:
+into the member area; full-journey QA PASS 35 of 36 (2026-08-13). Howard approved the
+glow redesign same evening ("perfect job"). Phase 4C BUILT overnight 2026-08-13
+(orvanna-designer round 3): www\shop.html, the twelve-agent catalog in two tiers with
+tier filter, cart DRAWER (research-backed: drawer for browse continuation, threshold
+progress bar pattern) with quantity controls, localStorage persistence, nav cart badge,
+and the Personal Volume (PV) meter (fills toward the 100 PV qualified month, glows
+cyan at qualification); demonstration checkout (any values continue, order number
+ORV-YYYY-MM-XXXX, cart clears, forward note re the orchestration layer); index.html
+nav Shop and call to action now link to the shop. Designer-verified via live document
+object model + console on :9120, both widths, zero console errors. AWAITING: Howard's
+morning review of the shop. Then Phase 4D (Enroll), Phase 5 (orvanna.io:
 serve www at root, portal at /portal/, AND repoint login.html's redirect which
 currently targets ../site/, per QA's forward flag), Phase 6 (HyperSwitch).
