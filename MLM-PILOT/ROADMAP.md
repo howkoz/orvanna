@@ -161,10 +161,34 @@ for Sunday"). Runs after or alongside Phase 7's flow-out, his ordering call:
    app.orders plus live demo_orders rows, which already carry member_id).
    Architect decision first: a new sealed read path in the style of the demo
    views versus an Edge Function like list-demo-orders. Both gates.
-2. AI CHATBOT on the site: the AI-agent company gets a real AI support agent.
-   First outside ingredient: an Anthropic API key in the Supabase vault (Howard
-   types it, never chat), per-message cost is real, so the spec bakes in abuse
-   rails AND a monthly spend cap. Edge Function proxy; no key ever client-side.
+2. AI CHATBOT on the site: DECIDED 2026-08-14 night, Howard chose BOTPRESS
+   (hosted, he built the agent in their builder), so no Anthropic key, no
+   Edge Function proxy, and no per-message cost on our side; Botpress hosts
+   the agent and the conversation. Embed snippet (public by design, safe in
+   the repository), goes immediately before the closing body tag:
+     <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+     <script src="https://files.bpcontent.cloud/2026/08/14/20/20260814201237-9JS9TWQ7.js" defer></script>
+   PLACEMENT, Howard's ruling: a NAV ITEM on three surfaces, not a floating
+   bubble: the corporate pages, the member portal (office), and the staff
+   console. The default floating action button is suppressed with
+   `.bpFab { display: none }` and the nav link calls window.botpress.open()
+   (verified against the Botpress documentation; readiness event is
+   window.botpress.on('webchat:ready', ...)).
+   THEME, Howard 2026-08-14: the widget must render DARK to match the glow
+   design system (ink #0F172A, indigo #4F46E5 and #818CF8, cyan #22D3EE as
+   the single lit accent). Two levers, in order of preference: set the theme
+   in the Botpress builder's webchat configuration (survives our deploys and
+   is the vendor-supported path, Howard's click), and if the hosted default
+   still lands light, override the widget's own custom properties in our
+   stylesheet against the .bpWebchat and .bpFabWrapper classes. Verify the
+   rendered colors in the browser, do not assume the setting took.
+   Consequences recorded: (a) this is the SECOND sanctioned external script
+   after HyperLoader.js, so the verifier is told rather than surprised, and
+   the two hosts are named in the spec; (b) nav-triggered means nothing
+   auto-opens over the card form, which satisfies the payment-page script
+   discipline (Payment Card Industry Data Security Standard, PCI DSS 4.0,
+   requirements 6.4.3 and 11.6.1) that Fable flagged; (c) a third party now
+   receives visitor chat text, so the demo framing must say so plainly.
 3. TAXJAR (Phase 6.2, blocked at signup): retry, email support@taxjar.com, or
    architect finds another tax route; amount-contract respec required either way.
 4. 3-D SECURE (3DS): sandbox challenge card 4000 0038 0000 0446 already in
