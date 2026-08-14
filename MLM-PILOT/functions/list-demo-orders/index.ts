@@ -26,6 +26,7 @@ import {
   isAllowedOrigin,
   jsonResponse,
   preflight,
+  sweepAbandonedWithFinalRetrieve,
 } from "../_shared/edge.ts";
 
 interface ListedOrder {
@@ -68,13 +69,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   const client = await getPool().connect();
   try {
-    /* Opportunistic abandon sweep (spec 5.4). */
-    await client.queryArray(
-      `update app.demo_orders
-          set payment_status = 'abandoned', status_updated_at = now()
-        where payment_status in ('created', 'processing')
-          and created_at < now() - interval '1 hour'`,
-    );
+    /* Opportunistic abandon sweep (spec 5.4), now with a final
+       server-side retrieve first: a slow bank approval must never
+       be mistaken for an abandonment, which matters far more once
+       a 3-D Secure (3DS) challenge can hold a payment open for
+       minutes. Gated on one call in four and capped at five
+       retrieves so the list stays fast. */
+    if (Math.random() < 0.25) {
+      await sweepAbandonedWithFinalRetrieve(client, {
+        caller: "list-demo-orders",
+        maxRetrieves: 5,
+      });
+    }
 
     const result = await client.queryObject<ListedOrder>(
       `select order_number,

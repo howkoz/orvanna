@@ -4,3 +4,8 @@ MLM-PILOT/deploy/dist/
 
 # Howard's local key storage. NEVER commit: contains HyperSwitch sandbox secrets.
 HyperSwitch/
+
+# Downloaded command-line tools, not source.
+.tools/
+MLM-PILOT/supabase/
+

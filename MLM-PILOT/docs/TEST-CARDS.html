@@ -11,28 +11,162 @@
   h1 span { color: #4F46E5; }
   .note { background: #EEF2FF; border: 1px solid #818CF8; border-radius: 10px;
           padding: 14px 18px; font-size: 14px; margin: 18px 0; }
+  .warn { background: #FEF3C7; border-color: #D97706; }
   h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .12em; margin-top: 28px; }
   h2.ok { color: #15803D; } h2.bad { color: #B91C1C; } h2.tds { color: #92400E; }
+  h3 { font-size: 14px; margin-top: 20px; color: #374151; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
   th, td { border: 1px solid #D1D5DB; padding: 9px 12px; text-align: left; }
   th { background: #F3F4F6; }
   td.num { font-family: Consolas, monospace; font-size: 15px; letter-spacing: .05em; }
+  td.code { font-family: Consolas, monospace; font-size: 14px; }
   .src { font-size: 12px; color: #6B7280; margin-top: 28px; }
   a { color: #4F46E5; }
+  p { font-size: 14px; line-height: 1.6; }
+  .tablewrap { overflow-x: auto; }
   @media print { .note { border: 1px solid #999; } }
 </style>
 </head>
 <body>
 <h1>ORVANNA <span>sandbox test cards</span></h1>
-<p>For the live demo checkout at orvanna.io and the HyperSwitch sandbox dashboard.
-These are industry-standard test numbers: they work ONLY in sandboxes, move no real
-money anywhere, and are public knowledge (safe to share, print, or store openly).</p>
+<p>For the live demo checkout at orvanna.io, the staff call console, and the HyperSwitch
+sandbox dashboard. These are industry-standard test numbers: they work ONLY in sandboxes,
+move no real money anywhere, and are public knowledge (safe to share, print, or store
+openly).</p>
+
+<div class="note"><strong>Acronym key.</strong>
+<strong>3DS</strong> is 3-D Secure, the card-network check that asks the card's issuing bank
+to confirm the shopper really is the cardholder.
+<strong>PAN</strong> is Primary Account Number, the long number on the front of a card.
+<strong>CVV</strong> is Card Verification Value, the short code on the back.
+<strong>ACS</strong> is Access Control Server, the issuing bank's server that draws the
+approval screen.
+<strong>transStatus</strong> is the single letter 3DS uses to report how the check went:
+Y authenticated, N not authenticated, A attempted, R rejected by the issuer,
+U unavailable, I informational.</div>
 
 <div class="note"><strong>Expiry and security code:</strong> any FUTURE expiry date
-(for example 12 / 30) and any 3 digit Card Verification Value (CVV), for example 123.
-American Express uses a 4 digit code. Cardholder name can be anything.</div>
+(for example 12 / 30) and any 3 digit CVV, for example 123. American Express uses a
+4 digit code. Cardholder name can be anything.</div>
 
-<h2 class="ok">Cards that succeed</h2>
+<div class="note warn"><strong>Read this before you pick a card.</strong> There are three
+separate worlds of test cards here and they are NOT interchangeable. Mixing them is the
+fastest way to lose an afternoon. Which world you are in depends on who is doing the
+authentication:
+<ul>
+  <li><strong>External authentication (3DSecure.io)</strong>, the path this site uses.
+      Use the 3DSecure.io PANs below. This is the primary matrix.</li>
+  <li><strong>The processor's own 3DS (stripe_test)</strong>, the fallback path.
+      Use the Stripe cards.</li>
+  <li><strong>The dummy connector (pretendpay)</strong>. Use the HyperSwitch dummy list.</li>
+</ul>
+</div>
+
+<h2 class="tds">1. Primary matrix: 3DSecure.io sandbox PANs</h2>
+<p>3DSecure.io does not publish a flat card list. It publishes an <strong>encoding
+scheme</strong>: the outcome is chosen by the LAST FOUR DIGITS of the card number, and the
+leading digits are free. Any last four that does not match a defined case returns an
+error. This is the authentication path the Orvanna checkout uses, so these are the cards
+that decide whether an approval screen appears.</p>
+
+<h3>The cases you will actually want</h3>
+<div class="tablewrap">
+<table>
+  <tr><th>What you want to see</th><th>Last four</th><th>Example PAN published by 3DSecure.io</th></tr>
+  <tr><td>Approval screen, then it passes</td><td class="code">xx70</td><td class="num">7000 1009 1111 2070</td></tr>
+  <tr><td>Approval screen, then it fails</td><td class="code">xx71</td><td class="num">3000 1010 1111 1071</td></tr>
+  <tr><td>Approval screen the tester decides by hand</td><td class="code">xx72</td><td class="num">3000 1008 1111 1072</td></tr>
+  <tr><td>Frictionless, no screen at all, authenticated</td><td class="code">xx03</td><td class="num">4000 1005 1111 2003</td></tr>
+  <tr><td>3DS unavailable (transStatus U)</td><td class="code">xx53</td><td class="num">any leading digits, last four 53</td></tr>
+  <tr><td>Rejected by the issuer (transStatus R)</td><td class="code">xx33</td><td class="num">any leading digits, last four 33</td></tr>
+  <tr><td>Directory server timeout</td><td class="code">xx63</td><td class="num">any leading digits, last four 63</td></tr>
+  <tr><td>Card not enrolled in 3DS at all</td><td class="code">&mdash;</td><td class="num">9000 1001 1111 1111</td></tr>
+</table>
+</div>
+
+<h3>How the last four digits are read, if you want to build your own</h3>
+<p>Read the last four digits as W, X, Y, Z. This is the browser flow, device channel 02.</p>
+<div class="tablewrap">
+<table>
+  <tr><th>Position</th><th>Digit</th><th>Meaning</th></tr>
+  <tr><td>W, first of the last four</td><td class="code">0</td><td>Range across message versions 2.1, 2.2 and 2.3.1</td></tr>
+  <tr><td>W</td><td class="code">1</td><td>Message version 2.1</td></tr>
+  <tr><td>W</td><td class="code">2</td><td>Message version 2.2</td></tr>
+  <tr><td>W</td><td class="code">3</td><td>Message version 2.3.1</td></tr>
+  <tr><td>X, second</td><td class="code">0</td><td>With the 3DS method, the invisible device fingerprint step</td></tr>
+  <tr><td>X</td><td class="code">1</td><td>Without the 3DS method</td></tr>
+  <tr><td>X</td><td class="code">2</td><td>With a 3DS method timeout</td></tr>
+  <tr><td>Y, third</td><td class="code">0</td><td>Frictionless, transStatus Y, authenticated</td></tr>
+  <tr><td>Y</td><td class="code">1</td><td>Frictionless, transStatus N, not authenticated</td></tr>
+  <tr><td>Y</td><td class="code">2</td><td>Frictionless, transStatus A, attempted but not verified</td></tr>
+  <tr><td>Y</td><td class="code">3</td><td>Frictionless, transStatus R, rejected by the issuer</td></tr>
+  <tr><td>Y</td><td class="code">4</td><td>Frictionless, transStatus I, informational, version 2.2 and above</td></tr>
+  <tr><td>Y</td><td class="code">5</td><td>Frictionless, transStatus U, unavailable</td></tr>
+  <tr><td>Y</td><td class="code">6</td><td>Directory server timeout</td></tr>
+  <tr><td>Y</td><td class="code">7</td><td>transStatus C, an approval screen is required. Z then decides how it ends.</td></tr>
+  <tr><td>Z, fourth, only when Y is 7</td><td class="code">0</td><td>The approval passes automatically, final transStatus Y</td></tr>
+  <tr><td>Z</td><td class="code">1</td><td>The approval fails automatically, final transStatus N</td></tr>
+  <tr><td>Z</td><td class="code">2</td><td>Manual: the tester chooses Y or N on the screen</td></tr>
+</table>
+</div>
+
+<h3>Worked examples published by 3DSecure.io</h3>
+<div class="tablewrap">
+<table>
+  <tr><th>PAN</th><th>Last four</th><th>What happens</th></tr>
+  <tr><td class="num">5000 1004 1111 0203</td><td class="code">0203</td><td>3DS method times out, then frictionless transStatus Y</td></tr>
+  <tr><td class="num">4000 1005 1111 2003</td><td class="code">2003</td><td>Version 2.2, with 3DS method, frictionless transStatus Y</td></tr>
+  <tr><td class="num">6000 1006 1111 1103</td><td class="code">1103</td><td>Version 2.1, no 3DS method, frictionless transStatus Y</td></tr>
+  <tr><td class="num">3000 1008 1111 1072</td><td class="code">1072</td><td>Version 2.1, manual approval screen, result Y or N chosen by the tester</td></tr>
+  <tr><td class="num">7000 1009 1111 2070</td><td class="code">2070</td><td>Version 2.2, automatic approval that passes, transStatus Y</td></tr>
+  <tr><td class="num">3000 1010 1111 1071</td><td class="code">1071</td><td>Version 2.1, automatic approval that fails, transStatus N</td></tr>
+</table>
+</div>
+
+<div class="note warn"><strong>The trap in this section.</strong> These are 3DSecure.io
+sandbox numbers, not processor test-mode numbers. The authentication leg can pass against
+3DSecure.io and the AUTHORIZATION leg can then fail, because the processor's test mode does
+not recognize the card. If that happens the code is not broken: the test proved
+authentication only. Route these to the dummy connector, or read the outcome as an
+authentication result rather than an end-to-end sale.</div>
+
+<div class="note"><strong>What the approval screen looks like.</strong> For the automatic
+cases (last four xx70 and xx71) the screen submits itself with JavaScript, so on screen it
+is a brief flash and the tester types nothing. For the manual case (xx72) the screen must be
+completed by hand; the exact wording and controls are not published. When you run xx72 for
+the first time, screenshot it and write the answer in here.</div>
+
+<h2 class="tds">2. Alternative path: Stripe test cards</h2>
+<p>These matter when the processor's own 3DS does the authentication, which is the fallback
+if external authentication misbehaves. They produce a Stripe-hosted approval screen with
+explicit "Complete authentication" and "Fail authentication" buttons, which makes them
+genuinely useful for building and screenshotting the user interface.</p>
+<div class="tablewrap">
+<table>
+  <tr><th>Card number</th><th>What it does</th><th>End state</th></tr>
+  <tr><td class="num">4000 0000 0000 3220</td><td>Approval required, issued in Ireland</td><td>Screen, then success</td></tr>
+  <tr><td class="num">4000 0084 0000 0027</td><td>Approval required, issued in the United States</td><td>Screen, then success</td></tr>
+  <tr><td class="num">4000 0027 6000 3184</td><td>Always authenticates, every transaction</td><td>Screen, then success. Deterministic.</td></tr>
+  <tr><td class="num">4000 0038 0000 0446</td><td>Set up for off-session use, still asks on one-time payments</td><td>Screen, then success</td></tr>
+  <tr><td class="num">4000 0000 3220 0000</td><td>3DS required on every transaction but resolves frictionless</td><td>No screen, success</td></tr>
+  <tr><td class="num">4000 0084 0000 1629</td><td><strong>Approval passes, then the bank declines the money</strong> (card_declined)</td><td>Screen, then payment fails</td></tr>
+  <tr><td class="num">4000 0082 6000 3178</td><td>Approval passes, then declined for insufficient funds</td><td>Screen, then payment fails</td></tr>
+  <tr><td class="num">4000 0084 0000 1280</td><td>The 3DS lookup itself errors, payment declined</td><td>3DS error, payment fails</td></tr>
+  <tr><td class="num">4000 0000 0000 3097</td><td>3DS may be attempted, any attempt errors</td><td>3DS error</td></tr>
+  <tr><td class="num">4000 0000 0000 3055</td><td>3DS supported but not required</td><td>Usually no screen, success</td></tr>
+  <tr><td class="num">4000 0025 0000 3155</td><td>Requires authentication for off-session payments</td><td>Screen on first use</td></tr>
+</table>
+</div>
+
+<div class="note warn"><strong>The two rows that matter most for wording.</strong>
+<strong>4000 0084 0000 1629</strong> is the case where the shopper does everything right and
+still gets a no: the bank confirms who they are, then refuses the money. That decline must
+never read like a plain decline, and telling that shopper to "check their card details" is
+actively wrong. <strong>4000 0084 0000 1280</strong> is the case where the security check
+itself breaks, which is nobody's fault and must not blame the card.</div>
+
+<h2 class="ok">3. Cards that succeed with no approval screen</h2>
+<div class="tablewrap">
 <table>
   <tr><th>Card number</th><th>Brand</th></tr>
   <tr><td class="num">4242 4242 4242 4242</td><td>Visa (the everyday workhorse)</td></tr>
@@ -42,8 +176,21 @@ American Express uses a 4 digit code. Cardholder name can be anything.</div>
   <tr><td class="num">6011 1111 1111 1117</td><td>Discover</td></tr>
   <tr><td class="num">3800 0000 0000 06</td><td>Diners Club</td></tr>
 </table>
+</div>
 
-<h2 class="bad">Cards that decline (for testing the sad path)</h2>
+<div class="note warn"><strong>4242 4242 4242 4242 CAN NEVER SHOW AN APPROVAL SCREEN.</strong>
+It is documented as a card that supports 3DS but is not enrolled in it, so no matter what
+the site asks for, no screen appears. If you test "is 3DS working?" with this card, the
+answer will always look like no, and it will be wrong. This exact confusion is what sent us
+down a long road once already. Use a card from section 1 to see an approval screen; use
+this one to prove the frictionless path still sails through.</div>
+
+<div class="note"><strong>American Express 3782 8224 6310 005</strong> does not support 3DS
+at all and cannot be asked to. It is the card that proves the flow degrades gracefully when
+an approval is simply impossible.</div>
+
+<h2 class="bad">4. Cards that decline, for testing the sad path</h2>
+<div class="tablewrap">
 <table>
   <tr><th>Card number</th><th>What the processor answers</th></tr>
   <tr><td class="num">4000 0000 0000 0002</td><td>Card declined (generic, Visa)</td></tr>
@@ -52,19 +199,48 @@ American Express uses a 4 digit code. Cardholder name can be anything.</div>
   <tr><td class="num">4000 0000 0000 9987</td><td>Lost card</td></tr>
   <tr><td class="num">4000 0000 0000 9979</td><td>Stolen card</td></tr>
 </table>
+</div>
 
-<h2 class="tds">3-D Secure (3DS) challenge flow</h2>
+<h2 class="tds">5. HyperSwitch dummy connector (pretendpay)</h2>
+<p>Only relevant when routing sends the payment to the dummy connector.</p>
+<div class="tablewrap">
 <table>
-  <tr><th>Card number</th><th>Behavior</th></tr>
-  <tr><td class="num">4000 0038 0000 0446</td><td>Runs the 3DS challenge, then succeeds</td></tr>
+  <tr><th>Card number</th><th>Flow</th><th>Outcome</th></tr>
+  <tr><td class="num">4000 0038 0000 0446</td><td>3DS</td><td>The documented 3DS success card, and the only one on this list</td></tr>
+  <tr><td class="num">4111 1111 1111 1111</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">4242 4242 4242 4242</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">5555 5555 5555 4444</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">3800 0000 0000 06</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">3782 8224 6310 005</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">6011 1111 1111 1117</td><td>Non-3DS</td><td>Success</td></tr>
+  <tr><td class="num">5105 1051 0510 5100</td><td>Non-3DS</td><td>Declined</td></tr>
+  <tr><td class="num">4000 0000 0000 0002</td><td>Non-3DS</td><td>Declined</td></tr>
+  <tr><td class="num">4000 0000 0000 9995</td><td>Non-3DS</td><td>Insufficient funds</td></tr>
+  <tr><td class="num">4000 0000 0000 9987</td><td>Non-3DS</td><td>Lost card</td></tr>
+  <tr><td class="num">4000 0000 0000 9979</td><td>Non-3DS</td><td>Stolen card</td></tr>
 </table>
+</div>
+<p>The published dummy connector list has exactly ONE 3DS card, a success card, and no 3DS
+failure card. If you need an approval that fails on the dummy connector, it is not
+published; use section 1 instead.</p>
 
 <div class="note"><strong>Dummy connector quirks worth knowing:</strong> payments made
 through dummy connectors expire after 2 days, and dummy connectors support payments
 and refunds only. Perfect for a demo, useless for theft.</div>
 
-<p class="src">Source: the official HyperSwitch test credentials page,
-<a href="https://docs.hyperswitch.io/explore-hyperswitch/payment-orchestration/quickstart/payment-methods-setup/test-credentials">docs.hyperswitch.io, Test Credentials</a>.
+<div class="note"><strong>One thing that is NOT a knob.</strong> The acquirer BIN (Bank
+Identification Number) configured with the authentication provider, 424242 in our sandbox,
+says WHO IS ASKING: which acquiring bank and which merchant account. The card number says
+WHO IS PAYING, and only the card number decides whether an approval screen appears. The
+acquirer BIN is the same on every transaction forever, and nothing you type into it will
+turn approvals on or off. It merely happens to look like the start of the famous test card,
+which is exactly the coincidence that makes it confusing.</div>
+
+<p class="src">Sources: the official HyperSwitch test credentials page,
+<a href="https://docs.hyperswitch.io/other-features/payment-orchestration/quickstart/payment-methods-setup/test-credentials">docs.hyperswitch.io, Test Credentials</a>;
+<a href="https://docs.3dsecure.io/3dsv2/sandbox.html">3DSecure.io sandbox test cases</a>;
+<a href="https://docs.stripe.com/testing?testing-method=card-numbers#regulatory-cards">Stripe testing, regulatory and 3DS test cards</a>.
+Full research and reasoning: MLM-PILOT\docs\3DS-RESEARCH.md.
 Kept in the project at MLM-PILOT\docs\TEST-CARDS.html.</p>
 </body>
 </html>

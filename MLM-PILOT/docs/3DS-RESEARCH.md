@@ -937,3 +937,412 @@ Mail order and telephone order practice:
 - [Adyen, understanding Strong Customer Authentication](https://www.adyen.com/knowledge-hub/psd2-understanding-strong-customer-authentication)
 - [Checkout.com, SCA exemptions explained](https://www.checkout.com/blog/exemptions-to-sca)
 - [Paytia, MOTO payments guide](https://www.paytia.com/resources/blog/what-you-need-to-know-about-moto-payments)
+
+---
+
+# Acquirer configuration
+
+Added 2026-08-14 in answer to Howard's follow-up: "the 424242 is the wrong bin we
+need to use the correct one that hyperswitch indicates."
+
+**Short version, up front:** HyperSwitch does not indicate a value. The only text
+it renders next to that field is the generic placeholder `Enter Acquirer BIN`.
+There is no prefilled default, no sandbox credential, and no hint anywhere in the
+product or the documentation. The Application Programming Interface (API) schema
+carries a documentation example of `456789`, and a newer dashboard screen carries
+a placeholder reading `e.g. 56688`. Neither of those is a value to use; they are
+illustrative only. The real value comes from an acquiring bank, and for this
+pilot there is no acquiring bank, so nobody can supply a correct one.
+
+Additional acronyms used only in this section: ICA (Interbank Card Association,
+Mastercard's identifier for an acquiring institution), MCC (Merchant Category
+Code), ISO (International Organization for Standardization).
+
+---
+
+## 1. What the three fields mean, and where the correct values come from
+
+### The protocol definitions
+
+These are EMV 3-D Secure Authentication Request (AReq) fields. 3DSecure.io's own
+specification page for protocol version 2.2.0 defines them
+([specification 2.2.0](https://docs.3dsecure.io/3dsv2/specification_220.html)):
+
+| Field | 3DSecure.io's exact definition | Required? | Format |
+|---|---|---|---|
+| `acquirerBIN` | "Acquiring institution identification code as assigned by the DS receiving the AReq message." | Conditional. Required when `messageCategory` is `01` (Payment). Visa requires it. | Maximum 11 characters |
+| `acquirerMerchantID` | "Acquirer-assigned Merchant identifier. This may be the same value that is used in authorisation requests sent on behalf of the 3DS Requestor and is represented in ISO 8583 formatting requirements." | Same condition | Maximum 35 characters |
+| `merchantCountryCode` | "The ISO 3166-1 numeric three-digit country code of the Merchant." | Same condition | Regular expression for three digits, so 840 for the United States, not US |
+
+Read the acquirer Bank Identification Number (BIN) definition carefully: it is
+"assigned by the DS", the Directory Server, which is the card network. It is
+therefore **brand specific**. A BIN registered with Visa's Directory Server means
+nothing to Mastercard's. Mastercard's own acquirer onboarding guidance is that
+acquirers and merchants should stay aligned on the values used for `acquirerBIN`
+and `acquirerMerchantID`, and that BINs must be associated with merchant
+identifiers as part of onboarding
+([Mastercard Identity Check onboarding guide for acquirers](https://static.developer.mastercard.com/content/identity-check/uploads/files/mc_idc_onboard_guide_Acquirer.pdf)).
+Ravelin's merchant enrollment guidance says the same thing in plainer words: card
+schemes each have their own merchant onboarding requirements, and the merchant
+should speak to their acquirer or to the scheme directly
+([Ravelin, merchant enrolment](https://developer.ravelin.com/psp/guides/3d-secure/merchant-enrolment/)).
+
+### What HyperSwitch itself says about the source
+
+HyperSwitch's own source comments are unambiguous that these values come from the
+acquirer, not from HyperSwitch. From
+[crates/api_models/src/profile_acquirer.rs](https://github.com/juspay/hyperswitch/blob/main/crates/api_models/src/profile_acquirer.rs):
+
+| Field | HyperSwitch's doc comment | Schema example |
+|---|---|---|
+| `acquirer_assigned_merchant_id` | "The merchant id assigned by the acquirer" | `M123456789` |
+| `acquirer_bin` | "Acquirer bin" | `456789` |
+| `acquirer_ica` | "Acquirer ica provided by acquirer" | `401288` |
+| `acquirer_country_code` | "Acquirer country code" | `US` |
+| `network` | "Network provider" | `VISA` |
+
+Note that `acquirer_country_code` here is a two-letter alpha-2 code (`US`), while
+the connector metadata field `merchant_country_code` is a three-digit numeric code
+(`840`). They are different fields with different formats and they are easy to
+confuse. See hazard 5.7 below.
+
+### What HyperSwitch says to use in sandbox
+
+Nothing. I searched the documentation, the API reference, the connector
+configuration files, and the dashboard source. There is no published sandbox
+acquirer BIN for `threedsecureio` or for any other authentication connector, and
+no statement that any particular value works in test mode.
+
+3DSecure.io's documentation is the same story. Their sandbox test cases page
+defines outcomes purely by card number and says nothing about acquirer values
+([sandbox test cases](https://docs.3dsecure.io/3dsv2/sandbox.html)), and their
+introduction hands onboarding off entirely with "Sign up at 3dsecure.io (not
+covered by this documentation)" ([documentation index](https://docs.3dsecure.io/3dsv2/)).
+
+**So the honest answer is: these are values supplied by the acquirer, and in a
+sandbox with no acquirer, the only parties who can tell Howard what to enter are
+3DSecure.io support (through the account where he registered) or HyperSwitch
+support.** I am not going to invent one.
+
+---
+
+## 2. What actually happens if the acquirer BIN is wrong or a placeholder
+
+There are three distinct failure modes and they are very different. Only the
+first is provable from source, and it is the one that matters tonight.
+
+### 2a. Missing, or the BIN set without the merchant identifier: hard failure before anything is sent
+
+From
+[crates/hyperswitch_connectors/src/connectors/threedsecureio/transformers.rs](https://github.com/juspay/hyperswitch/blob/main/crates/hyperswitch_connectors/src/connectors/threedsecureio/transformers.rs):
+
+```rust
+let (acquirer_bin, acquirer_merchant_id) = pre_authentication_data
+    .acquirer_bin
+    .clone()
+    .zip(pre_authentication_data.acquirer_merchant_id.clone())
+    .get_required_value("acquirer_details")
+    .change_context(errors::ConnectorError::MissingRequiredField {
+        field_name: "acquirer_details",
+    })?;
+```
+
+Note the `zip`. **Both** values must be present, or the whole thing is treated as
+absent. Setting only the acquirer BIN and leaving the acquirer merchant
+identifier blank fails identically to setting neither.
+
+What Howard would **see**: the payment fails at confirm with a missing required
+field error naming `acquirer_details`. No challenge, no redirect, no frictionless
+pass. Our `confirm-payment` would report `failed`, or the widget would surface an
+error. This failure is loud and specific, not silent.
+
+### 2b. Present but syntactically invalid: the dashboard blocks it
+
+The control center validates the field. From
+[AcquirerConfigUtils.res](https://github.com/juspay/hyperswitch-control-center/blob/main/src/screens/Developer/PaymentSettings/AcquirerConfigSettings/AcquirerConfigUtils.res)
+and
+[MerchantAcquirerDetailsUtils.res](https://github.com/juspay/hyperswitch-control-center/blob/main/src/screens/Developer/PaymentSettings/MerchantAcquirerDetails/MerchantAcquirerDetailsUtils.res):
+it must be a whole number ("Acquirer BIN must be a whole number"), between 4 and
+20 digits ("Acquirer BIN must be between 4 and 20 digits"), with leading zeros
+stripped.
+
+`424242` is six digits and a whole number, so it passes every validation
+HyperSwitch performs. **The product will never tell Howard that `424242` is
+wrong.** That is exactly why it feels like there must be a correct value being
+indicated somewhere.
+
+### 2c. Present, valid in shape, but not registered with that scheme's Directory Server
+
+This is the production failure mode. The Directory Server is the authority: it
+either recognizes the acquiring institution identification code or it does not,
+and an unregistered value produces an authentication error rather than a
+challenge.
+
+In 3DSecure.io's **sandbox**, the outcome is documented as being driven entirely
+by the last four digits of the card number, ending with "If the last four digits
+do not match any of the given test cases above, an error will be given". That
+strongly implies the sandbox is simulating the Directory Server and is not
+validating the acquirer BIN against any real registration. **3DSecure.io does not
+state this explicitly, so I am flagging it as an inference, not a fact.**
+
+The important part for tonight is that every one of these three modes produces an
+**error**, not a quiet downgrade. A wrong acquirer BIN does not turn a challenge
+card into a frictionless pass. If Howard runs a challenge card and gets a
+frictionless success, the acquirer BIN is not the reason.
+
+---
+
+## 3. Correcting my earlier statement to Howard
+
+My statement was: a wrong acquirer BIN cannot by itself cause or prevent a
+challenge, and only the card number decides that.
+
+**The first half is correct.** Nothing typed into the acquirer BIN field selects
+"challenge" versus "frictionless". That decision belongs to the issuer's Access
+Control Server, and in the 3DSecure.io sandbox it is determined by the last four
+digits of the card number. You cannot tune the challenge rate through the
+acquirer BIN.
+
+**The second half is too strong and needs correcting.** A missing or unpaired
+acquirer configuration absolutely does *prevent* a challenge, because per 2a
+HyperSwitch refuses to build the authentication request at all. It prevents the
+challenge by preventing the entire 3DS attempt, one step earlier in the chain.
+
+The accurate wording is:
+
+> The acquirer BIN is a gate, not a dial. It cannot make a card challenge, and it
+> cannot make a challenging card go frictionless. But if it is missing, or if the
+> acquirer merchant identifier alongside it is missing, 3-D Secure does not run at
+> all, and from the outside that looks exactly like "no challenge".
+
+One further nuance worth carrying: the profile-level acquirer configuration is
+**keyed by card network**. A configuration entered for Visa gives no coverage for
+a Mastercard test card. So "challenge works on this card but not that one" can be
+an acquirer configuration gap rather than a card behavior, which is a second way
+my original statement was too absolute.
+
+---
+
+## 4. Does the dashboard display a correct value anywhere?
+
+I looked specifically for a prefilled default, a hint under the field, or a value
+revealed after the connector is enabled. **There is none.** Here is exactly what
+HyperSwitch renders.
+
+### The 3DS authenticator connector form for threedsecureio
+
+The field list is defined in HyperSwitch's connector configuration files. From
+[crates/connector_configs/toml/sandbox.toml](https://github.com/juspay/hyperswitch/blob/main/crates/connector_configs/toml/sandbox.toml)
+(the development file is identical):
+
+| Field | Label rendered | Placeholder rendered | Required |
+|---|---|---|---|
+| `api_key` | Api Key | (authentication credential) | yes |
+| `mcc` | MCC | `Enter MCC` | yes |
+| `merchant_country_code` | 3 digit numeric country code | `Enter 3 digit numeric country code` | yes |
+| `merchant_name` | Name of the merchant | `Enter Name of the merchant` | yes |
+| `pull_mechanism_for_external_3ds_enabled` | Pull Mechanism Enabled | toggle | no |
+| `acquirer_bin` | **Acquirer BIN** | **`Enter Acquirer BIN`** | **yes** |
+| `acquirer_merchant_id` | **Acquirer Merchant ID** | **`Enter Acquirer Merchant ID`** | **yes** |
+| `acquirer_country_code` | Acquirer Country Code | `Enter Acquirer Country Code` | no |
+
+So the placeholder is the literal string `Enter Acquirer BIN`. That is a prompt,
+not a value. Nothing in this form suggests a number.
+
+### The other place the same values live
+
+There is a second, profile-level home for acquirer data, under **Developer,
+Payment Settings**, in the control center screens named `AcquirerConfigSettings`
+and `MerchantAcquirerDetails`. Fields there: Network, Acquirer BIN, Acquirer ICA,
+Acquirer Fraud Rate, Acquirer Country Code, Acquirer Assigned Merchant ID,
+Merchant Name. Only **Network** and **Acquirer BIN** are marked required by that
+form.
+
+The placeholders there are `Enter Acquirer Bin` on the older screen and
+**`e.g. 56688`** on the newer per-network screen
+([MerchantAcquirerDetailsUtils.res](https://github.com/juspay/hyperswitch-control-center/blob/main/src/screens/Developer/PaymentSettings/MerchantAcquirerDetails/MerchantAcquirerDetailsUtils.res)).
+
+**`e.g. 56688` is almost certainly what Howard saw and read as an indication.** It
+is a placeholder that disappears the moment you type. It is not a default, it is
+not saved, and `56688` is not a usable value. It is also only five digits, which
+would fail nothing but means nothing.
+
+### A resolution-order subtlety worth knowing before debugging
+
+HyperSwitch does not necessarily read the acquirer values from the 3DS
+authenticator form. From
+[crates/router/src/core/authentication.rs](https://github.com/juspay/hyperswitch/blob/main/crates/router/src/core/authentication.rs),
+with the source's own comment:
+
+> "Prefer acquirer details set directly on the PSP connector's own metadata; fall
+> back to the profile's card-network-keyed acquirer config"
+
+and then, if the payment intent carries a `profile_acquirer_id`, that specific
+bucket first, otherwise the profile's default for the card network.
+
+So there are up to three places the same three values can live: the payment
+processor connector's metadata, a profile acquirer bucket, and the 3DS
+authenticator connector's metadata. If Howard filled in the 3DS authenticator
+form and the running build resolves from the payment processor connector's
+metadata instead, his values would be silently ignored and the flow would fail
+with the `acquirer_details` missing-field error from 2a even though the field on
+screen is populated. **I could not verify which resolution order the hosted
+sandbox build uses**, since that code path is version dependent and I have no
+dashboard access. If the missing-field error appears while the 3DS connector form
+shows a value, this is the first thing to check: set the same acquirer values on
+the payment processor connector's metadata as well.
+
+---
+
+## 5. Other first-setup mistakes that silently produce no challenges
+
+Ordered by how likely they are to be what is actually happening.
+
+### 5.1 The payment never asks for external authentication
+
+`request_external_three_ds_authentication` is not being sent by our
+`create-payment`. Without it the `threedsecureio` connector is never invoked, no
+matter how green it looks in the dashboard. **Completely silent.** Covered as
+change 2 in the main change list.
+
+### 5.2 authentication_type is not being sent
+
+Without it, the decision falls to HyperSwitch's 3DS Decision Manager and the
+connector's own default. **Completely silent**, and it is why behavior has looked
+arbitrary.
+
+### 5.3 The authentication connector is not named under Payment Settings
+
+HyperSwitch's external authentication guide describes a three-step setup:
+create the authenticator under Connectors, configure the payment processor, and
+then, under Developers and Payment Settings, "add the authentication connector and
+relevant details"
+([External authentication for 3DS](https://docs.hyperswitch.io/integration-guide/workflows/3ds-decision-manager/external-authentication-for-3ds.md)).
+Creating the connector alone is not enough. **Silent.**
+
+### 5.4 No billing address. This is the real blocker, and it is bigger than the BIN.
+
+The `threedsecureio` AReq builder hard-requires a billing address. From the same
+transformer file, each of these is a required-field check that errors if absent:
+
+| AReq field | Error field name if absent |
+|---|---|
+| `bill_addr_city` | `billing_address.address.city` |
+| `bill_addr_line1` | `billing_address.address.line1` |
+| `bill_addr_post_code` | `billing_address.address.zip` |
+| `bill_addr_country` | derived from the billing country, so a billing country is required |
+| `bill_addr_state` | derived from the billing state |
+| `notification_url` | "missing return_url" |
+
+**Our `create-payment` sends no billing address at all**, deliberately, because
+the demo collects nothing personal. So an external 3DS attempt through
+`threedsecureio` will fail on `billing_address.address.city` before it ever gets
+far enough for the acquirer BIN to matter.
+
+This forces a decision that is not a code detail, it is a product decision:
+
+- **Option A.** Keep the no-personal-data stance and do **not** use external 3DS
+  for the demo. Use connector-side 3DS on `stripe_test` instead, with
+  `authentication_type: "three_ds"` and no external authentication flag. This is
+  also the path that produces the full page redirect, which is the code path we
+  most need to prove. **Recommended for tonight.**
+- **Option B.** Send a fixed, obviously synthetic demo billing address (for
+  example the Orvanna company address, or a clearly labeled placeholder) on every
+  payment, and say so plainly in the demo copy. This keeps the external 3DS path
+  alive but changes what the demo claims about data collection, so it needs to be
+  a conscious decision, not a quiet code change.
+- **Option C.** Collect a real billing address from the shopper. Largest change,
+  best 3DS outcomes, worst fit for a public demo.
+
+### 5.5 Acquirer BIN set, acquirer merchant identifier blank
+
+Per 2a, the pairing requirement means this fails exactly like setting neither.
+Very easy to hit, because the profile-level form marks only Network and Acquirer
+BIN as required, while the connector transformer requires both. **Loud, but easy
+to misread as a BIN problem.**
+
+### 5.6 No acquirer configuration for the card network being tested
+
+The profile-level configuration is keyed by network. Testing a Mastercard number
+against a Visa-only configuration fails the same missing-field way.
+
+### 5.7 merchant_country_code entered as US instead of 840
+
+The connector form's own label says "3 digit numeric country code" and the
+protocol requires exactly three digits. Entering the two-letter code is a natural
+mistake, especially because the neighboring `acquirer_country_code` field
+genuinely does take `US`. Two adjacent fields, two different formats.
+
+### 5.8 mcc left at a guess
+
+Merchant Category Code is required metadata on the connector and has no sensible
+default. A wrong value will not stop a challenge but it does ride in the AReq and
+is part of the issuer's risk view.
+
+### 5.9 Testing with 4242 4242 4242 4242
+
+Stripe documents this card as 3DS supported but **not enrolled**: even when 3DS is
+requested, the customer is not prompted. It is currently the only card named in
+our own on-page hint text. **Completely silent**, and the single most likely
+reason a correctly configured setup looks broken.
+
+### 5.10 Routing or a decision-manager rule
+
+If routing sends the payment to a connector with no authentication attached, or a
+3DS Exemption or Decision Manager rule resolves to `no_three_ds`, the result is
+silence. Worth a glance at Workflow, 3DS rules, before blaming configuration.
+
+---
+
+## 6. Direct answer to the follow-up
+
+**What to put in the field.** There is no correct sandbox value published by
+HyperSwitch or by 3DSecure.io. Keep `424242`, or use HyperSwitch's own schema
+example `456789`; in a sandbox neither is more correct than the other, and both
+pass every validation the product performs. The `e.g. 56688` text Howard saw on
+the profile-level screen is a placeholder, not an instruction. Whatever value is
+chosen, **also fill in Acquirer Merchant ID**, because leaving it blank fails
+identically to leaving the BIN blank.
+
+**Who can give the real value.** An acquiring bank, one per card brand,
+registered with each scheme's Directory Server. This pilot has no acquirer, so
+the only parties who can say what to use in the 3DSecure.io sandbox are
+3DSecure.io support through Howard's account, or HyperSwitch support. That is a
+question to send tonight and read tomorrow, not a blocker to sit on.
+
+**Does it block tonight's build?** **No.** The acquirer BIN blocks nothing we
+planned to build. Every item on the change list, the canonical return URL, the
+resume handler, the status mapping, the two polling schedules, the four outcome
+messages, the webhook receiver, is testable without it.
+
+What *would* block an end-to-end external 3-D Secure test tonight is the missing
+billing address in section 5.4, which is a hard required field and a product
+decision rather than a bug.
+
+**Recommended plan for tonight:** set `authentication_type: "three_ds"`, leave
+`request_external_three_ds_authentication` **off**, and test the challenge against
+`stripe_test` with card 4000 0000 0000 3220. That exercises the
+`redirect_to_url` full page redirect, which is the gap the whole main report is
+about, and it needs no acquirer configuration and no billing address at all. Turn
+external 3DS on later, once the billing address decision and the acquirer
+question are settled.
+
+## What I could not verify, acquirer configuration
+
+10. **Whether the 3DSecure.io sandbox validates the acquirer BIN at all.** Their
+    sandbox page defines outcomes purely by card number, which implies it does
+    not, but they never say so. If it does validate, the symptom is an
+    authentication error, not a silent frictionless pass.
+11. **Which of the three possible sources the hosted HyperSwitch sandbox actually
+    reads acquirer details from** (payment processor connector metadata, profile
+    acquirer bucket, or the 3DS authenticator connector metadata). The source
+    comment on the main branch says the payment processor connector's metadata is
+    preferred, which would mean values entered on the 3DS form are ignored. This
+    is version dependent and I have no dashboard access.
+12. **Whether 3DSecure.io issues a sandbox acquirer BIN on signup.** Their public
+    documentation explicitly does not cover signup. Howard's account may already
+    show one, in which case that is the value to use and this whole question
+    resolves itself.
+13. **Whether `424242` was supplied by 3DSecure.io or chosen as a placeholder.**
+    If 3DSecure.io supplied it during registration, it is very likely the correct
+    sandbox value and there is nothing to change.

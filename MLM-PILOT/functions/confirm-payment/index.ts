@@ -16,11 +16,20 @@
    reference:
    https://api-reference.hyperswitch.io/api-reference/payments/payments--retrieve
 
-   Status mapping (spec 5.4):
-     succeeded                  -> succeeded (amount must match
-                                   total_cents to the cent)
-     failed | cancelled         -> failed (error fields kept)
-     anything else non-terminal -> processing
+   Status mapping: the full HyperSwitch IntentStatus enum is
+   named in mapHyperswitchStatus() in _shared/edge.ts, including
+   'expired' and 'cancelled_post_capture' as terminal failures.
+   Every answer now carries a `reason`, a short machine-readable
+   explanation the site turns into a sentence a shopper can act
+   on, and an `authentication` object with named 3-D Secure (3DS)
+   fields only.
+
+   The retrieve, the amount check and the guarded update all live
+   in _shared/edge.ts (retrieveAndApplyPaymentTruth) so that this
+   function and payment-webhook cannot drift apart. The amount
+   check is unchanged and is still the last word before any
+   'succeeded' is written: 3DS authenticates a cardholder, it
+   never changes an amount.
 
    Idempotency (spec 5.5): there is no INSERT here. Terminal
    rows (succeeded, failed, abandoned) are immutable: a repeat
@@ -34,10 +43,10 @@ import {
   checkRateLimit,
   errorResponse,
   getPool,
-  HYPERSWITCH_BASE_URL,
   isAllowedOrigin,
   jsonResponse,
   preflight,
+  retrieveAndApplyPaymentTruth,
 } from "../_shared/edge.ts";
 
 const ORDER_NUMBER_RE = /^ORV-\d{4}-\d{2}-[0-9A-Z]{6}$/;
@@ -62,12 +71,35 @@ interface DemoOrderRow {
   processor_summary: Record<string, unknown> | null;
 }
 
+/* When a row has never been synced with HyperSwitch there is no
+   stored reason, but the row still says something honest. */
+function fallbackReason(row: DemoOrderRow): string | null {
+  if (row.payment_status === "abandoned") return "abandoned";
+  if (row.payment_status === "created" && !row.payment_reference) {
+    return "not_submitted";
+  }
+  return null;
+}
+
 /* The sanitized receipt the site renders its confirmation view
    from (spec 1.2 step 8): server math only, no processor
-   payloads, no card data, nothing personal. */
+   payloads, no card data, nothing personal.
+
+   Two 3-D Secure (3DS) additions, both read back out of the
+   stored processor_summary so a terminal row answers with them
+   too:
+     reason         a short machine-readable explanation
+     authentication named 3DS fields only, or null */
 function receiptOf(row: DemoOrderRow) {
-  const summary = row.processor_summary ?? {};
+  const summary = (row.processor_summary ?? {}) as Record<string, unknown>;
+  const storedReason = typeof summary.reason === "string" ? summary.reason : null;
+  const authentication =
+    summary.authentication !== undefined && summary.authentication !== null
+      ? summary.authentication
+      : null;
   return {
+    reason: storedReason ?? fallbackReason(row),
+    authentication,
     order_number: row.order_number,
     payment_status: row.payment_status,
     created_at: row.created_at,
@@ -83,21 +115,15 @@ function receiptOf(row: DemoOrderRow) {
     total_cents: row.total_cents,
     pv_total: Number(row.pv_total),
     processor: {
-      status: (summary as Record<string, unknown>).status ?? null,
-      error_code: (summary as Record<string, unknown>).error_code ?? null,
-      error_message: (summary as Record<string, unknown>).error_message ?? null,
+      status: summary.status ?? null,
+      error_code: summary.error_code ?? null,
+      error_message: summary.error_message ?? null,
+      /* Which challenge shape HyperSwitch chose, when it chose
+         one: three_ds_invoke, redirect_to_url, or
+         redirect_inside_popup. Useful to the site and to us. */
+      next_action_type: summary.next_action_type ?? null,
     },
   };
-}
-
-/* Map a HyperSwitch payment status to our state machine. */
-function mapStatus(hsStatus: string): "succeeded" | "failed" | "processing" {
-  if (hsStatus === "succeeded") return "succeeded";
-  if (hsStatus === "failed" || hsStatus === "cancelled") return "failed";
-  /* requires_confirmation, requires_customer_action,
-     requires_payment_method, requires_capture, processing, and
-     any future non-terminal status: still in flight. */
-  return "processing";
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -180,9 +206,21 @@ Deno.serve(async (req: Request): Promise<Response> => {
       return jsonResponse(req, 200, receiptOf(row));
     }
 
-    /* ---- the truth: server-side retrieve with the secret key ---- */
-    const apiKey = Deno.env.get("HYPERSWITCH_API_KEY");
-    if (!apiKey) {
+    /* ---- the truth: server-side retrieve with the secret key,
+       the amount check, and the guarded update. One shared
+       implementation, also used by payment-webhook, so the two
+       callers cannot disagree about what is true. ---- */
+    const truth = await retrieveAndApplyPaymentTruth(
+      client,
+      {
+        order_number: row.order_number,
+        total_cents: row.total_cents,
+        payment_reference: row.payment_reference,
+      },
+      { caller: "confirm-payment" },
+    );
+
+    if (truth.outcome === "not_configured") {
       return errorResponse(
         req,
         500,
@@ -190,18 +228,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         "The payment rail is not configured yet.",
       );
     }
-
-    let hsResponse: Response;
-    try {
-      hsResponse = await fetch(
-        `${HYPERSWITCH_BASE_URL}/payments/${encodeURIComponent(row.payment_reference)}`,
-        {
-          method: "GET",
-          headers: { "api-key": apiKey },
-          signal: AbortSignal.timeout(15_000),
-        },
-      );
-    } catch {
+    if (truth.outcome === "processor_unreachable") {
       return errorResponse(
         req,
         502,
@@ -209,10 +236,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         "Could not reach the test payment service to check. Please try again in a moment.",
       );
     }
-    if (!hsResponse.ok) {
-      console.error(
-        `confirm-payment: HyperSwitch GET /payments returned ${hsResponse.status} for ${orderNumber}`,
-      );
+    if (truth.outcome === "processor_error") {
       return errorResponse(
         req,
         502,
@@ -220,62 +244,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
         "The test payment service could not report on this order. Please try again in a moment.",
       );
     }
-
-    const hs = (await hsResponse.json()) as {
-      status?: string;
-      amount?: number;
-      amount_received?: number | null;
-      connector?: string;
-      payment_method_type?: string;
-      error_code?: string | null;
-      error_message?: string | null;
-    };
-    const hsStatus = hs.status ?? "unknown";
-    let newStatus = mapStatus(hsStatus);
-
-    /* Amount equality, to the cent, before any 'succeeded' is
-       written (spec 1.2 step 8). Integer comparison: both sides
-       are minor units. A mismatch never marks success. */
-    let amountMismatch = false;
-    if (newStatus === "succeeded") {
-      const amountOk = hs.amount === row.total_cents;
-      const receivedOk =
-        hs.amount_received === undefined ||
-        hs.amount_received === null ||
-        hs.amount_received === row.total_cents;
-      if (!amountOk || !receivedOk) {
-        amountMismatch = true;
-        newStatus = "processing"; /* never succeeded on a mismatch */
-        console.error(
-          `confirm-payment: amount mismatch on ${orderNumber} (expected ${row.total_cents})`,
-        );
-      }
-    }
-
-    /* Sanitized processor summary (spec 2.2): named fields only,
-       never a raw payload, never card data. */
-    const summary = {
-      status: hsStatus,
-      connector: hs.connector ?? null,
-      payment_method_type: hs.payment_method_type ?? null,
-      error_code: amountMismatch ? "amount_mismatch" : hs.error_code ?? null,
-      error_message: amountMismatch
-        ? "The processor amount did not match the order total."
-        : hs.error_message ?? null,
-      last_synced_at: new Date().toISOString(),
-    };
-
-    /* Guarded update: only a non-terminal row may move, so a
-       concurrent confirm cannot overwrite a terminal state. */
-    await client.queryArray(
-      `update app.demo_orders
-          set payment_status = $1,
-              processor_summary = $2::jsonb,
-              status_updated_at = now()
-        where order_number = $3
-          and payment_status in ('created', 'processing')`,
-      [newStatus, JSON.stringify(summary), orderNumber],
-    );
 
     const fresh = await client.queryObject<DemoOrderRow>(
       `select order_number, created_at, created_by_channel,
