@@ -1,9 +1,11 @@
 # Orvanna, team profile
 
 > As of 2026-08-14. Canonical home: `ORVANNA\LIBRARY\company\`. One owner, one
-> Chief Information Officer (CIO), eight specialist agents on the five-teams model
-> (Planner, Builder, Verifier; Collector and Researcher roles are filled ad hoc).
-> Agent definitions live in `ORVANNA\.claude\agents\`.
+> Chief Information Officer (CIO), nine specialist agents: eight on the five-teams
+> model (Planner, Builder, Verifier; Collector and Researcher roles are filled ad
+> hoc) who built the property, plus one Support agent who answers visitors on it.
+> The eight build-side definitions live in `ORVANNA\.claude\agents\`; the Support
+> agent is configured in Botpress, the hosted chat vendor, and has no charter file.
 
 ## The owner
 
@@ -18,7 +20,7 @@ strategy; Orvanna is where that experience builds equity that is entirely his ow
 
 **Fable, Chief Information Officer (CIO).** An Artificial Intelligence (AI), and says so
 plainly. Title granted by Howard 2026-08-14, the day the site went live. Manages the
-eight specialist agents end to end: writes their charters, sequences the phases, briefs
+build-side specialist agents end to end: writes their charters, sequences the phases, briefs
 every build, routes every result through both verification gates, and owns the
 deployment pipeline (the domain, the hosting, the database connection). Makes the calls
 Howard has delegated and brings him the ones he has not. The one rule Fable enforces
@@ -36,6 +38,7 @@ above all others: the builder never grades its own work.
 | orvanna-writer | Builder | 2026-08-14 | brand-voice prose, product marketing copy, believable fiction discipline (no income claims, no fake social proof, plausible capabilities only), microcopy | The words: corporate site copy, all product pages, naming. Hired at Howard's suggestion to replace Latin filler with credible content. |
 | mlm-verifier | Verifier | 2026-08-13 | independent recomputation from specification prose, determinism testing, data integrity auditing, security review, adversarial reading | The correctness gate: recomputes everything, grades every phase PASS or FAIL, fixes nothing |
 | mlm-qa | Verifier | 2026-08-13 | acceptance-checklist discipline (promises first, evidence second), requirements traceability, end-to-end functional testing, hygiene sweeps | The completeness gate: 43-row checklists, every promise traced to a working artifact |
+| orvanna-concierge | Support | 2026-08-14 | conversational visitor support, pricing and catalog questions, site and member-portal walkthroughs, first-line troubleshooting, demonstration-request capture | The chat window: the Support item in the navigation on the corporate site, the member portal, and the staff console. Speaks as "Orvanna", the company name shown in the chat header. Collects demonstration requests; books nothing, because there is no human but Howard. Hosted on Botpress, live 2026-08-14. |
 
 ## The prime rule
 
@@ -58,6 +61,7 @@ to the builder.
 
 ## Hiring outlook
 
-Phase 3 needs no new hires. Candidate future roles when the pilot grows: a Collector
-(market and competitor research), a Researcher (regulatory landscape for direct
-selling), and a support-desk persona for the demo. Howard decides if and when.
+Phase 3 needs no new hires. The support-desk role listed here as a candidate was
+filled 2026-08-14 by orvanna-concierge. Candidate future roles when the pilot grows:
+a Collector (market and competitor research) and a Researcher (regulatory landscape
+for direct selling). Howard decides if and when.
