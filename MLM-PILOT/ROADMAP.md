@@ -169,8 +169,23 @@ progress bar pattern) with quantity controls, localStorage persistence, nav cart
 and the Personal Volume (PV) meter (fills toward the 100 PV qualified month, glows
 cyan at qualification); demonstration checkout (any values continue, order number
 ORV-YYYY-MM-XXXX, cart clears, forward note re the orchestration layer); index.html
-nav Shop and call to action now link to the shop. Designer-verified via live document
-object model + console on :9120, both widths, zero console errors. AWAITING: Howard's
-morning review of the shop. Then Phase 4D (Enroll), Phase 5 (orvanna.io:
-serve www at root, portal at /portal/, AND repoint login.html's redirect which
-currently targets ../site/, per QA's forward flag), Phase 6 (HyperSwitch).
+nav Shop and call to action now link to the shop. Night QA PASS 40 of 41; drawer now
+opens on add (coordinator's call, designer dissent + middle ground recorded in the
+shop.html add handler comments). Howard's morning verdict: "Amazing job to the team...
+works with no errors."
+
+ROUND 4 SHIPPED 2026-08-14 (Howard's seven-item feedback; QA PASS 49 of 51, zero
+HIGH, four orders placed, one per payment method): 16 purchasable items (12 agents +
+Manager Agent bundle $200.00 with three support children + packs Ignition $200.00 /
+Momentum $400.00 / Constellation $800.00), catalog.js single source of truth,
+product.html template page for every item, subscription-default with the 10x one-time
+anchor (domain $1,000.00 / 1,000 PV, support $500.00 / 500 PV), four-step checkout:
+account (sign in with anything or guest, synthetic Iowa billing prefill), activation
+selector (Standard free / Priority $25.00), 5 percent tax with live Tax ID digit
+exemption, four payment methods as self-drawn generic marks. Round-3 carts migrate.
+
+AWAITING: Howard's walk of round 4. His open wording call: the corporate metric tile
+still reads "12 AI agents in the catalog" while the shop sells 16 items. LOW touch-up
+queued: PV first-use ordering on product.html. Then Phase 4D (Enroll), Phase 4.5
+(staff toggle), Phase 5 (orvanna.io: www at root, portal at /portal/, repoint
+login.html's redirect per QA's forward flag), Phase 6 (HyperSwitch test payments).
