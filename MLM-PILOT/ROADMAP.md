@@ -328,3 +328,50 @@ still reads "12 AI agents in the catalog" while the shop sells 16 items. LOW tou
 queued: PV first-use ordering on product.html. Then Phase 4D (Enroll), Phase 4.5
 (staff toggle), Phase 5 (orvanna.io: www at root, portal at /portal/, repoint
 login.html's redirect per QA's forward flag), Phase 6 (HyperSwitch test payments).
+
+## 3-D Secure (3DS) status, 2026-08-14 night, end of session
+
+BUILT AND DEPLOYED, all of it:
+- create-payment requests authentication_type "three_ds" and
+  request_external_three_ds_authentication true, with a fixed SYNTHETIC billing
+  address (1 Demonstration Way) that satisfies the external provider's
+  requirement without collecting anything from anyone. Howard's ruling: fake
+  everything, collect nothing real.
+- Server-built return address, origin validated, page from a two-item allow
+  list, our order number on it. A client-supplied address would be an open
+  redirect and is refused.
+- confirm-payment maps all 17 HyperSwitch statuses, returns a `reason` and a
+  named `authentication` summary. The retrieve, the cent-for-cent amount check
+  and the guarded update are ONE shared implementation so the browser path and
+  the webhook path cannot drift.
+- NEW payment-webhook, deployed without token verification (its own
+  HMAC-SHA512 signature is the gate), treats the body only as a wake-up call
+  and re-asks HyperSwitch itself. Machine-verified: forged signatures are
+  refused with ZERO database queries.
+- Checkout survives a full page redirect: resume handler, order-number
+  recovery panel, two polling schedules, four distinct outcomes.
+- Staff console tells the truth: it never instructs an agent to ask a caller
+  for a code, and it names the vishing risk plainly.
+
+WHY NO CHALLENGE FIRES YET, proven by test tonight: both connectors
+(pretendpay_default, stripe_test_default) are HyperSwitch DUMMY connectors,
+which support payments and refunds only, no 3DS. Every genuine 3DS test card
+was refused with "Card not supported. Please use test cards" (DC_04), which is
+the simulator saying it knows only its own short list. External authentication
+never engaged either: no authentication record came back at all, so the
+acquirer-resolution question the research flagged remains untested rather than
+answered.
+
+NEXT STEP TO SEE A REAL CHALLENGE: connect a real processor in TEST mode. A
+free Stripe test account added to HyperSwitch as a genuine connector is the
+cheapest path; simulators cannot authenticate, a real test processor can. Then
+retest with 4000 0000 0000 3220 and, for the external path, mirror the acquirer
+BIN and merchant identifier onto that connector's metadata first.
+
+NOT DEPLOYED YET: list-demo-orders still runs the old abandon sweep; its source
+now calls sweepAbandonedWithFinalRetrieve but the deployed bundle predates it.
+Harmless (the webhook covers the case it protects against) but it should go out
+with the next deploy.
+
+REGRESSION CHECKED after every change: ordinary payments still succeed on the
+live site. ORV-2026-08-1RLZFO, 5250 cents, succeeded via pretendpay.
