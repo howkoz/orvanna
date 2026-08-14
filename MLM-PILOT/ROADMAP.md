@@ -117,7 +117,25 @@ connectors (pretendpay_default, stripe_test_default) -> FIRST PAYMENT EVER:
 ORV-2026-08-158WRU, $105.00, succeeded via stripe_test, amount verified to the
 cent, recorded in demo_orders -> LIVE_PAYMENTS flag shipped to orvanna.io
 (commit b9e6936; flag confirmed in the live page). Test cards only, real money
-impossible by construction. Gates running: verifier (spec 6.1) then QA (6.2).
+impossible by construction.
+PHASE 6 CLOSED 2026-08-14, BOTH GATES PASS, same evening it opened:
+- Verifier (docs/verification/PHASE-6-VERDICT.md): zero HIGH; tamper/forge/posture
+  all held live; both MEDIUMs FIXED and verified same session (migration 011
+  SELECT-only views; scoped per-function rate buckets, functions v2); deferred
+  finalized-months bracket closed by the coordinator: checksums byte-identical
+  across 5 real succeeded payments.
+- QA (docs/qa/PHASE-6-QA.md): PASS 10/10 on the live rail; hand-computed carts to
+  the cent; decline/retry/idempotency proven; rails push back politely and scoped
+  buckets confirmed.
+- Howard's live catch, fixed and deployed same hour: declines now fail GRACEFULLY
+  (processor reason shown, cart preserved, retry path); proof order
+  ORV-2026-08-16STIL carries "Payment declined: Card declined" end to end.
+Backlog banked from the gates (polish round, not blocking): QA M1 inert demo card
+fields visible pre-mount in live mode (W4 designer); demo framing thin pre-mount
+(W5 writer); LOWs: rate-limiter read-then-increment race, abandoned-terminal
+asymmetry (spec-accepted), list accepts POST, list JSON raw dollars number.
+First-day scoreboard on the processor: 8+ payments, 5+ succeeded, 1 failed by
+design, $105.00 to $1,425.00 range, all via stripe_test (pretendpay idle).
 
 Phase 6.2 (queued 2026-08-14, Howard: "we should apply the taxjar engine to the
 site"): REAL TAX ENGINE via HyperSwitch's Tax Processor connector (TaxJar).
