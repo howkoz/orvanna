@@ -99,6 +99,15 @@ untouched; (c) Howard creates the HyperSwitch sandbox account himself (credentia
 never pass through Claude; connect via publishable/secret keys pasted into
 Supabase secrets, not into chat); (d) the local C:\hs Docker install stays parked,
 work-side. Starts after the team page ships.
+SANDBOX ACCOUNT READY 2026-08-14: Howard signed up at app.hyperswitch.io himself.
+Publishable key (public by design): pk_snd_bfcb22d171b54957b2cdc9046c56ae16.
+The SECRET Application Programming Interface (API) key and the payment response
+hash key exist but both touched the chat window, so BOTH get regenerated in the
+dashboard at wiring time and the fresh values go straight into the Supabase
+secrets vault, typed by Howard, never through chat or any repo. His local copy
+lives at C:\Users\howar\Desktop\Desktop\HyperSwitch\APIKEY, confirmed OUTSIDE
+every git repository (no push risk); he deletes it himself once the vault holds
+the fresh keys.
 
 Phase 4C.2 (Howard's morning feedback round, 2026-08-14, after "Amazing job... works
 with no errors"): (1) every product gets a PRODUCT PAGE (filler prose under
