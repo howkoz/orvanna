@@ -7,10 +7,11 @@
 <meta name="description" content="Orvanna: intelligent agents on your team, working around the clock. Demonstration company, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="css/corporate.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
-<!-- ============ STICKY NAV (dark) ============ -->
+<!-- ============ STICKY NAV (glass) ============ -->
 <header class="nav">
   <div class="nav-inner">
     <a class="nav-brand" href="#top" aria-label="Orvanna home">
@@ -20,113 +21,75 @@
       <a class="nav-link is-active" href="#overview">Learn</a>
       <span class="nav-link is-soon" aria-disabled="true">Shop<span class="soon-pill">soon</span></span>
       <span class="nav-link is-soon" aria-disabled="true">Enroll<span class="soon-pill">soon</span></span>
-      <a class="nav-signin" href="../site/index.html">Sign In</a>
+      <a class="nav-signin" href="login.html">Sign In</a>
     </nav>
   </div>
 </header>
 
 <main>
 
-<!-- ============ HERO (dark band) ============ -->
-<section class="band band-dark hero">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <p class="kicker">Orvanna</p>
-      <h1 class="hero-title">Intelligent agents on your team, working around the clock</h1>
-      <p class="hero-sub">Orvanna pairs a human network with artificial intelligence (AI) agents that carry real workloads: payments, pricing, support, and the roles every business needs.</p>
-      <div class="hero-actions">
-        <a class="btn btn-ghost" href="#overview">Explore the company</a>
-      </div>
-    </div>
-    <div class="hero-art" aria-hidden="true">
-      <svg viewBox="0 0 560 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="">
-        <!-- faint hexagon behind the lit node -->
-        <polygon points="300,120 361,155 361,225 300,260 239,225 239,155"
-                 fill="none" stroke="#818CF8" stroke-width="1.5" opacity="0.18"/>
-        <!-- edges -->
-        <g stroke="#818CF8" stroke-width="1.5" opacity="0.28">
-          <line x1="80"  y1="90"  x2="210" y2="50"/>
-          <line x1="210" y1="50"  x2="350" y2="95"/>
-          <line x1="350" y1="95"  x2="480" y2="60"/>
-          <line x1="80"  y1="90"  x2="130" y2="210"/>
-          <line x1="210" y1="50"  x2="300" y2="190"/>
-          <line x1="350" y1="95"  x2="300" y2="190"/>
-          <line x1="480" y1="60"  x2="455" y2="205"/>
-          <line x1="130" y1="210" x2="300" y2="190"/>
-          <line x1="300" y1="190" x2="455" y2="205"/>
-          <line x1="130" y1="210" x2="90"  y2="340"/>
-          <line x1="300" y1="190" x2="240" y2="320"/>
-          <line x1="455" y1="205" x2="500" y2="300"/>
-          <line x1="90"  y1="340" x2="240" y2="320"/>
-          <line x1="240" y1="320" x2="390" y2="350"/>
-          <line x1="390" y1="350" x2="500" y2="300"/>
-          <line x1="240" y1="320" x2="310" y2="412"/>
-          <line x1="390" y1="350" x2="310" y2="412"/>
-        </g>
-        <!-- nodes -->
-        <g fill="#818CF8">
-          <circle cx="80"  cy="90"  r="5"/>
-          <circle cx="210" cy="50"  r="6"/>
-          <circle cx="350" cy="95"  r="5"/>
-          <circle cx="480" cy="60"  r="4" opacity="0.7"/>
-          <circle cx="130" cy="210" r="6"/>
-          <circle cx="455" cy="205" r="6"/>
-          <circle cx="90"  cy="340" r="4" opacity="0.7"/>
-          <circle cx="240" cy="320" r="6"/>
-          <circle cx="390" cy="350" r="5"/>
-          <circle cx="500" cy="300" r="4" opacity="0.7"/>
-          <circle cx="310" cy="412" r="4" opacity="0.7"/>
-        </g>
-        <!-- the lit node -->
-        <circle class="lit-halo" cx="300" cy="190" r="22" fill="#22D3EE" opacity="0.12"/>
-        <circle class="lit-ring" cx="300" cy="190" r="13" fill="none" stroke="#22D3EE" stroke-width="1.5" opacity="0.55"/>
-        <circle cx="300" cy="190" r="8" fill="#22D3EE"/>
-      </svg>
+<!-- ============ HERO: live constellation ============ -->
+<section class="hero" id="hero">
+  <canvas id="constellation" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <p class="kicker">Orvanna</p>
+    <h1 class="hero-title">Intelligent agents on your team, working around the clock</h1>
+    <p class="hero-sub">Orvanna pairs a human network with artificial intelligence (AI) agents that carry real workloads: payments, pricing, support, and the roles every business needs.</p>
+    <div class="hero-actions">
+      <a class="btn btn-solid" href="#overview">Explore the company</a>
     </div>
   </div>
 </section>
 
-<!-- ============ OVERVIEW (light band) ============ -->
-<section class="band band-light" id="overview">
+<!-- ============ OVERVIEW ============ -->
+<section class="band glow-indigo" id="overview">
   <div class="wrap">
-    <p class="kicker kicker-light">Overview</p>
-    <h2 class="section-title">A company run with agents</h2>
-    <p class="lead latin">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere, arcu at laoreet ultricies, augue nisl tincidunt magna, in facilisis lorem ipsum vitae arcu. Curabitur vitae fermentum ante, nec porta justo. Integer euismod, sapien a viverra dictum, nulla lorem congue urna, at tempus elit purus in mauris.</p>
-    <div class="metrics">
-      <div class="metric">
-        <div class="metric-num">12</div>
+    <div class="reveal">
+      <p class="kicker kicker-light">Overview</p>
+      <h2 class="section-title">A company run with agents</h2>
+      <p class="lead latin">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere, arcu at laoreet ultricies, augue nisl tincidunt magna, in facilisis lorem ipsum vitae arcu. Curabitur vitae fermentum ante, nec porta justo. Integer euismod, sapien a viverra dictum, nulla lorem congue urna, at tempus elit purus in mauris.</p>
+    </div>
+    <div class="metrics stagger reveal">
+      <div class="metric glass glass-cyan">
+        <span class="accent-bar bar-cyan" aria-hidden="true"></span>
+        <div class="metric-num"><span class="count" data-count="12">12</span></div>
         <div class="metric-label">AI agents in the catalog</div>
       </div>
-      <div class="metric">
-        <div class="metric-num">1,000</div>
+      <div class="metric glass">
+        <span class="accent-bar" aria-hidden="true"></span>
+        <div class="metric-num"><span class="count" data-count="1000" data-comma="1">1,000</span></div>
         <div class="metric-label">Members in the network</div>
       </div>
-      <div class="metric">
-        <div class="metric-num">6</div>
+      <div class="metric glass glass-violet">
+        <span class="accent-bar bar-violet" aria-hidden="true"></span>
+        <div class="metric-num"><span class="count" data-count="6">6</span></div>
         <div class="metric-label">Months of locked statements</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ PILLARS (light band, tinted) ============ -->
-<section class="band band-tint" id="pillars">
+<!-- ============ PILLARS ============ -->
+<section class="band glow-violet" id="pillars">
   <div class="wrap">
-    <p class="kicker kicker-light">What we build</p>
-    <h2 class="section-title">Three pillars</h2>
-    <div class="cards">
+    <div class="reveal">
+      <p class="kicker kicker-light">What we build</p>
+      <h2 class="section-title">Three pillars</h2>
+    </div>
+    <div class="cards stagger reveal">
 
-      <article class="card">
+      <article class="card glass">
+        <span class="accent-bar" aria-hidden="true"></span>
         <div class="card-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <polygon points="32,6 54.5,19 54.5,45 32,58 9.5,45 9.5,19"
-                     fill="none" stroke="#4F46E5" stroke-width="3.5" stroke-linejoin="round"/>
-            <line x1="32" y1="32" x2="32" y2="19" stroke="#4F46E5" stroke-width="2"/>
-            <line x1="32" y1="32" x2="21" y2="41" stroke="#4F46E5" stroke-width="2"/>
-            <line x1="32" y1="32" x2="43" y2="41" stroke="#4F46E5" stroke-width="2"/>
-            <circle cx="32" cy="19" r="3.4" fill="#4F46E5"/>
-            <circle cx="21" cy="41" r="3.4" fill="#4F46E5"/>
-            <circle cx="43" cy="41" r="3.4" fill="#4F46E5"/>
+                     fill="none" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/>
+            <line x1="32" y1="32" x2="32" y2="19" stroke="#818CF8" stroke-width="2"/>
+            <line x1="32" y1="32" x2="21" y2="41" stroke="#818CF8" stroke-width="2"/>
+            <line x1="32" y1="32" x2="43" y2="41" stroke="#818CF8" stroke-width="2"/>
+            <circle cx="32" cy="19" r="3.4" fill="#818CF8"/>
+            <circle cx="21" cy="41" r="3.4" fill="#818CF8"/>
+            <circle cx="43" cy="41" r="3.4" fill="#818CF8"/>
             <circle cx="32" cy="32" r="4" fill="#22D3EE"/>
           </svg>
         </div>
@@ -135,14 +98,15 @@
         <p class="card-body latin">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae. Donec sollicitudin molestie malesuada, proin eget tortor risus.</p>
       </article>
 
-      <article class="card">
+      <article class="card glass glass-cyan">
+        <span class="accent-bar bar-cyan" aria-hidden="true"></span>
         <div class="card-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <polygon points="32,6 54.5,19 54.5,45 32,58 9.5,45 9.5,19"
-                     fill="none" stroke="#4F46E5" stroke-width="3.5" stroke-linejoin="round"/>
-            <line x1="19" y1="32" x2="45" y2="32" stroke="#4F46E5" stroke-width="2"/>
-            <circle cx="19" cy="32" r="3.4" fill="#4F46E5"/>
-            <circle cx="45" cy="32" r="3.4" fill="#4F46E5"/>
+                     fill="none" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/>
+            <line x1="19" y1="32" x2="45" y2="32" stroke="#818CF8" stroke-width="2"/>
+            <circle cx="19" cy="32" r="3.4" fill="#818CF8"/>
+            <circle cx="45" cy="32" r="3.4" fill="#818CF8"/>
             <circle cx="32" cy="32" r="4" fill="#22D3EE"/>
           </svg>
         </div>
@@ -151,17 +115,18 @@
         <p class="card-body latin">Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt, quisque velit nisi pretium ut lacinia.</p>
       </article>
 
-      <article class="card">
+      <article class="card glass glass-violet">
+        <span class="accent-bar bar-violet" aria-hidden="true"></span>
         <div class="card-icon" aria-hidden="true">
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <polygon points="32,6 54.5,19 54.5,45 32,58 9.5,45 9.5,19"
-                     fill="none" stroke="#4F46E5" stroke-width="3.5" stroke-linejoin="round"/>
-            <circle cx="32" cy="20" r="3.2" fill="#4F46E5"/>
-            <circle cx="42.5" cy="26" r="3.2" fill="#4F46E5"/>
-            <circle cx="42.5" cy="38" r="3.2" fill="#4F46E5"/>
+                     fill="none" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/>
+            <circle cx="32" cy="20" r="3.2" fill="#818CF8"/>
+            <circle cx="42.5" cy="26" r="3.2" fill="#818CF8"/>
+            <circle cx="42.5" cy="38" r="3.2" fill="#818CF8"/>
             <circle cx="32" cy="44" r="3.2" fill="#22D3EE"/>
-            <circle cx="21.5" cy="38" r="3.2" fill="#4F46E5"/>
-            <circle cx="21.5" cy="26" r="3.2" fill="#4F46E5"/>
+            <circle cx="21.5" cy="38" r="3.2" fill="#818CF8"/>
+            <circle cx="21.5" cy="26" r="3.2" fill="#818CF8"/>
           </svg>
         </div>
         <h3 class="card-title">The Network</h3>
@@ -173,10 +138,10 @@
   </div>
 </section>
 
-<!-- ============ ORIGIN (dark band) ============ -->
-<section class="band band-dark" id="origin">
+<!-- ============ ORIGIN ============ -->
+<section class="band glow-cyan" id="origin">
   <div class="wrap origin-grid">
-    <div class="origin-copy">
+    <div class="origin-copy reveal">
       <p class="kicker">Our story</p>
       <h2 class="section-title on-dark">From a single node</h2>
       <p class="body-dark latin">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Donec rutrum congue leo eget malesuada, sed porttitor lectus nibh. Cras ultricies ligula sed magna dictum porta.</p>
@@ -185,7 +150,7 @@
       </blockquote>
       <p class="body-dark latin">Nulla quis lorem ut libero malesuada feugiat. Pellentesque in ipsum id orci porta dapibus, proin eget tortor risus. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui.</p>
     </div>
-    <div class="origin-art" aria-hidden="true">
+    <div class="origin-art reveal" aria-hidden="true">
       <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
         <circle cx="150" cy="150" r="104" fill="none" stroke="#818CF8" stroke-width="1.5" opacity="0.25"/>
         <g fill="#818CF8" opacity="0.9">
@@ -217,35 +182,39 @@
   </div>
 </section>
 
-<!-- ============ TECHNOLOGY (light band) ============ -->
-<section class="band band-light" id="technology">
+<!-- ============ TECHNOLOGY ============ -->
+<section class="band glow-indigo" id="technology">
   <div class="wrap">
-    <p class="kicker kicker-light">Technology</p>
-    <h2 class="section-title">One platform underneath</h2>
-    <p class="lead">The platform vision behind every agent we ship.</p>
-    <div class="features">
+    <div class="reveal">
+      <p class="kicker kicker-light">Technology</p>
+      <h2 class="section-title">One platform underneath</h2>
+      <p class="lead">The platform vision behind every agent we ship.</p>
+    </div>
+    <div class="features stagger reveal">
 
-      <div class="feature">
+      <div class="feature glass">
+        <span class="accent-bar" aria-hidden="true"></span>
         <div class="feature-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8" cy="16" r="3.4" fill="#4F46E5"/>
-            <line x1="11" y1="15" x2="24" y2="7"  stroke="#4F46E5" stroke-width="2"/>
-            <line x1="11" y1="16" x2="25" y2="16" stroke="#4F46E5" stroke-width="2"/>
-            <line x1="11" y1="17" x2="24" y2="25" stroke="#4F46E5" stroke-width="2"/>
-            <circle cx="26" cy="7"  r="2.4" fill="#4F46E5"/>
+            <circle cx="8" cy="16" r="3.4" fill="#818CF8"/>
+            <line x1="11" y1="15" x2="24" y2="7"  stroke="#818CF8" stroke-width="2"/>
+            <line x1="11" y1="16" x2="25" y2="16" stroke="#818CF8" stroke-width="2"/>
+            <line x1="11" y1="17" x2="24" y2="25" stroke="#818CF8" stroke-width="2"/>
+            <circle cx="26" cy="7"  r="2.4" fill="#818CF8"/>
             <circle cx="27" cy="16" r="2.4" fill="#22D3EE"/>
-            <circle cx="26" cy="25" r="2.4" fill="#4F46E5"/>
+            <circle cx="26" cy="25" r="2.4" fill="#818CF8"/>
           </svg>
         </div>
         <h3 class="feature-label">Orchestration</h3>
         <p class="feature-body latin">Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec sollicitudin molestie malesuada.</p>
       </div>
 
-      <div class="feature">
+      <div class="feature glass glass-cyan">
+        <span class="accent-bar bar-cyan" aria-hidden="true"></span>
         <div class="feature-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <polygon points="16,3 27.2,9.5 27.2,22.5 16,29 4.8,22.5 4.8,9.5"
-                     fill="none" stroke="#4F46E5" stroke-width="2.4" stroke-linejoin="round"/>
+                     fill="none" stroke="#818CF8" stroke-width="2.4" stroke-linejoin="round"/>
             <circle cx="16" cy="16" r="3.2" fill="#22D3EE"/>
           </svg>
         </div>
@@ -253,11 +222,12 @@
         <p class="feature-body latin">Vivamus suscipit tortor eget felis porttitor volutpat. Curabitur arcu erat, accumsan id imperdiet et.</p>
       </div>
 
-      <div class="feature">
+      <div class="feature glass glass-violet">
+        <span class="accent-bar bar-violet" aria-hidden="true"></span>
         <div class="feature-mark" aria-hidden="true">
           <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="7" width="24" height="18" rx="3" fill="none" stroke="#4F46E5" stroke-width="2.4"/>
-            <line x1="4" y1="13" x2="28" y2="13" stroke="#4F46E5" stroke-width="2.4"/>
+            <rect x="4" y="7" width="24" height="18" rx="3" fill="none" stroke="#818CF8" stroke-width="2.4"/>
+            <line x1="4" y1="13" x2="28" y2="13" stroke="#818CF8" stroke-width="2.4"/>
             <circle cx="10" cy="19.5" r="2.2" fill="#22D3EE"/>
           </svg>
         </div>
@@ -269,17 +239,20 @@
   </div>
 </section>
 
-<!-- ============ LEADERSHIP (light band, tinted) ============ -->
-<section class="band band-tint" id="leadership">
+<!-- ============ LEADERSHIP ============ -->
+<section class="band glow-violet" id="leadership">
   <div class="wrap">
-    <p class="kicker kicker-light">Leadership</p>
-    <h2 class="section-title">The people at the hub</h2>
-    <div class="leaders">
+    <div class="reveal">
+      <p class="kicker kicker-light">Leadership</p>
+      <h2 class="section-title">The people at the hub</h2>
+    </div>
+    <div class="leaders stagger reveal">
 
-      <article class="leader">
+      <article class="leader glass">
         <div class="avatar" aria-hidden="true">
           <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle cx="48" cy="48" r="44" fill="#4F46E5"/>
+            <circle cx="48" cy="48" r="44" fill="none" stroke="#818CF8" stroke-width="2" opacity="0.6"/>
             <circle cx="82" cy="30" r="5" fill="#22D3EE"/>
             <text x="48" y="60" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="30" font-weight="600" fill="#FFFFFF" letter-spacing="2">AV</text>
           </svg>
@@ -289,10 +262,11 @@
         <p class="leader-bio latin">Etiam porta sem malesuada magna mollis euismod. Nullam quis risus eget urna mollis ornare vel eu leo.</p>
       </article>
 
-      <article class="leader">
+      <article class="leader glass glass-cyan">
         <div class="avatar" aria-hidden="true">
           <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle cx="48" cy="48" r="44" fill="#0F172A"/>
+            <circle cx="48" cy="48" r="44" fill="none" stroke="#22D3EE" stroke-width="2" opacity="0.7"/>
             <circle cx="82" cy="30" r="5" fill="#22D3EE"/>
             <text x="48" y="60" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="30" font-weight="600" fill="#FFFFFF" letter-spacing="2">LS</text>
           </svg>
@@ -302,10 +276,11 @@
         <p class="leader-bio latin">Maecenas faucibus mollis interdum, cras justo odio, dapibus ac facilisis in. Aenean lacinia bibendum nulla sed consectetur.</p>
       </article>
 
-      <article class="leader">
+      <article class="leader glass glass-violet">
         <div class="avatar" aria-hidden="true">
           <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle cx="48" cy="48" r="44" fill="#4F46E5"/>
+            <circle cx="48" cy="48" r="44" fill="none" stroke="#A78BFA" stroke-width="2" opacity="0.7"/>
             <circle cx="82" cy="30" r="5" fill="#22D3EE"/>
             <text x="48" y="60" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="30" font-weight="600" fill="#FFFFFF" letter-spacing="2">DV</text>
           </svg>
@@ -315,10 +290,11 @@
         <p class="leader-bio latin">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper.</p>
       </article>
 
-      <article class="leader">
+      <article class="leader glass">
         <div class="avatar" aria-hidden="true">
           <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
             <circle cx="48" cy="48" r="44" fill="#0F172A"/>
+            <circle cx="48" cy="48" r="44" fill="none" stroke="#818CF8" stroke-width="2" opacity="0.6"/>
             <circle cx="82" cy="30" r="5" fill="#22D3EE"/>
             <text x="48" y="60" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="30" font-weight="600" fill="#FFFFFF" letter-spacing="2">MO</text>
           </svg>
@@ -332,9 +308,9 @@
   </div>
 </section>
 
-<!-- ============ CALL TO ACTION (dark band) ============ -->
-<section class="band band-dark cta" id="cta">
-  <div class="wrap cta-inner">
+<!-- ============ CALL TO ACTION ============ -->
+<section class="band glow-cyan cta" id="cta">
+  <div class="wrap cta-inner reveal">
     <h2 class="section-title on-dark">Start the conversation</h2>
     <p class="body-dark cta-sub">The agent catalog opens soon. Until then, we answer every message.</p>
     <div class="cta-actions">
@@ -345,7 +321,7 @@
 
 </main>
 
-<!-- ============ FOOTER (dark) ============ -->
+<!-- ============ FOOTER ============ -->
 <footer class="footer">
   <div class="wrap">
     <div class="footer-cols">
@@ -408,6 +384,222 @@
     </div>
   </div>
 </footer>
+
+<script>
+/* ============================================================
+   Hero constellation: connected nodes, gentle drift, one lit
+   node pulsing. Pauses when the tab is hidden (the Page Visibility
+   application programming interface), renders a single static frame
+   under prefers-reduced-motion, and is throttled to 30 frames per
+   second to stay light on the central processing unit (CPU).
+   ============================================================ */
+(function () {
+  var canvas = document.getElementById('constellation');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var dpr = 1, W = 0, H = 0, nodes = [], litIndex = 0;
+  var rafId = null, running = false, lastFrame = 0;
+  var FRAME_MS = 1000 / 30;
+  var LINK = 150;
+  var pointer = { x: 0, y: 0, active: false };
+
+  function resize() {
+    var host = canvas.parentElement;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    W = host.clientWidth;
+    H = host.clientHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function build() {
+    var count = W < 700 ? 26 : 44;
+    nodes = [];
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: 1.4 + Math.random() * 1.8
+      });
+    }
+    var tx = W * 0.62, ty = H * 0.4, best = 0, bestD = Infinity;
+    for (var j = 0; j < nodes.length; j++) {
+      var dx = nodes[j].x - tx, dy = nodes[j].y - ty, d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = j; }
+    }
+    litIndex = best;
+  }
+
+  function draw(ts) {
+    ctx.clearRect(0, 0, W, H);
+    var i, j, a, b, dx, dy, d2, dist, alpha;
+    for (i = 0; i < nodes.length; i++) {
+      a = nodes[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < -20) a.x = W + 20; else if (a.x > W + 20) a.x = -20;
+      if (a.y < -20) a.y = H + 20; else if (a.y > H + 20) a.y = -20;
+    }
+    ctx.lineWidth = 1;
+    for (i = 0; i < nodes.length; i++) {
+      a = nodes[i];
+      for (j = i + 1; j < nodes.length; j++) {
+        b = nodes[j];
+        dx = a.x - b.x; dy = a.y - b.y;
+        d2 = dx * dx + dy * dy;
+        if (d2 < LINK * LINK) {
+          dist = Math.sqrt(d2);
+          alpha = 0.16 * (1 - dist / LINK);
+          ctx.strokeStyle = 'rgba(129, 140, 248, ' + alpha.toFixed(3) + ')';
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+      if (pointer.active) {
+        dx = a.x - pointer.x; dy = a.y - pointer.y;
+        d2 = dx * dx + dy * dy;
+        if (d2 < 160 * 160) {
+          dist = Math.sqrt(d2);
+          alpha = 0.22 * (1 - dist / 160);
+          ctx.strokeStyle = 'rgba(34, 211, 238, ' + alpha.toFixed(3) + ')';
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(pointer.x, pointer.y); ctx.stroke();
+        }
+      }
+    }
+    for (i = 0; i < nodes.length; i++) {
+      if (i === litIndex) continue;
+      a = nodes[i];
+      ctx.fillStyle = 'rgba(129, 140, 248, 0.85)';
+      ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 6.2832); ctx.fill();
+    }
+    a = nodes[litIndex];
+    var pulse = 0.5 + 0.5 * Math.sin((ts || 0) / 700);
+    var haloR = 26 + 10 * pulse;
+    var halo = ctx.createRadialGradient(a.x, a.y, 0, a.x, a.y, haloR);
+    halo.addColorStop(0, 'rgba(34, 211, 238, ' + (0.26 + 0.2 * pulse).toFixed(3) + ')');
+    halo.addColorStop(1, 'rgba(34, 211, 238, 0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(a.x, a.y, haloR, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#22D3EE';
+    ctx.beginPath(); ctx.arc(a.x, a.y, 3.2, 0, 6.2832); ctx.fill();
+  }
+
+  function step(ts) {
+    if (!running) return;
+    rafId = requestAnimationFrame(step);
+    if (ts - lastFrame < FRAME_MS) return;
+    lastFrame = ts;
+    draw(ts);
+  }
+
+  function start() {
+    if (running || reduce.matches || document.hidden) return;
+    running = true;
+    lastFrame = 0;
+    rafId = requestAnimationFrame(step);
+  }
+
+  function stop() {
+    running = false;
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  function drawStatic() { draw(0); }
+
+  window.addEventListener('resize', function () {
+    resize(); build();
+    if (!running) drawStatic();
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); } else { start(); }
+  });
+
+  if (typeof reduce.addEventListener === 'function') {
+    reduce.addEventListener('change', function () {
+      if (reduce.matches) { stop(); drawStatic(); } else { start(); }
+    });
+  }
+
+  var hero = canvas.parentElement;
+  hero.addEventListener('pointermove', function (e) {
+    var rect = canvas.getBoundingClientRect();
+    pointer.x = e.clientX - rect.left;
+    pointer.y = e.clientY - rect.top;
+    pointer.active = !reduce.matches;
+  });
+  hero.addEventListener('pointerleave', function () { pointer.active = false; });
+
+  resize(); build();
+  if (reduce.matches) { drawStatic(); }
+  else {
+    start();
+    /* loaded in a hidden tab: paint one static frame so the hero
+       is never blank at the moment the tab first becomes visible */
+    if (!running) drawStatic();
+  }
+
+  window.OrvannaHero = { isRunning: function () { return running; }, start: start, stop: stop, drawStatic: drawStatic };
+})();
+
+/* ============================================================
+   Scroll reveals + metric count-ups (IntersectionObserver).
+   Each section reveals once; numbers count up the first time
+   their tile scrolls into view. Reduced motion jumps straight
+   to the final values.
+   ============================================================ */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function setFinal(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    el.textContent = el.hasAttribute('data-comma') ? target.toLocaleString('en-US') : String(target);
+  }
+
+  function countUp(el) {
+    if (reduce.matches) { setFinal(el); return; }
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    var comma = el.hasAttribute('data-comma');
+    var DUR = 1100, t0 = null;
+    el.textContent = '0';
+    function tick(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min((ts - t0) / DUR, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = Math.round(target * eased);
+      el.textContent = comma ? val.toLocaleString('en-US') : String(val);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  var reveals = document.querySelectorAll('.reveal');
+
+  if (!('IntersectionObserver' in window)) {
+    reveals.forEach(function (el) { el.classList.add('is-in'); });
+    document.querySelectorAll('.count').forEach(setFinal);
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      entry.target.querySelectorAll('.count').forEach(function (c) {
+        if (!c.hasAttribute('data-done')) {
+          c.setAttribute('data-done', '1');
+          countUp(c);
+        }
+      });
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(function (el) { io.observe(el); });
+})();
+</script>
 
 </body>
 </html>
