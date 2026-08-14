@@ -163,8 +163,13 @@
   border-radius: 12px;
   padding: 16px 18px;
   position: relative;
-  overflow: hidden;
+  /* no overflow clipping: the lookup dropdown must escape its panel.
+     Nothing inside these panels needs clipping (no accent bars here). */
+  overflow: visible;
 }
+/* the lookup panel sits above the snapshot panel so the open
+   dropdown overlays cleanly instead of sliding underneath */
+.lookup-panel { z-index: 20; }
 .console-panel + .console-panel { margin-top: 14px; }
 
 .panel-title {
@@ -238,7 +243,22 @@
   max-height: 300px;
   overflow-y: auto;
   box-shadow: 0 14px 34px rgba(2, 6, 16, 0.7);
+  /* a scrollbar the staffer can SEE and GRAB, both engines */
+  scrollbar-color: #818CF8 #10192E;      /* Firefox: indigo thumb, raised track */
+  scrollbar-width: auto;
 }
+.lookup-list::-webkit-scrollbar { width: 13px; }
+.lookup-list::-webkit-scrollbar-track {
+  background: #10192E;
+  border-radius: 0 9px 9px 0;            /* follows the list's rounded corner */
+}
+.lookup-list::-webkit-scrollbar-thumb {
+  background: #818CF8;                    /* indigo-on-dark, 5.9:1 against the track */
+  border-radius: 7px;
+  border: 3px solid #10192E;              /* inset so the thumb reads as a pill */
+  min-height: 32px;
+}
+.lookup-list::-webkit-scrollbar-thumb:hover { background: #A5B4FC; }
 .lookup-item {
   display: flex;
   align-items: center;

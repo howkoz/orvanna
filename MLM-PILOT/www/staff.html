@@ -7,7 +7,7 @@
 <meta name="description" content="Orvanna staff call console: verify the caller, see their account at a glance, place a phone order for them, and read the confirmation aloud. Demonstration tool, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="css/corporate.css?v=4.5">
-<link rel="stylesheet" href="css/staff.css?v=4.5">
+<link rel="stylesheet" href="css/staff.css?v=4.5.1">
 </head>
 <body class="console-body">
 
@@ -47,7 +47,7 @@
     <div>
 
       <!-- lookup -->
-      <section class="console-panel" aria-label="Member lookup">
+      <section class="console-panel lookup-panel" aria-label="Member lookup">
         <h2 class="panel-title">Caller lookup</h2>
         <div class="lookup-row">
           <label class="order-label" for="lookupInput">Member number or name</label>
@@ -342,7 +342,7 @@
 
   function matches(query) {
     var q = query.trim().toLowerCase();
-    if (!q) return db.members.slice(0, 8);
+    if (!q) return { rows: db.members.slice(0, 30), total: db.members.length };
     var norm = normalizeCode(q);
     var out = db.members.filter(function (m) {
       return m.member_code.toLowerCase().indexOf(q) >= 0 ||
@@ -355,22 +355,37 @@
         return (b.member_code === norm ? 1 : 0) - (a.member_code === norm ? 1 : 0);
       });
     }
-    return out.slice(0, 8);
+    return { rows: out.slice(0, 30), total: out.length };
+  }
+
+  var hotIndex = 0;   /* which match the keyboard highlight sits on */
+
+  function paintHot() {
+    var items = lookupList.querySelectorAll('.lookup-item');
+    items.forEach(function (el, i) { el.classList.toggle('is-hot', i === hotIndex); });
+    var hot = items[hotIndex];
+    if (hot && hot.scrollIntoView) hot.scrollIntoView({ block: 'nearest' });
   }
 
   function renderLookupList() {
-    var rows = matches(lookupInput.value);
-    if (rows.length === 0) {
+    var m = matches(lookupInput.value);
+    hotIndex = 0;
+    if (m.rows.length === 0) {
       lookupList.innerHTML = '<div class="lookup-empty">No member matches. Codes run GW-000001 through GW-00' +
         String(db.members.length) + '.</div>';
     } else {
-      lookupList.innerHTML = rows.map(function (m, i) {
-        return '<div class="lookup-item' + (i === 0 ? ' is-hot' : '') + '" data-code="' + esc(m.member_code) + '">' +
-          '<span><span class="li-code">' + esc(m.member_code) + '</span> ' + esc(m.display_name) + '</span>' +
-          '<span class="li-rank">' + esc(m.rank_name) + '</span></div>';
-      }).join('');
+      lookupList.innerHTML = m.rows.map(function (r, i) {
+        return '<div class="lookup-item' + (i === 0 ? ' is-hot' : '') + '" data-code="' + esc(r.member_code) + '">' +
+          '<span><span class="li-code">' + esc(r.member_code) + '</span> ' + esc(r.display_name) + '</span>' +
+          '<span class="li-rank">' + esc(r.rank_name) + '</span></div>';
+      }).join('') +
+      (m.total > m.rows.length
+        ? '<div class="lookup-empty">' + (m.total - m.rows.length).toLocaleString('en-US') +
+          ' more matches; keep typing to narrow.</div>'
+        : '');
     }
     lookupList.hidden = false;
+    lookupList.scrollTop = 0;
   }
 
   lookupInput.addEventListener('input', renderLookupList);
@@ -379,8 +394,19 @@
   });
   lookupInput.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { lookupList.hidden = true; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();                       /* the caret stays put; the highlight moves */
+      if (lookupList.hidden) { renderLookupList(); return; }
+      var n = lookupList.querySelectorAll('.lookup-item').length;
+      if (n === 0) return;
+      hotIndex = e.key === 'ArrowDown'
+        ? Math.min(hotIndex + 1, n - 1)
+        : Math.max(hotIndex - 1, 0);
+      paintHot();
+    }
     if (e.key === 'Enter') {
-      var hot = lookupList.querySelector('.lookup-item');
+      var items = lookupList.querySelectorAll('.lookup-item');
+      var hot = items[hotIndex] || items[0];
       if (hot && !lookupList.hidden) selectCaller(hot.getAttribute('data-code'));
       else {
         var norm = normalizeCode(lookupInput.value);
