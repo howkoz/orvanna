@@ -110,7 +110,7 @@
   </div>
 </section>
 
-<!-- ============ PROSE: business-benefit sections, Latin filler ============ -->
+<!-- ============ PROSE: business-benefit sections, filled per product from js/catalog.js ============ -->
 <section class="pdp-prose glow-violet">
   <div class="wrap">
     <div class="prose-grid">
@@ -118,22 +118,22 @@
       <div class="prose-panel glass">
         <span class="accent-bar" aria-hidden="true"></span>
         <h2 class="prose-title">How this helps your business</h2>
-        <p class="prose-body latin">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum commoda ratione negotii, ubi flumen ordinum sine mora procedit et mensurae certae manent. Curabitur augue metus, opera continua sustinet dum tabulae rationum ad assem quadrant.</p>
-        <p class="prose-body latin">Praesent vigilat pretia, spectat mercatum, et quaeque hora renovat computationes. Nulla facilisi: quod ante per hebdomadas trahebatur, nunc intra horam perficitur.</p>
+        <p class="prose-body" id="proseHelp1">Every Orvanna agent takes one job off your plate and works it continuously.</p>
+        <p class="prose-body" id="proseHelp2">The routine work gets done; the decisions still come to you.</p>
       </div>
 
       <div class="prose-panel glass">
         <span class="accent-bar" aria-hidden="true"></span>
         <h2 class="prose-title" id="proseDayTitle">What this agent does day to day</h2>
-        <p class="prose-body latin">Mane epistulas percurrit, ordines aperit, et quae nocte acciderunt in unum conspectum redigit. Meridie exceptiones tractat: retenta solvit, morata urget, dubia ad te refert cum tota historia iam collecta.</p>
-        <p class="prose-body latin">Vespere rationes claudit, numeros confert, et diarium diei scribit quod postero mane te expectat. Nihil dormit, nihil obliviscitur.</p>
+        <p class="prose-body" id="proseDay1">It works its queue through the day and keeps a record of everything it touches.</p>
+        <p class="prose-body" id="proseDay2">Exceptions are escalated to you with the history already gathered.</p>
       </div>
 
       <div class="prose-panel glass">
         <span class="accent-bar" aria-hidden="true"></span>
         <h2 class="prose-title">Works with your team</h2>
-        <p class="prose-body latin">Cum ceteris agentibus loquitur lingua communi: quod unus invenit, omnes sciunt. Homini semper cedit, ubi iudicium humanum poscitur, et acta sua aperta tabula praebet.</p>
-        <p class="prose-body latin">Additur uno die, nulla instructione longa: accedit ad opus quasi collega qui iam annos apud te fuerit.</p>
+        <p class="prose-body" id="proseTeam1">Agents share what they learn, so a fact found once is known everywhere.</p>
+        <p class="prose-body" id="proseTeam2">Approval for anything consequential always rests with a person.</p>
       </div>
 
     </div>
@@ -148,28 +148,28 @@
     <div class="footer-cols">
       <div class="footer-col">
         <h4 class="footer-head">Shop</h4>
-        <span class="flink latin">Agentes domini</span>
-        <span class="flink latin">Agentes auxilii</span>
-        <span class="flink latin">Tabulae pretiorum</span>
+        <span class="flink">Domain agents</span>
+        <span class="flink">Support agents</span>
+        <span class="flink">Pricing</span>
       </div>
       <div class="footer-col">
         <h4 class="footer-head">Learn</h4>
-        <span class="flink latin">De societate</span>
-        <span class="flink latin">Historia nostra</span>
-        <span class="flink latin">Quaestiones crebrae</span>
-        <span class="flink latin">Scripta recentia</span>
+        <span class="flink">About us</span>
+        <span class="flink">Our story</span>
+        <span class="flink">Frequently asked questions</span>
+        <span class="flink">Latest updates</span>
       </div>
       <div class="footer-col">
         <h4 class="footer-head">Support</h4>
-        <span class="flink latin">Auxilium sodalibus</span>
-        <span class="flink latin">Documenta artis</span>
-        <span class="flink latin">Status systematis</span>
+        <span class="flink">Help center</span>
+        <span class="flink">Contact</span>
+        <span class="flink">Activation status</span>
       </div>
       <div class="footer-col">
         <h4 class="footer-head">Careers</h4>
-        <span class="flink latin">Munera aperta</span>
-        <span class="flink latin">Cultura nostra</span>
-        <span class="flink latin">Praxis tirocinii</span>
+        <span class="flink">Open roles</span>
+        <span class="flink">How we work</span>
+        <span class="flink">Internships</span>
       </div>
     </div>
 
@@ -249,6 +249,17 @@
 
   if (product.tier === 'pack') {
     document.getElementById('proseDayTitle').textContent = 'What this pack does day to day';
+  }
+
+  /* ---------- per-product prose (text from js/catalog.js) ---------- */
+
+  if (product.prose) {
+    document.getElementById('proseHelp1').textContent = product.prose.help[0];
+    document.getElementById('proseHelp2').textContent = product.prose.help[1];
+    document.getElementById('proseDay1').textContent = product.prose.day[0];
+    document.getElementById('proseDay2').textContent = product.prose.day[1];
+    document.getElementById('proseTeam1').textContent = product.prose.team[0];
+    document.getElementById('proseTeam2').textContent = product.prose.team[1];
   }
 
   /* ---------- billing mode toggle (subscription is the default) ---------- */
