@@ -107,7 +107,21 @@ dashboard at wiring time and the fresh values go straight into the Supabase
 secrets vault, typed by Howard, never through chat or any repo. His local copy
 lives at C:\Users\howar\Desktop\Desktop\HyperSwitch\APIKEY, confirmed OUTSIDE
 every git repository (no push risk); he deletes it himself once the vault holds
-the fresh keys.
+the fresh keys. (Update: Howard later moved the key folder INSIDE ORVANNA as
+ORVANNA\HyperSwitch\; it is gitignore-fenced and verified never committed.)
+PHASE 6 OPENED 2026-08-14 evening (Howard: "team page is stellar!! Open Phase 6").
+mlm-architect is writing docs\PHASE-6-SPEC.md first; build follows the spec's
+work packages through both gates.
+
+Phase 7 (queued 2026-08-14, Howard: "when hyperswitch is done, then you and i
+need to do a full inventory everything that was done and flow everything out"):
+FULL INVENTORY AND FLOW MAP. Howard and Fable together, not delegated: walk every
+artifact the project produced (site pages, portal, staff console, database,
+engine, gates, deploy pipeline, brand, library, specs) and FLOW EVERYTHING OUT
+visually, Howard-style: diagrams first, an end-to-end map of how every piece
+connects, what exists where, and what each phase proved. Deliverable shape to be
+decided with Howard at kickoff (candidates: a master flow document in the
+LIBRARY, a printable systems map, possibly a page on the site itself).
 
 Phase 4C.2 (Howard's morning feedback round, 2026-08-14, after "Amazing job... works
 with no errors"): (1) every product gets a PRODUCT PAGE (filler prose under
