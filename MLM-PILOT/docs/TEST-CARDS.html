@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orvanna Sandbox Test Cards</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #FFFFFF; color: #111827;
+         max-width: 820px; margin: 0 auto; padding: 32px 20px; }
+  h1 { font-size: 22px; letter-spacing: .06em; }
+  h1 span { color: #4F46E5; }
+  .note { background: #EEF2FF; border: 1px solid #818CF8; border-radius: 10px;
+          padding: 14px 18px; font-size: 14px; margin: 18px 0; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .12em; margin-top: 28px; }
+  h2.ok { color: #15803D; } h2.bad { color: #B91C1C; } h2.tds { color: #92400E; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #D1D5DB; padding: 9px 12px; text-align: left; }
+  th { background: #F3F4F6; }
+  td.num { font-family: Consolas, monospace; font-size: 15px; letter-spacing: .05em; }
+  .src { font-size: 12px; color: #6B7280; margin-top: 28px; }
+  a { color: #4F46E5; }
+  @media print { .note { border: 1px solid #999; } }
+</style>
+</head>
+<body>
+<h1>ORVANNA <span>sandbox test cards</span></h1>
+<p>For the live demo checkout at orvanna.io and the HyperSwitch sandbox dashboard.
+These are industry-standard test numbers: they work ONLY in sandboxes, move no real
+money anywhere, and are public knowledge (safe to share, print, or store openly).</p>
+
+<div class="note"><strong>Expiry and security code:</strong> any FUTURE expiry date
+(for example 12 / 30) and any 3 digit Card Verification Value (CVV), for example 123.
+American Express uses a 4 digit code. Cardholder name can be anything.</div>
+
+<h2 class="ok">Cards that succeed</h2>
+<table>
+  <tr><th>Card number</th><th>Brand</th></tr>
+  <tr><td class="num">4242 4242 4242 4242</td><td>Visa (the everyday workhorse)</td></tr>
+  <tr><td class="num">4111 1111 1111 1111</td><td>Visa</td></tr>
+  <tr><td class="num">5555 5555 5555 4444</td><td>Mastercard</td></tr>
+  <tr><td class="num">3782 8224 6310 005</td><td>American Express (4 digit code)</td></tr>
+  <tr><td class="num">6011 1111 1111 1117</td><td>Discover</td></tr>
+  <tr><td class="num">3800 0000 0000 06</td><td>Diners Club</td></tr>
+</table>
+
+<h2 class="bad">Cards that decline (for testing the sad path)</h2>
+<table>
+  <tr><th>Card number</th><th>What the processor answers</th></tr>
+  <tr><td class="num">4000 0000 0000 0002</td><td>Card declined (generic)</td></tr>
+  <tr><td class="num">4000 0000 0000 9995</td><td>Insufficient funds</td></tr>
+  <tr><td class="num">4000 0000 0000 9987</td><td>Lost card</td></tr>
+  <tr><td class="num">4000 0000 0000 9979</td><td>Stolen card</td></tr>
+</table>
+
+<h2 class="tds">3-D Secure (3DS) challenge flow</h2>
+<table>
+  <tr><th>Card number</th><th>Behavior</th></tr>
+  <tr><td class="num">4000 0038 0000 0446</td><td>Runs the 3DS challenge, then succeeds</td></tr>
+</table>
+
+<div class="note"><strong>Dummy connector quirks worth knowing:</strong> payments made
+through dummy connectors expire after 2 days, and dummy connectors support payments
+and refunds only. Perfect for a demo, useless for theft.</div>
+
+<p class="src">Source: the official HyperSwitch test credentials page,
+<a href="https://docs.hyperswitch.io/explore-hyperswitch/payment-orchestration/quickstart/payment-methods-setup/test-credentials">docs.hyperswitch.io, Test Credentials</a>.
+Kept in the project at MLM-PILOT\docs\TEST-CARDS.html.</p>
+</body>
+</html>
