@@ -535,3 +535,52 @@ run, because no challenge had ever fired.
 NOT YET DONE: nobody has completed a challenge end to end in a browser. The card
 fields live in a cross-origin iframe that automation may not type into, so the
 final click-through is Howard's to confirm.
+
+
+## CHECKOUT SHAPE AFTER THE 3DS WORK, 2026-08-15
+
+Howard, on seeing the working flow: "it is clunky, i have to enter the credit
+card 2 different times", and separately that after the passcode the page "stops
+for a second back at the card entry and then finishes at the complete page".
+Both were real. Three changes, all verified in the live page.
+
+1. ONE CARD ENTRY. www/shop.html carried its own card inputs, which exist only
+   for the FAKE checkout. With live payments on they were a decoy: the shopper
+   filled them in, pressed the button, and was handed the payment provider's
+   own (empty) card form. They are now hidden whenever LIVE_PAYMENTS is true.
+
+2. NO FLASH BACK TO THE CARD FORM. Between the bank window closing and our
+   server answering, the provider's form was still mounted underneath. A
+   finishing state now hides the form and the button and leaves only the status
+   line. It deliberately says nothing about the outcome, because at that instant
+   nobody knows it. Guarded on a payment actually being in flight, and cleared
+   on every ending including the timeout path, where leaving it on would have
+   hidden the button the timeout message tells the shopper to press.
+
+3. THE CARD FORM IS NOW THE PAYMENT STEP (Howard: "do it"). The payment opens
+   automatically when the payment step first becomes reachable, which is the
+   account-done stage, not checkout entry: before the guest or sign-in choice
+   everything below is hidden and there is nothing to pay for.
+
+   THE HAZARD THIS CREATED. A payment fixes its AMOUNT when created. Opening it
+   early means the shopper can then switch to priority activation or enter a tax
+   identifier and move the total, leaving a payment that would settle at the OLD
+   amount while the page showed the new one. Closed with an amount signature
+   (items, activation, tax exemption, member code): every amount-affecting
+   control already funnels through renderSummary, which now re-checks, and any
+   change discards the opened payment and opens a fresh one. The server reprices
+   from scratch each time, so an amount never originates in the browser. The
+   open is debounced 900ms because a tax identifier is typed one character at a
+   time and the demo allows five creates a minute per visitor.
+
+   PROVEN: cart at $420.00 held order ORV-2026-08-1BX8GO; switching to priority
+   activation produced a NEW order ORV-2026-08-1BY49Y at $446.25, with the pay
+   button relabelled to match. The stale payment was discarded, not reused.
+
+FLOW IS NOW THREE SCREENS: payment step with the card form already present ->
+bank approval window -> order placed.
+
+NOTE FOR TESTING: orvanna.io is served with Cache-Control max-age 600, so a
+change can look absent for up to ten minutes in a browser that already has the
+page. A cache-busting query string settles whether a fix is missing or merely
+cached; this cost an unnecessary round of debugging today.
