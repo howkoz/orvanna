@@ -104,6 +104,49 @@ def link_check() -> list:
     return problems
 
 
+ASSET_VERSION_RE = re.compile(r"\?v=[0-9A-Za-z._-]+")
+
+
+def stamp_assets() -> str:
+    """Rewrite every ?v= asset query to a hash of the actual asset bytes.
+
+    WHY THIS EXISTS, and it is not a nicety. The pages hand-carried a version
+    string, and it sat at 5.2 while shop.css was rewritten three times on
+    2026-08-15. Because the URL never changed, every browser that had visited
+    before kept serving itself the OLD stylesheet from cache. One of those
+    rewrites was the fix that lifts the bank-approval chrome above the payment
+    frame; with the stale sheet it is painted behind it and is invisible. So a
+    fix could be correct, deployed, and provably working for a new visitor
+    while reaching nobody who had been to the site before. The HTML expires in
+    ten minutes and the assets did not, which is the worst of both.
+
+    Hand-maintained version strings fail this way every time, because the
+    person changing the stylesheet is never the person remembering the stamp.
+    The build already hashes every file to print a digest it used for nothing,
+    so the honest fix is to spend that hash: the stamp is derived from the
+    content, which means it changes when, and only when, the content does.
+    """
+    assets = sorted(
+        p for p in DIST.rglob("*")
+        if p.is_file() and p.suffix.lower() in (".css", ".js") and ".git" not in p.parts
+    )
+    digest = hashlib.sha256()
+    for p in assets:
+        digest.update(p.relative_to(DIST).as_posix().encode())
+        digest.update(p.read_bytes())
+    stamp = digest.hexdigest()[:12]
+
+    stamped = 0
+    for page in DIST.rglob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        new_text, hits = ASSET_VERSION_RE.subn(f"?v={stamp}", text)
+        if hits:
+            page.write_text(new_text, encoding="utf-8")
+            stamped += hits
+    print(f"asset cache stamp: ?v={stamp} applied to {stamped} references")
+    return stamp
+
+
 def main() -> None:
     www, site = ROOT / "www", ROOT / "site"
     for required in (www, site):
@@ -136,6 +179,8 @@ def main() -> None:
     (DIST / "404.html").write_text(NOT_FOUND_PAGE, encoding="utf-8")
     (DIST / "README.md").write_text(README, encoding="utf-8")
     MARKER.write_text("built by deploy/build_dist.py\n", encoding="utf-8")
+
+    stamp_assets()
 
     leftovers = []
     for page in DIST.rglob("*.html"):
