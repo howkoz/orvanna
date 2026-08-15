@@ -332,6 +332,17 @@ Full write-up, including the four collisions in detail:
 Plain path:
 `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md`
 
+**All five of those open questions now have a costed option set and a recommendation**, in
+`DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`. Nothing there is decided; it is a choice sheet.
+The recommended package is 20 percent of the order price, paid to the sponsor on a sponsored
+member's first order inside 30 days of enrolment, in addition to level one pay, capped at
+$50.00 per event and 3 per sponsor per month. Modelled on the six finalized runs it costs
+0.72 percent of revenue, taking the whole plan from 11.86 percent to 12.59 percent against
+the 20 percent ceiling.
+
+Plain path:
+`C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`
+
 ---
 
 ## 8. The rank ladder

@@ -1105,6 +1105,19 @@ it appears:
 The interview with Howard is the work. Nothing here should be built until those five have
 answers.
 
+> **UPDATE 2026-08-15, later the same day.** All five now have a costed option set and a
+> recommendation, written so Howard can approve or amend the whole thing in one pass:
+> `DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`. Plain path:
+> `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`
+> Still adopted, still unbuilt, still undecided. Two findings from that work belong here
+> because they change how collisions three and four read. **Collision three dissolves if the
+> basis is the order price rather than Commissionable Volume**, because a price basis consumes
+> no volume and therefore leaves the ten-month spreading rule completely untouched.
+> **Collision four is not a cost question**, because every first order has one buyer and at
+> most one sponsor, so "own first order" and "recruit's first order" produce identical event
+> counts and identical cost; only the payee changes, which means the choice can be made purely
+> on the behaviour it rewards.
+
 ---
 
 ## 13. What I recommend happens next, in order

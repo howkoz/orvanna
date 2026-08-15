@@ -31,6 +31,7 @@ REWRITES_PORTAL = [
     ("portal/index.html", "../www/login.html", "../login.html"),
     ("portal/index.html", "../www/index.html", "../index.html"),
     ("portal/index.html", "../www/shop.html", "../shop.html"),
+    ("portal/index.html", "../www/library.html", "../library.html"),
     ("portal/index.html", "../www/staff.html", "../staff.html"),
 ]
 

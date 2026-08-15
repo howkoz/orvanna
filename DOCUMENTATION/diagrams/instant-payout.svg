@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1130" width="1180" height="1130" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+  <rect x="0" y="0" width="1180" height="1130" fill="#ffffff"/>
+
+  <text x="40" y="46" font-size="26" font-weight="700" fill="#14202e">INSTANT PAYOUT: the recommended terms, and what they cost</text>
+  <text x="40" y="72" font-size="14" fill="#4a5b6d">Orvanna compensation plan, mechanism four. Adopted 2026-08-15. Not yet designed, not yet built. Every figure below is measured, never estimated.</text>
+  <line x1="40" y1="86" x2="1140" y2="86" stroke="#c9d4de" stroke-width="2"/>
+
+  <!-- PANEL A: one first order, both paths -->
+  <text x="40" y="118" font-size="17" font-weight="700" fill="#14202e">A. What happens when a new recruit places a first order of $150.00</text>
+
+  <rect x="40" y="134" width="220" height="92" rx="8" fill="#eef3f8" stroke="#7d94ab" stroke-width="2"/>
+  <text x="150" y="162" font-size="14" font-weight="700" fill="#14202e" text-anchor="middle">NEW RECRUIT</text>
+  <text x="150" y="182" font-size="13" fill="#33475b" text-anchor="middle">first order ever</text>
+  <text x="150" y="202" font-size="13" fill="#33475b" text-anchor="middle">price $150.00</text>
+  <text x="150" y="219" font-size="13" fill="#33475b" text-anchor="middle">Personal Volume 150</text>
+
+  <!-- arrows -->
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#5d7188"/>
+    </marker>
+    <marker id="arrowg" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#1f7a4d"/>
+    </marker>
+  </defs>
+
+  <path d="M260,164 L330,164" stroke="#1f7a4d" stroke-width="2.5" fill="none" marker-end="url(#arrowg)"/>
+  <path d="M260,200 L330,200" stroke="#5d7188" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- instant path -->
+  <rect x="336" y="128" width="330" height="76" rx="8" fill="#e3f4ea" stroke="#1f7a4d" stroke-width="2.5"/>
+  <text x="352" y="152" font-size="14" font-weight="700" fill="#12603a">INSTANT PAYOUT, paid the same day</text>
+  <text x="352" y="172" font-size="13" fill="#1b4b34">20 percent of the ORDER PRICE, not of volume</text>
+  <text x="352" y="192" font-size="13" font-weight="700" fill="#12603a">0.20 x $150.00 = $30.00 to the SPONSOR</text>
+
+  <path d="M666,166 L742,166" stroke="#1f7a4d" stroke-width="2.5" fill="none" marker-end="url(#arrowg)"/>
+  <rect x="748" y="128" width="392" height="76" rx="8" fill="#e3f4ea" stroke="#1f7a4d" stroke-width="2"/>
+  <text x="764" y="152" font-size="13" fill="#1b4b34">Price is a number the till already knows, so no volume</text>
+  <text x="764" y="172" font-size="13" fill="#1b4b34">is consumed. The ten-month spreading rule for one-time</text>
+  <text x="764" y="192" font-size="13" fill="#1b4b34">purchases is untouched. That is why price is the basis.</text>
+
+  <!-- monthly path -->
+  <rect x="336" y="216" width="330" height="96" rx="8" fill="#eef3f8" stroke="#7d94ab" stroke-width="2"/>
+  <text x="352" y="240" font-size="14" font-weight="700" fill="#14202e">THE MONTHLY RUN, unchanged</text>
+  <text x="352" y="260" font-size="13" fill="#33475b">Sales Volume 150.00</text>
+  <text x="352" y="280" font-size="13" fill="#33475b">Commissionable Volume 0.80 x 150.00 = 120.00</text>
+  <text x="352" y="300" font-size="13" font-weight="700" fill="#14202e">Level 1 pays 0.10 x 120.00 = $12.00 at month end</text>
+
+  <path d="M666,264 L742,264" stroke="#5d7188" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+  <rect x="748" y="216" width="392" height="96" rx="8" fill="#fdf3e3" stroke="#b5822a" stroke-width="2"/>
+  <text x="764" y="240" font-size="13" font-weight="700" fill="#7a5514">IN ADDITION, not instead of</text>
+  <text x="764" y="260" font-size="13" fill="#5c4210">The sponsor receives $30.00 now AND $12.00 at month end.</text>
+  <text x="764" y="280" font-size="13" fill="#5c4210">Total $42.00 on a $150.00 first order, which is 28 percent</text>
+  <text x="764" y="300" font-size="13" fill="#5c4210">of THAT order. The 20 percent ceiling is an average, not</text>
+  <text x="764" y="317" font-size="13" fill="#5c4210">a per-order cap once Instant Payout exists. Read panel C.</text>
+
+  <line x1="40" y1="336" x2="1140" y2="336" stroke="#dde5ec" stroke-width="1.5"/>
+
+  <!-- PANEL B: the five decisions -->
+  <text x="40" y="366" font-size="17" font-weight="700" fill="#14202e">B. The five open questions, and the recommended answer to each</text>
+
+  <g font-size="13">
+    <rect x="40" y="382" width="1100" height="30" fill="#eef3f8"/>
+    <text x="52" y="402" font-weight="700" fill="#14202e">Question</text>
+    <text x="300" y="402" font-weight="700" fill="#14202e">Options considered</text>
+    <text x="700" y="402" font-weight="700" fill="#12603a">RECOMMENDED</text>
+    <text x="1000" y="402" font-weight="700" fill="#14202e">Why</text>
+
+    <rect x="40" y="412" width="1100" height="44" fill="#ffffff" stroke="#e2e9ef"/>
+    <text x="52" y="431" fill="#14202e" font-weight="700">1. What counts as first</text>
+    <text x="300" y="431" fill="#33475b">own first order / recruit's first order /</text>
+    <text x="300" y="448" fill="#33475b">any order inside a window after enrolment</text>
+    <text x="700" y="431" fill="#12603a" font-weight="700">the RECRUIT's first order,</text>
+    <text x="700" y="448" fill="#12603a" font-weight="700">inside 30 days of enrolment</text>
+    <text x="1000" y="431" fill="#33475b">paying your own</text>
+    <text x="1000" y="448" fill="#33475b">buying rewards buying</text>
+
+    <rect x="40" y="456" width="1100" height="44" fill="#f7fafc" stroke="#e2e9ef"/>
+    <text x="52" y="475" fill="#14202e" font-weight="700">2. The basis</text>
+    <text x="300" y="475" fill="#33475b">percentage of Commissionable Volume /</text>
+    <text x="300" y="492" fill="#33475b">percentage of order price / flat amount</text>
+    <text x="700" y="483" fill="#12603a" font-weight="700">percentage of ORDER PRICE</text>
+    <text x="1000" y="475" fill="#33475b">no deferred volume</text>
+    <text x="1000" y="492" fill="#33475b">is consumed</text>
+
+    <rect x="40" y="500" width="1100" height="44" fill="#ffffff" stroke="#e2e9ef"/>
+    <text x="52" y="519" fill="#14202e" font-weight="700">3. The rate</text>
+    <text x="300" y="527" fill="#33475b">10 percent / 20 percent / 30 percent of price</text>
+    <text x="700" y="527" fill="#12603a" font-weight="700">20 percent of price</text>
+    <text x="1000" y="519" fill="#33475b">$30 on a $150 order</text>
+    <text x="1000" y="536" fill="#33475b">is felt; 10 is not</text>
+
+    <rect x="40" y="544" width="1100" height="44" fill="#f7fafc" stroke="#e2e9ef"/>
+    <text x="52" y="563" fill="#14202e" font-weight="700">4. Against level 1</text>
+    <text x="300" y="571" fill="#33475b">in addition to level one pay / instead of it</text>
+    <text x="700" y="571" fill="#12603a" font-weight="700">IN ADDITION</text>
+    <text x="1000" y="563" fill="#33475b">instead-of saves only</text>
+    <text x="1000" y="580" fill="#33475b">0.23 points of revenue</text>
+
+    <rect x="40" y="588" width="1100" height="44" fill="#ffffff" stroke="#e2e9ef"/>
+    <text x="52" y="607" fill="#14202e" font-weight="700">5. Chargebacks</text>
+    <text x="300" y="607" fill="#33475b">pay and accept the loss / hold N days and call</text>
+    <text x="300" y="624" fill="#33475b">it instant anyway / pay now, recover later</text>
+    <text x="700" y="607" fill="#12603a" font-weight="700">PAY NOW, recover from the</text>
+    <text x="700" y="624" fill="#12603a" font-weight="700">next monthly run</text>
+    <text x="1000" y="607" fill="#33475b">the name is a promise;</text>
+    <text x="1000" y="624" fill="#33475b">a held payout breaks it</text>
+  </g>
+
+  <line x1="40" y1="652" x2="1140" y2="652" stroke="#dde5ec" stroke-width="1.5"/>
+
+  <!-- PANEL C: the ceiling -->
+  <text x="40" y="682" font-size="17" font-weight="700" fill="#14202e">C. Does it fit inside the 20 percent of revenue ceiling? Measured on the six finalized runs, March to July 2026</text>
+  <text x="40" y="704" font-size="13" fill="#4a5b6d">Revenue for those five months $699,550.00. Plan payout already made $82,995.60. Modelled Instant Payout $5,050.00 across 234 qualifying first orders.</text>
+
+  <!-- bar scale 0..20% mapped to x 60..1120 -->
+  <g>
+    <rect x="60" y="726" width="1060" height="52" fill="#f2f6f9" stroke="#c9d4de"/>
+    <!-- existing plan 11.8641% of 20 -> width -->
+    <rect x="60" y="726" width="628.8" height="52" fill="#7d94ab"/>
+    <rect x="688.8" y="726" width="38.3" height="52" fill="#1f7a4d"/>
+    <text x="120" y="758" font-size="14" font-weight="700" fill="#ffffff">EXISTING PLAN 11.86 percent of revenue</text>
+    <text x="760" y="748" font-size="13" font-weight="700" fill="#12603a">Instant Payout 0.72 percent</text>
+    <text x="760" y="768" font-size="13" fill="#33475b">Headroom left over: 7.41 percent of revenue</text>
+    <!-- ticks -->
+    <line x1="60" y1="778" x2="60" y2="792" stroke="#8a9aa8"/><text x="60" y="808" font-size="12" fill="#4a5b6d" text-anchor="middle">0%</text>
+    <line x1="325" y1="778" x2="325" y2="792" stroke="#8a9aa8"/><text x="325" y="808" font-size="12" fill="#4a5b6d" text-anchor="middle">5%</text>
+    <line x1="590" y1="778" x2="590" y2="792" stroke="#8a9aa8"/><text x="590" y="808" font-size="12" fill="#4a5b6d" text-anchor="middle">10%</text>
+    <line x1="855" y1="778" x2="855" y2="792" stroke="#8a9aa8"/><text x="855" y="808" font-size="12" fill="#4a5b6d" text-anchor="middle">15%</text>
+    <line x1="1120" y1="712" x2="1120" y2="792" stroke="#b03030" stroke-width="2.5"/>
+    <text x="1120" y="808" font-size="12" font-weight="700" fill="#b03030" text-anchor="middle">20% CEILING</text>
+  </g>
+
+  <text x="60" y="838" font-size="15" font-weight="700" fill="#12603a">COMBINED 12.59 percent of revenue. It fits, with 7.41 points to spare.</text>
+  <text x="60" y="860" font-size="13" fill="#33475b">Worst single month is July 2026 at 12.88 percent. Best is April at 12.35 percent. No month in the model comes within 7 points of the ceiling.</text>
+
+  <line x1="40" y1="880" x2="1140" y2="880" stroke="#dde5ec" stroke-width="1.5"/>
+
+  <!-- PANEL D: the real risk -->
+  <text x="40" y="910" font-size="17" font-weight="700" fill="#14202e">D. The number that actually decides affordability, and the one thing that has no answer today</text>
+
+  <rect x="40" y="926" width="540" height="170" rx="8" fill="#eef3f8" stroke="#7d94ab" stroke-width="2"/>
+  <text x="56" y="950" font-size="14" font-weight="700" fill="#14202e">Instant Payout is affordable because first orders are small</text>
+  <text x="56" y="972" font-size="13" fill="#33475b">First orders are $33,350.00 of $699,550.00 revenue, which is</text>
+  <text x="56" y="991" font-size="13" fill="#33475b">4.77 percent. A 20 percent rate on 4.77 percent of revenue</text>
+  <text x="56" y="1010" font-size="13" fill="#33475b">costs 0.95 percent of revenue before caps.</text>
+  <text x="56" y="1036" font-size="13" font-weight="700" fill="#14202e">The break-even: first orders would have to reach 40.7 percent</text>
+  <text x="56" y="1055" font-size="13" font-weight="700" fill="#14202e">of revenue before this rate exhausts the headroom.</text>
+  <text x="56" y="1078" font-size="13" fill="#33475b">That is 8.5 times today's level. A young organisation with</text>
+  <text x="56" y="1090" font-size="13" fill="#33475b">mostly first orders is where this rate would break.</text>
+
+  <rect x="600" y="926" width="540" height="170" rx="8" fill="#fdecec" stroke="#b03030" stroke-width="2.5"/>
+  <text x="616" y="950" font-size="14" font-weight="700" fill="#8c1f1f">THE UNSOLVED ONE: recovering a paid bonus</text>
+  <text x="616" y="972" font-size="13" fill="#6d1c1c">A card chargeback window runs for months. Today there is no</text>
+  <text x="616" y="991" font-size="13" fill="#6d1c1c">refunded payment status, no clawback code, and no way for a</text>
+  <text x="616" y="1010" font-size="13" fill="#6d1c1c">member balance to go negative. Nothing can be taken back.</text>
+  <text x="616" y="1036" font-size="13" font-weight="700" fill="#8c1f1f">Must be built BEFORE the first Instant Payout is paid:</text>
+  <text x="616" y="1055" font-size="13" fill="#6d1c1c">1. a refunded and charged-back payment status</text>
+  <text x="616" y="1072" font-size="13" fill="#6d1c1c">2. a member balance that may go negative</text>
+  <text x="616" y="1089" font-size="13" fill="#6d1c1c">3. the monthly run settling that balance before it pays</text>
+
+  <text x="40" y="1120" font-size="12" fill="#6b7a89">Sources: app.commission_runs (six finalized runs), app.orders and app.order_lines (10,332 rows), app.demo_orders (117 live rows, 29 paid, 11 attributed). Read-only, 2026-08-15.</text>
+</svg>
