@@ -372,7 +372,7 @@ See section 5.
 
 ### 4.1 `app.demo_orders`
 
-Migration 010, extended by migrations 016 and 017. 115 rows live.
+Migration 010, extended by migrations 016 and 017. 117 rows live.
 
 | Column | Type | Meaning | Why the column exists |
 |---|---|---|---|
@@ -419,10 +419,14 @@ is what makes running it twice harmless. The partial index
 not null and tax_transaction_id is null` answers that job's one question
 directly instead of scanning every order ever placed.
 
-Live as of 2026-08-15: 115 demonstration orders, 25 with a tax calculation
+Live as of 2026-08-15: 117 demonstration orders, 27 with a tax calculation
 identifier, 6 with a tax transaction identifier, and **zero succeeded orders
 holding a calculation but no transaction**, which is the recorder's backlog
 measured directly.
+
+This table grows continuously, because the public demonstration checkout is
+live and any visitor can add a row. Every count in this document was measured
+on 2026-08-15 and none should be treated as current. Measure, never copy.
 
 Indexes on `app.demo_orders`, read from the live database:
 `demo_orders_pkey`, `demo_orders_order_number_key` (unique),
@@ -853,7 +857,7 @@ Queried directly, for scale context.
 | `app.run_member_results` | 12,000 |
 | `app.commission_lines` | 22,076 |
 | `app.run_level_map` | 29,550 |
-| `app.demo_orders` | 115 |
+| `app.demo_orders` | 117 (live and growing, see section 4.1) |
 | `app.demo_users` | 1,002 |
 
 ---
@@ -891,7 +895,7 @@ changed; this document only records it.
    written into migration 016 itself, is that a fallback must never be silent. A
    nullable column with a null-permitting check leaves the silent case
    reachable. Today the Edge Function always supplies a value and zero of the
-   115 live rows are null, but that is a habit of the code, not a guarantee of
+   117 live rows are null, but that is a habit of the code, not a guarantee of
    the database. `018_PROPOSED_tax_integrity_hardening.sql` makes it `not null`
    with a default and is **not applied**. It contains one genuine judgement
    call, about whether the default should be `flat_fallback` or a new
@@ -904,8 +908,9 @@ changed; this document only records it.
    a single arithmetic slip in a future edit would be stored without complaint,
    and `total_cents` is the figure the payment is actually opened for. The
    constraint is in migration 018, **not applied**. Pre-flight already run
-   read-only against live data: all 115 rows satisfy it today, so it would
-   validate without a failing row.
+   read-only against live data: all 117 rows satisfy it today, so it would
+   validate without a failing row. Re-run that count immediately before
+   applying, because the table grows on its own.
 
 5. **`items` is unvalidated `jsonb`.** Nothing in the database requires the
    array shape the code writes. If the pricing code changes shape, old and new

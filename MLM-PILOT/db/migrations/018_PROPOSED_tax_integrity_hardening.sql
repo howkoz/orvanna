@@ -17,12 +17,15 @@
 -- decisions below first, because one of them is a genuine judgement call.
 --
 -- PRE-FLIGHT, ALREADY CHECKED AGAINST LIVE DATA (read-only) 2026-08-15:
---   115 demo orders exist.
---   115 of 115 satisfy total_cents = the sum of the four parts. The check
+--   117 demo orders exist.
+--   117 of 117 satisfy total_cents = the sum of the four parts. The check
 --       constraint will therefore validate without a single failing row.
---     0 of 115 have a null tax_source. The 'set not null' will therefore
+--     0 of 117 have a null tax_source. The 'set not null' will therefore
 --       succeed without needing a backfill.
 -- Re-run those two counts before applying, since rows arrive continuously.
+-- This is not a formality: an earlier draft of this header said 115, measured
+-- minutes before two more orders arrived through the live checkout. A count
+-- against this table is true for a moment, not for a day.
 -- ===========================================================================
 
 

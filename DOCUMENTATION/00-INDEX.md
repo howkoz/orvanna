@@ -26,6 +26,7 @@ something is unverified or not yet built, it says so plainly.
 | 06 | [Quality assurance and verification](06-QA-AND-VERIFICATION.md) | What has been tested, what passed, what is still open, and what is not tested at all | Quality assurance and verifier |
 | 07 | [Design system](07-DESIGN-SYSTEM.md) | Colours, type, components, and the Figma import pack | Designer |
 | 08 | [The team and what we built](08-TEAM-AND-WHAT-WE-BUILT.md) | Who does what, the timeline of every phase, and the lessons that cost real time | Project historian |
+| 09 | [Linking the shop to the compensation plan](09-LINKING-SHOP-TO-COMP.md) | The one missing connection: why no real purchase has ever paid a commission, the seven decisions Howard has to make, and a dry run of what today's real sales would pay | Compensation engineer |
 
 **Diagrams** live in `diagrams\`. Every one is a standalone Scalable Vector
 Graphics (SVG) file on a white background with fixed colours, so it drops

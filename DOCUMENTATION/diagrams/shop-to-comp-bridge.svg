@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 800" width="1020" height="800" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="1020" height="800" fill="#FFFFFF"/>
+
+  <text x="28" y="40" font-size="22" font-weight="700" fill="#111827">Linking the shop to the compensation engine</text>
+  <text x="28" y="63" font-size="13" fill="#4B5563">Personal Volume (PV), Sales Volume (SV), Commissionable Volume (CV). Every box is a real table or function.</text>
+
+  <!-- ================= PANEL A: TODAY ================= -->
+  <rect x="24" y="82" width="470" height="660" rx="10" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="44" y="106" font-size="15" font-weight="700" fill="#B91C1C">TODAY: two halves, no bridge</text>
+
+  <rect x="40" y="120" width="438" height="50" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="56" y="142" font-size="13" font-weight="700" fill="#111827">The shop and the staff console</text>
+  <text x="56" y="160" font-size="12" fill="#1F2937">www/shop.html, www/staff.html, www/js/catalog.js</text>
+  <path d="M 259 170 L 259 190" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="259,198 254,188 264,188" fill="#4B5563"/>
+
+  <rect x="40" y="200" width="438" height="50" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="56" y="222" font-size="13" font-weight="700" fill="#111827">create-payment (Edge Function)</text>
+  <text x="56" y="240" font-size="12" fill="#1F2937">Reprices the cart server side, opens the payment</text>
+  <path d="M 259 250 L 259 270" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="259,278 254,268 264,268" fill="#4B5563"/>
+
+  <rect x="40" y="280" width="438" height="58" rx="8" fill="#E0E7FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="56" y="302" font-size="13" font-weight="700" fill="#111827">app.demo_orders  (117 rows, 29 succeeded)</text>
+  <text x="56" y="320" font-size="12" fill="#1F2937">items jsonb, pv_total, member_id, payment_status</text>
+  <path d="M 259 338 L 259 356" stroke="#B91C1C" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+
+  <rect x="40" y="360" width="438" height="60" rx="8" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2.5"/>
+  <text x="56" y="383" font-size="13" font-weight="700" fill="#7F1D1D">THE WALL</text>
+  <text x="56" y="401" font-size="12" fill="#7F1D1D">Migration 010: no foreign key into app.orders.</text>
+  <text x="56" y="416" font-size="12" fill="#7F1D1D">Its own words: this table "feeds nothing".</text>
+
+  <rect x="40" y="440" width="438" height="52" rx="8" fill="#F3F4F6" stroke="#6B7280" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="56" y="462" font-size="13" font-weight="700" fill="#374151">Seeded data loader (the only input)</text>
+  <text x="56" y="480" font-size="12" fill="#374151">app.products: 12 rows, tiers domain and support only</text>
+  <path d="M 259 492 L 259 510" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="259,518 254,508 264,508" fill="#4B5563"/>
+
+  <rect x="40" y="522" width="438" height="52" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="56" y="544" font-size="13" font-weight="700" fill="#111827">app.orders + app.order_lines  (10,332 each)</text>
+  <text x="56" y="562" font-size="12" fill="#1F2937">volume_month stamped once; unit_volume copied in</text>
+  <path d="M 259 574 L 259 592" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="259,600 254,590 264,590" fill="#4B5563"/>
+
+  <rect x="40" y="604" width="438" height="44" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="56" y="631" font-size="13" font-weight="700" fill="#111827">app.fn_run_commission  ->  app.fn_finalize_run</text>
+  <path d="M 259 648 L 259 666" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="259,674 254,664 264,664" fill="#4B5563"/>
+
+  <rect x="40" y="678" width="438" height="52" rx="8" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+  <text x="56" y="700" font-size="13" font-weight="700" fill="#111827">app.commission_lines  (22,076 rows)</text>
+  <text x="56" y="718" font-size="12" fill="#166534">Every cent of it from seeded data. No real sale, ever.</text>
+
+  <!-- ================= PANEL B: LINKED ================= -->
+  <rect x="526" y="82" width="470" height="660" rx="10" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="546" y="106" font-size="15" font-weight="700" fill="#15803D">ONCE LINKED: one path, engine unchanged</text>
+
+  <rect x="542" y="120" width="438" height="50" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="558" y="142" font-size="13" font-weight="700" fill="#111827">The shop and the staff console</text>
+  <text x="558" y="160" font-size="12" fill="#1F2937">Unchanged. No page edit is needed for any of this.</text>
+  <path d="M 761 170 L 761 190" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="761,198 756,188 766,188" fill="#4B5563"/>
+
+  <rect x="542" y="200" width="438" height="50" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="558" y="222" font-size="13" font-weight="700" fill="#111827">create-payment (Edge Function)</text>
+  <text x="558" y="240" font-size="12" fill="#1F2937">Unchanged. Still the only thing that prices a cart.</text>
+  <path d="M 761 250 L 761 270" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="761,278 756,268 766,268" fill="#4B5563"/>
+
+  <rect x="542" y="280" width="438" height="58" rx="8" fill="#E0E7FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="558" y="302" font-size="13" font-weight="700" fill="#111827">app.demo_orders  (the receipt, still the receipt)</text>
+  <text x="558" y="320" font-size="12" fill="#1F2937">Only payment_status = 'succeeded' rows are read</text>
+  <path d="M 761 338 L 761 356" stroke="#15803D" stroke-width="2" fill="none"/>
+  <polygon points="761,362 756,352 766,352" fill="#15803D"/>
+
+  <rect x="542" y="360" width="438" height="60" rx="8" fill="#DCFCE7" stroke="#15803D" stroke-width="2.5"/>
+  <text x="558" y="383" font-size="13" font-weight="700" fill="#14532D">THE BRIDGE  (new: migration 019)</text>
+  <text x="558" y="401" font-size="12" fill="#14532D">app.fn_bridge_demo_orders translates a paid order</text>
+  <text x="558" y="416" font-size="12" fill="#14532D">into engine orders. Link column: orders.demo_order_id</text>
+  <path d="M 761 420 L 761 438" stroke="#15803D" stroke-width="2" fill="none"/>
+  <polygon points="761,444 756,434 766,434" fill="#15803D"/>
+
+  <rect x="542" y="440" width="438" height="52" rx="8" fill="#FEF9C3" stroke="#A16207" stroke-width="2"/>
+  <text x="558" y="462" font-size="13" font-weight="700" fill="#111827">app.products  (+ bundle and pack tiers, 16 rows)</text>
+  <text x="558" y="480" font-size="12" fill="#1F2937">app.shop_sku_map joins shop names to product rows</text>
+  <path d="M 761 492 L 761 510" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="761,518 756,508 766,508" fill="#4B5563"/>
+
+  <rect x="542" y="522" width="438" height="52" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="558" y="544" font-size="13" font-weight="700" fill="#111827">app.orders + app.order_lines  (same shape)</text>
+  <text x="558" y="562" font-size="12" fill="#1F2937">A live sale is now just another completed order</text>
+  <path d="M 761 574 L 761 592" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="761,600 756,590 766,590" fill="#4B5563"/>
+
+  <rect x="542" y="604" width="438" height="44" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="558" y="631" font-size="13" font-weight="700" fill="#111827">app.fn_run_commission  (NOT ONE LINE CHANGED)</text>
+  <path d="M 761 648 L 761 666" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="761,674 756,664 766,664" fill="#4B5563"/>
+
+  <rect x="542" y="678" width="438" height="52" rx="8" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+  <text x="558" y="700" font-size="13" font-weight="700" fill="#111827">app.commission_lines  (real sales included)</text>
+  <text x="558" y="718" font-size="12" fill="#166534">Dry run on today's 29 paid orders: $120.00 to 2 members</text>
+
+  <!-- footer -->
+  <text x="28" y="768" font-size="12" fill="#4B5563">The bridge translates, it does not compute. The engine keeps one input shape, so the worked-example acceptance test still governs it.</text>
+  <text x="28" y="786" font-size="12" fill="#4B5563">Read the boxes across, left to right: only two rows differ. That is the whole change.</text>
+</svg>

@@ -113,6 +113,38 @@ reduces to: qualified AND 2 active legs.)
   8.00 + 4.00 + 4.00 + 2.40 + 1.60 = 20.00, i.e. 20 percent of revenue before
   breakage.
 
+## 5A. Instant Payout (ADOPTED 2026-08-15 by Howard; NOT DESIGNED, NOT BUILT)
+
+**Amendment note: added 2026-08-15 on Howard's instruction, "log that in your notes as a
+rule of one of the commission rules". No surrounding rule is changed by this amendment.**
+
+- **Rule.** An immediate payout on a first order, paid at the time of purchase rather than in
+  the end-of-month run. The mechanism's name is **Instant Payout** and that name is
+  normative: it is to be used in the plan, in the field, and in any table, column, or
+  function built for it.
+- **Status.** Adopted as a rule of this plan. There is no design and no code. It must not be
+  described to anyone as available.
+- **Rationale on the record.** Immediate payout on a first order is the strongest known lever
+  for a new distributor to begin selling, because the gap between effort and reward is what
+  kills early momentum.
+- **Open questions carried with the rule.** Adoption does not answer any of these, and the
+  rule may not be built until all five have answers:
+  1. Definition of "first": first order ever by the member, first order by somebody they
+     personally sponsored, or first order within a window after enrolment.
+  2. Payout basis: full order value, first monthly slice only, or price rather than
+     Commissionable Volume.
+  3. Placement: a real-time path alongside the monthly batch, or the batch reconciling
+     against payouts already made.
+  4. Chargeback recovery. **No clawback path exists anywhere in this system**, and
+     `payment_status` has no refunded state, so an Instant Payout that should not have been
+     paid cannot currently be recovered. The chargeback window runs months.
+  5. Whether a cap applies, and whether the payer's own qualification gate applies.
+- **Known collision with section 6.3 and with the spreading rule.** Every other payout in
+  this plan resolves once, at month end, inside a self-contained calendar month. An immediate
+  payout does not. Separately, a one-time purchase's volume is recognised across ten months
+  (Howard, 2026-08-15), so paying Instant Payout on the full one-time price would pay at once
+  on volume the plan deliberately declined to recognise at once.
+
 ## 6. Edge cases, decided
 
 1. **Roots** (no sponsor): earn normally on their downline; nobody earns on them.

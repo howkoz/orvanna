@@ -284,6 +284,56 @@ the reason the customer feature exists at all.
 
 ---
 
+## 7A. Mechanism four: INSTANT PAYOUT (ADOPTED, NOT YET BUILT)
+
+**Status: adopted as a rule of this plan by Howard on 2026-08-15. No design. No code.**
+
+The three mechanisms above are live and verified. This fourth one is a rule of the plan
+that has been chosen but not yet designed, and it is placed here rather than in an appendix
+so that nobody reads sections 5 through 7 and believes the plan has only three mechanisms.
+
+**What it is.** An immediate payout on a first order, paid at the moment of purchase rather
+than in the end-of-month commission run. Howard's name for it is **Instant Payout**, and
+that name should be used everywhere, including in any future table, column, or function, so
+the code and the field share one word.
+
+**Why it is worth building.** Immediate payout on a first order is the strongest known lever
+for getting a new distributor to actually sell. The gap between effort and reward is what
+kills early momentum. The caution below is entirely about *how*, never about *whether*.
+
+**What is not decided, and must be before anyone builds it.**
+
+1. **What "first" means.** First order ever by that member, first order by somebody they
+   personally sponsored, or first order within a window after enrolment. These pay very
+   different people and produce very different behaviour.
+2. **What it pays on.** Full order value, the first monthly slice only, or a basis of its own
+   computed on price rather than Commissionable Volume. The last of these sidesteps a real
+   collision (see below) and is defensible, but it must be a choice.
+3. **How it fits the monthly run.** Everything else in this plan resolves once, at month end,
+   inside a self-contained calendar month. An immediate payout by definition does not. Either
+   a separate real-time path runs alongside the batch, or the batch reconciles against
+   payouts already made. The second keeps one ledger and is usually correct.
+4. **How a chargeback is recovered.** This is the serious one. A card chargeback window runs
+   for months, so Instant Payout pays out of money that can still be taken back. Refunds and
+   clawbacks are specification-only with no code, and `payment_status` has no refunded state
+   at all, so **today there is no mechanism to recover an Instant Payout that should never
+   have been paid.** Whoever builds it must build the clawback path first or knowingly accept
+   a loss. The name raises that cost rather than lowering it: a mechanism called Instant
+   Payout makes an explicit promise of speed to the field, and a delayed or reversed Instant
+   Payout damages trust more than a bonus that never promised speed in its name.
+5. **Whether it collides with spreading.** Howard decided on 2026-08-15 that one-time
+   purchase volume is recognised across ten months. Paying Instant Payout on the full
+   one-time price would pay at once on volume the plan deliberately decided not to recognise
+   at once.
+
+Full write-up, including the four collisions in detail:
+`DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md`, section 12.
+
+Plain path:
+`C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md`
+
+---
+
 ## 8. The rank ladder
 
 ![The rank ladder](diagrams/rank-ladder.svg)
@@ -619,13 +669,14 @@ rather than deleted.
 
 | Item | Status | Why it matters |
 |---|---|---|
+| **INSTANT PAYOUT** | **ADOPTED as a rule of this plan by Howard on 2026-08-15. No design, no code.** See section 7A. | **The highest-value item in this table, because it is the only one Howard actively CHOSE rather than inherited.** It is also the most dangerous kind of gap: an adopted rule gets spoken about as though it exists. Five open questions sit under it in section 7A, and the chargeback one has no answer at all today. |
 | **Compression** | Written up as the flagship version 2 feature. No code. | This is the single biggest gap between how the plan reads and how mature plans behave. Every unqualified person is currently a hard wall. |
 | **Refunds and clawbacks** | Explicitly out of scope. The order status column allows `refunded`, but the engine only ever reads `completed`, and no code path ever writes a refund. | If a refund ever happens, no rule exists yet for reversing volume or reclaiming paid commission. The booklet promises the rule will be published before refunds exist. |
 | **A retail commission on customer sales** | Open question 5 in the specification, answered "no for v1". Not built. | Today a member with only customer sales earns nothing directly from them. |
 | **Grace months, rank retention, highest-ever titles** | Named as version 2 candidates. Not built. | Ranks are brutally monthly today. |
 | **The `cumulative_sv` column** | Exists in the results table, written as `null` on every row, explicitly "reserved in v1". | A column that always holds nothing is a promise, not a feature. |
-| **Bundles, packs, and one-time purchases** | Sold by the shop at 200 to 800 PV monthly and up to 8,000 PV one time. The compensation specification describes only two tiers, and the `app.products` table constraint permits only `domain` and `support`. | **This is the most serious gap.** The storefront can sell a product the compensation engine structurally cannot see. No bundle or pack has ever paid a commission to anyone. |
-| **Live checkouts feeding the commission engine** | Live shop and staff console orders are written to `app.demo_orders` by the edge functions. Migration 010 states explicitly that this table has no foreign key into `app.orders` and "feeds nothing". | **Every commission ever calculated came from seeded data.** No real purchase on the live site has ever produced a cent of commission. The two halves of the system are not connected. |
+| **Bundles, packs, and one-time purchases** | Sold by the shop at 200 to 800 PV monthly and up to 8,000 PV one time. The compensation specification describes only two tiers, and the `app.products` table constraint permits only `domain` and `support`. | **This is the most serious gap.** The storefront can sell a product the compensation engine structurally cannot see. No bundle or pack has ever paid a commission to anyone. **Measured since: half of the real paid volume on the live site, 1,000 of 2,000 Personal Volume, is bundles and packs. Fix designed in `09-LINKING-SHOP-TO-COMP.md`, section 5.** |
+| **Live checkouts feeding the commission engine** | Live shop and staff console orders are written to `app.demo_orders` by the edge functions. Migration 010 states explicitly that this table has no foreign key into `app.orders` and "feeds nothing". | **Every commission ever calculated came from seeded data.** No real purchase on the live site has ever produced a cent of commission. The two halves of the system are not connected. **A full design, a proposed migration, and a dry run now exist: see `09-LINKING-SHOP-TO-COMP.md`. Still not applied; seven decisions are waiting on Howard.** |
 | **Any mechanism for actually paying a member** | Nothing in the codebase moves money to a member. There is no payout method, no bank detail, no disbursement record, no payment file. | The system computes statements. It does not pay them. That is a deliberate scope line for a demonstration, but it should never be described as a payout system. |
 | **Any scheduler** | `app.fn_run_commission` and `app.fn_finalize_run` are called by hand. There is no cron job, no scheduled task, no automation. | A month closes only when a human runs it. |
 | **Closed-account handling** | Unresolved open question in the engine README. Closed members are included in runs. | Low impact today, undefined behavior tomorrow. |
