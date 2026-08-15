@@ -92,21 +92,52 @@ const BASE36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
    something; without it, it stays idle however healthy it looks
    in the dashboard.
 
-   Two things have to be true for external authentication to
-   work, and both now are:
+   REQUEST_EXTERNAL_THREE_DS IS FALSE, DELIBERATELY, 2026-08-15.
+   Read this before turning it back on.
 
-   1. Acquirer details. The provider's authentication request
-      builder requires the acquirer Bank Identification Number
-      (BIN) and the acquirer merchant identifier TOGETHER: the
-      source zips the two values, so one without the other fails
-      exactly like neither. Both are registered on the connector.
-   2. A billing address. See DEMO_BILLING_ADDRESS below.
+   External authentication has a prerequisite that is invisible
+   from the dashboard and absent from the documentation: the
+   PAYMENT processor must itself be on HyperSwitch's hard-coded
+   list of connectors that support separate authentication. The
+   list lives in crates/common_enums/src/connector_enums.rs, in
+   is_separate_authentication_supported(), and it is exactly:
 
-   Background for both: docs/3DS-RESEARCH.md, "Acquirer
-   configuration".
+     Stripe, Checkout, Braintree, Adyen, Cybersource,
+     Nuvei, NMI, Zift, Archipel
+
+   Every HyperSwitch DUMMY connector returns false there, by
+   name. That single line explains two nights of silence: with a
+   simulator selected, HyperSwitch skipped authentication
+   entirely and charged the card, and the standalone
+   authentication endpoint refused us with "you cannot
+   authenticate this payment because
+   payment_attempt.external_three_ds_authentication_attempted is
+   false". Nothing configurable on our side could have changed
+   that outcome.
+
+   So the account now runs Braintree in sandbox, which IS on the
+   list, accepts raw test cards, and raises its own challenge.
+   With authentication_type "three_ds" alone, Braintree returns
+   requires_customer_action and a redirect_to_url next action:
+   a real bank approval screen, verified 2026-08-15.
+
+   TO SWITCH TO THE EXTERNAL PROVIDER (3DSecure.io) LATER, set
+   this back to true, and note one correction to the older note
+   below: the acquirer Bank Identification Number (BIN) and
+   acquirer merchant identifier are read from the PAYMENT
+   connector's metadata first (see
+   get_payment_external_authentication_flow_during_confirm in
+   crates/router/src/core/payments/helpers.rs). The values on the
+   3DSecure.io connector are only a fallback. Put them on the
+   Braintree connector before flipping this.
+
+   Still true either way: external authentication also demands a
+   billing address. See DEMO_BILLING_ADDRESS below.
+
+   Background: docs/3DS-RESEARCH.md, "Acquirer configuration".
    ------------------------------------------------------------ */
 const AUTHENTICATION_TYPE = "three_ds";
-const REQUEST_EXTERNAL_THREE_DS = true;
+const REQUEST_EXTERNAL_THREE_DS = false;
 
 /* ------------------------------------------------------------
    SYNTHETIC DEMONSTRATION BILLING ADDRESS. Read this before

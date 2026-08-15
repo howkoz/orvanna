@@ -432,3 +432,52 @@ REGRESSION CHECKED after every change: ordinary payments still succeed on the
 live site. ORV-2026-08-1RLZFO, 5250 cents, succeeded via pretendpay; checkout
 re-verified in the browser after the restore, reaching "Pay $210.00 now, test
 mode".
+
+## 3-D SECURE IS WORKING, 2026-08-15
+
+ROOT CAUSE, found in HyperSwitch's source rather than its documentation.
+crates/common_enums/src/connector_enums.rs, is_separate_authentication_supported():
+only nine connectors return true.
+
+    Stripe, Checkout, Braintree, Adyen, Cybersource, Nuvei, NMI, Zift, Archipel
+
+DummyConnector1 through DummyConnector7 return FALSE, by name. Every processor
+on this account was a dummy, so HyperSwitch skipped authentication and charged
+the card. The standalone endpoint POST /payments/{id}/3ds/authentication said so
+outright: "you cannot authenticate this payment because
+payment_attempt.external_three_ds_authentication_attempted is false". No setting,
+key, or acquirer value on our side could ever have changed that. Two nights of
+configuration work were spent against a hard-coded list.
+
+FIX: Braintree sandbox (free, instant, self-serve) added as the payment
+processor, mca_eE4v07QwkYUSyF55vrUC. All four simulators disabled so routing
+cannot wander. The real Stripe connector stays disabled: it is on the qualifying
+list but refuses raw card numbers without a Stripe support ticket.
+
+VERIFIED ON THE LIVE RAIL 2026-08-15:
+  4111 1111 1111 1111  ->  requires_customer_action + next_action
+                           redirect_to_url  =  a real bank approval screen
+  4000 1111 1111 1115  ->  failed, ProcessorDeclined
+  amounts 2000.00-3000.00 also decline, Braintree's amount-triggered rule
+  expiry 01/29 on all test cards
+Payment pay_adXhgxSYhKH6n61KLiJS was left parked at requires_customer_action,
+which is the correct state while a shopper is in front of the challenge.
+
+DEPLOYED: create-payment v4 with REQUEST_EXTERNAL_THREE_DS = false, so the
+challenge comes from Braintree's own 3-D Secure. Pricing mirror verified intact
+after the hand-carried upload: a two-unit payment-agent cart priced to exactly
+21000 cents, matching the hand calculation. Shop and staff card hints updated.
+
+STILL OPEN, and NOT needed for a working challenge:
+- The EXTERNAL path (3DSecure.io) still returns HE_00 "Something went wrong",
+  now even with Braintree, which IS on the qualifying list, and even after
+  acquirer_bin 400000 and acquirer_merchant_id 00002000000 were written into
+  the Braintree connector's metadata. So the remaining fault is inside the
+  3DSecure.io integration itself, not the connector-support rule. Worth noting
+  the sandbox 3DSecure.io key was pasted in chat and is burned; rotating it is
+  a sensible first move before debugging further.
+- Correction to yesterday's note: acquirer details are read from the PAYMENT
+  connector's metadata FIRST (get_payment_external_authentication_flow_during_confirm
+  in crates/router/src/core/payments/helpers.rs); the values on the 3DSecure.io
+  connector are only a fallback.
+- Key rotation and the orvanna.ai forward remain untouched.
