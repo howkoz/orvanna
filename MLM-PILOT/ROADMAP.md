@@ -362,16 +362,73 @@ never engaged either: no authentication record came back at all, so the
 acquirer-resolution question the research flagged remains untested rather than
 answered.
 
-NEXT STEP TO SEE A REAL CHALLENGE: connect a real processor in TEST mode. A
-free Stripe test account added to HyperSwitch as a genuine connector is the
-cheapest path; simulators cannot authenticate, a real test processor can. Then
-retest with 4000 0000 0000 3220 and, for the external path, mirror the acquirer
-BIN and merchant identifier onto that connector's metadata first.
+### LATER THE SAME NIGHT: the Stripe path was tried and is a dead end
 
-NOT DEPLOYED YET: list-demo-orders still runs the old abandon sweep; its source
-now calls sweepAbandonedWithFinalRetrieve but the deployed bundle predates it.
-Harmless (the webhook covers the case it protects against) but it should go out
-with the next deploy.
+The advice above (add a real Stripe test account) was FOLLOWED and DID NOT WORK.
+Recording it so nobody spends the hour again.
+
+1. Howard created a real Stripe test connector (stripe_default, ACTIVE) and, on
+   my suggestion, disabled the dummy connectors. Every card then failed with
+   IR_29, "authentication_connector_details is not available in business
+   profile", INCLUDING plain 4242, so the live checkout was briefly broken.
+
+2. CAUSE OF IR_29, and it was mine to find, not Howard's to fix: creating the
+   3DSecure.io connector and ATTACHING it to a business profile are two separate
+   steps in HyperSwitch. The connector was correct all along (acquirer_bin
+   400000, acquirer_merchant_id 00002000000, both verified by reading the
+   connector back). The profile simply had authentication_connector_details
+   null. Fixed by POST to
+   /account/{merchant}/business_profile/{profile} with
+   {"authentication_connectors":["threedsecureio"],
+    "three_ds_requestor_url":"https://orvanna.io/shop.html"}.
+   The merchant api-key is sufficient for this; no admin key needed.
+
+3. THE ACTUAL WALL, and it has nothing to do with 3DS. Stripe refuses raw card
+   numbers sent to its application programming interface:
+     "Sending credit card numbers directly to the Stripe API is generally
+      unsafe... To enable testing raw card data APIs, contact support."
+   Proven not to be a 3DS issue: a plain 4242 with authentication_type
+   "no_three_ds" and external 3DS OFF failed with the SAME message. Unlocking it
+   is a Stripe SUPPORT TICKET, not a dashboard toggle (verified against Stripe's
+   own support page). So Stripe cannot carry this demo's cards today.
+
+4. RESTORED: fauxpay re-enabled, stripe disabled, both via
+   POST /account/{merchant}/connectors/{mca_id} with
+   {"connector_type":"payment_processor","disabled":<bool>}. Note the
+   connector_type field is REQUIRED or the call fails IR_06.
+
+CONFIRMED CARD BEHAVIOUR on the current rail (each run end to end, not copied
+from a vendor page):
+  4242 4242 4242 4242   succeeded
+  4111 1111 1111 1111   succeeded
+  5555 5555 5555 4444   succeeded
+  4000 0000 0000 0002   DECLINED, "Payment declined: Card declined"  <- the
+                        decline the site can finally demonstrate
+  4000 0000 0000 9995   fails, but with an ugly connector error, do not publish
+  any real 3DS test card  "Card not supported. Please use test cards"
+Shop and staff hints now name the first and fourth of these.
+
+WHERE 3DS ACTUALLY STANDS: our side is DONE and the authentication provider is
+now properly attached. The only missing piece is a processor that will accept a
+raw test card. That is a vendor-account problem, not a build problem.
+
+TOMORROW, in order of likely speed:
+  a. Try a different real test processor that permits raw card data. Checkout.com
+     sandbox, Adyen test, and Braintree sandbox are the candidates; confirm the
+     raw-card-data policy BEFORE wiring each one, because that is the single
+     question that decides it.
+  b. In parallel, open the Stripe support request to unlock raw card data APIs
+     for the test account, since it costs nothing to have running.
+  c. Only after a processor accepts a 3DS card, mirror the acquirer BIN and
+     merchant identifier onto THAT connector and retest the external path.
+
+DEPLOYED SINCE: list-demo-orders is now version 3 and carries
+sweepAbandonedWithFinalRetrieve. Verified functionally (boots, imports resolve,
+ten calls all HTTP 200, correct data), NOT byte-compared. A Supabase personal
+access token would make future deploys exact and scripted instead of hand
+carried through a tool call; worth doing.
 
 REGRESSION CHECKED after every change: ordinary payments still succeed on the
-live site. ORV-2026-08-1RLZFO, 5250 cents, succeeded via pretendpay.
+live site. ORV-2026-08-1RLZFO, 5250 cents, succeeded via pretendpay; checkout
+re-verified in the browser after the restore, reaching "Pay $210.00 now, test
+mode".
