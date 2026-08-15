@@ -625,3 +625,32 @@ APPLIED TO BOTH SURFACES per the QA rule that scope follows capability, not the
 brief. On the staff console the stakes are higher: that page's script tells an
 agent on a live call what the cardholder is being asked to do, so announcing a
 challenge that never comes would put words in the agent's mouth.
+
+
+## KNOWN AND ACCEPTED, 2026-08-15 (Howard: "for now this is acceptable")
+
+Frictionless payments still flash the authentication window briefly. The reveal
+delay is 1400ms and the frictionless round trip on this sandbox sometimes runs
+longer than that, so the frame is revealed just before it closes. Two ways to
+finish it properly when it is worth the time:
+  a. raise CHALLENGE_REVEAL_MS, which trades a slower challenge for a cleaner
+     frictionless path, or
+  b. stop guessing on a timer: poll the payment with the publishable key and
+     reveal only when next_action is present and the status is genuinely
+     requires_customer_action.
+(b) is the correct fix; (a) is one number. Neither is urgent.
+
+Howard also confirmed the payment step now feels fast, which was the point of
+opening the payment behind the account step rather than in front of him.
+
+STILL OPEN across the project, none of it blocking:
+- No gate has been run over today's checkout work. The auto-open, the amount
+  signature, the finishing state, the challenge reveal and the member sign-in
+  all shipped verified by their BUILDER only, which is exactly what the
+  two-gate rule exists to prevent. One verifier plus one QA pass over the
+  checkout as a whole is owed.
+- Key rotation: 3DSecure.io, HyperSwitch secret and hash keys, Stripe test key.
+- orvanna.ai still needs its forward to orvanna.io.
+- The external 3DS path (3DSecure.io) still returns HE_00 and is parked; the
+  processor's own 3-D Secure is what runs today.
+- Office landing page QA findings M2, M3 and M4 remain Howard's calls.
