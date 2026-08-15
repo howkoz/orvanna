@@ -481,3 +481,57 @@ STILL OPEN, and NOT needed for a working challenge:
   in crates/router/src/core/payments/helpers.rs); the values on the 3DSecure.io
   connector are only a fallback.
 - Key rotation and the orvanna.ai forward remain untouched.
+
+
+## THE 3DS2 CHALLENGE WINDOW, 2026-08-15 (Howard: "build the OTP window")
+
+WHAT IS OURS TO BUILD, AND WHAT IS NOT. The one-time passcode form is served by
+the cardholder's own bank (its Access Control Server). A merchant never writes
+it, styles it, or sees its code. What a merchant supplies is the WINDOW: an
+iframe sized to one of the five sizes the EMV 3-D Secure 2 standard permits.
+    01  250x400     02  390x400     03  500x600     04  600x400     05  full screen
+The bank formats its content to whichever size was requested.
+
+WHY WE DO NOT DRAW THE INNERMOST FRAME. HyperSwitch's web SDK creates that frame
+itself, because the SDK is what confirms the payment and therefore what first
+sees status requires_customer_action. Taking that away from the SDK would mean
+confirming server-side, which would mean the card entering our own page, which
+would put this site inside Payment Card Industry (PCI) scope. Not worth it for a
+demo, and not better practice for a real one.
+
+SWITCHED TO THE IN-PAGE FLOW. Profile setting is_iframe_redirection_enabled is
+now TRUE, so HyperSwitch returns next_action redirect_inside_popup (with
+popup_url and redirect_response_url) instead of redirect_to_url. The shopper now
+stays on orvanna.io through the approval instead of the page being navigated
+away. This is the native 3DS2 browser flow; the full-page redirect is the older
+fallback. Set on the PROFILE, so no Edge Function redeploy was needed. Verified:
+a payment with no per-payment flag now returns redirect_inside_popup.
+
+THE CHROME WAS ALREADY BUILT, AND HAD A DEFECT THAT WOULD HAVE HIDDEN IT.
+www/shop.html and www/staff.html already carried a challenge dialog (order
+number, test-mode notice, cancel that re-asks the server, focus trap, Escape
+suppressed, MutationObserver on the SDK element id 'orca-fullscreen', which is
+confirmed correct against hyperswitch-web src/Utilities/Utils.res). It had never
+run, because no challenge had ever fired.
+
+  DEFECT: the SDK paints its bank frame with inline z-index 422222133323.
+  Browsers CLAMP z-index to a signed 32-bit integer, so it resolves to
+  2147483647. Our chrome asked for 2147483000 and therefore rendered BEHIND the
+  bank frame: order number, test-mode notice and cancel button all invisible at
+  the exact moment they matter.
+
+  FIX, both halves required: chrome z-index raised to 2147483647 (matching the
+  ceiling, since it cannot be exceeded), AND openChallengeChrome() now moves the
+  element to the end of <body> so the document-order tie-break favours us.
+
+  VERIFIED IN THE LIVE PAGE by injecting an element with the SDK's exact id and
+  inline style, then probing with document.elementFromPoint:
+    shipped (max z-index AND last in DOM)   -> chrome visible
+    old z-index 2147483000                  -> chrome COVERED by orca-fullscreen
+    max z-index but earlier in DOM          -> chrome COVERED by orca-fullscreen
+  The same fix is applied to staff.html and staff.css; only shop.html was
+  probed directly, since the staff console sits behind a sign-in.
+
+NOT YET DONE: nobody has completed a challenge end to end in a browser. The card
+fields live in a cross-origin iframe that automation may not type into, so the
+final click-through is Howard's to confirm.
