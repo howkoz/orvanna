@@ -1,0 +1,266 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1400" width="1440" height="1400" font-family="Segoe UI, Arial, sans-serif">
+
+  <!-- ============ light export style: white ground, pale hardcoded fills, dark hardcoded text ============ -->
+  <rect x="0" y="0" width="1440" height="1400" fill="#ffffff"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#b45309"/>
+    </marker>
+  </defs>
+
+  <!-- ============ title ============ -->
+  <text x="40" y="42" font-size="24" font-weight="700" fill="#0f172a">Orvanna data model: schema app, the public views, and the payment status machine</text>
+  <text x="40" y="66" font-size="13" fill="#475569">Supabase Postgres project oiyibdczkokegaxkwulv. Every table lives in schema app. The browser reads only the seven public v_demo_ views.</text>
+
+  <!-- ============ SECTION 1: schema map ============ -->
+  <rect x="24" y="84" width="1392" height="740" fill="#fbfcfe" stroke="#cbd5e1" stroke-width="1" rx="8"/>
+
+  <text x="40" y="110" font-size="15" font-weight="700" fill="#0f172a">1. The engine schema: who is in the tree, what they bought, what they were paid</text>
+
+  <!-- lane headings -->
+  <text x="40"  y="136" font-size="12" font-weight="700" fill="#334155">PEOPLE AND CATALOG</text>
+  <text x="480" y="136" font-size="12" font-weight="700" fill="#334155">SALES HISTORY</text>
+  <text x="860" y="136" font-size="12" font-weight="700" fill="#334155">COMMISSION ENGINE (one frozen snapshot per monthly run)</text>
+
+  <!-- lane 1 boxes -->
+  <rect x="40" y="152" width="380" height="72" fill="#dbe9f7" stroke="#7ba0c4" stroke-width="1.2" rx="6"/>
+  <text x="56" y="176" font-size="14" font-weight="700" fill="#0f172a">app.members</text>
+  <text x="56" y="195" font-size="11" fill="#1f2937">id, member_code, display_name, email, sponsor_id,</text>
+  <text x="56" y="211" font-size="11" fill="#1f2937">enrolled_on, status, demo_address_* (5 columns)</text>
+
+  <rect x="40" y="252" width="380" height="72" fill="#dbe9f7" stroke="#7ba0c4" stroke-width="1.2" rx="6"/>
+  <text x="56" y="276" font-size="14" font-weight="700" fill="#0f172a">app.subscriptions</text>
+  <text x="56" y="295" font-size="11" fill="#1f2937">id, member_id, product_id, quantity,</text>
+  <text x="56" y="311" font-size="11" fill="#1f2937">start_month, cancel_month (exclusive end)</text>
+
+  <rect x="40" y="352" width="380" height="72" fill="#dbe9f7" stroke="#7ba0c4" stroke-width="1.2" rx="6"/>
+  <text x="56" y="376" font-size="14" font-weight="700" fill="#0f172a">app.customers</text>
+  <text x="56" y="395" font-size="11" fill="#1f2937">id, customer_code, display_name, email,</text>
+  <text x="56" y="411" font-size="11" fill="#1f2937">referring_member_id, enrolled_on, status</text>
+
+  <rect x="40" y="452" width="380" height="72" fill="#dbe9f7" stroke="#7ba0c4" stroke-width="1.2" rx="6"/>
+  <text x="56" y="476" font-size="14" font-weight="700" fill="#0f172a">app.products</text>
+  <text x="56" y="495" font-size="11" fill="#1f2937">id, sku, name, tier (domain or support),</text>
+  <text x="56" y="511" font-size="11" fill="#1f2937">price, volume_points, commissionable_value</text>
+
+  <!-- lane 2 boxes -->
+  <rect x="480" y="252" width="320" height="72" fill="#e6f4ea" stroke="#7fb08f" stroke-width="1.2" rx="6"/>
+  <text x="496" y="276" font-size="14" font-weight="700" fill="#0f172a">app.orders</text>
+  <text x="496" y="295" font-size="11" fill="#1f2937">id, member_id, buyer_role, customer_id,</text>
+  <text x="496" y="311" font-size="11" fill="#1f2937">ordered_at, volume_month, status</text>
+
+  <rect x="480" y="402" width="320" height="72" fill="#e6f4ea" stroke="#7fb08f" stroke-width="1.2" rx="6"/>
+  <text x="496" y="426" font-size="14" font-weight="700" fill="#0f172a">app.order_lines</text>
+  <text x="496" y="445" font-size="11" fill="#1f2937">id, order_id, product_id, quantity,</text>
+  <text x="496" y="461" font-size="11" fill="#1f2937">unit_price, unit_volume (copied at order time)</text>
+
+  <!-- lane 3 boxes -->
+  <rect x="860" y="152" width="540" height="72" fill="#f6ecfa" stroke="#a884bd" stroke-width="1.2" rx="6"/>
+  <text x="876" y="176" font-size="14" font-weight="700" fill="#0f172a">app.commission_runs</text>
+  <text x="876" y="195" font-size="11" fill="#1f2937">id, period, spec_version, status (running, final, superseded),</text>
+  <text x="876" y="211" font-size="11" fill="#1f2937">started_at, finished_at, notes, total_sv, total_cv, total_payout, members_paid</text>
+
+  <rect x="860" y="252" width="540" height="72" fill="#f6ecfa" stroke="#a884bd" stroke-width="1.2" rx="6"/>
+  <text x="876" y="276" font-size="14" font-weight="700" fill="#0f172a">app.run_level_map   (the genealogy, frozen per run)</text>
+  <text x="876" y="295" font-size="11" fill="#1f2937">run_id, ancestor_id, descendant_id, level</text>
+  <text x="876" y="311" font-size="11" fill="#1f2937">one row per ancestor and descendant pair, to full depth</text>
+
+  <rect x="860" y="352" width="540" height="72" fill="#f6ecfa" stroke="#a884bd" stroke-width="1.2" rx="6"/>
+  <text x="876" y="376" font-size="14" font-weight="700" fill="#0f172a">app.run_member_results</text>
+  <text x="876" y="395" font-size="11" fill="#1f2937">run_id, member_id, sv, cv, tv, is_active, rank_earned,</text>
+  <text x="876" y="411" font-size="11" fill="#1f2937">paid_depth, total_earned, cumulative_sv (reserved)</text>
+
+  <rect x="860" y="452" width="540" height="72" fill="#f6ecfa" stroke="#a884bd" stroke-width="1.2" rx="6"/>
+  <text x="876" y="476" font-size="14" font-weight="700" fill="#0f172a">app.commission_lines   (the statement)</text>
+  <text x="876" y="495" font-size="11" fill="#1f2937">id, run_id, earner_id, source_member_id, level (1 to 5),</text>
+  <text x="876" y="511" font-size="11" fill="#1f2937">source_cv, rate, amount, payout_type</text>
+
+  <rect x="860" y="552" width="540" height="56" fill="#f6ecfa" stroke="#a884bd" stroke-width="1.2" rx="6"/>
+  <text x="876" y="576" font-size="14" font-weight="700" fill="#0f172a">app.ranks</text>
+  <text x="876" y="595" font-size="11" fill="#1f2937">rank_code, rank_name, sort_order, paid_depth (member 1 to executive 5)</text>
+
+  <!-- relationships, lane 1 internal -->
+  <line x1="150" y1="224" x2="150" y2="248" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <line x1="90"  y1="224" x2="90"  y2="348" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="158" y="242" font-size="10" fill="#334155">member_id</text>
+  <text x="96"  y="342" font-size="10" fill="#334155">referring_member_id</text>
+
+  <!-- products up into subscriptions and right into order_lines -->
+  <path d="M 430 470 L 452 470 L 452 300 L 476 300" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="322" y="345" font-size="10" fill="#334155">product_id</text>
+  <path d="M 430 500 L 460 500 L 460 445 L 476 445" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+
+  <!-- members and customers into orders -->
+  <path d="M 420 188 L 448 188 L 448 268 L 476 268" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="430" y="182" font-size="10" fill="#334155">member_id</text>
+  <path d="M 420 388 L 436 388 L 436 312 L 476 312" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="404" y="404" font-size="10" fill="#334155">customer_id</text>
+
+  <!-- orders into order_lines -->
+  <line x1="620" y1="324" x2="620" y2="398" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="628" y="366" font-size="10" fill="#334155">order_id</text>
+
+  <!-- order history into the engine -->
+  <path d="M 800 438 L 828 438 L 828 388 L 856 388" fill="none" stroke="#475569" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="640" y="500" font-size="10" fill="#334155">completed orders are what the engine aggregates into Sales Volume</text>
+
+  <!-- run fan out -->
+  <path d="M 848 200 L 838 200 L 838 288 L 856 288" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <path d="M 838 288 L 838 388 L 856 388" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <path d="M 838 388 L 838 488 L 856 488" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="700" y="205" font-size="10" fill="#334155">run_id</text>
+
+  <!-- ranks into results -->
+  <path d="M 1400 580 L 1416 580 L 1416 400 L 1400 400" fill="none" stroke="#475569" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="1240" y="544" font-size="10" fill="#334155">rank_earned references rank_code</text>
+
+  <!-- note about members being referenced everywhere -->
+  <text x="480" y="196" font-size="10" fill="#334155">app.members is also referenced by</text>
+  <text x="480" y="210" font-size="10" fill="#334155">run_member_results.member_id, commission_lines.earner_id</text>
+  <text x="480" y="224" font-size="10" fill="#334155">and source_member_id, run_level_map.ancestor_id and</text>
+  <text x="480" y="238" font-size="10" fill="#334155">descendant_id, and demo_orders.member_id.</text>
+
+  <!-- ============ live checkout band ============ -->
+  <text x="40" y="650" font-size="15" font-weight="700" fill="#0f172a">2. The live demonstration checkout: written only by Edge Functions, read by no view</text>
+
+  <rect x="40" y="662" width="420" height="84" fill="#fdf1e0" stroke="#c9a26a" stroke-width="1.2" rx="6"/>
+  <text x="56" y="686" font-size="14" font-weight="700" fill="#0f172a">app.demo_orders</text>
+  <text x="56" y="705" font-size="11" fill="#1f2937">order_number (idempotency key), member_id, items (JSON),</text>
+  <text x="56" y="721" font-size="11" fill="#1f2937">all money in integer cents, pv_total, payment_reference,</text>
+  <text x="56" y="737" font-size="11" fill="#1f2937">payment_status, processor_summary, six tax provenance columns</text>
+
+  <rect x="480" y="662" width="290" height="84" fill="#fdf1e0" stroke="#c9a26a" stroke-width="1.2" rx="6"/>
+  <text x="496" y="686" font-size="14" font-weight="700" fill="#0f172a">app.demo_rate_events</text>
+  <text x="496" y="705" font-size="11" fill="#1f2937">ip_hash (salted, raw address never</text>
+  <text x="496" y="721" font-size="11" fill="#1f2937">stored), window_start, request_count</text>
+
+  <rect x="790" y="662" width="300" height="84" fill="#fdf1e0" stroke="#c9a26a" stroke-width="1.2" rx="6"/>
+  <text x="806" y="686" font-size="14" font-weight="700" fill="#0f172a">app.demo_users</text>
+  <text x="806" y="705" font-size="11" fill="#1f2937">username, password_hash (bcrypt),</text>
+  <text x="806" y="721" font-size="11" fill="#1f2937">role (admin, staff, member),</text>
+  <text x="806" y="737" font-size="11" fill="#1f2937">member_code, label, created_at</text>
+
+  <rect x="1110" y="662" width="290" height="84" fill="#fdf1e0" stroke="#c9a26a" stroke-width="1.2" rx="6"/>
+  <text x="1126" y="686" font-size="14" font-weight="700" fill="#0f172a">app.demo_auth_config</text>
+  <text x="1126" y="705" font-size="11" fill="#1f2937">key, value, updated_at</text>
+  <text x="1126" y="721" font-size="11" fill="#1f2937">holds the token signing key,</text>
+  <text x="1126" y="737" font-size="11" fill="#1f2937">server side only</text>
+
+  <path d="M 250 662 L 250 620 L 230 620 L 230 528" fill="none" stroke="#475569" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="258" y="640" font-size="10" fill="#334155">member_id, read only attribution: it feeds nothing in the commission engine</text>
+
+  <!-- ============ public views band ============ -->
+  <text x="40" y="782" font-size="15" font-weight="700" fill="#0f172a">3. The entire public read surface: seven views in schema public, SELECT only, final runs only</text>
+
+  <g font-size="11" fill="#0f172a">
+    <rect x="40"  y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="50"  y="814" font-weight="700">v_demo_members</text>
+    <text x="50"  y="831" font-size="10" fill="#334155">code, name, enrolled, rank</text>
+
+    <rect x="236" y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="246" y="814" font-weight="700">v_demo_tree</text>
+    <text x="246" y="831" font-size="10" fill="#334155">child code, sponsor code</text>
+
+    <rect x="432" y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="442" y="814" font-weight="700">v_demo_member_months</text>
+    <text x="442" y="831" font-size="10" fill="#334155">sv, cv, tv, active, rank</text>
+
+    <rect x="628" y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="638" y="814" font-weight="700">v_demo_statements</text>
+    <text x="638" y="831" font-size="10" fill="#334155">level, source, rate, amount</text>
+
+    <rect x="824" y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="834" y="814" font-weight="700">v_demo_company</text>
+    <text x="834" y="831" font-size="10" fill="#334155">run totals, rank counts</text>
+
+    <rect x="1020" y="794" width="188" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="1030" y="814" font-weight="700">v_demo_customers</text>
+    <text x="1030" y="831" font-size="10" fill="#334155">customer, referring member</text>
+
+    <rect x="1216" y="794" width="184" height="46" fill="#e8eef6" stroke="#94a3b8" rx="5"/>
+    <text x="1226" y="814" font-weight="700">v_demo_customer_volume</text>
+    <text x="1226" y="831" font-size="10" fill="#334155">customer share of volume</text>
+  </g>
+
+  <text x="40" y="866" font-size="11" fill="#334155">No view exposes an email address or an internal id. Views are definer views owned by the read only role app_demo_reader. Row Level Security is on for every table,</text>
+  <text x="40" y="882" font-size="11" fill="#334155">and no policy exists for the anon or authenticated roles, so the published key can read nothing from a table even if a view were dropped.</text>
+
+  <!-- ============ SECTION 2: state machine ============ -->
+  <rect x="24" y="906" width="1392" height="470" fill="#fbfcfe" stroke="#cbd5e1" stroke-width="1" rx="8"/>
+  <text x="40" y="934" font-size="15" font-weight="700" fill="#0f172a">4. app.demo_orders.payment_status: the legal moves, enforced by a database trigger</text>
+  <text x="40" y="954" font-size="11" fill="#334155">Trigger app.demo_orders_guard_status_transition, before update of payment_status (migration 010). Setting the same status again is always allowed, so retries are harmless.</text>
+
+  <!-- created -->
+  <rect x="70" y="1040" width="170" height="60" fill="#e8eef6" stroke="#7ba0c4" stroke-width="1.4" rx="6"/>
+  <text x="155" y="1066" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">created</text>
+  <text x="155" y="1085" font-size="10" fill="#334155" text-anchor="middle">row written, no money moved</text>
+
+  <!-- processing -->
+  <rect x="360" y="1040" width="180" height="60" fill="#e8eef6" stroke="#7ba0c4" stroke-width="1.4" rx="6"/>
+  <text x="450" y="1066" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">processing</text>
+  <text x="450" y="1085" font-size="10" fill="#334155" text-anchor="middle">in flight at the processor</text>
+
+  <!-- succeeded -->
+  <rect x="700" y="1000" width="180" height="60" fill="#dff0e2" stroke="#6ea87c" stroke-width="2" rx="6"/>
+  <text x="790" y="1026" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">succeeded</text>
+  <text x="790" y="1045" font-size="10" fill="#334155" text-anchor="middle">terminal, immutable</text>
+
+  <!-- failed -->
+  <rect x="700" y="1130" width="180" height="60" fill="#fae3e3" stroke="#c08484" stroke-width="2" rx="6"/>
+  <text x="790" y="1156" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">failed</text>
+  <text x="790" y="1175" font-size="10" fill="#334155" text-anchor="middle">terminal, retry is a NEW order</text>
+
+  <!-- abandoned -->
+  <rect x="360" y="1230" width="180" height="60" fill="#fdf1e0" stroke="#c9a26a" stroke-width="1.4" rx="6"/>
+  <text x="450" y="1256" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">abandoned</text>
+  <text x="450" y="1275" font-size="10" fill="#334155" text-anchor="middle">aged out after one hour</text>
+
+  <!-- transitions -->
+  <line x1="240" y1="1070" x2="356" y2="1070" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 155 1040 L 155 985 L 790 985 L 790 996" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 200 1100 L 200 1118 L 664 1118 L 664 1150 L 696 1150" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 110 1100 L 110 1260 L 356 1260" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 540 1058 L 640 1058 L 640 1024 L 696 1024" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 540 1082 L 610 1082 L 610 1136 L 696 1136" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="450" y1="1100" x2="450" y2="1226" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <path d="M 540 1248 L 586 1248 L 586 1040 L 696 1040" fill="none" stroke="#475569" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <path d="M 540 1272 L 676 1272 L 676 1178 L 696 1178" fill="none" stroke="#475569" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+
+  <text x="248" y="1062" font-size="10" fill="#334155">payment opened</text>
+  <text x="330" y="980"  font-size="10" fill="#334155">an immediate approval, no challenge needed</text>
+  <text x="300" y="1113" font-size="10" fill="#334155">an immediate decline</text>
+  <text x="118" y="1252" font-size="10" fill="#334155">never reached the processor, swept after one hour</text>
+  <text x="458" y="1170" font-size="10" fill="#334155">still in flight</text>
+  <text x="458" y="1186" font-size="10" fill="#334155">after one hour</text>
+  <text x="548" y="1330" font-size="10" fill="#334155">Dashed: a late truth. The processor webhook, or a later retrieve, can still settle an abandoned row, because abandonment is our</text>
+  <text x="548" y="1346" font-size="10" fill="#334155">guess about a shopper and never the processor's word about the money.</text>
+
+  <!-- forbidden panel -->
+  <rect x="920" y="1000" width="480" height="300" fill="#fdeeee" stroke="#c08484" stroke-width="1.2" rx="6"/>
+  <text x="940" y="1026" font-size="13" font-weight="700" fill="#0f172a">Forbidden, and refused with an exception</text>
+
+  <text x="940" y="1054" font-size="11" fill="#1f2937">succeeded to anything else</text>
+  <text x="940" y="1070" font-size="10" fill="#7c2d12">a settled receipt cannot be rewritten</text>
+
+  <text x="940" y="1096" font-size="11" fill="#1f2937">failed to anything else</text>
+  <text x="940" y="1112" font-size="10" fill="#7c2d12">a retry is a new order number, not an edit</text>
+
+  <text x="940" y="1138" font-size="11" fill="#1f2937">abandoned to processing</text>
+  <text x="940" y="1154" font-size="10" fill="#7c2d12">an abandoned order may only resolve, never restart</text>
+
+  <text x="940" y="1180" font-size="11" fill="#1f2937">anything to created</text>
+  <text x="940" y="1196" font-size="10" fill="#7c2d12">created is an initial state only, so no row can rewind</text>
+
+  <text x="940" y="1226" font-size="11" font-weight="700" fill="#1f2937">Two more locks, in the function layer</text>
+  <text x="940" y="1244" font-size="10" fill="#334155">1. Status is only ever written from a fresh retrieve against the</text>
+  <text x="940" y="1258" font-size="10" fill="#334155">    processor, never from anything the browser says.</text>
+  <text x="940" y="1274" font-size="10" fill="#334155">2. The update carries its own guard list, so a row that settled</text>
+  <text x="940" y="1288" font-size="10" fill="#334155">    between the retrieve and the write is left alone.</text>
+
+  <line x1="908" y1="1006" x2="908" y2="1294" stroke="#cbd5e1" stroke-width="1"/>
+
+</svg>

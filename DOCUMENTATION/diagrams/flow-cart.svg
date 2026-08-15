@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 660" width="980" height="660" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="660" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">A. Shopping and cart</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">Subscription is the default mode on every item. One-time is the same item at ten times the monthly price.</text>
+
+  <!-- entry points -->
+  <rect x="30" y="86" width="272" height="92" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="110" font-size="13.5" font-weight="600" fill="#111827">Catalog grid, shop.html</text>
+  <text x="46" y="132" font-size="12.5" fill="#374151">Add to cart always adds mode "sub"</text>
+  <text x="46" y="150" font-size="12.5" fill="#374151">(the monthly subscription).</text>
+  <text x="46" y="168" font-size="12.5" fill="#374151">The drawer opens so the meter is seen.</text>
+
+  <rect x="338" y="86" width="272" height="92" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="354" y="110" font-size="13.5" font-weight="600" fill="#111827">Product page, product.html</text>
+  <text x="354" y="132" font-size="12.5" fill="#374151">A switch flips between Subscribe</text>
+  <text x="354" y="150" font-size="12.5" fill="#374151">monthly and One-time purchase.</text>
+  <text x="354" y="168" font-size="12.5" fill="#374151">One-time adds mode "one".</text>
+
+  <!-- ten times rule -->
+  <rect x="650" y="86" width="300" height="196" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="666" y="110" font-size="13.5" font-weight="600" fill="#111827">The ten times rule</text>
+  <text x="666" y="134" font-size="12.5" fill="#374151">Domain agent: $100.00 a month</text>
+  <text x="666" y="152" font-size="12.5" fill="#374151">becomes $1,000.00 once.</text>
+  <text x="666" y="174" font-size="12.5" fill="#374151">Support agent: $50.00 a month</text>
+  <text x="666" y="192" font-size="12.5" fill="#374151">becomes $500.00 once.</text>
+  <text x="666" y="214" font-size="12.5" fill="#374151">Bundles and packs follow the same rule.</text>
+  <text x="666" y="240" font-size="12.5" fill="#374151">Personal Volume (PV) equals dollars in</text>
+  <text x="666" y="258" font-size="12.5" fill="#374151">both modes, so one-time carries ten</text>
+  <text x="666" y="276" font-size="12.5" fill="#374151">times the PV as well.</text>
+
+  <line x1="166" y1="178" x2="166" y2="216" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="474" y1="178" x2="474" y2="216" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- cart storage -->
+  <rect x="30" y="220" width="580" height="86" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="244" font-size="13.5" font-weight="600" fill="#111827">One cart, keyed by item and mode</text>
+  <text x="46" y="266" font-size="12.5" fill="#374151">Entry key is "sku|mode", value is the quantity, capped at 99.</text>
+  <text x="46" y="286" font-size="12.5" fill="#374151">Saved in the browser under the localStorage key "orvannaCart".</text>
+
+  <line x1="320" y1="306" x2="320" y2="342" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- drawer -->
+  <rect x="30" y="346" width="580" height="106" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="370" font-size="13.5" font-weight="600" fill="#111827">Cart drawer</text>
+  <text x="46" y="392" font-size="12.5" fill="#374151">One line per key, each carrying a Monthly or a One-time badge.</text>
+  <text x="46" y="412" font-size="12.5" fill="#374151">Bundle and pack children are listed at $0.00 and marked "Included":</text>
+  <text x="46" y="430" font-size="12.5" fill="#374151">the parent line already carries the whole price and the whole PV.</text>
+  <text x="46" y="446" font-size="12.5" fill="#374151">The meter shows progress toward a 100 PV qualified month.</text>
+
+  <line x1="320" y1="452" x2="320" y2="488" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- checkout -->
+  <rect x="30" y="492" width="580" height="106" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="516" font-size="13.5" font-weight="600" fill="#111827">Checkout button</text>
+  <text x="46" y="538" font-size="12.5" fill="#374151">Closes the drawer, discards any payment opened for an older cart,</text>
+  <text x="46" y="556" font-size="12.5" fill="#374151">starts downloading the card form script in the background, and</text>
+  <text x="46" y="574" font-size="12.5" fill="#374151">shows step 1, Account. It then asks for a tax quote and opens the</text>
+  <text x="46" y="592" font-size="12.5" fill="#374151">payment, in that order.</text>
+
+  <!-- what the browser sends -->
+  <rect x="650" y="300" width="300" height="180" rx="10" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="666" y="324" font-size="13.5" font-weight="600" fill="#111827">What the browser is allowed to send</text>
+  <text x="666" y="348" font-size="12.5" fill="#374151">Only { sku, mode, quantity } per line,</text>
+  <text x="666" y="366" font-size="12.5" fill="#374151">plus the activation choice, the tax</text>
+  <text x="666" y="384" font-size="12.5" fill="#374151">identifier text, and the member code.</text>
+  <text x="666" y="408" font-size="12.5" fill="#374151">No prices ever leave this page. The</text>
+  <text x="666" y="426" font-size="12.5" fill="#374151">server reprices from its own mirror in</text>
+  <text x="666" y="444" font-size="12.5" fill="#374151">functions/_shared/pricing.ts, which is</text>
+  <text x="666" y="462" font-size="12.5" fill="#374151">diffed against catalog.js by a gate.</text>
+
+  <text x="30" y="632" font-size="11.5" fill="#6B7280">Sources: www/js/catalog.js, www/shop.html, www/product.html, functions/_shared/pricing.ts</text>
+</svg>

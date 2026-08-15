@@ -1,5 +1,30 @@
 # Architecture and Documentation Audit
 
+> **HISTORICAL RECORD. Header added 2026-08-15, later the same day, by
+> mlm-architect. The body below is left exactly as written and should stay that
+> way: it is the snapshot that prompted the work, and its verdict on browser-side
+> duplication is still the sharpest description of the biggest problem in this
+> project.**
+>
+> Three things to know before reading it.
+>
+> 1. **It predates the tax round.** `quote-tax`, `record-tax` and
+>    `functions\_shared\tax.ts` did not exist when this was written. Any statement
+>    here about how tax is computed describes the world before Stripe Tax went
+>    live. See ROADMAP.md, Phase 6.2, "RESOLVED 2026-08-15".
+> 2. **Its worst finding was fixed the same day.** Section 0 flags tax exemption as
+>    "decided in the browser and obeyed by the server, ONCE, IN THE WRONG PLACE".
+>    That hole is CLOSED: `create-payment` now ignores any `tax_exempt` field in
+>    the request body, the page sends the tax identifier text instead, and the
+>    decision is made by the server and by Stripe.
+> 3. **Its line counts are stale by design.** They were accurate at the moment of
+>    the audit and were never meant to be maintained. `create-payment`, for one,
+>    has grown from the 505 lines quoted here. Read them as a shape, not a figure.
+>
+> Everything else in this document, in particular the two copies of the payment
+> engine and the identity checks that do not bind to each other, was still true at
+> the time of this header.
+
 As of 2026-08-15. Author: mlm-architect. Status: REPORT ONLY. No file was edited
 to produce this document, and nothing in it is a change; every item is a finding
 or a recommendation for Howard to rule on.

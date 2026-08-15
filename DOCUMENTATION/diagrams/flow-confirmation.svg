@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 760" width="1080" height="760" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1080" height="760" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">E. Confirmation and receipt: the browser never decides the outcome</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">The only thing the page may send is an order number. There is no status field to forge.</text>
+
+  <rect x="30" y="84" width="420" height="88" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="46" y="108" font-size="13.5" font-weight="600" fill="#111827">The card form's own verdict is advisory</text>
+  <text x="46" y="130" font-size="12.5" fill="#374151">A decline can reach the bank and come back through the form</text>
+  <text x="46" y="148" font-size="12.5" fill="#374151">as an error, so it is never treated as the answer. The one</text>
+  <text x="46" y="166" font-size="12.5" fill="#374151">exception is a form validation problem, which never left the browser.</text>
+
+  <line x1="240" y1="172" x2="240" y2="208" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="212" width="420" height="70" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="236" font-size="13.5" font-weight="600" fill="#111827">The page asks confirm-payment</text>
+  <text x="46" y="258" font-size="12.5" fill="#374151">Body: { order_number }. Nothing else. A forged call degenerates</text>
+  <text x="46" y="276" font-size="12.5" fill="#374151">into asking us to re-check the truth.</text>
+
+  <line x1="240" y1="282" x2="240" y2="318" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="322" width="420" height="88" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="346" font-size="13.5" font-weight="600" fill="#111827">Terminal rows answer from the row</text>
+  <text x="46" y="368" font-size="12.5" fill="#374151">succeeded, failed, and abandoned are immutable. A repeat call</text>
+  <text x="46" y="386" font-size="12.5" fill="#374151">returns the same receipt without touching the row or the</text>
+  <text x="46" y="404" font-size="12.5" fill="#374151">processor. Calling five times produces the same final row.</text>
+
+  <line x1="240" y1="410" x2="240" y2="446" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="450" width="420" height="88" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.8"/>
+  <text x="46" y="474" font-size="13.5" font-weight="600" fill="#111827">Otherwise: a server-side retrieve with the secret key</text>
+  <text x="46" y="496" font-size="12.5" fill="#374151">Our server asks the processor directly. One shared implementation,</text>
+  <text x="46" y="514" font-size="12.5" fill="#374151">also used by the webhook, so the two callers cannot disagree</text>
+  <text x="46" y="532" font-size="12.5" fill="#374151">about what is true.</text>
+
+  <line x1="240" y1="538" x2="240" y2="574" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="578" width="420" height="88" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="46" y="602" font-size="13.5" font-weight="600" fill="#111827">The amount check is the last word before "succeeded"</text>
+  <text x="46" y="624" font-size="12.5" fill="#374151">The processor's amount must equal the order total, to the cent,</text>
+  <text x="46" y="642" font-size="12.5" fill="#374151">as an integer comparison. A mismatch is never written as a sale:</text>
+  <text x="46" y="660" font-size="12.5" fill="#374151">the row stays in flight with the reason "amount_mismatch".</text>
+
+  <!-- right column -->
+  <rect x="480" y="84" width="570" height="120" rx="10" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="496" y="108" font-size="13.5" font-weight="600" fill="#111827">What comes back: a sanitized receipt</text>
+  <text x="496" y="132" font-size="12.5" fill="#374151">Server math only. No processor payloads, no card data, nothing personal.</text>
+  <text x="496" y="152" font-size="12.5" fill="#374151">It carries the order number, the status, the item lines, every money line in cents,</text>
+  <text x="496" y="170" font-size="12.5" fill="#374151">the Personal Volume total, a short machine-readable reason, and named</text>
+  <text x="496" y="188" font-size="12.5" fill="#374151">3-D Secure fields when the rail populated them.</text>
+
+  <rect x="480" y="216" width="570" height="122" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="496" y="240" font-size="13.5" font-weight="600" fill="#111827">The confirmation view is rendered from the receipt, not from the page</text>
+  <text x="496" y="264" font-size="12.5" fill="#374151">The cart is cleared only when the receipt says succeeded. A decline leaves it</text>
+  <text x="496" y="282" font-size="12.5" fill="#374151">exactly as it was.</text>
+  <text x="496" y="306" font-size="12.5" fill="#374151">The tax rate printed on the receipt is DERIVED from the receipt's own numbers,</text>
+  <text x="496" y="324" font-size="12.5" fill="#374151">so it can never disagree with the amount beside it. "8.88 percent, NY", not "5 percent".</text>
+
+  <rect x="480" y="350" width="570" height="112" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="496" y="374" font-size="13.5" font-weight="600" fill="#111827">Two waiting clocks, never one</text>
+  <text x="496" y="398" font-size="12.5" fill="#374151">Waiting for a processor: every 2 seconds, up to about 20 seconds.</text>
+  <text x="496" y="418" font-size="12.5" fill="#374151">Waiting for a person to read a message from their bank: every 5 seconds for the</text>
+  <text x="496" y="436" font-size="12.5" fill="#374151">first minute, then every 10, up to 10 minutes. Never presented as an error.</text>
+  <text x="496" y="454" font-size="12.5" fill="#374151">Past the window, the button becomes "Check this order again".</text>
+
+  <rect x="480" y="474" width="570" height="112" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="496" y="498" font-size="13.5" font-weight="600" fill="#111827">The one sentence that is never absent</text>
+  <text x="496" y="522" font-size="12.5" fill="#374151">At every moment the page says either "nothing has been charged" or "this is</text>
+  <text x="496" y="540" font-size="12.5" fill="#374151">confirmed, here is your order number". There is no third, silent state.</text>
+  <text x="496" y="564" font-size="12.5" fill="#374151">The order number is shown from the moment the payment opens, before anything</text>
+  <text x="496" y="582" font-size="12.5" fill="#374151">can go wrong, so a lost shopper always holds the one string that finds their order.</text>
+
+  <rect x="480" y="598" width="570" height="68" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="496" y="622" font-size="13.5" font-weight="600" fill="#111827">The lookup box, the last line of defence</text>
+  <text x="496" y="644" font-size="12.5" fill="#374151">Any order number can be typed in at any time, and the same server-side check</text>
+  <text x="496" y="660" font-size="12.5" fill="#374151">answers exactly what happened to it, including whether anything was charged.</text>
+
+  <text x="30" y="702" font-size="12.5" fill="#374151">On success the page also fires record-tax, after the receipt has rendered. That is bookkeeping: a shopper whose money has moved must never wait on it.</text>
+
+  <text x="30" y="740" font-size="11.5" fill="#6B7280">Sources: functions/confirm-payment/index.ts, functions/_shared/edge.ts (retrieveAndApplyPaymentTruth, mapHyperswitchStatus), www/shop.html</text>
+</svg>

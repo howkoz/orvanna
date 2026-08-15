@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 950" width="1180" height="950" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arwRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#B91C1C"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="950" fill="#FFFFFF"/>
+
+  <text x="40" y="38" font-size="22" font-weight="700" fill="#111827">Orvanna quality: the two gates, and what nothing covers</text>
+  <text x="40" y="60" font-size="13" fill="#374151">Multi-Level Marketing (MLM) Pilot. State as of 2026-08-15. Every row below traces to a dated gate document or to a direct check of the working tree.</text>
+
+  <!-- ============ BAND 1: THE TWO GATE FLOW ============ -->
+  <rect x="40" y="78" width="1100" height="262" rx="10" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="60" y="104" font-size="15" font-weight="700" fill="#111827">HOW A PHASE CLOSES</text>
+  <text x="60" y="124" font-size="12.5" fill="#374151">Two independent graders, asking two different questions. Neither one built the thing it grades.</text>
+
+  <!-- builder -->
+  <rect x="60" y="176" width="160" height="76" rx="8" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <text x="140" y="206" font-size="13.5" font-weight="700" fill="#1E1B4B" text-anchor="middle">BUILDER</text>
+  <text x="140" y="226" font-size="11.5" fill="#312E81" text-anchor="middle">builds the phase</text>
+  <text x="140" y="242" font-size="11.5" fill="#312E81" text-anchor="middle">and never grades it</text>
+
+  <line x1="222" y1="200" x2="306" y2="176" stroke="#334155" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="222" y1="228" x2="306" y2="254" stroke="#334155" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- verifier gate -->
+  <rect x="310" y="140" width="272" height="82" rx="8" fill="#E8F0FE" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="326" y="166" font-size="13" font-weight="700" fill="#1E3A8A">GATE 1: VERIFIER</text>
+  <text x="326" y="186" font-size="11.5" fill="#1E3A8A">Are the numbers right?</text>
+  <text x="326" y="203" font-size="11.5" fill="#1E3A8A">Recomputes the math from the written rules,</text>
+  <text x="326" y="216" font-size="11.5" fill="#1E3A8A">never from the builder's code.</text>
+
+  <!-- qa gate -->
+  <rect x="310" y="234" width="272" height="82" rx="8" fill="#E8F0FE" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="326" y="260" font-size="13" font-weight="700" fill="#1E3A8A">GATE 2: QUALITY ASSURANCE</text>
+  <text x="326" y="280" font-size="11.5" fill="#1E3A8A">Is the delivery complete and does it work?</text>
+  <text x="326" y="297" font-size="11.5" fill="#1E3A8A">Writes the checklist from the promises BEFORE</text>
+  <text x="326" y="310" font-size="11.5" fill="#1E3A8A">opening any deliverable, then runs every row.</text>
+
+  <line x1="584" y1="180" x2="656" y2="204" stroke="#334155" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="584" y1="276" x2="656" y2="252" stroke="#334155" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- AND -->
+  <rect x="660" y="190" width="164" height="76" rx="8" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="742" y="218" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">BOTH must say</text>
+  <text x="742" y="238" font-size="13" font-weight="700" fill="#78350F" text-anchor="middle">PASS</text>
+  <text x="742" y="256" font-size="11" fill="#78350F" text-anchor="middle">one PASS is not enough</text>
+
+  <line x1="826" y1="228" x2="900" y2="228" stroke="#334155" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- closed -->
+  <rect x="904" y="190" width="180" height="76" rx="8" fill="#E8F5EE" stroke="#2F855A" stroke-width="1.5"/>
+  <text x="994" y="222" font-size="13.5" font-weight="700" fill="#14532D" text-anchor="middle">PHASE CLOSED</text>
+  <text x="994" y="242" font-size="11.5" fill="#14532D" text-anchor="middle">recorded with a date</text>
+  <text x="994" y="256" font-size="11.5" fill="#14532D" text-anchor="middle">and a file hash</text>
+
+  <!-- fail return -->
+  <path d="M 742 268 L 742 322 L 140 322 L 140 258" fill="none" stroke="#B91C1C" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arwRed)"/>
+  <rect x="330" y="308" width="360" height="24" rx="5" fill="#FDECEC" stroke="#B91C1C" stroke-width="1"/>
+  <text x="510" y="325" font-size="11.5" font-weight="600" fill="#7F1D1D" text-anchor="middle">Either gate FAILs: a ranked defect list goes back, phase stays open</text>
+
+  <!-- ============ BAND 2: COVERAGE ============ -->
+  <rect x="40" y="360" width="1100" height="520" rx="10" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="60" y="388" font-size="15" font-weight="700" fill="#111827">WHAT THE GATES ACTUALLY COVER TODAY</text>
+
+  <!-- column headers -->
+  <rect x="60" y="400" width="336" height="34" rx="6" fill="#E8F5EE" stroke="#2F855A" stroke-width="1.5"/>
+  <text x="228" y="422" font-size="12.5" font-weight="700" fill="#14532D" text-anchor="middle">COVERED: both gates, with evidence</text>
+
+  <rect x="420" y="400" width="336" height="34" rx="6" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="588" y="422" font-size="12.5" font-weight="700" fill="#78350F" text-anchor="middle">PARTLY COVERED: one gate, or stale</text>
+
+  <rect x="780" y="400" width="340" height="34" rx="6" fill="#FDECEC" stroke="#B91C1C" stroke-width="1.5"/>
+  <text x="950" y="422" font-size="12.5" font-weight="700" fill="#7F1D1D" text-anchor="middle">NOT COVERED BY ANYTHING</text>
+
+  <!-- column 1 items -->
+  <g font-size="12.5" fill="#14532D">
+    <circle cx="68" cy="466" r="3" fill="#2F855A"/>
+    <text x="80" y="470">Commission math recomputed by hand:</text>
+    <text x="80" y="486">2,187 statement lines, matched to the cent</text>
+
+    <circle cx="68" cy="512" r="3" fill="#2F855A"/>
+    <text x="80" y="516">Seed data regenerates byte for byte</text>
+
+    <circle cx="68" cy="542" r="3" fill="#2F855A"/>
+    <text x="80" y="546">Row-level security probed on the live</text>
+    <text x="80" y="562">database, not read off the migration file</text>
+
+    <circle cx="68" cy="588" r="3" fill="#2F855A"/>
+    <text x="80" y="592">Server price list: 32 of 32 checks matched</text>
+
+    <circle cx="68" cy="618" r="3" fill="#2F855A"/>
+    <text x="80" y="622">The charged amount is checked to the cent</text>
+    <text x="80" y="638">before any payment can be called a success</text>
+
+    <circle cx="68" cy="664" r="3" fill="#2F855A"/>
+    <text x="80" y="668">Payment status can only come from a</text>
+    <text x="80" y="684">server-side lookup at the processor</text>
+
+    <circle cx="68" cy="710" r="3" fill="#2F855A"/>
+    <text x="80" y="714">Secret sweep of the public repository</text>
+
+    <circle cx="68" cy="740" r="3" fill="#2F855A"/>
+    <text x="80" y="744">Text contrast: 9,700 elements measured</text>
+
+    <circle cx="68" cy="770" r="3" fill="#2F855A"/>
+    <text x="80" y="774">Every page and asset loads over HTTPS</text>
+
+    <circle cx="68" cy="800" r="3" fill="#2F855A"/>
+    <text x="80" y="804">Direct-selling compliance: no income claims</text>
+
+    <circle cx="68" cy="830" r="3" fill="#2F855A"/>
+    <text x="80" y="834">No employer data or terminology anywhere</text>
+  </g>
+
+  <!-- column 2 items -->
+  <g font-size="12.5" fill="#78350F">
+    <circle cx="428" cy="466" r="3" fill="#B45309"/>
+    <text x="440" y="470">The live payment rail was gated on</text>
+    <text x="440" y="486">2026-08-14, on a processor that has</text>
+    <text x="440" y="502">since been swapped out</text>
+
+    <circle cx="428" cy="528" r="3" fill="#B45309"/>
+    <text x="440" y="532">Staff call console: quality assurance</text>
+    <text x="440" y="548">gate only, no verifier verdict exists</text>
+
+    <circle cx="428" cy="574" r="3" fill="#B45309"/>
+    <text x="440" y="578">The shop, rounds 3 and 4: quality</text>
+    <text x="440" y="594">assurance gate only</text>
+
+    <circle cx="428" cy="620" r="3" fill="#B45309"/>
+    <text x="440" y="624">Team page and office landing: quality</text>
+    <text x="440" y="640">assurance gate only</text>
+
+    <circle cx="428" cy="666" r="3" fill="#B45309"/>
+    <text x="440" y="670">Sign-in gate: forged by hand in a test,</text>
+    <text x="440" y="686">and still described in shipped source</text>
+    <text x="440" y="702">as impossible to forge</text>
+
+    <circle cx="428" cy="728" r="3" fill="#B45309"/>
+    <text x="440" y="732">Every gate ran with the browser window</text>
+    <text x="440" y="748">hidden, so no page was ever seen</text>
+  </g>
+
+  <!-- column 3 items -->
+  <g font-size="12.5" fill="#7F1D1D">
+    <circle cx="788" cy="466" r="3" fill="#B91C1C"/>
+    <text x="800" y="470">The 2026-08-15 checkout rebuild:</text>
+    <text x="800" y="486">15 commits, no gate before it shipped</text>
+
+    <circle cx="788" cy="512" r="3" fill="#B91C1C"/>
+    <text x="800" y="516">Stripe Tax: two new server functions,</text>
+    <text x="800" y="532">shipped after the audits, no gate at all</text>
+
+    <circle cx="788" cy="558" r="3" fill="#B91C1C"/>
+    <text x="800" y="562">Migrations 013, 015, 016 and 017 are live</text>
+    <text x="800" y="578">with no file in the repository</text>
+
+    <circle cx="788" cy="604" r="3" fill="#B91C1C"/>
+    <text x="800" y="608">One card driven end to end on the new</text>
+    <text x="800" y="624">processor: deferred since 2026-08-14</text>
+
+    <circle cx="788" cy="650" r="3" fill="#B91C1C"/>
+    <text x="800" y="654">Anything visual: no frame was ever drawn</text>
+
+    <circle cx="788" cy="680" r="3" fill="#B91C1C"/>
+    <text x="800" y="684">Real phones and real browsers</text>
+
+    <circle cx="788" cy="710" r="3" fill="#B91C1C"/>
+    <text x="800" y="714">Load and concurrent traffic</text>
+
+    <circle cx="788" cy="740" r="3" fill="#B91C1C"/>
+    <text x="800" y="744">Rebuilding the database from the repository</text>
+
+    <circle cx="788" cy="770" r="3" fill="#B91C1C"/>
+    <text x="800" y="774">A blocked bank-approval popup window</text>
+
+    <circle cx="788" cy="800" r="3" fill="#B91C1C"/>
+    <text x="800" y="804">Screen readers and assistive technology</text>
+
+    <circle cx="788" cy="830" r="3" fill="#B91C1C"/>
+    <text x="800" y="834">Rolling any migration back</text>
+  </g>
+
+  <text x="40" y="908" font-size="11.5" fill="#374151">Green is proven twice. Amber is proven once, or proven against something that has since changed. Red has never been proven at all.</text>
+  <text x="40" y="928" font-size="11.5" fill="#374151">The red column is the honest cost of fifteen small commits on one debugging day, none of which felt big enough to stop and gate.</text>
+
+</svg>

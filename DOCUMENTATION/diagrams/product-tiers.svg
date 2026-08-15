@@ -1,0 +1,218 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1035" width="1200" height="1035" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+  <!-- ============================================================
+       Orvanna product tiers. Built for Snagit: white background
+       rect, pale hardcoded fills, dark hardcoded text, no CSS
+       variables, no dark mode. Every number taken from
+       MLM_PILOT/www/js/catalog.js.
+       ============================================================ -->
+
+  <rect x="0" y="0" width="1200" height="1035" fill="#FFFFFF"/>
+
+  <!-- ========== header ========== -->
+  <text x="40" y="46" font-size="26" font-weight="700" fill="#111827">Orvanna product catalog: four tiers, sixteen items</text>
+  <text x="40" y="72" font-size="13.5" fill="#4B5563">Personal Volume (PV) always equals dollars. Subscription is the default mode. The one-time price is ten times the monthly price.</text>
+  <text x="40" y="92" font-size="13.5" fill="#4B5563">Every figure on this page is read from MLM-PILOT/www/js/catalog.js, the single source of truth for the site.</text>
+
+  <!-- ============ TIER CARDS ============ -->
+
+  <!-- Domain agents -->
+  <rect x="40" y="120" width="244" height="260" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="56" y="150" font-size="12.5" font-weight="700" fill="#3730A3" letter-spacing="1.6">DOMAIN AGENTS</text>
+  <text x="56" y="170" font-size="11.5" fill="#6B7280">6 items</text>
+  <text x="56" y="200" font-size="20" font-weight="700" fill="#111827">$100.00 / month</text>
+  <text x="56" y="222" font-size="13" fill="#1F2937">100 PV every month</text>
+  <text x="56" y="244" font-size="11.5" fill="#6B7280">One time: $1,000.00, 1,000 PV</text>
+  <line x1="56" y1="260" x2="268" y2="260" stroke="#C7D2FE" stroke-width="1.4"/>
+  <text x="56" y="282" font-size="12" fill="#1F2937">Payment Agent</text>
+  <text x="56" y="299" font-size="12" fill="#1F2937">Shipping Agent</text>
+  <text x="56" y="316" font-size="12" fill="#1F2937">Pricing Agent</text>
+  <text x="56" y="333" font-size="12" fill="#1F2937">Inventory Agent</text>
+  <text x="56" y="350" font-size="12" fill="#1F2937">Marketing Agent</text>
+  <text x="56" y="367" font-size="12" fill="#1F2937">Tax Agent</text>
+
+  <!-- Support agents -->
+  <rect x="332" y="120" width="244" height="260" rx="10" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.6"/>
+  <text x="348" y="150" font-size="12.5" font-weight="700" fill="#155E75" letter-spacing="1.6">SUPPORT AGENTS</text>
+  <text x="348" y="170" font-size="11.5" fill="#6B7280">6 items</text>
+  <text x="348" y="200" font-size="20" font-weight="700" fill="#111827">$50.00 / month</text>
+  <text x="348" y="222" font-size="13" fill="#1F2937">50 PV every month</text>
+  <text x="348" y="244" font-size="11.5" fill="#6B7280">One time: $500.00, 500 PV</text>
+  <line x1="348" y1="260" x2="560" y2="260" stroke="#A5F3FC" stroke-width="1.4"/>
+  <text x="348" y="282" font-size="12" fill="#1F2937">Software Engineer</text>
+  <text x="348" y="299" font-size="12" fill="#1F2937">Quality Assurance</text>
+  <text x="348" y="316" font-size="12" fill="#1F2937">Secretary</text>
+  <text x="348" y="333" font-size="12" fill="#1F2937">Chief Executive</text>
+  <text x="348" y="350" font-size="12" fill="#1F2937">Accounting</text>
+  <text x="348" y="367" font-size="12" fill="#1F2937">Customer Care</text>
+
+  <!-- Bundle -->
+  <rect x="624" y="120" width="244" height="260" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.6"/>
+  <text x="640" y="150" font-size="12.5" font-weight="700" fill="#5B21B6" letter-spacing="1.6">BUNDLE</text>
+  <text x="640" y="170" font-size="11.5" fill="#6B7280">1 item</text>
+  <text x="640" y="200" font-size="20" font-weight="700" fill="#111827">$200.00 / month</text>
+  <text x="640" y="222" font-size="13" fill="#1F2937">200 PV every month</text>
+  <text x="640" y="244" font-size="11.5" fill="#6B7280">One time: $2,000.00, 2,000 PV</text>
+  <line x1="640" y1="260" x2="852" y2="260" stroke="#DDD6FE" stroke-width="1.4"/>
+  <text x="640" y="282" font-size="12" font-weight="600" fill="#1F2937">Manager Agent</text>
+  <text x="640" y="303" font-size="11.5" fill="#4B5563">Its three parts alone cost</text>
+  <text x="640" y="319" font-size="11.5" fill="#4B5563">$150.00 per month.</text>
+  <text x="640" y="341" font-size="11.5" fill="#4B5563">Priced $50.00 above that,</text>
+  <text x="640" y="357" font-size="11.5" fill="#4B5563">because the management</text>
+  <text x="640" y="373" font-size="11.5" fill="#4B5563">layer is itself the product.</text>
+
+  <!-- Packs -->
+  <rect x="916" y="120" width="244" height="260" rx="10" fill="#FEF3C7" stroke="#B45309" stroke-width="1.6"/>
+  <text x="932" y="150" font-size="12.5" font-weight="700" fill="#92400E" letter-spacing="1.6">PACKS</text>
+  <text x="932" y="170" font-size="11.5" fill="#6B7280">3 items</text>
+  <text x="932" y="200" font-size="20" font-weight="700" fill="#111827">$200 to $800 / month</text>
+  <text x="932" y="222" font-size="13" fill="#1F2937">200 to 800 PV every month</text>
+  <text x="932" y="244" font-size="11.5" fill="#6B7280">One time: ten times the above</text>
+  <line x1="932" y1="260" x2="1144" y2="260" stroke="#FDE68A" stroke-width="1.4"/>
+  <text x="932" y="282" font-size="12" fill="#1F2937">Ignition Pack</text>
+  <text x="1080" y="282" font-size="12" font-weight="600" fill="#111827">$200.00</text>
+  <text x="932" y="303" font-size="12" fill="#1F2937">Momentum Pack</text>
+  <text x="1080" y="303" font-size="12" font-weight="600" fill="#111827">$400.00</text>
+  <text x="932" y="324" font-size="12" fill="#1F2937">Constellation Pack</text>
+  <text x="1080" y="324" font-size="12" font-weight="600" fill="#111827">$800.00</text>
+  <text x="932" y="352" font-size="11.5" fill="#4B5563">Each pack costs exactly</text>
+  <text x="932" y="368" font-size="11.5" fill="#4B5563">the sum of its parts.</text>
+
+  <!-- ============ COMPOSITION ============ -->
+
+  <text x="40" y="424" font-size="18" font-weight="700" fill="#111827">What sits inside each bundle and pack</text>
+  <text x="40" y="448" font-size="12.5" fill="#4B5563">A child item shows at $0.00 in the cart. The parent line already carries the whole price and the whole Personal Volume (PV), so nothing is charged twice and nothing is counted twice.</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- ==== row 1: Manager Agent ==== -->
+  <rect x="40" y="475" width="250" height="104" rx="9" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.6"/>
+  <text x="56" y="503" font-size="15" font-weight="700" fill="#111827">Manager Agent</text>
+  <text x="56" y="524" font-size="11" fill="#5B21B6" letter-spacing="1.1">BUNDLE</text>
+  <text x="56" y="547" font-size="13" fill="#1F2937">$200.00 / month, 200 PV</text>
+  <text x="56" y="566" font-size="11" fill="#6B7280">One time $2,000.00, 2,000 PV</text>
+  <line x1="298" y1="527" x2="336" y2="527" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="345" y="483" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="421" y="503" font-size="11.5" fill="#1F2937" text-anchor="middle">Software Engineer</text>
+  <text x="421" y="518" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="509" y="483" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="585" y="503" font-size="11.5" fill="#1F2937" text-anchor="middle">Secretary</text>
+  <text x="585" y="518" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="673" y="483" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="749" y="503" font-size="11.5" fill="#1F2937" text-anchor="middle">Accounting</text>
+  <text x="749" y="518" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <text x="845" y="507" font-size="11.5" fill="#6B7280">Three support agents at $50.00 each</text>
+  <text x="845" y="523" font-size="11.5" fill="#6B7280">would be $150.00. The bundle is $200.00.</text>
+
+  <!-- ==== row 2: Ignition Pack ==== -->
+  <rect x="40" y="605" width="250" height="104" rx="9" fill="#FEF3C7" stroke="#B45309" stroke-width="1.6"/>
+  <text x="56" y="633" font-size="15" font-weight="700" fill="#111827">Ignition Pack</text>
+  <text x="56" y="654" font-size="11" fill="#92400E" letter-spacing="1.1">PACK</text>
+  <text x="56" y="677" font-size="13" fill="#1F2937">$200.00 / month, 200 PV</text>
+  <text x="56" y="696" font-size="11" fill="#6B7280">One time $2,000.00, 2,000 PV</text>
+  <line x1="298" y1="657" x2="336" y2="657" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="345" y="613" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="421" y="633" font-size="11.5" fill="#1F2937" text-anchor="middle">Payment Agent</text>
+  <text x="421" y="648" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="509" y="613" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="585" y="633" font-size="11.5" fill="#1F2937" text-anchor="middle">Customer Care</text>
+  <text x="585" y="648" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="673" y="613" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="749" y="633" font-size="11.5" fill="#1F2937" text-anchor="middle">Secretary</text>
+  <text x="749" y="648" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <text x="845" y="637" font-size="11.5" fill="#6B7280">$100.00 + $50.00 + $50.00 = $200.00.</text>
+  <text x="845" y="653" font-size="11.5" fill="#6B7280">The pack costs the sum of its parts.</text>
+
+  <!-- ==== row 3: Momentum Pack ==== -->
+  <rect x="40" y="735" width="250" height="104" rx="9" fill="#FEF3C7" stroke="#B45309" stroke-width="1.6"/>
+  <text x="56" y="763" font-size="15" font-weight="700" fill="#111827">Momentum Pack</text>
+  <text x="56" y="784" font-size="11" fill="#92400E" letter-spacing="1.1">PACK</text>
+  <text x="56" y="807" font-size="13" fill="#1F2937">$400.00 / month, 400 PV</text>
+  <text x="56" y="826" font-size="11" fill="#6B7280">One time $4,000.00, 4,000 PV</text>
+  <line x1="298" y1="787" x2="336" y2="787" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="345" y="743" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="421" y="763" font-size="11.5" fill="#1F2937" text-anchor="middle">Payment Agent</text>
+  <text x="421" y="778" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="509" y="743" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="585" y="763" font-size="11.5" fill="#1F2937" text-anchor="middle">Marketing Agent</text>
+  <text x="585" y="778" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="673" y="743" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="749" y="763" font-size="11.5" fill="#1F2937" text-anchor="middle">Pricing Agent</text>
+  <text x="749" y="778" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="837" y="743" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="913" y="763" font-size="11.5" fill="#1F2937" text-anchor="middle">Software Engineer</text>
+  <text x="913" y="778" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="1001" y="743" width="152" height="44" rx="7" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="1077" y="763" font-size="11.5" fill="#1F2937" text-anchor="middle">Quality Assurance</text>
+  <text x="1077" y="778" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <text x="345" y="811" font-size="11.5" fill="#6B7280">Three domain agents at $100.00 plus two support agents at $50.00 = $400.00. Again, exactly the sum of the parts.</text>
+
+  <!-- ==== row 4: Constellation Pack ==== -->
+  <rect x="40" y="865" width="250" height="104" rx="9" fill="#FEF3C7" stroke="#B45309" stroke-width="1.6"/>
+  <text x="56" y="893" font-size="15" font-weight="700" fill="#111827">Constellation Pack</text>
+  <text x="56" y="914" font-size="11" fill="#92400E" letter-spacing="1.1">PACK</text>
+  <text x="56" y="937" font-size="13" fill="#1F2937">$800.00 / month, 800 PV</text>
+  <text x="56" y="956" font-size="11" fill="#6B7280">One time $8,000.00, 8,000 PV</text>
+  <line x1="298" y1="917" x2="336" y2="917" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="345" y="873" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="421" y="893" font-size="11.5" fill="#1F2937" text-anchor="middle">Payment Agent</text>
+  <text x="421" y="908" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="509" y="873" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="585" y="893" font-size="11.5" fill="#1F2937" text-anchor="middle">Shipping Agent</text>
+  <text x="585" y="908" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="673" y="873" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="749" y="893" font-size="11.5" fill="#1F2937" text-anchor="middle">Pricing Agent</text>
+  <text x="749" y="908" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="837" y="873" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="913" y="893" font-size="11.5" fill="#1F2937" text-anchor="middle">Inventory Agent</text>
+  <text x="913" y="908" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="1001" y="873" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="1077" y="893" font-size="11.5" fill="#1F2937" text-anchor="middle">Marketing Agent</text>
+  <text x="1077" y="908" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="345" y="921" width="152" height="44" rx="7" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="421" y="941" font-size="11.5" fill="#1F2937" text-anchor="middle">Tax Agent</text>
+  <text x="421" y="956" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <rect x="509" y="921" width="152" height="44" rx="7" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.6"/>
+  <text x="585" y="941" font-size="11.5" font-weight="600" fill="#1F2937" text-anchor="middle">Manager Agent</text>
+  <text x="585" y="956" font-size="10.5" fill="#6B7280" text-anchor="middle">$0.00, included</text>
+
+  <text x="673" y="939" font-size="11.5" fill="#6B7280">Six domain agents at $100.00 plus the $200.00 Manager Agent = $800.00.</text>
+  <text x="673" y="955" font-size="11.5" fill="#6B7280">That Manager chip carries its own three support agents, so this pack covers ten agents.</text>
+
+  <!-- ==== legend ==== -->
+  <rect x="40" y="990" width="14" height="14" rx="3" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.3"/>
+  <text x="62" y="1002" font-size="11.5" fill="#4B5563">Domain agent</text>
+  <rect x="170" y="990" width="14" height="14" rx="3" fill="#ECFEFF" stroke="#0E7490" stroke-width="1.3"/>
+  <text x="192" y="1002" font-size="11.5" fill="#4B5563">Support agent</text>
+  <rect x="305" y="990" width="14" height="14" rx="3" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.3"/>
+  <text x="327" y="1002" font-size="11.5" fill="#4B5563">Bundle</text>
+  <rect x="400" y="990" width="14" height="14" rx="3" fill="#FEF3C7" stroke="#B45309" stroke-width="1.3"/>
+  <text x="422" y="1002" font-size="11.5" fill="#4B5563">Pack</text>
+  <text x="500" y="1002" font-size="11.5" fill="#6B7280">Sixteen items in total: 6 domain agents, 6 support agents, 1 bundle, 3 packs.</text>
+
+</svg>

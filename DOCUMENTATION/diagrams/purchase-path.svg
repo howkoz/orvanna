@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1180" viewBox="0 0 1180 1180" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+  <defs>
+    <marker id="pdown" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#1F2937"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="1180" fill="#FFFFFF"/>
+
+  <text x="40" y="46" font-size="26" font-weight="600" fill="#111827">Orvanna purchase path, end to end</text>
+  <text x="40" y="72" font-size="14" fill="#4B5563">Twelve hops from an empty cart to a recorded sale. Every hop names the real file and the real function. Sandbox test mode only.</text>
+  <text x="40" y="94" font-size="13" fill="#6B7280">Blue = the visitor's browser. Purple = our server code. Brown = a third party. Read top to bottom.</text>
+
+  <!-- spine -->
+  <line x1="88" y1="150" x2="88" y2="1102" stroke="#D4D8E0" stroke-width="2"/>
+
+  <!-- STEP 1 -->
+  <rect x="60" y="150" width="700" height="72" rx="9" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <circle cx="88" cy="186" r="17" fill="#2B3A67"/>
+  <text x="88" y="191" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="120" y="176" font-size="13.5" font-weight="600" fill="#111827">The shopper fills a cart</text>
+  <text x="120" y="196" font-size="12" fill="#374151">www/shop.html, reading names, prices and volume points from www/js/catalog.js (the PRODUCTS array).</text>
+  <text x="120" y="213" font-size="12" fill="#4B5563">Nothing has left the browser yet. The cart lives in the browser's own local storage.</text>
+  <text x="748" y="192" font-size="11.5" fill="#2B3A67" text-anchor="end">BROWSER</text>
+
+  <!-- STEP 2 -->
+  <rect x="60" y="230" width="700" height="72" rx="9" fill="#EDE9FB" stroke="#4C3A8A" stroke-width="2"/>
+  <circle cx="88" cy="266" r="17" fill="#4C3A8A"/>
+  <text x="88" y="271" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="120" y="256" font-size="13.5" font-weight="600" fill="#111827">The page asks what it will really cost, before any card</text>
+  <text x="120" y="276" font-size="12" fill="#374151">POST quote-tax. File: functions/quote-tax/index.ts. It creates no order and no payment.</text>
+  <text x="120" y="293" font-size="12" fill="#4B5563">It reprices with priceCart() in _shared/pricing.ts, then calls calculateTax() in _shared/tax.ts.</text>
+  <text x="748" y="272" font-size="11.5" fill="#4C3A8A" text-anchor="end">OUR SERVER</text>
+
+  <!-- STEP 3 -->
+  <rect x="60" y="310" width="700" height="72" rx="9" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <circle cx="88" cy="346" r="17" fill="#8A5A17"/>
+  <text x="88" y="351" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="120" y="336" font-size="13.5" font-weight="600" fill="#111827">Stripe Tax answers</text>
+  <text x="120" y="356" font-size="12" fill="#374151">The destination address comes from the member's row in our database, read by resolveTaxAddress().</text>
+  <text x="120" y="373" font-size="12" fill="#4B5563">If Stripe cannot be reached the cart still prices, at a flat five percent, marked as a fallback.</text>
+  <text x="748" y="352" font-size="11.5" fill="#8A5A17" text-anchor="end">THIRD PARTY</text>
+
+  <!-- STEP 4 -->
+  <rect x="60" y="390" width="700" height="72" rx="9" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <circle cx="88" cy="426" r="17" fill="#2B3A67"/>
+  <text x="88" y="431" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">4</text>
+  <text x="120" y="416" font-size="13.5" font-weight="600" fill="#111827">The account step finishes, so the payment step opens itself</text>
+  <text x="120" y="436" font-size="12" fill="#374151">liveEnsureCheckout() in www/shop.html sends POST create-payment.</text>
+  <text x="120" y="453" font-size="12" fill="#4B5563">The request carries only sku, mode and quantity. No price, no total, no name, no address, no card.</text>
+  <text x="748" y="432" font-size="11.5" fill="#2B3A67" text-anchor="end">BROWSER</text>
+
+  <!-- STEP 5 -->
+  <rect x="60" y="470" width="700" height="72" rx="9" fill="#EDE9FB" stroke="#4C3A8A" stroke-width="2"/>
+  <circle cx="88" cy="506" r="17" fill="#4C3A8A"/>
+  <text x="88" y="511" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">5</text>
+  <text x="120" y="496" font-size="13.5" font-weight="600" fill="#111827">create-payment runs the rails, reprices, and books the order</text>
+  <text x="120" y="516" font-size="12" fill="#374151">functions/create-payment/index.ts: checkRateLimit(), the daily ceiling, priceCart(), calculateTax(),</text>
+  <text x="120" y="533" font-size="12" fill="#4B5563">generateOrderNumber() making ORV-YYYY-MM-XXXXXX, then INSERT app.demo_orders with status created.</text>
+  <text x="748" y="512" font-size="11.5" fill="#4C3A8A" text-anchor="end">OUR SERVER</text>
+
+  <!-- STEP 6 -->
+  <rect x="60" y="550" width="700" height="72" rx="9" fill="#EDE9FB" stroke="#4C3A8A" stroke-width="2"/>
+  <circle cx="88" cy="586" r="17" fill="#4C3A8A"/>
+  <text x="88" y="591" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">6</text>
+  <text x="120" y="576" font-size="13.5" font-weight="600" fill="#111827">The same function opens the payment at HyperSwitch</text>
+  <text x="120" y="596" font-size="12" fill="#374151">POST /payments with the secret key, the amount in whole cents, and a return address built by</text>
+  <text x="120" y="613" font-size="12" fill="#4B5563">buildReturnUrl() on the server. The returned payment_id is stored on the row as payment_reference.</text>
+  <text x="748" y="592" font-size="11.5" fill="#4C3A8A" text-anchor="end">OUR SERVER</text>
+
+  <!-- STEP 7 -->
+  <rect x="60" y="630" width="700" height="72" rx="9" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <circle cx="88" cy="666" r="17" fill="#2B3A67"/>
+  <text x="88" y="671" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">7</text>
+  <text x="120" y="656" font-size="13.5" font-weight="600" fill="#111827">The browser mounts HyperSwitch's own card widget</text>
+  <text x="120" y="676" font-size="12" fill="#374151">loadHyperLoader() then window.Hyper(publishable key) in www/shop.html. The page shows the</text>
+  <text x="120" y="693" font-size="12" fill="#4B5563">server's totals, not its own. Card numbers are typed into HyperSwitch's frame, never into our page.</text>
+  <text x="748" y="672" font-size="11.5" fill="#2B3A67" text-anchor="end">BROWSER</text>
+
+  <!-- STEP 8 -->
+  <rect x="60" y="710" width="700" height="72" rx="9" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <circle cx="88" cy="746" r="17" fill="#8A5A17"/>
+  <text x="88" y="751" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">8</text>
+  <text x="120" y="736" font-size="13.5" font-weight="600" fill="#111827">HyperSwitch routes the card to Braintree, and 3-D Secure runs</text>
+  <text x="120" y="756" font-size="12" fill="#374151">Usually silent. When the bank wants proof it draws a passcode window inside its own frame.</text>
+  <text x="120" y="773" font-size="12" fill="#4B5563">Our part is only the surrounding chrome: openChallengeChrome() in www/shop.html.</text>
+  <text x="748" y="752" font-size="11.5" fill="#8A5A17" text-anchor="end">THIRD PARTY</text>
+
+  <!-- STEP 9 -->
+  <rect x="60" y="790" width="700" height="72" rx="9" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <circle cx="88" cy="826" r="17" fill="#2B3A67"/>
+  <text x="88" y="831" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">9</text>
+  <text x="120" y="816" font-size="13.5" font-weight="600" fill="#111827">The browser asks us what happened</text>
+  <text x="120" y="836" font-size="12" fill="#374151">POST confirm-payment carrying only { order_number }.</text>
+  <text x="120" y="853" font-size="12" fill="#4B5563">There is no status field in the request, so there is nothing for a hostile page to forge.</text>
+  <text x="748" y="832" font-size="11.5" fill="#2B3A67" text-anchor="end">BROWSER</text>
+
+  <!-- STEP 10 -->
+  <rect x="60" y="870" width="700" height="72" rx="9" fill="#EDE9FB" stroke="#4C3A8A" stroke-width="2"/>
+  <circle cx="88" cy="906" r="17" fill="#4C3A8A"/>
+  <text x="88" y="911" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">10</text>
+  <text x="120" y="896" font-size="13.5" font-weight="600" fill="#111827">Our server asks the processor itself, and writes the truth</text>
+  <text x="120" y="916" font-size="12" fill="#374151">retrieveAndApplyPaymentTruth() in functions/_shared/edge.ts: GET /payments/{id} with the secret</text>
+  <text x="120" y="933" font-size="12" fill="#4B5563">key, mapHyperswitchStatus(), amount compared to the cent, then a guarded UPDATE.</text>
+  <text x="748" y="912" font-size="11.5" fill="#4C3A8A" text-anchor="end">OUR SERVER</text>
+
+  <!-- STEP 11 -->
+  <rect x="60" y="950" width="700" height="72" rx="9" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <circle cx="88" cy="986" r="17" fill="#2B3A67"/>
+  <text x="88" y="991" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">11</text>
+  <text x="120" y="976" font-size="13.5" font-weight="600" fill="#111827">The shopper sees the receipt the server wrote</text>
+  <text x="120" y="996" font-size="12" fill="#374151">The confirmation view renders from the response, not from the page's own arithmetic.</text>
+  <text x="120" y="1013" font-size="12" fill="#4B5563">The cart is cleared on succeeded and on nothing else, so a decline keeps the cart for a retry.</text>
+  <text x="748" y="992" font-size="11.5" fill="#2B3A67" text-anchor="end">BROWSER</text>
+
+  <!-- STEP 12 -->
+  <rect x="60" y="1030" width="700" height="72" rx="9" fill="#EDE9FB" stroke="#4C3A8A" stroke-width="2"/>
+  <circle cx="88" cy="1066" r="17" fill="#4C3A8A"/>
+  <text x="88" y="1071" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">12</text>
+  <text x="120" y="1056" font-size="13.5" font-weight="600" fill="#111827">The sale is booked with the tax engine, afterwards</text>
+  <text x="120" y="1076" font-size="12" fill="#374151">POST record-tax, fired and forgotten by the page: functions/record-tax/index.ts turns the Stripe</text>
+  <text x="120" y="1093" font-size="12" fill="#4B5563">calculation into a recorded transaction. Deliberately outside the payment path, and retryable.</text>
+  <text x="748" y="1072" font-size="11.5" fill="#4C3A8A" text-anchor="end">OUR SERVER</text>
+
+  <!-- SIDE NOTES -->
+  <rect x="800" y="150" width="340" height="196" rx="9" fill="#F7F8FA" stroke="#C7CBD3" stroke-width="1"/>
+  <text x="820" y="176" font-size="13.5" font-weight="600" fill="#111827">The second door: payment-webhook</text>
+  <text x="820" y="199" font-size="12" fill="#374151">A shopper can approve a passcode and then</text>
+  <text x="820" y="216" font-size="12" fill="#374151">close the tab, so step 9 never happens.</text>
+  <text x="820" y="239" font-size="12" fill="#374151">HyperSwitch also calls us directly.</text>
+  <text x="820" y="262" font-size="12" fill="#374151">functions/payment-webhook/index.ts checks a</text>
+  <text x="820" y="279" font-size="12" fill="#374151">keyed signature first, and a bad one is refused</text>
+  <text x="820" y="296" font-size="12" fill="#374151">before a single database query runs.</text>
+  <text x="820" y="319" font-size="12" fill="#374151">A good one is still only a wake-up call: the</text>
+  <text x="820" y="336" font-size="12" fill="#374151">same step 10 function decides what is true.</text>
+
+  <rect x="800" y="366" width="340" height="162" rx="9" fill="#F7F8FA" stroke="#C7CBD3" stroke-width="1"/>
+  <text x="820" y="392" font-size="13.5" font-weight="600" fill="#111827">What never travels to our server</text>
+  <text x="820" y="415" font-size="12" fill="#374151">No card number or security code.</text>
+  <text x="820" y="434" font-size="12" fill="#374151">No shopper name or street address.</text>
+  <text x="820" y="453" font-size="12" fill="#374151">No price and no total.</text>
+  <text x="820" y="472" font-size="12" fill="#374151">No raw network address; only a salted hash.</text>
+  <text x="820" y="495" font-size="12" fill="#4B5563">The billing address sent to the card networks</text>
+  <text x="820" y="512" font-size="12" fill="#4B5563">is one fixed invented address, not a person's.</text>
+
+  <rect x="800" y="548" width="340" height="130" rx="9" fill="#F7F8FA" stroke="#C7CBD3" stroke-width="1"/>
+  <text x="820" y="574" font-size="13.5" font-weight="600" fill="#111827">The staff console takes the same path</text>
+  <text x="820" y="597" font-size="12" fill="#374151">www/staff.html is a phone-order version of the</text>
+  <text x="820" y="614" font-size="12" fill="#374151">same twelve hops, sending channel</text>
+  <text x="820" y="631" font-size="12" fill="#374151">staff_console instead of shop.</text>
+  <text x="820" y="654" font-size="12" fill="#4B5563">It carries its own copy of the payment code,</text>
+  <text x="820" y="671" font-size="12" fill="#4B5563">which is a known problem. See the gaps list.</text>
+
+  <text x="800" y="716" font-size="11.5" fill="#6B7280">Verified against the files on 2026-08-15.</text>
+  <text x="800" y="734" font-size="11.5" fill="#6B7280">MLM-PILOT/functions/ and MLM-PILOT/www/.</text>
+</svg>

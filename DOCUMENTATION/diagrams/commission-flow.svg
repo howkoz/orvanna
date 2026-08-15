@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 660" width="900" height="660" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="660" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="21" font-weight="700" fill="#111827">One order turning into commissions</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">Orvanna compensation plan v1.3. Personal Volume (PV), Sales Volume (SV), Commissionable Volume (CV).</text>
+
+  <!-- LEFT COLUMN: order becomes CV -->
+  <rect x="30" y="90" width="290" height="62" rx="8" fill="#E0E7FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="46" y="114" font-size="13" font-weight="700" fill="#111827">1. The order</text>
+  <text x="46" y="134" font-size="13" fill="#1F2937">Payment Agent subscription, $100.00</text>
+
+  <path d="M 175 152 L 175 186" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="175,194 170,184 180,184" fill="#4B5563"/>
+
+  <rect x="30" y="196" width="290" height="62" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="46" y="220" font-size="13" font-weight="700" fill="#111827">2. Personal Volume (PV)</text>
+  <text x="46" y="240" font-size="13" fill="#1F2937">100 PV. PV always equals dollars.</text>
+
+  <path d="M 175 258 L 175 292" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="175,300 170,290 180,290" fill="#4B5563"/>
+
+  <rect x="30" y="302" width="290" height="62" rx="8" fill="#EEF2FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="46" y="326" font-size="13" font-weight="700" fill="#111827">3. Sales Volume (SV) for the month</text>
+  <text x="46" y="346" font-size="13" fill="#1F2937">SV = 100.00 (all orders on the account)</text>
+
+  <path d="M 175 364 L 175 398" stroke="#4B5563" stroke-width="2" fill="none"/>
+  <polygon points="175,406 170,396 180,396" fill="#4B5563"/>
+
+  <rect x="30" y="408" width="290" height="72" rx="8" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+  <text x="46" y="432" font-size="13" font-weight="700" fill="#111827">4. Commissionable Volume (CV)</text>
+  <text x="46" y="452" font-size="13" fill="#1F2937">CV = 0.80 x 100.00 = 80.00</text>
+  <text x="46" y="470" font-size="12" fill="#166534">Every percentage below applies to this.</text>
+
+  <text x="30" y="516" font-size="12" fill="#4B5563">The 20 cents on the dollar that CV leaves</text>
+  <text x="30" y="533" font-size="12" fill="#4B5563">behind is the company's, not the field's.</text>
+
+  <!-- ARROW ACROSS -->
+  <path d="M 320 444 L 372 444" stroke="#15803D" stroke-width="2.5" fill="none"/>
+  <polygon points="380,444 368,438 368,450" fill="#15803D"/>
+
+  <!-- RIGHT COLUMN: the upline ladder, buyer at the bottom -->
+  <text x="392" y="86" font-size="14" font-weight="700" fill="#111827">The money climbs the sponsor chain</text>
+
+  <rect x="392" y="426" width="470" height="46" rx="7" fill="#DCFCE7" stroke="#15803D" stroke-width="2"/>
+  <text x="408" y="455" font-size="13" fill="#111827">The buyer, CV 80.00. Buyers are never paid on their own volume.</text>
+
+  <rect x="392" y="362" width="470" height="46" rx="7" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/>
+  <text x="408" y="391" font-size="13" fill="#111827">Level 1, the sponsor: 10% x 80.00 = 8.00</text>
+
+  <rect x="392" y="298" width="470" height="46" rx="7" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/>
+  <text x="408" y="327" font-size="13" fill="#111827">Level 2: 5% x 80.00 = 4.00</text>
+
+  <rect x="392" y="234" width="470" height="46" rx="7" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/>
+  <text x="408" y="263" font-size="13" fill="#111827">Level 3: 5% x 80.00 = 4.00</text>
+
+  <rect x="392" y="170" width="470" height="46" rx="7" fill="#E0E7FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="408" y="199" font-size="13" fill="#111827">Level 4: 3% x 80.00 = 2.40</text>
+
+  <rect x="392" y="106" width="470" height="46" rx="7" fill="#E0E7FF" stroke="#4338CA" stroke-width="2"/>
+  <text x="408" y="135" font-size="13" fill="#111827">Level 5: 2% x 80.00 = 1.60</text>
+
+  <path d="M 627 426 L 627 414" stroke="#15803D" stroke-width="2" fill="none"/>
+  <polygon points="627,406 622,416 632,416" fill="#15803D"/>
+  <path d="M 627 362 L 627 350" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+  <polygon points="627,342 622,352 632,352" fill="#1D4ED8"/>
+  <path d="M 627 298 L 627 286" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+  <polygon points="627,278 622,288 632,288" fill="#1D4ED8"/>
+  <path d="M 627 234 L 627 222" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+  <polygon points="627,214 622,224 632,224" fill="#1D4ED8"/>
+  <path d="M 627 170 L 627 158" stroke="#4338CA" stroke-width="2" fill="none"/>
+  <polygon points="627,150 622,160 632,160" fill="#4338CA"/>
+
+  <!-- TOTAL AND GATES -->
+  <rect x="392" y="492" width="470" height="46" rx="7" fill="#FEF3C7" stroke="#B45309" stroke-width="2"/>
+  <text x="408" y="521" font-size="13" font-weight="700" fill="#111827">Most this order can ever pay: 20.00, that is 20% of $100.00</text>
+
+  <text x="392" y="566" font-size="12.5" font-weight="700" fill="#111827">Two gates decide who on the ladder actually gets paid</text>
+  <text x="392" y="588" font-size="12.5" fill="#374151">A. The earner must be QUALIFIED that month: their own SV must be 100.00 or more.</text>
+  <text x="392" y="608" font-size="12.5" fill="#374151">B. The level must be within the earner's PAID DEPTH, which their rank sets.</text>
+  <text x="392" y="628" font-size="12.5" fill="#374151">Anything that fails either gate is BREAKAGE: nobody is paid it, and nobody below moves up.</text>
+  <text x="392" y="648" font-size="12.5" fill="#374151">The buyer's own qualification never matters. Their volume always pays upward.</text>
+</svg>

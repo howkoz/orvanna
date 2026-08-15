@@ -7,6 +7,48 @@ mlm-qa, both gates required.
 
 Status: SPEC. Nothing in this document is code; worked examples are hand-computed.
 
+---
+
+## AMENDMENTS SINCE THIS SPEC WAS WRITTEN (read this first)
+
+> Added 2026-08-15 by mlm-architect, after an audit compared this document to the
+> deployed code. **Nothing below this heading has been deleted or edited.** The
+> original text stands exactly as written, because the intent behind a decision is
+> worth as much as the decision, and a spec that quietly changes is as dangerous as
+> one that is stale. Where the shipped system now differs, the difference is stated
+> here AND flagged again inline with an "AMENDED" note at the point of divergence.
+>
+> Five divergences, all deliberate, none accidental.
+
+| # | Section | What this spec says | What actually shipped | When and why |
+|---|---|---|---|---|
+| A1 | 1.2 step 2 | The site sends a `tax_exempt` boolean and the Tax ID value is NOT transmitted. | The exact reverse. The site sends the tax identifier TEXT, and `create-payment` deliberately IGNORES any `tax_exempt` field in the body. | 2026-08-15. The boolean was the one hole in an otherwise server-authoritative money path: any caller could zero their own tax. Exemption is now decided by `looksLikeTaxId()` on the server and by Stripe, never by the page. |
+| A2 | 0 rule 5, and 1.4 | The site may load EXACTLY ONE external script, `HyperLoader.js`. | TWO. `HyperLoader.js` plus the Botpress hosted chat widget (`cdn.botpress.cloud` and `files.bpcontent.cloud`). | 2026-08-14, Howard's ruling in ROADMAP.md, the Sunday list item 2. It is nav-triggered, never auto-opening, so nothing can appear over the card form. The rule is still "no external scripts except by name"; the list of names is now two long. |
+| A3 | 4 | "No webhook endpoint ships in v1"; a webhook is planned for v1.1. | `payment-webhook` SHIPPED and is live. | 2026-08-14, Phase 6.1. A 3-D Secure challenge lets a shopper approve on their phone and then close the tab, so the browser-triggered confirm can never fire. The trust model in section 4 was honoured exactly: the body is a wake-up call, the signature is checked first, and the same server-side retrieve decides the truth. |
+| A4 | 3 | Four vault secrets. | FIVE. `STRIPE_SECRET_KEY` was added and is missing from the section 3 table. | 2026-08-15, with the tax engine. Same rule as every other secret: dashboard only, never in a repository, a chat window, or a log line. |
+| A5 | 1.3, the 1.5 worked example, and check V5 in 6.1 | Tax is a flat 5 percent computed by the pricing mirror. | Flat 5 percent is now only the FALLBACK. Real tax comes from Stripe Tax, called directly by our own Edge Functions, and the outcome records `stripe_tax` or `flat_fallback` so the difference is never silent. | 2026-08-15. See ROADMAP.md Phase 6.2, "RESOLVED 2026-08-15". Note this route never touches HyperSwitch, so the amount-verification contract this spec defends did NOT have to be redefined: `create-payment` still reprices from scratch and still rejects any charge that does not equal its own math to the cent. |
+
+Two consequences of A5 worth stating here rather than leaving to be inferred.
+
+1. A new Edge Function, `quote-tax`, prices a cart and answers WITHOUT creating an
+   order row or a payment. It shares one implementation, `functions\_shared\tax.ts`,
+   with `create-payment`, so a quote and a charge cannot drift apart. Reason, from
+   Howard on 2026-08-15: nobody should hand over a card and only then discover what
+   the tax was.
+2. A companion function, `record-tax`, books the completed sale with the tax engine
+   afterwards, deliberately outside the payment path so that a bookkeeping failure
+   never leaves a paid shopper watching a spinner.
+
+The function count in section 7's work packages is likewise historical: W2 names
+three functions, and there are now SEVEN (create-payment, confirm-payment,
+list-demo-orders, payment-webhook, demo-login, quote-tax, record-tax).
+
+Everything else in this specification, including the whole of section 6 (the two
+gates) and the anon posture rule in section 0.4, held exactly as written and was
+proven live.
+
+---
+
 Acronym key: Application Programming Interface (API), Software Development Kit (SDK),
 Personal Volume (PV), Commissionable Volume (CV), Row-Level Security (RLS),
 JavaScript Object Notation (JSON), Internet Protocol (IP), Hypertext Transfer
@@ -32,6 +74,9 @@ Marketing (MLM), Quality Assurance (QA).
    Function using the service role.
 5. The live site stays static GitHub Pages at orvanna.io. It may load exactly ONE
    external script, named in section 1.4, and may call our Edge Function endpoints.
+   **AMENDED 2026-08-14, see amendment A2 at the top: TWO sanctioned scripts now,
+   HyperLoader.js plus the Botpress chat widget. The principle is unchanged, the
+   list of names is one longer.**
 6. Demo philosophy: safe for strangers. Rate limited, no personal data required,
    and the payment screen says out loud that this is a test.
 
@@ -87,6 +132,9 @@ Marketing (MLM), Quality Assurance (QA).
    - `tax_exempt`: true or false (the client's Tax ID digit check result; the
      server re-derives nothing from the Tax ID itself and the Tax ID value is
      NOT transmitted)
+     **AMENDED 2026-08-15, see amendment A1 at the top: this is now REVERSED.
+     The Tax ID text IS sent and the `tax_exempt` boolean IS ignored, because
+     letting the browser decide exemption let any caller zero their own tax.**
    - `member_code`: optional referring member code, may be blank
    - `channel`: `shop` (the Phase 4.5 staff console will send `staff_console`)
    Deliberately NOT sent: names, street addresses, card data, prices, totals,
@@ -158,6 +206,13 @@ gate-passed, engine-facing table for the benefit of a demo checkout, exactly the
 kind of scope bleed Phase 6 must not cause. The engine and its finalized months
 stay untouched when the pricing mirror changes.
 
+**AMENDED 2026-08-15, see amendment A5 at the top. The mirror is still the
+canonical PRICE source and everything below about it holds. What changed is TAX:
+the mirror's flat 5 percent is now only the fallback figure used when Stripe Tax
+cannot be reached. Real tax comes from Stripe Tax, called directly by our own
+functions, never through HyperSwitch, so the amount-verification contract this
+section protects did not have to change.**
+
 The mirror: a small server-side pricing table (one entry per SKU: tier, sub price,
 sub PV, once price, once PV) plus the two constants (activation fee $25.00, tax
 rate 5 percent), deployed inside the Edge Function bundle. `www\js\catalog.js`
@@ -201,6 +256,12 @@ Server recomputation from the pricing mirror:
 - Amount sent to HyperSwitch: 223125 (cents)
 - Total PV: 2,100 (a qualified month is 100 PV or more, so the receipt says
   qualified)
+
+**AMENDED 2026-08-15, amendment A5: the $106.25 tax line above is now what this
+cart costs only when Stripe Tax cannot be reached. With the engine answering, the
+figure depends on the destination read from the member's own database row. The
+rest of this worked example, including the tamper case below it, is unchanged and
+still exactly how the server behaves.**
 
 Tamper case: a hostile client edits its JavaScript to claim a $1.00 total. It
 cannot: the request carries no prices, only `{ sku, mode, quantity }`. The server
@@ -342,6 +403,7 @@ runtime.
 | HYPERSWITCH_HASH_KEY | The regenerated payment response hash key. Verifies webhook signatures in v1.1 (section 4). Stored now so rotation happens once. | webhook handler (v1.1) |
 | HYPERSWITCH_PUBLISHABLE_KEY | `pk_snd_bfcb22d171b54957b2cdc9046c56ae16`. Public by design; vaulted anyway so the functions have one source and a future key swap is one dashboard edit. | create-payment (returned to the browser) |
 | ORVANNA_DEMO_IP_SALT | Random salt for hashing caller IP addresses in the rate limit ledger, so raw IPs are never stored. Howard generates it (any long random string) and types it in. | all three functions |
+| STRIPE_SECRET_KEY | **ADDED 2026-08-15, amendment A4.** Authorizes tax calculations and tax transaction records at Stripe Tax. Same handling rule as every row above: dashboard only. | _shared\tax.ts (through quote-tax and create-payment), and record-tax |
 
 Provided by the platform automatically (not typed by anyone): `SUPABASE_URL` and
 the service role key are injected into Edge Functions by Supabase itself. The
@@ -358,6 +420,12 @@ dead the moment the new pair exists, and Howard deletes his local
 
 RECOMMENDATION (v1): server-side retrieve on confirm. No webhook endpoint ships
 in v1.
+
+**AMENDED 2026-08-14, see amendment A3 at the top: the webhook DID ship, as
+`payment-webhook`, once 3-D Secure made the abandoned-tab gap in point 3 below a
+real one rather than a tidy one. The trust model demanded in point 4 was honoured
+exactly: signature verified before anything is touched, and even a valid body is
+only a hint, because the same server-side retrieve decides what is written.**
 
 Reasoning, spelled out:
 
@@ -490,6 +558,12 @@ moves the clear to the confirmed-success branch.
   from the items jsonb (unit prices, activation, tax at 5 percent, rounding
   half up to 2 decimals) and prove it equals `total_cents` AND the amount on
   the HyperSwitch payment object.
+  **AMENDED 2026-08-15, amendment A5: recompute the tax line from the row's own
+  `tax_cents` and check `tax_source`. A `flat_fallback` row is still the 5
+  percent arithmetic above; a `stripe_tax` row is the engine's figure and cannot
+  be rederived by hand, so the check becomes: parts sum to `total_cents`, and
+  `total_cents` equals the processor amount to the cent. That second half is the
+  part that matters and it is untouched.**
 - V6 Mirror parity: mechanical diff of all sixteen (sku, mode, price, pv)
   quadruples plus activation fee and tax rate between `www\js\catalog.js` and
   the deployed pricing mirror. Zero differences.

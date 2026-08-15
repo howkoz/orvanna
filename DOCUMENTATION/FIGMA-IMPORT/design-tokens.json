@@ -1,0 +1,189 @@
+{
+  "$description": "Orvanna design tokens, read straight out of MLM-PILOT/www/css/corporate.css, www/css/shop.css, www/css/staff.css and site/css/portal.css on 2026-08-15. Format is the Design Tokens Community Group draft ($type and $value), which Tokens Studio for Figma and the common Figma variable importer plugins both read. Gradients and glows are listed under effect for reference only: Figma variables cannot hold a gradient, so those arrive as documentation rather than as variables.",
+  "color": {
+    "$type": "color",
+    "core": {
+      "$description": "corporate.css :root. These drive the corporate site, the shop, the product page, the login page, the team page and the staff console. All of those surfaces are dark only, on purpose.",
+      "navy": { "$value": "#060B18", "$description": "Page field on every www page. Deliberately deeper than ink." },
+      "navy-raised": { "$value": "#0A1226", "$description": "Raised field: dropdown lists, the bank approval chrome bar." },
+      "ink": { "$value": "#0F172A", "$description": "Ink. Text on light surfaces, and the label on a disabled button." },
+      "indigo": { "$value": "#4F46E5", "$description": "Structural indigo. The primary button in the staff console." },
+      "indigo-on-dark": { "$value": "#818CF8", "$description": "Indigo for dark surfaces: hairlines, hexagon marks, scrollbar thumb." },
+      "indigo-light": { "$value": "#A5B4FC", "$description": "Small text on dark. Measures 7.4 to 1 on navy." },
+      "violet": { "$value": "#A78BFA", "$description": "Third accent. Bundles, the Company section, violet glow bands." },
+      "cyan": { "$value": "#22D3EE", "$description": "THE single lit accent. One accent stays loudest; this is it." },
+      "paper": { "$value": "#FFFFFF", "$description": "Paper. Also the label on an indigo button." },
+      "text-on-dark": { "$value": "#C7D0DE", "$description": "Body text on dark." },
+      "muted-on-dark": { "$value": "#94A3B8", "$description": "Muted text on dark. Measures 7.4 to 1 on navy." },
+      "hairline": { "$value": "#818CF82E", "$description": "1 px luminous border. Authored as rgba(129, 140, 248, 0.18)." }
+    },
+    "surface": {
+      "$description": "Literal values that are not named tokens in the stylesheets but are load bearing, so they are pinned here.",
+      "heading-on-dark": { "$value": "#F1F5F9", "$description": "Every heading on a dark surface." },
+      "field-text": { "$value": "#E2E8F0", "$description": "Text inside form fields and table cells on dark." },
+      "ink-on-cyan": { "$value": "#05121C", "$description": "The label on a cyan button. Measures 10.7 to 1." },
+      "cyan-hover": { "$value": "#67E3F4", "$description": "Hover state of a solid cyan button." },
+      "cyan-text": { "$value": "#67E8F9", "$description": "Cyan used as TEXT in the staff console. Measures 9.6 to 1 on navy." },
+      "quiet": { "$value": "#7C8AA0", "$description": "Legal text and the not yet nav items. 5.61 to 1 on navy. Replaced #64748B, which measured 4.13 to 1 and failed." },
+      "placeholder": { "$value": "#8B99AF", "$description": "Placeholder text inside a field. Measures 4.9 to 1." },
+      "footer": { "$value": "#050914", "$description": "Footer field, one step under navy." }
+    },
+    "state": {
+      "$description": "Meaning colours. Every one of these has a measured contrast ratio recorded against the surface it actually sits on.",
+      "good": { "$value": "#34D399", "$description": "Qualified, met, approved." },
+      "good-soft": { "$value": "#6EE7B7", "$description": "Supporting note under a good state." },
+      "bad": { "$value": "#F87171", "$description": "Declined, remove, error." },
+      "bad-soft": { "$value": "#FCA5A5", "$description": "Error body text on dark. Measures 8.6 to 1 on navy." },
+      "bad-strong": { "$value": "#FECACA", "$description": "Emphasis inside an error card." },
+      "waiting": { "$value": "#FACC15", "$description": "Bank approval in flight. Nothing can proceed until the cardholder acts." },
+      "waiting-soft": { "$value": "#FDE68A", "$description": "Heading inside a waiting card." },
+      "disabled-field": { "$value": "#64748B", "$description": "Background of a disabled button. Paired with ink, NEVER with opacity." },
+      "disabled-label": { "$value": "#0F172A", "$description": "Label on a disabled button. #0F172A on #64748B measures 4.63 to 1." }
+    },
+    "portal-dark": {
+      "$description": "portal.css bare :root. The member portal is the only surface with two themes, and dark is its default.",
+      "bg": { "$value": "#0F172A" },
+      "bg-soft": { "$value": "#1E293B" },
+      "bg-inset": { "$value": "#16223A" },
+      "line": { "$value": "#334155" },
+      "text": { "$value": "#E2E8F0" },
+      "muted": { "$value": "#94A3B8" },
+      "indigo-soft": { "$value": "#818CF8" },
+      "cyan": { "$value": "#22D3EE" },
+      "good": { "$value": "#34D399" },
+      "bad": { "$value": "#F87171" },
+      "amber": { "$value": "#FBBF24" },
+      "violet": { "$value": "#C084FC" },
+      "level-1": { "$value": "#4F46E5" },
+      "level-2": { "$value": "#6366F1" },
+      "level-3": { "$value": "#818CF8" },
+      "level-4": { "$value": "#A5B4FC" },
+      "level-5": { "$value": "#C7D2FE" }
+    },
+    "portal-light": {
+      "$description": "portal.css html[data-theme=\"light\"]. Every token here RESTATES a token that bare :root already defined. Nothing is introduced here for the first time. Four of these were darkened on 2026-08-15 for contrast.",
+      "bg": { "$value": "#F1F5F9" },
+      "bg-soft": { "$value": "#FFFFFF" },
+      "bg-inset": { "$value": "#F8FAFC" },
+      "line": { "$value": "#CBD5E1" },
+      "text": { "$value": "#0F172A" },
+      "muted": { "$value": "#475569" },
+      "indigo-soft": { "$value": "#4F46E5" },
+      "cyan": { "$value": "#0E7490", "$description": "Corrected 2026-08-15. Was #22D3EE, which measured 1.73 to 1 on white as text. Now 5.36 to 1 on white and 4.89 to 1 on the page field." },
+      "good": { "$value": "#065F46", "$description": "Corrected 2026-08-15. Was #34D399, 3.28 to 1 composited on its tinted chip. Now 6.72 to 1 on the chip and 7.34 to 1 on the page." },
+      "bad": { "$value": "#B91C1C", "$description": "Corrected 2026-08-15. Was #F87171, 4.12 to 1 composited on its tinted chip. Now 5.53 to 1." },
+      "amber": { "$value": "#B45309", "$description": "Corrected 2026-08-15 in the same sweep." },
+      "violet": { "$value": "#7C3AED" },
+      "level-1": { "$value": "#312E81" },
+      "level-2": { "$value": "#3730A3" },
+      "level-3": { "$value": "#4338CA" },
+      "level-4": { "$value": "#6366F1" },
+      "level-5": { "$value": "#A5B4FC" }
+    },
+    "drawing": {
+      "$description": "Chart fills. Every fill inside a chart resolves through one of these, so the light theme restates a chart instead of the chart being redrawn.",
+      "own-volume-dark": { "$value": "#4F46E5" },
+      "own-volume-light": { "$value": "#4338CA" },
+      "customer-volume-dark": { "$value": "#22D3EE" },
+      "customer-volume-light": { "$value": "#0E7490" },
+      "commission-dark": { "$value": "#818CF8" },
+      "commission-light": { "$value": "#4F46E5" },
+      "qualification-rule-dark": { "$value": "#94A3B8" },
+      "qualification-rule-light": { "$value": "#475569" },
+      "mark-dark": { "$value": "#818CF8" },
+      "mark-light": { "$value": "#4F46E5" },
+      "mark-lit-dark": { "$value": "#22D3EE" },
+      "mark-lit-light": { "$value": "#0E7490" }
+    }
+  },
+  "font": {
+    "family": {
+      "$type": "fontFamily",
+      "body": { "$value": "Segoe UI, Segoe UI Variable Text, system-ui, -apple-system, sans-serif", "$description": "Humanist sans. Everything except codes." },
+      "mono": { "$value": "Consolas, Cascadia Mono, Courier New, monospace", "$description": "Member codes, order numbers, agent names, keyboard hints." }
+    },
+    "weight": {
+      "$type": "fontWeight",
+      "regular": { "$value": 400 },
+      "medium": { "$value": 600 },
+      "button": { "$value": 650, "$description": "The button weight, deliberately between medium and bold." },
+      "bold": { "$value": 700 }
+    },
+    "size": {
+      "$type": "dimension",
+      "hero": { "$value": "clamp(1.9rem, 4.6vw, 3.1rem)", "$description": "Uppercase, 0.09em tracking." },
+      "section-title": { "$value": "clamp(1.45rem, 3vw, 2.05rem)", "$description": "Uppercase, 0.10em tracking." },
+      "page-title": { "$value": "1.35rem" },
+      "card-title": { "$value": "1.02rem", "$description": "Uppercase, 0.12em tracking." },
+      "body": { "$value": "16px", "$description": "Line height 1.7 on marketing surfaces." },
+      "body-console": { "$value": "15px", "$description": "Line height 1.45. Denser, because it is a work tool." },
+      "small": { "$value": "0.86rem" },
+      "kicker": { "$value": "0.78rem", "$description": "Uppercase, 0.34em tracking, the widest in the system." },
+      "micro": { "$value": "0.62rem", "$description": "Badges and pills. Uppercase, 0.18em tracking." }
+    },
+    "tracking": {
+      "$type": "dimension",
+      "kicker": { "$value": "0.34em" },
+      "badge": { "$value": "0.18em" },
+      "button": { "$value": "0.14em" },
+      "title": { "$value": "0.10em" },
+      "hero": { "$value": "0.09em" }
+    }
+  },
+  "space": {
+    "$type": "dimension",
+    "$description": "The rhythm actually used across the stylesheets. Marketing surfaces sit at the wide end, the console at the tight end.",
+    "1": { "$value": "6px" },
+    "2": { "$value": "8px" },
+    "3": { "$value": "10px" },
+    "4": { "$value": "12px" },
+    "5": { "$value": "14px" },
+    "6": { "$value": "16px" },
+    "7": { "$value": "18px" },
+    "8": { "$value": "22px" },
+    "9": { "$value": "26px" },
+    "10": { "$value": "28px" },
+    "11": { "$value": "32px" },
+    "12": { "$value": "36px" },
+    "13": { "$value": "44px" },
+    "14": { "$value": "56px" },
+    "15": { "$value": "64px" },
+    "16": { "$value": "84px" },
+    "17": { "$value": "104px" }
+  },
+  "radius": {
+    "$type": "dimension",
+    "chip": { "$value": "4px" },
+    "control": { "$value": "8px", "$description": "Buttons, payment method buttons, small fields." },
+    "field": { "$value": "9px" },
+    "field-large": { "$value": "10px" },
+    "panel": { "$value": "12px", "$description": "Console panels." },
+    "panel-large": { "$value": "14px", "$description": "Glass panels on marketing surfaces." },
+    "pill": { "$value": "999px", "$description": "Badges, meters, quantity groups, the cart count." }
+  },
+  "size": {
+    "$type": "dimension",
+    "content-max": { "$value": "1100px", "$description": "Marketing and shop content width." },
+    "console-max": { "$value": "1240px", "$description": "Staff console. Wider because it is a work surface." },
+    "portal-max": { "$value": "1160px" },
+    "cart-drawer": { "$value": "430px", "$description": "Full width under 480px." },
+    "tap-target-min": { "$value": "44px", "$description": "Minimum height of anything a finger has to hit." }
+  },
+  "effect": {
+    "$description": "Reference only. Figma variables cannot hold a gradient or a multi part shadow, so these are documented here and rebuilt as Figma effect styles by hand.",
+    "glass-panel": { "$value": "background linear-gradient(165deg, rgba(30,41,59,0.62), rgba(13,20,38,0.44)); border 1px rgba(129,140,248,0.26); box-shadow 0 0 26px rgba(79,70,229,0.14), inset 0 1px 0 rgba(255,255,255,0.05); backdrop-filter blur(9px)" },
+    "lift-hover": { "$value": "translateY(-5px) plus a widened accent glow, 0.2s ease" },
+    "glow-cyan": { "$value": "0 0 26px rgba(34,211,238,0.12)" },
+    "glow-indigo": { "$value": "0 0 26px rgba(79,70,229,0.14)" },
+    "glow-violet": { "$value": "0 0 26px rgba(167,139,250,0.13)" },
+    "shadow-light-theme": { "$value": "0 4px 14px rgba(15,23,42,0.10)", "$description": "The light theme uses a real shadow. Dark surfaces use glow instead." },
+    "accent-bar": { "$value": "2px bar, linear-gradient(90deg, #4F46E5, #22D3EE), inset 22px from each edge of a panel top" }
+  },
+  "z": {
+    "$type": "number",
+    "nav": { "$value": 50 },
+    "drawer-overlay": { "$value": 90 },
+    "cart-drawer": { "$value": 95 },
+    "challenge-chrome": { "$value": 2147483647, "$description": "The clamped 32 bit maximum. The payment widget asks for 422222133323 and gets clamped to the same number, so the chrome bar matches it and is moved to the end of body to win the tie on document order. Both halves are required." }
+  }
+}

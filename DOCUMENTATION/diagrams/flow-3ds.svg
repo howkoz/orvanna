@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 860" width="1120" height="860" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1120" height="860" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">D. Three-Domain Secure (3-D Secure, or 3DS): the bank approval flow</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">3DS is the card networks' identity check. It asks the card's issuing bank to confirm the shopper really is the cardholder. It never changes the amount.</text>
+
+  <!-- pay -->
+  <rect x="30" y="84" width="330" height="70" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="108" font-size="13.5" font-weight="600" fill="#111827">Shopper presses Pay</text>
+  <text x="46" y="130" font-size="12.5" fill="#374151">The page hands the card to the provider's secure form.</text>
+  <text x="46" y="148" font-size="12.5" fill="#374151">Card data never touches Orvanna's own code.</text>
+
+  <line x1="195" y1="154" x2="195" y2="190" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="194" width="330" height="60" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="218" font-size="13.5" font-weight="600" fill="#111827">The processor answers with a status</text>
+  <text x="46" y="240" font-size="12.5" fill="#374151">succeeded, failed, or requires_customer_action.</text>
+
+  <line x1="195" y1="254" x2="195" y2="290" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- frictionless -->
+  <rect x="30" y="294" width="330" height="104" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="318" font-size="13.5" font-weight="600" fill="#111827">Frictionless pass, the usual case</text>
+  <text x="46" y="340" font-size="12.5" fill="#374151">Phase one of 3DS is silent: the bank inspects the device</text>
+  <text x="46" y="358" font-size="12.5" fill="#374151">and the transaction and usually approves without asking</text>
+  <text x="46" y="376" font-size="12.5" fill="#374151">anything. The shopper sees nothing at all and the</text>
+  <text x="46" y="392" font-size="12.5" fill="#374151">promise resolves on our own page.</text>
+
+  <!-- challenge -->
+  <rect x="400" y="294" width="330" height="104" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="416" y="318" font-size="13.5" font-weight="600" fill="#111827">A real challenge</text>
+  <text x="416" y="340" font-size="12.5" fill="#374151">Phase two happens only when the bank wants proof.</text>
+  <text x="416" y="358" font-size="12.5" fill="#374151">It draws a passcode form of its own inside a window</text>
+  <text x="416" y="376" font-size="12.5" fill="#374151">the merchant supplies. We never write, style, or see</text>
+  <text x="416" y="392" font-size="12.5" fill="#374151">the contents of that form.</text>
+
+  <line x1="360" y1="346" x2="396" y2="346" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="565" y1="398" x2="565" y2="434" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- the reveal rule -->
+  <rect x="30" y="420" width="330" height="120" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="46" y="444" font-size="13.5" font-weight="600" fill="#111827">A blank window is not a challenge</text>
+  <text x="46" y="466" font-size="12.5" fill="#374151">Both phases run inside the same frame, so the frame</text>
+  <text x="46" y="484" font-size="12.5" fill="#374151">appearing means "authentication is running", not "a</text>
+  <text x="46" y="502" font-size="12.5" fill="#374151">challenge is up". So the frame is hidden the instant it</text>
+  <text x="46" y="520" font-size="12.5" fill="#374151">appears and revealed only if it is still there 1,400</text>
+  <text x="46" y="536" font-size="12.5" fill="#374151">milliseconds later. Presentation only; it gates nothing.</text>
+
+  <!-- shapes -->
+  <rect x="400" y="438" width="330" height="146" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="416" y="462" font-size="13.5" font-weight="600" fill="#111827">Two shapes the window can take</text>
+  <text x="416" y="486" font-size="12.5" font-weight="600" fill="#111827">In-page popup (what Orvanna runs today)</text>
+  <text x="416" y="504" font-size="12.5" fill="#374151">The profile setting for iframe redirection is on, so the</text>
+  <text x="416" y="522" font-size="12.5" fill="#374151">shopper stays on orvanna.io through the approval.</text>
+  <text x="416" y="546" font-size="12.5" font-weight="600" fill="#111827">Full page redirect (the older fallback)</text>
+  <text x="416" y="564" font-size="12.5" fill="#374151">The bank takes the whole page away with a history</text>
+  <text x="416" y="580" font-size="12.5" fill="#374151">replace, so pressing Back cannot bring it home.</text>
+
+  <line x1="565" y1="584" x2="565" y2="620" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- resume -->
+  <rect x="400" y="624" width="330" height="130" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="416" y="648" font-size="13.5" font-weight="600" fill="#111827">The resume path</text>
+  <text x="416" y="670" font-size="12.5" fill="#374151">The order number rides in the return address, and a copy</text>
+  <text x="416" y="688" font-size="12.5" fill="#374151">is written to storage BEFORE the payment is confirmed,</text>
+  <text x="416" y="706" font-size="12.5" fill="#374151">because a callback may never run. On the way back, the</text>
+  <text x="416" y="724" font-size="12.5" fill="#374151">page shows a complete destination that names the order</text>
+  <text x="416" y="742" font-size="12.5" fill="#374151">and asks our own server what happened. It never says "press Back".</text>
+
+  <!-- chrome bar -->
+  <rect x="30" y="560" width="330" height="194" rx="10" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="46" y="584" font-size="13.5" font-weight="600" fill="#111827">What Orvanna puts around the window</text>
+  <text x="46" y="608" font-size="12.5" fill="#374151">The bank's content cannot be branded or reached into,</text>
+  <text x="46" y="626" font-size="12.5" fill="#374151">so everything around it is ours:</text>
+  <text x="46" y="650" font-size="12.5" fill="#374151">- a bar carrying the test-mode notice, the order number,</text>
+  <text x="46" y="666" font-size="12.5" fill="#374151">  and a "Cancel and go back" control</text>
+  <text x="46" y="686" font-size="12.5" fill="#374151">- the checkout behind it genuinely disabled, so no</text>
+  <text x="46" y="702" font-size="12.5" fill="#374151">  keyboard user can change the amount being approved</text>
+  <text x="46" y="722" font-size="12.5" fill="#374151">- a focus trap, a dialog role, and a polite live region</text>
+  <text x="46" y="740" font-size="12.5" fill="#374151">- the bar sits at the maximum z-index AND last in the page</text>
+
+  <!-- window sizes -->
+  <rect x="770" y="84" width="320" height="220" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="786" y="108" font-size="13.5" font-weight="600" fill="#111827">The five challenge window sizes</text>
+  <text x="786" y="130" font-size="12.5" fill="#374151">A merchant supplies the WINDOW, not the form.</text>
+  <text x="786" y="148" font-size="12.5" fill="#374151">EMV 3-D Secure 2 permits exactly five sizes:</text>
+  <text x="786" y="176" font-size="13" font-family="Consolas, monospace" fill="#111827">01   250 x 400</text>
+  <text x="786" y="198" font-size="13" font-family="Consolas, monospace" fill="#111827">02   390 x 400</text>
+  <text x="786" y="220" font-size="13" font-family="Consolas, monospace" fill="#111827">03   500 x 600</text>
+  <text x="786" y="242" font-size="13" font-family="Consolas, monospace" fill="#111827">04   600 x 400</text>
+  <text x="786" y="264" font-size="13" font-family="Consolas, monospace" fill="#111827">05   full screen</text>
+  <text x="786" y="290" font-size="12.5" fill="#374151">The bank formats its content to the size asked for.</text>
+
+  <rect x="770" y="316" width="320" height="182" rx="10" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="786" y="340" font-size="13.5" font-weight="600" fill="#111827">Why we do not draw the innermost frame</text>
+  <text x="786" y="364" font-size="12.5" fill="#374151">The provider's own widget creates it, because the</text>
+  <text x="786" y="382" font-size="12.5" fill="#374151">widget is what confirms the payment and therefore</text>
+  <text x="786" y="400" font-size="12.5" fill="#374151">what first sees the "needs approval" status.</text>
+  <text x="786" y="424" font-size="12.5" fill="#374151">Taking that away would mean confirming server side,</text>
+  <text x="786" y="442" font-size="12.5" fill="#374151">which would mean the card entering our own page,</text>
+  <text x="786" y="460" font-size="12.5" fill="#374151">which would put this site inside Payment Card</text>
+  <text x="786" y="478" font-size="12.5" fill="#374151">Industry (PCI) scope. Not worth it for a demo.</text>
+
+  <rect x="770" y="510" width="320" height="244" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="786" y="534" font-size="13.5" font-weight="600" fill="#111827">Four endings, four different sentences</text>
+  <text x="786" y="558" font-size="12.5" font-weight="600" fill="#111827">The check could not run</text>
+  <text x="786" y="576" font-size="12.5" fill="#374151">Nothing is wrong with the card. Try again shortly.</text>
+  <text x="786" y="600" font-size="12.5" font-weight="600" fill="#111827">The bank did not confirm it was you</text>
+  <text x="786" y="618" font-size="12.5" fill="#374151">Retry the approval, or use a different card.</text>
+  <text x="786" y="642" font-size="12.5" font-weight="600" fill="#111827">Confirmed, then the card was declined</text>
+  <text x="786" y="660" font-size="12.5" fill="#374151">Usually a limit or a hold. Telling this shopper to</text>
+  <text x="786" y="676" font-size="12.5" fill="#374151">check their card details is actively wrong.</text>
+  <text x="786" y="700" font-size="12.5" font-weight="600" fill="#111827">A plain decline, no approval involved</text>
+  <text x="786" y="718" font-size="12.5" fill="#374151">Try again with a different card.</text>
+  <text x="786" y="742" font-size="12.5" fill="#374151">Every one of them ends "nothing was charged".</text>
+
+  <text x="30" y="796" font-size="12.5" fill="#374151">Two waiting clocks, because a processor takes seconds and a person reading a text message from their bank takes one to three minutes:</text>
+  <text x="30" y="816" font-size="12.5" fill="#374151">processor wait, every 2 seconds up to 20 seconds. Authentication wait, every 5 seconds for the first minute then every 10, up to 10 minutes.</text>
+  <text x="30" y="846" font-size="11.5" fill="#6B7280">Sources: www/shop.html (challenge chrome, reveal rule, poll schedule), docs/3DS-RESEARCH.md, ROADMAP.md, functions/create-payment/index.ts</text>
+</svg>

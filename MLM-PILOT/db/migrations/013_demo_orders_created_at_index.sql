@@ -1,0 +1,64 @@
+-- Migration 013: the descending created_at index that was never actually built
+-- Purpose: create a DESCENDING index on app.demo_orders (created_at) under a
+--          name that is free, so it can actually be created. The version
+--          applied to production on 2026-08-15 was a silent no-op; the whole
+--          story is below so nobody repeats it.
+-- Date: 2026-08-15 (original), rewritten 2026-08-15 during migration recovery
+-- Project: MLM Pilot (Orvanna, personal project)
+--
+-- ===========================================================================
+-- RECONSTRUCTED, AND DELIBERATELY NOT IDENTICAL TO PRODUCTION. READ THIS.
+-- ===========================================================================
+-- This file does NOT match the body applied to production. That is intentional
+-- and was directed during migration recovery. Everything else in this recovery
+-- set matches production; this one file does not.
+--
+-- WHAT WAS APPLIED. Ledger version 20260815175105, name
+-- '013_demo_orders_created_at_index'. Its body was:
+--
+--     create index if not exists demo_orders_created_at_idx
+--       on app.demo_orders (created_at desc);
+--
+-- WHY IT DID NOTHING. Migration 010 had already created an index called
+-- demo_orders_created_at_idx, ASCENDING. 'create index if not exists' matches
+-- on the NAME only. It does not compare the column list, the sort direction,
+-- the method, or the predicate. Postgres saw a matching name, raised a notice,
+-- and skipped the statement. No descending index was ever built. Confirmed
+-- against pg_indexes on 2026-08-15: the live definition is
+--
+--     CREATE INDEX demo_orders_created_at_idx
+--       ON app.demo_orders USING btree (created_at)
+--
+-- with no DESC. So the ledger recorded an intent that did not happen, which is
+-- worse than recording nothing, because a later reader trusts it.
+--
+-- THE LESSON, which is the real reason this comment is long. 'if not exists'
+-- makes a statement safe to RE-RUN. It does not make a statement safe to
+-- CHANGE. The moment you alter the definition of an object while keeping its
+-- name, 'if not exists' stops being a guard and becomes a silencer. If you
+-- need a different index, give it a different name, or drop and recreate it
+-- explicitly. Never edit a definition under an existing name and rely on
+-- 'if not exists' to sort it out.
+--
+-- HONEST NOTE ON THE VALUE OF THIS INDEX. Postgres can walk a b-tree index
+-- backwards. An ASCENDING index on (created_at) already serves
+-- 'order by created_at desc limit 25' about as well as a descending one, and
+-- it serves the two range scans below (the daily circuit-breaker count and the
+-- one-hour abandonment sweep) identically, because a range scan does not care
+-- about direction. So the practical gain here is small. It is created anyway
+-- because the intent was recorded in the ledger and an intent recorded but not
+-- delivered is exactly the drift this recovery exists to end. If it is later
+-- judged not worth the write cost on every insert, drop it deliberately and
+-- record THAT, rather than leaving the ledger disagreeing with the database.
+--
+-- CONSEQUENCE FOR PRODUCTION: production does not have this index today. This
+-- file was NOT applied. Applying it is Howard's decision, not this recovery's.
+-- ===========================================================================
+
+-- The name is new, so the statement is not silently skipped. The guard is kept
+-- for genuine re-runs of an unchanged definition, which is what it is for.
+create index if not exists demo_orders_created_at_desc_idx
+    on app.demo_orders (created_at desc);
+
+comment on index app.demo_orders_created_at_desc_idx is
+    'Descending companion to demo_orders_created_at_idx. Serves the recent-orders list (order by created_at desc limit 25). Migration 013 originally tried to create this under the ascending index name and was silently skipped; see the header of 013_demo_orders_created_at_index.sql.';

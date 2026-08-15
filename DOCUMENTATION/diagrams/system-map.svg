@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="800" viewBox="0 0 1180 800" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#1F2937"/>
+    </marker>
+    <marker id="arrowBack" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#8A5A17"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="800" fill="#FFFFFF"/>
+
+  <text x="40" y="46" font-size="26" font-weight="600" fill="#111827">Orvanna system map</text>
+  <text x="40" y="72" font-size="14" fill="#4B5563">What runs where, and who owns it. Live at https://orvanna.io. Every payment is sandbox test mode; no real money can move.</text>
+  <text x="40" y="94" font-size="13" fill="#6B7280">Solid dark blue border = ours. Green border = our database. Dashed brown border = a third party we do not control.</text>
+
+  <!-- ============ BROWSER ============ -->
+  <rect x="40" y="130" width="280" height="262" rx="10" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <text x="60" y="158" font-size="15" font-weight="600" fill="#1F2937">THE VISITOR'S BROWSER</text>
+  <text x="60" y="180" font-size="12.5" fill="#374151">Static pages on GitHub Pages</text>
+  <text x="60" y="198" font-size="12.5" fill="#374151">public repo howkoz/orvanna.io</text>
+  <line x1="60" y1="210" x2="300" y2="210" stroke="#9BAACB" stroke-width="1"/>
+  <text x="60" y="230" font-size="12.5" fill="#111827">index.html      corporate home</text>
+  <text x="60" y="249" font-size="12.5" fill="#111827">shop.html       catalog + checkout</text>
+  <text x="60" y="268" font-size="12.5" fill="#111827">product.html    one item</text>
+  <text x="60" y="287" font-size="12.5" fill="#111827">team.html       the people</text>
+  <text x="60" y="306" font-size="12.5" fill="#111827">login.html      sign in door</text>
+  <text x="60" y="325" font-size="12.5" fill="#111827">staff.html      call console</text>
+  <text x="60" y="344" font-size="12.5" fill="#111827">portal/index.html  member office</text>
+  <text x="60" y="371" font-size="12" fill="#4B5563">No framework. No bundler. No card data.</text>
+
+  <!-- Botpress -->
+  <rect x="40" y="452" width="280" height="92" rx="10" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="60" y="478" font-size="14" font-weight="600" fill="#7A4E12">BOTPRESS (third party)</text>
+  <text x="60" y="499" font-size="12.5" fill="#374151">Hosted support chat widget.</text>
+  <text x="60" y="518" font-size="12.5" fill="#374151">Opened from a nav item, never a bubble.</text>
+  <text x="60" y="536" font-size="12" fill="#6B7280">Down: the Support link does nothing. Site fine.</text>
+
+  <line x1="180" y1="392" x2="180" y2="450" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="190" y="424" font-size="11.5" fill="#4B5563">two script tags</text>
+
+  <!-- ============ EDGE FUNCTIONS ============ -->
+  <rect x="400" y="112" width="300" height="300" rx="10" fill="#E8EEFB" stroke="#2B3A67" stroke-width="2"/>
+  <text x="420" y="140" font-size="15" font-weight="600" fill="#1F2937">OUR SERVER: EDGE FUNCTIONS</text>
+  <text x="420" y="161" font-size="12.5" fill="#374151">Supabase project mlm-pilot, TypeScript</text>
+  <text x="420" y="179" font-size="12.5" fill="#374151">on the Deno runtime</text>
+  <line x1="420" y1="191" x2="680" y2="191" stroke="#9BAACB" stroke-width="1"/>
+  <text x="420" y="211" font-size="12.5" fill="#111827">quote-tax          price a cart</text>
+  <text x="420" y="230" font-size="12.5" fill="#111827">create-payment     open a payment</text>
+  <text x="420" y="249" font-size="12.5" fill="#111827">confirm-payment    ask what happened</text>
+  <text x="420" y="268" font-size="12.5" fill="#111827">payment-webhook    processor tells us</text>
+  <text x="420" y="287" font-size="12.5" fill="#111827">record-tax         book the tax sale</text>
+  <text x="420" y="306" font-size="12.5" fill="#111827">list-demo-orders   recent orders</text>
+  <text x="420" y="325" font-size="12.5" fill="#111827">demo-login         check a password</text>
+  <line x1="420" y1="338" x2="680" y2="338" stroke="#9BAACB" stroke-width="1"/>
+  <text x="420" y="357" font-size="12" fill="#4B5563">_shared/edge.ts    rails + payment truth</text>
+  <text x="420" y="375" font-size="12" fill="#4B5563">_shared/pricing.ts price mirror</text>
+  <text x="420" y="393" font-size="12" fill="#4B5563">_shared/tax.ts     one tax decision</text>
+
+  <!-- ============ POSTGRES ============ -->
+  <rect x="400" y="452" width="300" height="228" rx="10" fill="#E6F4EA" stroke="#1E6B3A" stroke-width="2"/>
+  <text x="420" y="480" font-size="15" font-weight="600" fill="#14532D">OUR DATABASE: POSTGRES</text>
+  <text x="420" y="501" font-size="12.5" fill="#374151">Same Supabase project, Postgres 17</text>
+  <line x1="420" y1="513" x2="680" y2="513" stroke="#8FBF9F" stroke-width="1"/>
+  <text x="420" y="533" font-size="12.5" fill="#111827">app schema: members, orders, ranks,</text>
+  <text x="420" y="551" font-size="12.5" fill="#111827">commission runs, demo_orders,</text>
+  <text x="420" y="569" font-size="12.5" fill="#111827">demo_rate_events, demo_users</text>
+  <text x="420" y="592" font-size="12.5" fill="#111827">Row Level Security on, no public policy.</text>
+  <line x1="420" y1="604" x2="680" y2="604" stroke="#8FBF9F" stroke-width="1"/>
+  <text x="420" y="624" font-size="12.5" fill="#111827">seven public v_demo_ views:</text>
+  <text x="420" y="642" font-size="12" fill="#374151">members, tree, member_months, statements,</text>
+  <text x="420" y="660" font-size="12" fill="#374151">company, customers, customer_volume</text>
+
+  <line x1="550" y1="412" x2="550" y2="450" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="560" y="437" font-size="11.5" fill="#4B5563">server side connection</text>
+
+  <!-- ============ HYPERSWITCH ============ -->
+  <rect x="790" y="130" width="330" height="140" rx="10" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="810" y="157" font-size="14" font-weight="600" fill="#7A4E12">HYPERSWITCH SANDBOX (third party)</text>
+  <text x="810" y="178" font-size="12.5" fill="#374151">Payment orchestrator, test mode only.</text>
+  <text x="810" y="196" font-size="12.5" fill="#374151">Also serves HyperLoader.js, the browser</text>
+  <text x="810" y="214" font-size="12.5" fill="#374151">card widget, so cards stay off our pages.</text>
+  <text x="810" y="238" font-size="12" fill="#6B7280">Down: no new payments open. Browsing,</text>
+  <text x="810" y="255" font-size="12" fill="#6B7280">the portal and past orders all still work.</text>
+
+  <!-- ============ BRAINTREE ============ -->
+  <rect x="790" y="310" width="330" height="118" rx="10" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="810" y="337" font-size="14" font-weight="600" fill="#7A4E12">BRAINTREE SANDBOX (third party)</text>
+  <text x="810" y="358" font-size="12.5" fill="#374151">The card connector behind HyperSwitch,</text>
+  <text x="810" y="376" font-size="12.5" fill="#374151">and the source of the 3-D Secure challenge.</text>
+  <text x="810" y="400" font-size="12" fill="#6B7280">Down: cards decline or hang. HyperSwitch</text>
+  <text x="810" y="417" font-size="12" fill="#6B7280">answers; our row never says succeeded.</text>
+
+  <!-- ============ STRIPE TAX ============ -->
+  <rect x="790" y="468" width="330" height="118" rx="10" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="810" y="495" font-size="14" font-weight="600" fill="#7A4E12">STRIPE TAX (third party)</text>
+  <text x="810" y="516" font-size="12.5" fill="#374151">Calculates tax, then records the sale.</text>
+  <text x="810" y="534" font-size="12.5" fill="#374151">Called only by our server, never the page.</text>
+  <text x="810" y="558" font-size="12" fill="#6B7280">Down: cart still prices, at the flat five</text>
+  <text x="810" y="575" font-size="12" fill="#6B7280">percent fallback, labelled as a fallback.</text>
+
+  <!-- ============ GITHUB PAGES ============ -->
+  <rect x="790" y="626" width="330" height="96" rx="10" fill="#FDF0E3" stroke="#8A5A17" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="810" y="653" font-size="14" font-weight="600" fill="#7A4E12">GITHUB PAGES (third party)</text>
+  <text x="810" y="674" font-size="12.5" fill="#374151">Serves the static site at orvanna.io.</text>
+  <text x="810" y="697" font-size="12" fill="#6B7280">Down: the whole site is unreachable.</text>
+  <text x="810" y="714" font-size="12" fill="#6B7280">Nothing else can help; it is the front door.</text>
+
+  <!-- ============ ARROWS ============ -->
+
+  <!-- browser -> edge functions -->
+  <line x1="322" y1="196" x2="398" y2="196" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="326" y="188" font-size="11.5" fill="#4B5563">HTTPS, public key</text>
+
+  <!-- browser -> hyperswitch (over the top) -->
+  <polyline points="180,128 180,104 955,104 955,128" fill="none" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="470" y="98" font-size="11.5" fill="#4B5563">card details go straight to HyperSwitch's own widget, never through our code</text>
+
+  <!-- browser -> postgres views -->
+  <polyline points="322,330 352,330 352,564 398,564" fill="none" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="196" y="602" font-size="11.5" fill="#4B5563">read only, seven views</text>
+
+  <!-- edge fn -> hyperswitch -->
+  <line x1="702" y1="176" x2="788" y2="176" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="704" y="168" font-size="11.5" fill="#4B5563">secret key</text>
+
+  <!-- hyperswitch -> edge fn (webhook) -->
+  <line x1="788" y1="222" x2="702" y2="222" stroke="#8A5A17" stroke-width="2" marker-end="url(#arrowBack)"/>
+  <text x="704" y="240" font-size="11.5" fill="#7A4E12">signed webhook</text>
+
+  <!-- hyperswitch -> braintree -->
+  <line x1="955" y1="272" x2="955" y2="308" stroke="#8A5A17" stroke-width="2" marker-end="url(#arrowBack)"/>
+  <text x="965" y="295" font-size="11.5" fill="#7A4E12">routes the card</text>
+
+  <!-- edge fn -> stripe tax -->
+  <polyline points="702,380 745,380 745,524 788,524" fill="none" stroke="#1F2937" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="600" y="705" font-size="11.5" fill="#4B5563"></text>
+
+  <!-- legend -->
+  <rect x="40" y="600" width="280" height="132" rx="8" fill="#F7F8FA" stroke="#C7CBD3" stroke-width="1"/>
+  <text x="58" y="624" font-size="13" font-weight="600" fill="#111827">Reading the arrows</text>
+  <text x="58" y="646" font-size="12" fill="#374151">Dark arrow: a request we make.</text>
+  <text x="58" y="665" font-size="12" fill="#374151">Brown arrow: a third party calls us.</text>
+  <text x="58" y="690" font-size="12" fill="#374151">The browser holds no secret of any kind.</text>
+  <text x="58" y="709" font-size="12" fill="#374151">Every private key sits in the Supabase</text>
+  <text x="58" y="726" font-size="12" fill="#374151">vault and is read only by a function.</text>
+
+  <text x="40" y="766" font-size="11.5" fill="#6B7280">Source of truth for this drawing: MLM-PILOT/functions/, MLM-PILOT/www/, MLM-PILOT/site/, MLM-PILOT/db/migrations/, MLM-PILOT/deploy/build_dist.py. As of 2026-08-15.</text>
+</svg>

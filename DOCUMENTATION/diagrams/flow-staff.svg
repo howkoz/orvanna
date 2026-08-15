@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 780" width="1080" height="780" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1080" height="780" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">F. The staff call console: one caller, one screen</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">Same three server functions as the shop, with the channel marked "staff_console" and the caller's member code attached.</text>
+
+  <rect x="30" y="84" width="420" height="88" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="46" y="108" font-size="13.5" font-weight="600" fill="#111827">The session gate runs before anything else</text>
+  <text x="46" y="130" font-size="12.5" fill="#374151">No valid staff token means an immediate redirect to the sign-in</text>
+  <text x="46" y="148" font-size="12.5" fill="#374151">page, and not one database call is made. The token was signed by</text>
+  <text x="46" y="166" font-size="12.5" fill="#374151">the server; the browser cannot mint or edit one.</text>
+
+  <line x1="240" y1="172" x2="240" y2="208" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="212" width="420" height="88" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="236" font-size="13.5" font-weight="600" fill="#111827">Caller lookup</text>
+  <text x="46" y="258" font-size="12.5" fill="#374151">A member number or a name. GW-000002, gw2, 000002 and 2 all</text>
+  <text x="46" y="276" font-size="12.5" fill="#374151">resolve to the same account. A slash key jumps back here from</text>
+  <text x="46" y="294" font-size="12.5" fill="#374151">anywhere, and Enter picks the top match.</text>
+
+  <line x1="240" y1="300" x2="240" y2="336" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="340" width="420" height="88" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="364" font-size="13.5" font-weight="600" fill="#111827">Caller snapshot and call notes</text>
+  <text x="46" y="386" font-size="12.5" fill="#374151">Volume figures come from the same public demonstration views the</text>
+  <text x="46" y="404" font-size="12.5" fill="#374151">member portal reads. Contact details are synthesized from the</text>
+  <text x="46" y="422" font-size="12.5" fill="#374151">member code, deterministically, so nothing personal is stored.</text>
+
+  <line x1="240" y1="428" x2="240" y2="464" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="468" width="420" height="88" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="492" font-size="13.5" font-weight="600" fill="#111827">Quick order</text>
+  <text x="46" y="514" font-size="12.5" fill="#374151">Product, billing mode, quantity, add line. The same catalog file</text>
+  <text x="46" y="532" font-size="12.5" fill="#374151">the shop uses. Phone orders carry no activation fee and the</text>
+  <text x="46" y="550" font-size="12.5" fill="#374151">activation is always standard.</text>
+
+  <line x1="240" y1="556" x2="240" y2="592" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="30" y="596" width="420" height="106" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="620" font-size="13.5" font-weight="600" fill="#111827">Confirmation, written to be read aloud</text>
+  <text x="46" y="642" font-size="12.5" fill="#374151">The order number is spelled out phonetically, the total is spelled</text>
+  <text x="46" y="660" font-size="12.5" fill="#374151">out in words, and the qualification line tells the agent whether</text>
+  <text x="46" y="678" font-size="12.5" fill="#374151">this order qualifies the caller's month. The agent reads the</text>
+  <text x="46" y="694" font-size="12.5" fill="#374151">screen; they do not have to compose anything.</text>
+
+  <!-- payment choices -->
+  <rect x="480" y="84" width="570" height="228" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="496" y="108" font-size="13.5" font-weight="600" fill="#111827">Three payment choices, and the truth about each</text>
+
+  <text x="496" y="136" font-size="12.5" font-weight="600" fill="#111827">Payment link to the caller's own device (recommended)</text>
+  <text x="496" y="154" font-size="12.5" fill="#374151">The right habit: the caller pays on their own phone, so a bank</text>
+  <text x="496" y="172" font-size="12.5" fill="#374151">approval can actually happen and no card number is spoken aloud.</text>
+  <text x="496" y="190" font-size="12.5" fill="#374151">Disabled today, with the reason stated: minting a hosted link needs</text>
+  <text x="496" y="208" font-size="12.5" fill="#374151">a server function that has not been built.</text>
+
+  <text x="496" y="236" font-size="12.5" font-weight="600" fill="#111827">Key the card here, a telephone order</text>
+  <text x="496" y="254" font-size="12.5" fill="#374151">The working path today. The card goes into the provider's secure</text>
+  <text x="496" y="272" font-size="12.5" fill="#374151">form, never into this page's own fields.</text>
+
+  <text x="496" y="296" font-size="12.5" font-weight="600" fill="#111827">Card on file: a labelled demonstration, permanently disabled</text>
+
+  <rect x="480" y="326" width="570" height="176" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.8"/>
+  <text x="496" y="350" font-size="13.5" font-weight="600" fill="#111827">The rules printed on the screen, not buried in a manual</text>
+  <text x="496" y="374" font-size="12.5" fill="#374151">1. Never ask a caller to read out a code their bank sent. That request</text>
+  <text x="496" y="392" font-size="12.5" fill="#374151">is word for word the script of a real fraud technique, and it does not</text>
+  <text x="496" y="410" font-size="12.5" fill="#374151">complete the approval anyway.</text>
+  <text x="496" y="434" font-size="12.5" fill="#374151">2. If the bank asks for an approval, only the cardholder can give it, on</text>
+  <text x="496" y="452" font-size="12.5" fill="#374151">their own device. The console says so plainly instead of inviting help.</text>
+  <text x="496" y="476" font-size="12.5" fill="#374151">3. A keyed card is a telephone order. It sits outside Strong Customer</text>
+  <text x="496" y="494" font-size="12.5" fill="#374151">Authentication (SCA), so the fraud liability lands on us, not the issuer.</text>
+
+  <rect x="480" y="516" width="570" height="122" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="496" y="540" font-size="13.5" font-weight="600" fill="#111827">Same rails as the shop</text>
+  <text x="496" y="564" font-size="12.5" fill="#374151">create-payment opens the order and returns the confirmation number,</text>
+  <text x="496" y="582" font-size="12.5" fill="#374151">which the agent gives the caller before anything else can go wrong.</text>
+  <text x="496" y="606" font-size="12.5" fill="#374151">confirm-payment is the only source of the outcome. The console has its</text>
+  <text x="496" y="624" font-size="12.5" fill="#374151">own resume state, its own abandon control, and its own order lookup.</text>
+
+  <rect x="480" y="652" width="570" height="82" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="496" y="676" font-size="13.5" font-weight="600" fill="#111827">Tax parity with the shop, closed 2026-08-15</text>
+  <text x="496" y="698" font-size="12.5" fill="#374151">The console now calls quote-tax, sends the tax identifier as text, and paints</text>
+  <text x="496" y="716" font-size="12.5" fill="#374151">calculated, estimate or flat. Measured on caller GW-000003: $8.88 tax and</text>
+  <text x="496" y="730" font-size="12.5" fill="#374151">$108.88 total on screen, on the button, and on the server row. Was $105.00.</text>
+
+  <text x="30" y="760" font-size="11.5" fill="#6B7280">Sources: www/staff.html, www/login.html, functions/create-payment/index.ts, functions/confirm-payment/index.ts</text>
+</svg>

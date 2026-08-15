@@ -18,7 +18,9 @@ Seven personas vetted the idea. **Verdict: GO, with a v1 scope lock.**
   AUDITABLE commission run: versioned batches, per-member statement receipts,
   recomputable by the verifier. That is the piece worth showing off.
 - **Marketer:** it must LOOK like a real member portal (tree view, rank badges, volume
-  bars) under the Globex Wellness brand; demo value is the point of the domain.
+  bars) under the Orvanna brand; demo value is the point of the domain. (This
+  verdict was written before the brand was named and originally said "Globex
+  Wellness", the placeholder retired 2026-08-13.)
 - **Chief financial officer:** $0/month stack confirmed; the only spend already
   happened (the domain). Use a personal Supabase org to keep IP clean.
 - **Security:** row-level security from day one, synthetic identities only (fake names,
@@ -112,7 +114,9 @@ ORVANNA\HyperSwitch\; it is gitignore-fenced and verified never committed.)
 PHASE 6 OPENED 2026-08-14 evening (Howard: "team page is stellar!! Open Phase 6").
 BUILT AND LIVE THE SAME EVENING: spec (PHASE-6-SPEC.md) -> migration 010 applied
 (demo_orders + rate ledger, sealed) -> three Edge Functions deployed and
-smoke-tested -> Howard loaded the vault (4 secrets) and created two dummy
+smoke-tested (create-payment, confirm-payment, list-demo-orders; four more
+followed within two days, so the current count is SEVEN, listed in full at the
+end of the Phase 6.2 section below) -> Howard loaded the vault (4 secrets) and created two dummy
 connectors (pretendpay_default, stripe_test_default) -> FIRST PAYMENT EVER:
 ORV-2026-08-158WRU, $105.00, succeeded via stripe_test, amount verified to the
 cent, recorded in demo_orders -> LIVE_PAYMENTS flag shipped to orvanna.io
@@ -154,6 +158,66 @@ keep the built-in 5 percent engine (gate-passed, live, honest for a demo) and
 present the TaxJar connector screen as the "where a real engine plugs in" story,
 (c) architect evaluates whether any other tax path exists in HyperSwitch's
 connector list. No build time was lost; the deal-breaker surfaced at step one.
+
+RESOLVED 2026-08-15, AND NOT BY ANY OF THOSE THREE OPTIONS. Everything above
+this line is history and is left standing so the dead end stays readable. The
+current truth is here.
+
+A REAL TAX ENGINE IS LIVE, AND IT IS STRIPE TAX. Not TaxJar, and not through
+HyperSwitch. Our own Edge Functions call Stripe Tax directly
+(https://api.stripe.com/v1/tax/calculations), which sidesteps the whole
+premise of the paragraphs above: the orchestrator never computes tax, so the
+amount-verification contract never had to be redefined. create-payment still
+reprices from scratch and still rejects any charge that does not equal its own
+math to the cent. The rejection risk that made this architect-first simply
+does not arise on this route.
+
+WHAT IT RETURNS: real rates at city level, not a flat guess. Verified on the
+live rail 2026-08-15 by the coordinator: a New York destination returned 8.875
+percent. Recorded here as reported by the coordinator, not as my own probe.
+
+WHO CONTROLS WHICH STATES TAX: Howard, in the Stripe dashboard, by adding a
+registration for a state. No code change, no deploy, no ticket. A jurisdiction
+we hold no registration in correctly returns zero, and Stripe says WHY
+(taxability_reason), which is carried back and stored rather than discarded, so
+a zero is never reported without its reason.
+
+TAX IS NOW QUOTED BEFORE THE CARD, not discovered after it. Howard, 2026-08-15:
+"no one wants to make a payment and then find out 71 dollars was applied after
+submitting the card." So a new Edge Function, quote-tax, prices a cart and
+answers. It CREATES NOTHING: no order row, no HyperSwitch payment, no Stripe
+transaction, and it deliberately does not keep Stripe's calculation identifier,
+because a quote nobody buys should leave nothing behind. Before this, the only
+way to learn what tax was owed was to open a payment first.
+
+THEY CANNOT DRIFT, BY CONSTRUCTION. quote-tax and create-payment share ONE
+implementation, functions\_shared\tax.ts. A quote that says one number and a
+charge that says another would be the single worst bug this checkout could
+ship, and copying the logic into two files is exactly how that bug gets
+written. One function, two callers, no second opinion. create-payment stays the
+authority: a quote is a display, a charge is a fact, and the cart is repriced
+from scratch at charge time rather than trusting anything the page was quoted.
+
+FALLBACK, STATED PLAINLY: if Stripe cannot be reached the cart still prices, at
+the flat 5 percent, and the outcome records source 'flat_fallback' so the
+difference is never silent.
+
+HONEST LIMIT, and the page says it too: Stripe checks the FORMAT of a tax
+identifier, not the government register behind it, so a well-formed fake
+passes. The mechanism is real; the verification is not.
+
+NEW SECRET: STRIPE_SECRET_KEY, in the Supabase vault, read only by the server.
+A companion function, record-tax, turns a calculation into a recorded Stripe
+Tax TRANSACTION after a payment succeeds, deliberately outside the payment path
+so a bookkeeping failure never leaves a paid shopper watching a spinner.
+
+THE EDGE FUNCTIONS, AS OF 2026-08-15: there are SEVEN, not the three named in
+the Phase 6 row above (that count was true the evening Phase 6 opened and was
+never updated). In deployment order: create-payment, confirm-payment,
+list-demo-orders, then payment-webhook (Phase 6.1), then demo-login, then
+quote-tax and record-tax (the tax round). Shared modules: _shared\edge.ts
+(rails and the single payment-truth path), _shared\pricing.ts (the price
+mirror), _shared\tax.ts (the one tax decision).
 
 THE SUNDAY LIST (Howard, 2026-08-14 night: "putting a list together of things
 for Sunday"). Runs after or alongside Phase 7's flow-out, his ordering call:
@@ -245,7 +309,8 @@ comp variant, order placement UI, KPI prism dashboard.
 ## Product concept (LOCKED 2026-08-13)
 
 Digital AI agents sold as monthly Software as a Service (SaaS) subscriptions, fully
-fictional under the Globex persona: DOMAIN agents (Payment, Shipping, Pricing, ...)
+fictional under the Orvanna brand (this line said "the Globex persona" until the
+placeholder was retired 2026-08-13): DOMAIN agents (Payment, Shipping, Pricing, ...)
 at $100.00 / 100 Personal Volume (PV); SUPPORT agents (Software Engineer, Quality
 Assurance, Secretary, Chief Executive, Accounting, ...) at $50.00 / 50 PV.
 Commission-qualified month = 100+ PV of subscriptions (one gate for being paid AND

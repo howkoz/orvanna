@@ -14,7 +14,7 @@ Quality Assurance (QA).
 
 ## 1. The product: digital AI agents, sold as monthly subscriptions
 
-Globex sells AI agents as SaaS subscriptions. Two tiers:
+Orvanna sells AI agents as SaaS subscriptions. Two tiers:
 
 | Tier | What they are | Price / month | PV / month |
 |---|---|---|---|
