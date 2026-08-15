@@ -584,3 +584,44 @@ NOTE FOR TESTING: orvanna.io is served with Cache-Control max-age 600, so a
 change can look absent for up to ten minutes in a browser that already has the
 page. A cache-busting query string settles whether a fix is missing or merely
 cached; this cost an unnecessary round of debugging today.
+
+
+## A BLANK WINDOW IS NOT A CHALLENGE, 2026-08-15
+
+Howard, testing 4242 4242 4242 4242: "the iframe appears for like 2 seconds
+waiting for a challenge and the challenge does not come, then it disappears and
+goes to the order placed page. The challenge window should not even show on that
+card number." Correct, and it was our bug, not a sandbox limitation. He offered
+to accept it as one; it should not have been accepted.
+
+CAUSE: 3-D Secure 2 has two phases and the payment widget runs BOTH inside the
+same full-screen frame. Phase one is silent (the issuer inspects the device and
+the transaction and usually approves without asking anything). Phase two is the
+visible passcode form, and only happens when the issuer wants proof. So the
+frame appearing means "authentication is running", not "a challenge is up".
+Treating the two as the same thing produced a blank white window on every
+frictionless payment, with our chrome bar announcing an approval nobody had
+asked for.
+
+FIX: the frame is made invisible the instant it appears, and revealed only if it
+is STILL PRESENT 1400ms later, which is the tell that a real challenge rendered
+inside it. A frictionless authentication finishes inside that beat and the
+shopper sees nothing at all, which is the entire point of frictionless. The
+delay is presentation only; it never gates the payment, and the verdict still
+comes from our server.
+
+VERIFIED on the live page by driving both timelines:
+  frictionless: frame present at +200ms with opacity 0 and no chrome; gone by
+                +2000ms; chrome never shown
+  challenge:    frame present at +200ms with opacity 0 and no chrome; at
+                +2000ms still present, opacity restored, chrome shown
+
+ALSO FIXED, same round: the card form used to reappear for a second between the
+approval finishing and the receipt. The finishing state now starts the moment
+the card is handed over rather than only after a challenge closes, so the form
+is never back on screen while the outcome is being settled.
+
+APPLIED TO BOTH SURFACES per the QA rule that scope follows capability, not the
+brief. On the staff console the stakes are higher: that page's script tells an
+agent on a live call what the cardholder is being asked to do, so announcing a
+challenge that never comes would put words in the agent's mouth.
