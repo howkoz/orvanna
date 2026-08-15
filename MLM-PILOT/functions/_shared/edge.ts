@@ -156,12 +156,22 @@ export async function checkRateLimit(
   ipHash: string,
   opts: RateLimitOptions,
   scope = "shared",
+  existingClient?: DbClient,
 ): Promise<RateLimitVerdict> {
   /* Scope keeps each function's bucket separate (Phase 6 verifier
      MEDIUM 2): confirm polling must never consume the create
      budget for the same visitor. The ledger key is scope:hash. */
   const key = `${scope}:${ipHash}`;
-  const client = await getPool().connect();
+  /* SPEED, 2026-08-15. A caller that already holds a connection can
+     lend it, which removes a whole Postgres connect (transmission
+     control protocol, then Transport Layer Security, then
+     authentication) from the critical path. In a fresh Edge Function
+     isolate that handshake is one of the largest single costs in the
+     request, and create-payment was paying it twice: once here and
+     once for its own work. Callers that pass nothing keep the old
+     behaviour exactly, so the other functions are unaffected. */
+  const borrowed = existingClient !== undefined;
+  const client = existingClient ?? await getPool().connect();
   try {
     const minuteRow = await client.queryObject<{ request_count: number }>(
       `select request_count
@@ -212,7 +222,9 @@ export async function checkRateLimit(
 
     return { allowed: true, retryAfterSeconds: 0 };
   } finally {
-    client.release();
+    /* a borrowed connection belongs to the caller and is theirs to
+       release; releasing it here would pull it out from under them */
+    if (!borrowed) client.release();
   }
 }
 

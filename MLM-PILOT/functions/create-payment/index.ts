@@ -251,21 +251,33 @@ Deno.serve(async (req: Request): Promise<Response> => {
   /* Narrowed by the check above: an allowed origin is a string. */
   const allowedOrigin = origin as string;
 
-  /* ---- rails: rate limit, then circuit breaker ---- */
+  /* ---- rails: rate limit, then circuit breaker ----
+     ONE database connection for the whole request. The rate limit
+     used to open and close its own, so every call paid the Postgres
+     handshake twice. In a fresh Edge Function isolate that handshake
+     is one of the largest costs in the request, and this checkout now
+     opens the card form automatically, so the wait is in front of the
+     shopper rather than behind a button press. Order of the rails is
+     unchanged: limit first, then the daily ceiling. */
   const ipHash = await callerIpHash(req);
-  const verdict = await checkRateLimit(ipHash, { perMinute: 5, perHour: 30 }, "create");
-  if (!verdict.allowed) {
-    return errorResponse(
-      req,
-      429,
-      "rate_limited",
-      "Easy does it. This demo takes a few orders per minute per visitor. Please wait a moment and try again.",
-      { "Retry-After": String(verdict.retryAfterSeconds) },
-    );
-  }
-
   const client = await getPool().connect();
   try {
+    const verdict = await checkRateLimit(
+      ipHash,
+      { perMinute: 5, perHour: 30 },
+      "create",
+      client,
+    );
+    if (!verdict.allowed) {
+      return errorResponse(
+        req,
+        429,
+        "rate_limited",
+        "Easy does it. This demo takes a few orders per minute per visitor. Please wait a moment and try again.",
+        { "Retry-After": String(verdict.retryAfterSeconds) },
+      );
+    }
+
     const todayCount = await client.queryObject<{ total: number }>(
       `select count(*)::int as total
          from app.demo_orders
