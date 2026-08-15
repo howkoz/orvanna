@@ -70,6 +70,7 @@ import {
   preflight,
 } from "../_shared/edge.ts";
 import { priceCart } from "../_shared/pricing.ts";
+import { calculateTax, looksLikeTaxId, resolveTaxAddress } from "../_shared/tax.ts";
 
 const DAILY_ORDER_CEILING = 500; // spec 5.1 circuit breaker
 
@@ -235,139 +236,19 @@ function generateOrderNumber(): string {
 /* ============================================================
    TAX, CALCULATED BY AN ENGINE RATHER THAN ASSUMED
 
-   Until 2026-08-15 tax was a flat five percent computed twice, once
-   in the browser for display and once here for the charge, which
-   agreed only because both were the same guess. Stripe Tax now
-   returns the real figure for a real destination.
+   The implementation moved to _shared/tax.ts on 2026-08-15 so that
+   quote-tax and this function cannot possibly disagree. Read that
+   file for the three rules it obeys (destination from the database,
+   exemption decided by Stripe, no zero without its reason) and for
+   the flat-rate fallback.
 
-   THREE RULES THIS OBEYS.
-
-   1. THE DESTINATION COMES FROM THE DATABASE, NEVER THE BROWSER. It
-      is read from the signed-in member's row. A browser that can
-      choose its own destination can choose its own tax rate, which
-      is the same mistake as letting it choose its own price.
-
-   2. EXEMPTION IS STRIPE'S DECISION, NOT THE PAGE'S. The old
-      tax_exempt flag was a boolean the browser sent, so anyone could
-      zero their own tax. Now the page sends the tax identifier TEXT,
-      this function decides whether it even looks like one, and
-      Stripe decides what it means. Honest limit, stated because the
-      page states it too: Stripe checks the FORMAT of an identifier,
-      not the government register behind it, so a well-formed fake
-      passes. The mechanism is real; the verification is not, and we
-      say so rather than implying a check we do not perform.
-
-   3. A ZERO IS NEVER REPORTED WITHOUT ITS REASON. Stripe returns
-      zero both when we hold no registration in a jurisdiction (a
-      misconfiguration) and when that jurisdiction simply does not
-      tax the product (the correct answer). taxability_reason is the
-      only thing that separates them, so it is carried back and
-      stored rather than discarded.
-
-   FALLBACK. If Stripe cannot be reached the order still prices, at
-   the flat rate, and the row records tax_source 'flat_fallback' so
-   the difference is never silent. The tax code is deliberately not
-   sent: the preset product category configured in the Stripe
-   dashboard is the single place that decision should live.
+   What matters HERE is which of the two functions is authority:
+   this one. quote-tax answers "what will this cost" and creates
+   nothing; this function answers "what is being charged" and is the
+   figure that reaches the card. The cart is repriced from scratch
+   below rather than trusting anything the page was quoted, because
+   a quote is a display and a charge is a fact.
    ============================================================ */
-const STRIPE_TAX_URL = "https://api.stripe.com/v1/tax/calculations";
-
-interface TaxOutcome {
-  tax_cents: number;
-  source: "stripe_tax" | "flat_fallback";
-  calculation_id: string | null;
-  reason: string | null;
-  jurisdiction: string | null;
-}
-
-async function calculateTax(
-  order: { items: Array<{ sku: string; quantity: number; unit_price: number }>; },
-  taxableCents: number,
-  address: {
-    line1: string; city: string; state: string; zip: string; country: string;
-  },
-  taxIdText: string,
-  flatFallbackCents: number,
-): Promise<TaxOutcome> {
-  const key = Deno.env.get("STRIPE_SECRET_KEY");
-  if (!key) {
-    return {
-      tax_cents: flatFallbackCents,
-      source: "flat_fallback",
-      calculation_id: null,
-      reason: "stripe_not_configured",
-      jurisdiction: null,
-    };
-  }
-
-  /* One line item for the whole taxable amount. Every product here is
-     the same category (software as a service), so splitting per item
-     would produce identical treatment and only add rounding seams. */
-  const form = new URLSearchParams();
-  form.set("currency", "usd");
-  form.set("line_items[0][amount]", String(taxableCents));
-  form.set("line_items[0][reference]", "orvanna-order");
-  form.set("line_items[0][tax_behavior]", "exclusive");
-  form.set("customer_details[address][line1]", address.line1);
-  form.set("customer_details[address][city]", address.city);
-  form.set("customer_details[address][state]", address.state);
-  form.set("customer_details[address][postal_code]", address.zip);
-  form.set("customer_details[address][country]", address.country);
-  form.set("customer_details[address_source]", "billing");
-  /* A tax identifier that looks like one asks Stripe to treat the
-     buyer as exempt. Stripe, not this function, decides the effect. */
-  if (/\d/.test(taxIdText)) {
-    form.set("customer_details[taxability_override]", "customer_exempt");
-  }
-
-  try {
-    const resp = await fetch(STRIPE_TAX_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${key}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: form.toString(),
-      signal: AbortSignal.timeout(8_000),
-    });
-    if (!resp.ok) {
-      console.error(`create-payment: Stripe Tax returned ${resp.status}`);
-      return {
-        tax_cents: flatFallbackCents,
-        source: "flat_fallback",
-        calculation_id: null,
-        reason: `stripe_http_${resp.status}`,
-        jurisdiction: null,
-      };
-    }
-    const calc = (await resp.json()) as {
-      id?: string;
-      tax_amount_exclusive?: number;
-      tax_breakdown?: Array<{
-        taxability_reason?: string;
-        tax_rate_details?: { state?: string; country?: string; tax_type?: string };
-      }>;
-    };
-    const first = calc.tax_breakdown?.[0];
-    const j = first?.tax_rate_details;
-    return {
-      tax_cents: calc.tax_amount_exclusive ?? 0,
-      source: "stripe_tax",
-      calculation_id: calc.id ?? null,
-      reason: first?.taxability_reason ?? "no_breakdown",
-      jurisdiction: j ? [j.state, j.country].filter(Boolean).join(", ") : null,
-    };
-  } catch {
-    console.error("create-payment: Stripe Tax unreachable");
-    return {
-      tax_cents: flatFallbackCents,
-      source: "flat_fallback",
-      calculation_id: null,
-      reason: "stripe_unreachable",
-      jurisdiction: null,
-    };
-  }
-}
 
 Deno.serve(async (req: Request): Promise<Response> => {
   const pre = preflight(req);
@@ -443,7 +324,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
        deliberately ignored: it let any caller zero their own tax, which was
        the one hole in an otherwise server-authoritative money path. */
     const taxIdText = typeof body.tax_id === "string" ? body.tax_id.trim().slice(0, 40) : "";
-    const taxExempt = /\d/.test(taxIdText);
+    const taxExempt = looksLikeTaxId(taxIdText);
     const channel =
       body.channel === "staff_console" ? "staff_console" : "shop";
     const rawMemberCode =
@@ -460,53 +341,22 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const order = priced.order;
 
     /* ---- member code: match stores the id, miss stores null,
-       the raw text is kept for the receipt either way ---- */
-    let memberId: number | null = null;
-    /* The house destination. Used for a guest, and for a member code that
-       matches nobody, so a tax calculation always has somewhere to land
-       rather than silently returning zero. */
-    let taxAddress = {
-      line1: "1 Demonstration Way",
-      city: "Springfield",
-      state: "IL",
-      zip: "62701",
-      country: "US",
-    };
-    if (rawMemberCode !== "") {
-      const memberRow = await client.queryObject<{
-        id: number;
-        demo_address_line1: string | null;
-        demo_address_city: string | null;
-        demo_address_state: string | null;
-        demo_address_zip: string | null;
-        demo_address_country: string | null;
-      }>(
-        `select id, demo_address_line1, demo_address_city, demo_address_state,
-                demo_address_zip, demo_address_country
-           from app.members where member_code = $1`,
-        [rawMemberCode],
-      );
-      const m = memberRow.rows[0];
-      memberId = m?.id ?? null;
-      /* THE TAX DESTINATION IS READ HERE, SERVER SIDE, and never accepted
-         from the request. This is the whole reason the addresses live in the
-         database at all. */
-      if (m && m.demo_address_zip) {
-        taxAddress = {
-          line1: m.demo_address_line1 ?? taxAddress.line1,
-          city: m.demo_address_city ?? taxAddress.city,
-          state: m.demo_address_state ?? taxAddress.state,
-          zip: m.demo_address_zip,
-          country: m.demo_address_country ?? "US",
-        };
-      }
-    }
+       the raw text is kept for the receipt either way ----
+
+       THE TAX DESTINATION IS READ HERE, SERVER SIDE, and never
+       accepted from the request. This is the whole reason the
+       addresses live in the database at all. quote-tax calls the
+       same resolver, so the address a shopper is quoted against is
+       by construction the address they are charged against. */
+    const { memberId, address: taxAddress } = await resolveTaxAddress(
+      client,
+      rawMemberCode,
+    );
 
     /* ---- real tax, replacing the flat mirror estimate ---- */
     const taxableCents =
       order.subtotal_one_cents + order.subtotal_sub_cents + order.activation_fee_cents;
     const taxOutcome = await calculateTax(
-      order,
       taxableCents,
       taxAddress,
       taxIdText,
