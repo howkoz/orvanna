@@ -626,6 +626,23 @@ brief. On the staff console the stakes are higher: that page's script tells an
 agent on a live call what the cardholder is being asked to do, so announcing a
 challenge that never comes would put words in the agent's mouth.
 
+CORRECTION, 2026-08-15, from the quality assurance and architecture audits. The
+sentence above is TRUE of the challenge reveal fix and FALSE as a general
+claim, and I wrote it as though it covered everything. Three things went to the
+shop only and are still missing from the staff console:
+  - the finishing state, so the console still flashes back to the card entry
+    between the approval and the receipt: exactly the bug Howard reported
+  - the amount signature, so the console can still move a total after the
+    payment is open and settle at the old one
+  - two of the six outcome messages, including "your passcode was not ignored",
+    so an agent reads the wrong sentence to a caller who authenticated and was
+    then declined
+The console is a roughly 600 line copy of the shop's payment engine and has now
+drifted three ways in a single day. The durable fix is one shared
+www/js/payments.js, which the code quality audit rates the highest-leverage
+item in the project. Until that exists, every payment change has to be made
+twice, and this correction is the evidence that it will not be.
+
 
 ## KNOWN AND ACCEPTED, 2026-08-15 (Howard: "for now this is acceptable")
 

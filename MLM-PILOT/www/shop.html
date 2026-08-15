@@ -1809,6 +1809,13 @@
     if (!frame) return;
     frame.style.opacity = visible ? '' : '0';
     frame.style.pointerEvents = visible ? '' : 'none';
+    /* M6, quality assurance audit 2026-08-15. The keyboard trap moves focus
+       between the cancel button and this frame, but an element with no
+       tabindex cannot take focus, so Tab simply stayed on Cancel and a
+       keyboard user could never reach into the bank's window at all. Setting
+       it here rather than in the markup is deliberate: the widget creates this
+       element itself, so this is the only moment we are certain it exists. */
+    if (visible) { try { frame.setAttribute('tabindex', '-1'); } catch (e) { /* best effort */ } }
   }
 
   function cancelChallengeReveal() {
