@@ -507,8 +507,19 @@ Deno.serve(async (req: Request): Promise<Response> => {
        where it helps an operator and does not help a prober. */
     const auth = await requireStaff(client, req, ["staff"]);
     if (!auth.ok) {
+      /* Finding N-M1, implemented 2026-08-16. NOT YET DEPLOYED:
+         deploy owes a byte-compare against the cloud copy plus both
+         gates per the standing rule; the repo is knowingly ahead of
+         the cloud here, on record.
+
+         When the refusal happened AFTER the token's signature
+         verified (expired, unknown_user, wrong_role), requireStaff
+         now hands back the verified username, and the audit line
+         names it instead of discarding it as "anonymous". Refusals
+         where no identity was ever established (missing, malformed,
+         forged token) still audit as "anonymous". */
       await auditStaffAction(client, {
-        actor: "anonymous",
+        actor: auth.verified_user ?? "anonymous",
         actor_role: null,
         action: "refund_payment",
         target: null,

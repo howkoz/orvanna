@@ -169,6 +169,20 @@ export type StaffAuthResult =
       | "unknown_user"
       | "wrong_role"
       | "not_configured";
+    /* Finding N-M1, implemented 2026-08-16. NOT YET DEPLOYED: deploy
+       owes a byte-compare against the cloud copy plus both gates per
+       the standing rule; the repo is knowingly ahead of the cloud
+       here, on record.
+
+       The username the token's SIGNATURE verified, present only when
+       the refusal happened after the signature check passed (expired,
+       unknown_user, wrong_role). Before this field existed, those
+       refusals were audited as actor "anonymous", discarding an
+       identity the cryptography had already established. The value is
+       for the AUDIT LOG ONLY: it authorises nothing, it is never
+       returned to the caller, and for unknown_user it is the claimed
+       spelling because no database row exists to canonicalise it. */
+    verified_user?: string;
   };
 
 function base64urlToBytes(value: string): Uint8Array | null {
@@ -310,8 +324,12 @@ export async function requireStaff(
 
   /* Expiry in seconds, matching how demo-login writes it. A token
      that has expired is refused even though its signature is
-     perfect: that is the entire point of an expiry. */
-  if (exp * 1000 <= Date.now()) return { ok: false, code: "expired" };
+     perfect: that is the entire point of an expiry. The signature
+     DID verify, so the refusal carries the verified username for
+     the audit log (N-M1, 2026-08-16). */
+  if (exp * 1000 <= Date.now()) {
+    return { ok: false, code: "expired", verified_user: claimedUser };
+  }
 
   /* ---- THE AUTHORISATION ITSELF ----
      The role comes from HERE, live, and the token's own role claim
@@ -326,8 +344,10 @@ export async function requireStaff(
   if (!row) {
     /* Correctly signed, but names an account that no longer exists.
        Deleting the row is how a person is revoked, and this is that
-       working. */
-    return { ok: false, code: "unknown_user" };
+       working. The signature verified the name, so the refusal
+       carries it for the audit log in the claimed spelling, there
+       being no row left to canonicalise it (N-M1, 2026-08-16). */
+    return { ok: false, code: "unknown_user", verified_user: claimedUser };
   }
 
   /* An unrecognised role is refused rather than trusted. A role
@@ -339,7 +359,10 @@ export async function requireStaff(
       ? row.role
       : null;
   if (role === null || !allowedRoles.includes(role)) {
-    return { ok: false, code: "wrong_role" };
+    /* A real account with a role this endpoint does not allow. The
+       refusal carries the DATABASE spelling of the username for the
+       audit log (N-M1, 2026-08-16). */
+    return { ok: false, code: "wrong_role", verified_user: row.username };
   }
 
   return {

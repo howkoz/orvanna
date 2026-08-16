@@ -191,6 +191,12 @@
                    the honest minimal fix is to SAY which address the tax is
                    computed against instead of implying it is the one shown. -->
               <p class="field-hint hint-loose" id="addressTaxNote" hidden>You are signed in, so tax is calculated against the billing address stored on this member's account, not the demonstration address shown above. The address fields here are display only for the demonstration.</p>
+              <!-- The guest half of N-H1, delivered 2026-08-16 (quality
+                   assurance finding M1): a guest order's tax is priced
+                   server side from the demonstration tax address in
+                   Illinois, never from these fields, and only the
+                   signed-in surface said so. Now both do. -->
+              <p class="field-hint hint-loose" id="addressTaxNoteGuest" hidden>You are checking out as a guest. For this demonstration, tax on a guest order is priced from the demonstration tax address in Illinois, United States, not from the address you type here. The address fields here are display only for the demonstration.</p>
             </div>
 
             <!-- STEP 3: ACTIVATION (delivery method for digital goods) -->
@@ -937,16 +943,21 @@
     if (!codeField) return;
     if (codeField.readOnly) { codeField.value = ''; }
     codeField.readOnly = false;
-    /* a guest's tax really is priced from what is on screen, so the
-       signed-in address note comes down with the sign-in */
+    /* Corrected 2026-08-16 (quality assurance finding M1): this used
+       to say a guest's tax "really is priced from what is on screen",
+       which was false. The server prices every guest order from the
+       demonstration tax address in Illinois (HOUSE_TAX_ADDRESS in
+       functions/_shared/tax.ts) regardless of what is typed here. So
+       the signed-in note comes down and the guest note goes up. */
     document.getElementById('addressTaxNote').hidden = true;
+    document.getElementById('addressTaxNoteGuest').hidden = false;
   }
 
   document.getElementById('chooseGuest').addEventListener('click', function () {
     accountMode = 'guest';
     clearSignedInMember();
     setAddress({ name: '', street: '', city: '', state: '', zip: '' });
-    accountStatus.textContent = 'Checking out as a guest. Enter your billing address below.';
+    accountStatus.textContent = 'Checking out as a guest. For this demonstration, tax on a guest order is priced from the demonstration tax address in Illinois, not from the address fields below.';
     setAccountStage('done');
   });
 
@@ -1029,6 +1040,7 @@
             zip: SYNTHETIC_ADDRESS.zip
           });
           document.getElementById('addressTaxNote').hidden = false;
+          document.getElementById('addressTaxNoteGuest').hidden = true;
           /* this is what actually credits the order: create-payment
              resolves it against app.members server side */
           var codeField = document.getElementById('memberCode');
@@ -1256,11 +1268,15 @@
     } else {
       /* N-H1: a signed-in member's tax is priced from the address
          stored on their account, so the label says so rather than
-         letting the demonstration address fields imply otherwise */
+         letting the demonstration address fields imply otherwise.
+         The guest half, delivered 2026-08-16 (quality assurance
+         finding M1): a guest order is priced from the demonstration
+         tax address in Illinois, so the guest estimate says that
+         too instead of implying the typed address is used. */
       taxLabel.innerHTML = LIVE_PAYMENTS
         ? (accountMode === 'member'
           ? 'Tax <span class="row-hint">estimate, from the address on file for this member</span>'
-          : 'Tax <span class="row-hint">estimate, working it out</span>')
+          : 'Tax <span class="row-hint">estimate, from the demonstration tax address, Illinois</span>')
         : 'Tax <span class="row-hint">5 percent</span>';
       document.getElementById('sumTax').textContent = fmtMoney(m.tax);
       document.getElementById('checkoutTotal').textContent = fmtMoney(m.total);
@@ -1486,8 +1502,13 @@
           ' Nothing was charged and your cart is unchanged. You can try again, or use a different card.';
       },
       outcomeDeclined: function (bankSaid) {
+        /* The button at this moment reads "Continue to card details"
+           (the onReset hook sets it), so that is the name this
+           message uses. Corrected 2026-08-16 (quality assurance
+           finding L2): it used to say "Press Place order", a button
+           that was not on screen. */
         return 'Declined.' + bankSaid +
-          ' Nothing was charged and your cart is unchanged. Press Place order to try again with a different card.';
+          ' Nothing was charged and your cart is unchanged. Press Continue to card details to try again with a different card.';
       },
       waitingAuth: function (orderNum) {
         return 'Waiting for you to approve this with your bank. Order ' + orderNum +
@@ -1721,6 +1742,19 @@
      payment; the response carries the order number, the client
      secret, and the publishable key */
   function liveStart() {
+    /* Record the signature this payment is being opened against, the
+       way the staff console does in liveStaffStart. Fixed 2026-08-16
+       (verifier finding M2): the auto-open path recorded it before
+       calling in here, but the manual path in liveSubmit did not, so
+       after a decline (which nulls the recorded signature) a retry
+       press opened a payment whose recorded signature was null, and
+       the trailing liveEnsureCheckout re-check read that null as a
+       mismatch and destroyed and recreated the payment 900
+       milliseconds later: a duplicate demo order, a wasted
+       rate-limit token, and a wiped card form. Recording at start
+       covers both paths; the auto-open's earlier record is the same
+       value, so this is idempotent. */
+    engine.setOpenedFor(liveAmountSignature());
     liveState.busy = true;
     placeOrderBtn.disabled = true;
     livePayArea.hidden = false;
@@ -1775,34 +1809,45 @@
     engine.mountWidget(publishableKey);
     cardFields.hidden = true;
     walletNote.hidden = true;
-    /* CARD HINT. Every number here was run end to end against the
-       live rail on 2026-08-15 before this text was written. The
-       cards changed today because the PROCESSOR changed: the
-       account now runs Braintree in sandbox, and each processor
-       publishes its own test numbers.
+    /* CARD HINT. ONE TRUTH FOR THE CHALLENGE CARD, settled 2026-08-16
+       (verifier finding M1, quality assurance finding H3). The
+       history, kept honest rather than deleted:
+       - 2026-08-15 morning: the hint taught 4111 1111 1111 1111 as
+         the challenge card, seen parking at requires_customer_action
+         on the live rail.
+       - 2026-08-15, twenty-six minutes later: rewritten against
+         Braintree's published 3-D Secure 2 table to teach the 2503,
+         2370 and 2701 cards, and the note here claimed the earlier
+         4111 recommendation "could never finish" and that 4111 "is
+         not a 3-D Secure test card at all".
+       - 2026-08-16: server-side probes against the live rail proved
+         BOTH 4111 and 2503 park at requires_customer_action with a
+         next_action attached, so those two claims about 4111 were
+         wrong and are withdrawn. What NOBODY has on record yet is
+         either card COMPLETING its challenge: automation cannot type
+         inside the bank's iframe, so the finished passcode ending is
+         pending one human click-through and is not claimed anywhere.
 
-       CORRECTED 2026-08-15 (second time today) against Braintree's
-       published 3-D Secure 2 table, after review found that the card
-       we were recommending could never finish. Two mistakes were in
-       the earlier hint: 4111 1111 1111 1111 is not a 3-D Secure test
-       card at all, and 4000 1111 1111 1115 DOES raise the approval
-       screen but is a decline card, so a correct passcode still ends
-       in a refusal. That reads as if the passcode was ignored.
-
-       Braintree's real table, expiry month 01 and year = current + 3:
-         4000 0000 0000 2503  approval screen, passcode, then APPROVED
+       The one story, told identically by this hint, staff.html's
+       hint, and docs/TEST-CARDS.html:
+         4000 0000 0000 2503  the primary recommended challenge card
+                              (Braintree's documented 3-D Secure
+                              challenge card; the sandbox passcode on
+                              its own screen is 1234)
          4000 0000 0000 2370  approval screen, authentication fails
-         4000 0000 0000 2701  no screen at all, approved (frictionless)
+                              (Braintree's documented table)
+         4000 0000 0000 2701  no screen at all, approves
+                              (frictionless, Braintree's documented
+                              table)
+         4111 1111 1111 1111  also raises a challenge on this rail
+                              (server-verified 2026-08-16)
          4000 1111 1111 1115  approval screen, then the card declines
-       The passcode the sandbox displays on its own screen is 1234.
-
-       Only the first of those shows the whole journey ending in a
-       sale, so it leads the hint. Full matrix: docs/TEST-CARDS.html.
-       See also ROADMAP.md. */
+       Expiry month 01, year = current + 3. Full matrix:
+       docs/TEST-CARDS.html. See also ROADMAP.md. */
     livePayNote.textContent =
       'Test mode, expiry 01/29, any three digit security code. ' +
-      '4000 0000 0000 2503 asks your bank for the passcode 1234 and then approves. ' +
-      '4000 0000 0000 2370 asks, and the approval fails. ' +
+      '4000 0000 0000 2503 opens the approval screen from your bank; the passcode it shows you is 1234. ' +
+      '4000 0000 0000 2370 opens it, and the approval fails. ' +
       '4000 0000 0000 2701 approves with no passcode at all. ' +
       'Nothing is ever charged.';
     liveStatus('');
@@ -2185,6 +2230,17 @@
         return;
       }
       lookupResult.textContent = '';
+      /* Fixed 2026-08-16 (verifier finding L2): the in-flight branch
+         of resumeApply renders the "Check again" button, whose click
+         handler reads liveState.orderNumber and silently returns when
+         it is empty; the lookup never set it, leaving a dead control.
+         The looked-up order is adopted the same way resumeConfirm
+         adopts one. Any open, unconfirmed checkout payment is
+         discarded first so the adopted number can never desync a
+         payment that is still holding the old one; a payment already
+         handed to a bank (checkOnly) is left alone. */
+      if (liveState.clientSecret && !liveState.checkOnly) liveResetPayment('');
+      liveState.orderNumber = value;
       liveState.sawChallenge = false;
       showResumeView(value);
       resumeApply(result.data);

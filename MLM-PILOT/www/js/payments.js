@@ -597,6 +597,13 @@
         setFinishing(true);
         status(copy.finishingStatus);
       }
+      /* The close hook fires on EVERY close, before the focus work
+         below, because its contract is "fires on close" and the
+         focus-restore path used to return early past it (verifier
+         finding L3, fixed 2026-08-16). The pages' hooks are
+         idempotent presentation work, so firing on the early-return
+         path is harmless and the contract now matches the code. */
+      if (hooks.onChallengeClose) hooks.onChallengeClose();
       /* focus must never be left on the control that just
          disappeared. It goes back where it came from when that is
          still a real, usable control, and otherwise to the status
@@ -609,7 +616,6 @@
           CONTROLS.test(back.tagName || '')) {
         try { back.focus(); return; } catch (e) { /* fall through */ }
       }
-      if (hooks.onChallengeClose) hooks.onChallengeClose();
       try {
         statusEl.hidden = false;
         statusEl.focus();
@@ -874,6 +880,20 @@
     function outcomeMessage(receipt) {
       var bankMsg = (receipt.processor && receipt.processor.error_message) || '';
       var bankSaid = bankMsg ? copy.bankSaidPrefix + bankMsg + '.' : '';
+      /* SESSION STATE APPLIES ONLY TO THE SESSION'S OWN PAYMENT.
+         Fixed 2026-08-16 (verifier finding M3, quality assurance
+         finding H2): sawChallenge records that THIS session's
+         approval window opened, so it may only ever colour the story
+         of the order this session is holding. The staff order lookup
+         fed arbitrary looked-up receipts through here while a live
+         challenge had the flag set, and an agent read "the cardholder
+         finished their bank approval" about an order that never saw
+         one. The guard lives HERE, at the engine level, so no caller
+         can repeat that mistake: every server receipt carries its
+         order_number, and a receipt for any order other than the
+         session's own never consults the session flag. */
+      var isSessionOrder = !!(receipt && receipt.order_number &&
+        receipt.order_number === state.orderNumber);
       if (authBroke(receipt)) {
         return copy.outcomeBroke(bankSaid);
       }
@@ -883,7 +903,7 @@
       if (authApproved(receipt)) {
         return copy.outcomeApprovedThenDeclined(bankSaid);
       }
-      if (state.sawChallenge) {
+      if (isSessionOrder && state.sawChallenge) {
         var declinedByCard =
           /processor.?declined|do not honou?r|insufficient|card.?declined/i.test(bankMsg);
         return declinedByCard
@@ -915,11 +935,15 @@
     }
 
     /* The sale completed, so the tax liability is now real and the
-       calculation should be recorded for reporting. Fire and forget,
-       deliberately AFTER the receipt renders: this is bookkeeping,
-       and a person whose money has already moved must never wait on
-       it. The job is idempotent and picks up anything missed on its
-       next run, so a failure here costs a retry, not a record. */
+       calculation should be recorded for reporting. Fire and forget:
+       handleReceipt calls this just BEFORE handing the receipt to the
+       page's onSuccess hook, and nothing awaits it, so this is
+       bookkeeping and a person whose money has already moved never
+       waits on it. (Comment corrected 2026-08-16, quality assurance
+       finding L6: it used to claim the call fired after the receipt
+       rendered, which was never what the code did.) The job is
+       idempotent and picks up anything missed on its next run, so a
+       failure here costs a retry, not a record. */
     function recordTax() {
       try { fnCall('record-tax', 'POST', {}).catch(function () { /* next run takes it */ }); }
       catch (e) { /* never let bookkeeping break a receipt */ }

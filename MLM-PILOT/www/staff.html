@@ -16,6 +16,12 @@
    it moves into the stylesheet when the feature ships.
    Colours are taken from the existing shipped tokens rather than
    invented, so this matches the rest of the console.
+
+   Superseded 2026-08-16 (quality assurance finding L4): the refund
+   rail is LIVE and passed both gates on 2026-08-15, so "proposed
+   and not deployed" above is history, not status. The styles stay
+   in this block until a move into staff.css is scheduled as its
+   own change.
    ============================================================ */
 .hist-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .hist-table { width:100%; border-collapse:collapse; font-size:14px; }
@@ -191,7 +197,11 @@
                 <p class="ar-head">Rules for card approvals on a call</p>
                 <ul class="ar-list">
                   <li><b>Never ask the caller to read you a code from their bank.</b> Not the six digits in a text message, not a code from a banking application, not ever. That request is the exact script of a real fraud technique, and it does not complete the approval anyway.</li>
-                  <li>If the bank asks for an approval, only the cardholder can give it, on their own phone or computer. Send them a payment link and stay on the line.</li>
+                  <!-- Reworded 2026-08-16 (quality assurance finding M2):
+                       this rule used to instruct "Send them a payment link",
+                       a path this sandbox cannot walk yet. The rule now says
+                       what the console can actually do. -->
+                  <li>If the bank asks for an approval, only the cardholder can give it, on their own phone or computer. This sandbox cannot send a payment link yet, so stay on the line while they finish the approval on their own device.</li>
                   <li>A card you key here is a telephone order. Telephone orders sit outside Strong Customer Authentication (SCA), the European rule that requires these approvals, so the bank usually will not ask for one. The trade is that a fraud chargeback lands on us rather than on the card issuer.</li>
                 </ul>
               </div>
@@ -199,7 +209,12 @@
               <div class="pay-choice-row" role="radiogroup" aria-label="How to take the payment">
                 <label class="pay-choice">
                   <input type="radio" name="payChoice" value="link">
-                  <span>Payment link to the caller's own device <span class="rec-chip">recommended</span> <span class="pc-note">the normal way to take a card: they pay on their phone while you stay on the line, and any bank approval works properly</span></span>
+                  <!-- Reworded 2026-08-16 (quality assurance finding M2):
+                       the chip used to read "recommended" on an option this
+                       sandbox cannot walk. The option stays listed first
+                       because it is the right habit, and the chip and note
+                       now say what is true today. -->
+                  <span>Payment link to the caller's own device <span class="rec-chip">not built yet</span> <span class="pc-note">the right way once it exists: they would pay on their phone while you stay on the line, and any bank approval would work properly. Not available on this sandbox yet; use the keyed telephone order below.</span></span>
                 </label>
                 <label class="pay-choice">
                   <input type="radio" name="payChoice" value="new">
@@ -215,7 +230,11 @@
                    side that mints a hosted payment link is not, and the
                    button says so rather than pretending. -->
               <div class="link-panel" id="linkPanel">
-                <p class="lp-line" id="linkStatus">Create the order, then send the caller a link. They pay on their own device, their bank can ask them to approve properly, and no card number is ever spoken aloud.</p>
+                <!-- Reworded 2026-08-16 (quality assurance finding M2): the
+                     panel used to open by instructing the link path as if it
+                     worked. It now describes the future path in the
+                     conditional and points at the path that exists. -->
+                <p class="lp-line" id="linkStatus">When this path is built, you will create the order and then send the caller a link to pay on their own device, so no card number is ever spoken aloud. It is not available on this sandbox yet; use the keyed telephone order path above.</p>
                 <div class="lp-row">
                   <input class="staff-field" id="linkField" type="text" readonly placeholder="The payment link appears here" aria-label="Payment link for the caller">
                   <button class="btn-addline" id="copyLinkBtn" type="button" disabled>Copy</button>
@@ -467,11 +486,12 @@
 
   /* ---------- small utilities ---------- */
 
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
+  /* The engine's escape helper, aliased the way shop.html does it.
+     Fixed 2026-08-16 (verifier finding L1): this console kept a
+     private byte-identical copy after the extraction, the one
+     duplicate definition the orphan sweep found; one copy in
+     js/payments.js is the rule. */
+  var esc = window.OrvannaPayments.esc;
   function byId(id) { return document.getElementById(id); }
   function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -1692,9 +1712,18 @@
            poll needs it to ask the payment service for the payment's
            status */
         engine.mountWidget(result.data.publishable_key);
+        /* ONE TRUTH FOR THE CHALLENGE CARD, settled 2026-08-16
+           (verifier finding M1, quality assurance finding H3): 4000
+           0000 0000 2503 is the primary recommended challenge card
+           (Braintree's documented 3-D Secure challenge card, sandbox
+           passcode 1234); 4111 1111 1111 1111 also raises a challenge
+           on this rail (server-verified 2026-08-16). Neither card has
+           a recorded COMPLETED challenge yet, so the hint claims the
+           screen, not the ending. Same story as shop.html's hint and
+           docs/TEST-CARDS.html. */
         staffStatus('Key the card into the secure form while the caller reads it; repeat back the last four only. ' +
           'If their bank asks for an approval you cannot complete it for them and you must not ask for any code. ' +
-          'Test mode, expiry 01/29: 4000 0000 0000 2503 raises the approval screen and then approves, ' +
+          'Test mode, expiry 01/29: 4000 0000 0000 2503 raises the approval screen (its sandbox passcode is 1234), ' +
           '4000 0000 0000 2701 approves with no approval screen.');
         /* THE BUTTON QUOTES THE SERVER, NEVER THIS PAGE.
            This line used to read fmtMoney(orderMath().total). That was
@@ -2018,6 +2047,9 @@
   /* ============================================================
      ORDER HISTORY, ORDER DETAIL, AND THE REFUND BUTTON
      Added 2026-08-15. PROPOSED, NOT DEPLOYED.
+     (Superseded 2026-08-16, quality assurance finding L4: the
+     refund rail is LIVE and passed both gates on 2026-08-15; the
+     line above is kept as history, not status.)
      Design: DOCUMENTATION\11-REFUNDS.md
 
      THIS SCREEN ENFORCES NOTHING. Read that twice before changing
@@ -2129,7 +2161,9 @@
           tr.setAttribute('aria-label', 'Open order ' + o.order_number);
           cell(tr, o.order_number, 'hist-ordernum');
           cell(tr, fmtWhen(o.created_at));
-          cell(tr, o.member_code || '—');
+          /* 'none' rather than a dash glyph: the global no-dash rule
+             (quality assurance finding L1, fixed 2026-08-16). */
+          cell(tr, o.member_code || 'none');
           cell(tr, fmtMoney(o.total));
           var td = document.createElement('td');
           var pill = document.createElement('span');
@@ -2171,7 +2205,9 @@
     var dt = document.createElement('dt');
     dt.textContent = label;
     var dd = document.createElement('dd');
-    dd.textContent = value == null || value === '' ? '—' : String(value);
+    /* 'none' rather than a dash glyph: the global no-dash rule
+       (quality assurance finding L1, fixed 2026-08-16). */
+    dd.textContent = value == null || value === '' ? 'none' : String(value);
     if (cls) dd.className = cls;
     dl.appendChild(dt); dl.appendChild(dd);
   }
@@ -2424,11 +2460,36 @@
           loadHistory(false);
           return;
         }
+        /* SAME-DAY REFUND AGAINST AN UNSETTLED PAYMENT, front-end
+           only, fixed 2026-08-16 (quality assurance finding M4). The
+           Braintree sandbox cannot refund a transaction it has not
+           settled yet, so a refund inside the 24 hour window can come
+           back HTTP 200 with refund_status "failed" and settled true
+           (settled here means the REFUND attempt reached a final
+           answer, not that money moved). The old message read as
+           both failed and settled at once and left the confirm box
+           with both buttons disabled. The server rules are untouched:
+           this branch only tells the truth about timing and gives the
+           agent a way out. */
+        if ((r.status === 200 || r.status === 202) && d.refund_status === 'failed') {
+          result.className = 'refund-result refund-result-bad';
+          result.textContent = 'The processor could not refund this payment because the payment has not settled on its side yet. ' +
+            'Nothing was returned to the customer and it will not be refunded twice. ' +
+            'Refunds work after the payment settles, usually overnight, so try this refund again later. ' +
+            'How the 24 hour refund window should treat settlement timing is on the owner\'s decision queue.';
+          cancel.disabled = false;
+          loadHistory(false);
+          return;
+        }
         if (r.status === 200 || r.status === 202) {
           result.className = 'refund-result refund-result-wait';
           result.textContent = d.message ||
             ('The processor has not settled this refund yet (' +
              (d.refund_status || 'pending') + '). It will not be refunded twice.');
+          /* Cancel re-enabled on every non-success ending, 2026-08-16:
+             the agent was left with both buttons disabled and Back to
+             history as the only exit. */
+          cancel.disabled = false;
           loadHistory(false);
           return;
         }

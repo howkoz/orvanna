@@ -624,7 +624,13 @@
 
   document.getElementById('priceSub').innerHTML =
     O.fmtMoney(product.sub.price) + ' <span class="per">/ month</span>';
-  document.getElementById('pvSub').textContent = O.fmtPv(product.sub.pv) + ' a month';
+  /* The price cards render ABOVE the expansion sentence beneath them,
+     so the first "PV" a reader meets is this one and it must be the
+     expanded form per the global acronym rule (quality assurance
+     finding L3, fixed 2026-08-16). The one-time card below it can
+     then use the short form. */
+  document.getElementById('pvSub').textContent =
+    O.fmtPv(product.sub.pv).replace(/\bPV\b/, 'Personal Volume (PV)') + ' a month';
   document.getElementById('priceOnce').innerHTML =
     O.fmtMoney(product.once.price) + ' <span class="per">once</span>';
   document.getElementById('pvOnce').textContent = O.fmtPv(product.once.pv) + ' once';
