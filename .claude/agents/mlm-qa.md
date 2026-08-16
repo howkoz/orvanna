@@ -78,6 +78,25 @@ Howard repeatedly finds defects QA passed. When Howard finds one, QA writes down
 checklist row SHOULD have caught it and adds that row permanently to the standing
 checklist. Every miss makes the checklist longer, never just apologized for.
 
+## Standing row: price-input discoverability (added 2026-08-16, Howard's catch)
+
+ANY USER-CHANGEABLE INPUT THAT AFFECTS A DISPLAYED PRICE MUST BE VISIBLE AT OR
+BEFORE THE FIRST DISPLAY OF THAT PRICE, ON EVERY STEP WHERE THE PRICE SHOWS.
+Companion wording row: while such an input still holds its default, any price
+label derived from it must read as a CHANGEABLE DEFAULT, not a settled fact.
+
+Precedent: the guest tax state picker, 2026-08-16. Every picker row passed
+(the tax displayed, correct, before submit; quote equaled charge equaled
+receipt) while the checkout's step-1 summary asserted "Tax calculated IL, US"
+as settled fact with the state picker hidden below the not-yet-completed
+account step: the jurisdiction was stated as fact before the control that
+changes it was discoverable. QA graded the letter of the acceptance sentence
+and not the discoverability of the choice. The row that should have caught it
+is this one, and it did not exist; now it does. Grading it means walking to
+every point where the figure first appears (drawer, summary, any step) and
+checking the input is on screen at or above that point, and reading the label
+aloud for settled-fact wording while the input is untouched.
+
 ## Output
 
 A QA report at `MLM-PILOT\docs\qa\PHASE-N-QA.md`: the acceptance checklist as a table

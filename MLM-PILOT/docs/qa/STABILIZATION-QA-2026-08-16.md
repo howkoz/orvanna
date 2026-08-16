@@ -485,3 +485,28 @@ with real charged money. Howard's acceptance sentence is met as stated: the tax
 displays correct, for the picked state, before the shopper submits the payment,
 and the figure quoted is the figure charged and the figure receipted. Nothing
 further is owed from QA's half on this feature.
+
+## Incident, 2026-08-16: Howard's discoverability catch, and the permanent row it becomes
+
+Howard found, on the live site, a defect every picker row above passed: at
+checkout step 1 as a guest, the summary asserts "Tax calculated IL, US" with a
+figure while the state picker sits hidden below the not-yet-completed account
+step. The jurisdiction is stated as settled fact before the control that
+changes it is discoverable. My rows graded the LETTER of the acceptance
+sentence (the tax displays, correct, before submit) and never asked whether
+the choice behind the figure was discoverable at the moment the figure first
+appeared.
+
+Per the standing rule (Howard's catches become checklist rows), the row that
+should have caught this now exists permanently in the charter
+(`.claude\agents\mlm-qa.md`, amended in this same commit):
+
+> ANY USER-CHANGEABLE INPUT THAT AFFECTS A DISPLAYED PRICE MUST BE VISIBLE AT
+> OR BEFORE THE FIRST DISPLAY OF THAT PRICE, ON EVERY STEP WHERE THE PRICE
+> SHOWS. Companion wording row: while such an input still holds its default,
+> any price label derived from it must read as a CHANGEABLE DEFAULT, not a
+> settled fact.
+
+The site-builder is moving the state control to the tax row in the summary;
+when that commit lands, the placement re-grades against this row, including
+the label-wording half (unpicked must read as a changeable default).
