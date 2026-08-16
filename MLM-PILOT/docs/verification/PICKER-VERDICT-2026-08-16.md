@@ -216,6 +216,209 @@ guest door; picker-at-chooser visibility): QA's half.
 
 ---
 
+# DATED SECTION: the outage-window commits, graded 2026-08-16
+
+Scope given: commits 0367407 through 14b6cc7 (ten commits authored under the
+owner's identity during the spend-limit outage, self-documented in
+CLAUDE_NOTES.md): staged Plaid sandbox panel, staged multi-currency tax,
+Braintree wallet enablement, sticky-summary fixes. Command-line instruments
+only. Per the standing rule these owe both gates before any deploy.
+
+## GATE: FAIL. Deploy NO from the verifier's half.
+
+Two HIGH findings. One is a fabricated confirmation path on the live page;
+the other is an ungated reversal of a ruled, verifier-passed money-path
+design. The staged-currency guards themselves are well built and verified;
+the failure is in what rode alongside them.
+
+## Scope correction, before the findings
+
+The briefed span does not match the repository. The span itself touches
+THREE Edge Function files (`_shared\tax.ts`, `quote-tax\index.ts`,
+`create-payment\index.ts`) and the engine (`payments.js`), not only
+shop.html and shop.css. And the ungated outage window is FOURTEEN
+payment-surface commits, not ten: be7656c and 94a53d9 (the billing-address
+tax rewrite) and a9aaff3 and c2d10e5 (the sticky summary work named in the
+briefing) sit BETWEEN my last gate (e9d2820) and the span start, ungated;
+efd8f0d (a subscription schema applied to the cloud) follows the span and
+owes its own gate. Everything below grades the named span and, where the
+span builds directly on the ungated pre-span base, says so explicitly.
+
+## Findings
+
+### HIGH
+
+**O-H1. The Plaid panel's ending fabricates a confirmation on the live
+page.** Commit 14b6cc7 wires the panel's "Authorize sandbox bank payment"
+button to `demoPlaceOrder(...)` UNCONDITIONALLY, on a page where
+LIVE_PAYMENTS is true. The result of clicking it: the round-4 demonstration
+handler renders the full confirmation view, mints a LOCAL order number in
+the live ORV format (`orderNumber()` in the page), and CLEARS THE CART. No
+server row exists anywhere: the order lookup on the same page will answer
+"No order with that number, which means nothing was charged for it" about
+the number the confirmation just displayed. The demo note's own words,
+"This preview placed a demo order", are false in this project's vocabulary:
+a demo order is an `app.demo_orders` row, and none was created. This is the
+exact defect class the 2026-08-14 precedent (the staff console faking
+payments) made a standing rule: looks real, is fake, and contradicts
+another surface's truth. Fix before any deploy: the authorize ending either
+stays a preview (no confirmation view, no minted order number, cart intact)
+or creates a REAL demo order through create-payment.
+
+**O-H2. The guest tax destination was rewritten from server-canned to
+client-typed, ungated, reversing a ruled and verifier-passed design.** The
+pre-span outage commits (be7656c, 94a53d9) made the billing State and ZIP
+fields the tax destination, and the span (69d24b4, f704c00) extended it:
+`guestAddressFor` now takes the client's typed street, city, and postal
+text and sends them to Stripe Tax (length- and charset-sanitized only), on
+BOTH quote and charge, with GB, IE, and CH added beside all fifty states.
+The picker gate this file records verified the opposite property as the
+design: "only the two-letter code from the allow list may influence the
+destination and everything else is server-canned", and my no-injection
+ruling in the main verdict above is NOT TRUE of main as it stands. A
+client-typed ZIP can now steer the priced tax jurisdiction, which alters
+tax_cents on a real create: client-controlled money movement inside the tax
+line. Making the visible billing fields authoritative is a defensible
+product choice, and the checkout-walk reasoning in the code is real; but it
+reverses a ruled control without a decision record (CLAUDE_NOTES is a work
+log, not the decisions folder), and it shipped ungated. Required before
+deploy: the owner rules it (a dated decision entry, and this file's
+no-injection claim gets a superseded marker), or the field routing reverts
+to canned addresses.
+
+### MEDIUM
+
+**O-M1. The live rail's routing changed in the cloud during the window, and
+the card-truth surfaces do not know it.** CLAUDE_NOTES documents an active
+50/50 volume-split routing configuration between Braintree and
+Authorize.net (`routing_loBp0KbnCzD0IADxwWbY`), probed live during the
+window. If that is the current active state, roughly half of live payments
+now land on a processor for which every published card promise is
+unverified: TEST-CARDS.html's "one truth" matrix, the shop and staff hints,
+the 2503 passcode journey, and the 2,000.00 to 3,000.00 amount rule are all
+Braintree-specific. The "one truth for the challenge card" this file gated
+is at best a coin-flip truth per payment under a volume split. Needs
+either routing pinned back to Braintree-only for the demo, or the card
+surfaces re-verified and rewritten per connector. Cloud state; my evidence
+is the window's own probe log, and confirming current routing needs
+dashboard or admin-key access I do not have.
+
+**O-M2. The currency select escaped the inert lockdown and can destroy an
+in-flight payment's state.** `#currencySelect` is not in `inertSelectors`
+(the new billing fields are), so it stays operable during authorization.
+Its change handler calls `liveResetPayment('')` whenever a payment is open
+and the new currency is not USD, without checking `busy`: switching to GBP
+while the card is mid-confirm clears the engine state, the order chip, AND
+the resume record that liveConfirm deliberately wrote before confirm, while
+the charge itself continues at the processor. A charge can then succeed
+with the client holding no record of it except the lookup. No wrong amount
+is possible (the payment's amount is fixed server-side), and reaching it
+requires flipping currency during the authorization seconds, but the
+resume-before-confirm guarantee was engineered precisely for this window.
+Fix is two lines: add `#currencySelect` to the inert list, and refuse the
+reset while `state.busy`.
+
+**O-M3. One conversion rate table, hand-copied into two codebases.** The
+client's `CURRENCIES` rates (shop.html) and the server's
+`TAX_CURRENCY_RATES` (tax.ts) carry the same hardcoded values (0.79, 0.92,
+0.88) with nothing keeping them equal. Today they match; the day one side
+is edited, the displayed conversion and the quoted tax conversion disagree
+by design. The engine's new `opts.formatMoney` seam is what lets the page's
+converting formatter reach every engine paint, so the blast radius of a
+drift is the whole checkout. Server-authoritative rates (the quote already
+returns `tax_calculation_currency` and `tax_calculation_cents`) would
+remove the duplication.
+
+### LOW
+
+**O-L1.** The GB, IE, and CH canned tax addresses are real famous addresses
+(10 Downing Street, London; 1 College Green, Dublin; Bahnhofstrasse 1,
+Zurich), breaking the stated synthetic-street principle ("nobody lives at 1
+Demonstration Way") that the US entries still follow.
+
+**O-L2.** The non-USD staging depends on a client-side guard
+(`serverTaxQuoteAllowed`) plus the deployed functions ignoring unknown
+fields; once the functions deploy, non-USD quotes go live while create
+stays 409-guarded, so a GBP tax figure can be quoted for an order that
+cannot be created in GBP. The currency hint says so; recorded as accepted
+staging.
+
+**O-L3.** CLAUDE_NOTES' final entry describes the Plaid ending as "a final
+'nothing charged' authorization preview"; commit 14b6cc7 then made it
+complete a fabricated confirmation (O-H1). The self-documentation lags its
+own last commit.
+
+## What was verified sound
+
+- **The staged-currency guards (the notes' central claims), verified in
+  code.** create-payment parses `currency` and `payment_method` defensively,
+  refuses non-card with a 409 (`payment_method_staged`) and non-USD with a
+  409 (`currency_staged`) BEFORE pricing and before any order insert, and
+  pins its own calculateTax call to the literal "USD". quote-tax asks
+  Stripe in the requested currency and converts the answer back to the USD
+  cents contract through the same rate table (`displayMinorFromUsdCents` in,
+  `usdCentsFromDisplayMinor` out, round-trip within rounding). The
+  normalizer allow-lists exactly USD, GBP, EUR, CHF. Neither the picker
+  flow, the member flow, nor any crafted body bypasses a server-side 409.
+- **The Plaid panel is page-owned and creates nothing (item 2).** Zero
+  external Plaid script: no plaid.com, no cdn.plaid, no link-initialize
+  anywhere in the page or stylesheet; the only external scripts remain the
+  two sanctioned ones (HyperLoader via the engine, Botpress). The panel
+  itself makes no network call. The HIGH condition in the briefing (a new
+  external script) is NOT triggered; the panel's defect is O-H1's ending,
+  not its loading.
+- **Wallet enablement is page and widget configuration only (item 3).** The
+  page enables the Google Pay and PayPal tiles (Apple Pay stays disabled
+  pending domain setup) and the engine's `mountWidget` adds the widget
+  `wallets` option with `walletReturnUrl` set to the canonical return URL,
+  so wallet redirects re-enter the existing resume flow. The create and
+  confirm paths are unchanged; which methods actually appear is processor
+  dashboard configuration. The deployed rail's behavior does not change
+  until this site deploys (the routing change of O-M1 is separate cloud
+  state, already live).
+- **The non-USD client guards hold where I traced them.** `canOpenLivePayment`
+  gates the auto-open (both the entry and the 900 millisecond re-check),
+  manual submit (staged message instead), the mount label, the button sync,
+  and `onTotalsApplied`; method and currency changes reset any open payment
+  (the reset's own defect is O-M2); `serverTaxQuoteAllowed` keeps non-USD
+  off the live quote path so the deployed Illinois-only resolver cannot
+  overwrite the local estimate.
+- **Guardrails (item 4).** Zero em or en dashes across the span's six code
+  files. No owner name in the shipped page, stylesheet, or engine (the
+  name lint also passes in the notes' own build run). New user-facing copy
+  spells its terms ("ZIP / postal code", "State / region"; Open Banking and
+  Automated Clearing House (ACH) appear in staff-facing hints as
+  "ACH/bank-debit", the one loose acronym, in a tooltip). No Unicity
+  terminology.
+
+## SHA-256 of the graded artifacts (at 14b6cc7 = current main for these files)
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `MLM-PILOT\www\shop.html` | `0f552d676ca157f33a8dc1c8ab6b87987368e9f60bd54880af881e51e0ca5e8d` |
+| `MLM-PILOT\www\css\shop.css` | `45b0975e4c86f7538534fb78f89776d38b7338bbeead41d6c2fd73a8793b3d23` |
+| `MLM-PILOT\www\js\payments.js` | `de78388fd2208a20f2907843eed791060e71d9584e6d20b5f974728650588a3f` |
+| `MLM-PILOT\functions\_shared\tax.ts` | `afa8d3864295d5acd647efcd4c4a6312c6c23717e2a3f77891724e7b21283780` |
+| `MLM-PILOT\functions\create-payment\index.ts` | `6c72fe0d8f659cbb24d9af8c00b02e04d3779a9745dab469470b65308dd190b2` |
+| `MLM-PILOT\functions\quote-tax\index.ts` | `aaa6bb47709dd41181dc85ed941c2f0b5921ccd152ff3900355b23d6ad6ca813` |
+| `CLAUDE_NOTES.md` | `263a0cd3db62aae22e47038f3b7967a5da198ce15c4158a48caae329815edaa0` |
+
+## What I did NOT probe
+
+- The four pre-span commits (be7656c, 94a53d9, a9aaff3, c2d10e5) beyond
+  where the span builds on them, and efd8f0d's cloud schema apply: each
+  owes its own gate; O-H2 covers the pre-span tax rewrite because the span
+  extends it directly.
+- The current active routing configuration (O-M1): needs dashboard or
+  admin-key access; my evidence is the window's own probe log.
+- The wallet flows, the Plaid panel, the currency selector, and the
+  sticky-summary behavior in a real browser: QA's half.
+- Whether Stripe Tax actually answers correctly for GB, IE, and CH
+  addresses in the sandbox account (registration state is the owner's
+  dashboard).
+
+---
+
 ## Deploy record, 2026-08-16 (appended by the deploy engineer)
 
 This section is the deploy log for the server half this verdict authorized. It is
