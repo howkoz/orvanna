@@ -172,3 +172,9 @@ Follow-up Plaid panel:
 - The panel shows the visible checkout total, the current two-letter country code, a few sandbox bank choices, and a final "nothing charged" authorization preview.
 - This is intentionally not Plaid Link yet. The real backend still needs order currency storage and a HyperSwitch Open Banking create-payment path before Plaid can create an actual payment.
 - Browser smoke check confirmed GBP checkout opens the panel above the sticky order summary, shows country `GB`, matches the sticky total, and updates the authorization preview message.
+
+Follow-up Plaid shopper simulation:
+- Howard correctly called out that the first Plaid panel still did not feel like a user experience.
+- The panel now simulates the shopper flow: choose sandbox bank, enter sandbox credentials, consent, choose an account, see a processing handoff, then land on the normal order confirmation page.
+- The final Plaid authorization button includes the visible checkout amount, for example `Authorize EUR 289.80`.
+- The IE/GB billing row was cleaned up at the same time: `ZIP / postal code` became `Postal code`, and the three-column row now reserves enough width for non-US address labels.
