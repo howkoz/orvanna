@@ -1,4 +1,18 @@
-# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.0
+# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.1
+
+**Amendment 2026-08-16, v1.1 (the build landed, commit 5a5ff33, proof
+`docs\verification\PLAN5-PROOF-RUN-2026-08-16.md`; the calibration residue ruled).**
+The one-shot calibration of section 9 was applied exactly as written and landed at an
+increment of 4.3314 points of CV, 0.33 above the window's 4.0 ceiling, because
+proration relief is non-linear (the same cause as the binary calibration residue).
+RULED: ACCEPT AND DISPLAY, the binary precedent extended; the calibrated rates (gen1
+0.015, gen2 0.010, second_leg 0.020) are the parameters of record in section 5; the
+full ruling with the rejected options is in section 9; section 9's falsified
+Builder-density expectation is corrected there; and section 12A(e) now carries the
+REAL census proration number (12 percent of sources) in place of the fixture-derived
+"rare" expectation. The section 10 gate fixture stays at the draft rates, correctly:
+every run records its rates, and the fixture's arithmetic is the contract, not the
+calibration.
 
 As of 2026-08-16. Written by mlm-architect on Howard's green light, his objective
 verbatim: "i just want to make sure we have a strong comp plan that incentivizes the
@@ -144,9 +158,9 @@ volume, whichever that is (open question 4 confirms the default).
 | Parameter | Draft | Meaning |
 |---|---|---|
 | spine_rates | [0.10, 0.05, 0.05, 0.03, 0.02] | Layer 1, fixed: the live plan's rates. Not a tuning dial. |
-| gen1_rate | 0.04 | Layer 2 generation 1, on the Builder's group CV. |
-| gen2_rate | 0.02 | Layer 2 generation 2. |
-| second_leg_rate | 0.05 | Layer 3 base rate on second-strongest leg CV. |
+| gen1_rate | **0.015** (calibrated of record, v1.1, 2026-08-16; draft was 0.04) | Layer 2 generation 1, on the Builder's group CV. |
+| gen2_rate | **0.010** (calibrated of record, v1.1; draft was 0.02) | Layer 2 generation 2. |
+| second_leg_rate | **0.020** (calibrated of record, v1.1; draft was 0.05; effective rates with multipliers 0.020 / 0.023 / 0.025) | Layer 3 base rate on second-strongest leg CV. |
 | leg_multipliers | {2: 1.00, 3: 1.15, 4: 1.25} | Multiplier by active-leg count; 4 means 4 or more; below 2, ineligible. |
 | pool_rate | 0.25 | Law B: the per-source pool is 0.25 x that source's CV, which equals 20 percent of revenue (0.25 x 0.80). See section 7 and open question 1. |
 | waterfall_order | ["spine", "overrides", "second_leg"] | Seniority, fixed. Overrides generation 1 and 2 share one class (open question 2). |
@@ -284,6 +298,35 @@ the nearest 0.005, recorded in plan_params and amended into section 5 the same d
 per-strategy questions not arising (no placement). The waterfall makes calibration a
 sizing question only: even wildly wrong rates cannot breach 25 percent of CV per
 source, because Law B holds regardless of parameters.
+
+**The calibration executed and the residue ruled (v1.1, 2026-08-16).** Measured on
+seeded March: the DRAFT rates paid 21.9712 percent of CV, an increment of 7.3627
+points, far outside the window, and this paragraph's own expectation is hereby
+CORRECTED as falsified by measurement: the census is much DENSER in nested Builders
+than the ten-member fixture, not sparser (pool pressure at draft: 333 of 1,001 sources
+at f2 below 1). The one-shot rule was applied exactly as written: factor 3.0 / 7.3627
+= 0.4075, rates gen1 0.015, gen2 0.010, second_leg 0.020, each nearest 0.005.
+CALIBRATED RESULT: 18.9399 percent of CV, increment **4.3314 points, 0.33 ABOVE the
+window's 4.0 ceiling**, because proration relief is non-linear: as rates shrink, fewer
+sources prorate (f2 below 1 fell from 333 to 120 sources, f3 from 139 to 83), so
+payout shrinks slower than the rates, the exact non-linearity the binary calibration
+met with its cap.
+
+RULED: **ACCEPT THE RESIDUE AND DISPLAY IT. The calibrated rates above are the
+parameters of record (section 5).** The window was a BUDGET, not a law; the miss is
+0.33 of a point, bounded by Law B either way, and it must be displayed per the
+standing rule: every surface shows this plan's actual 18.9399 beside the baseline's
+14.6085, "size held equal" banned. Reasoning, the binary precedent extended: iterating
+to convergence would solve a fixed point AGAINST the waterfall's proration, which is a
+shape feature of Law B, the same laundering this lab already refused once; and the
+measured interplay is itself information the dashboard should show, not tune away:
+under calibration the JUNIOR layer's paid total ROSE (second-leg bonus 287.78 at
+draft, 367.49 calibrated) because smaller senior claims leave the junior class more
+pool room, a redistribution the red team is directed to examine. Rejected options,
+recorded: iterate the factor to convergence on capped-and-prorated totals; or shave
+one rate a half-step (gen1 0.010 lands low in the window but cuts the plan's headline
+team-building rate by a third to chase a third of a point). Either remains available
+later as a new run with its rates in plan_params, never a respec.
 
 ## 10. Worked example, hand-computed: the ten-member fixture, all three layers
 
@@ -470,18 +513,25 @@ same accounting drives a source's payout INTO the cap and stops it there exactly
 more than the 20 percent of revenue the company already promises today; it pays the
 SAME ceiling to more purposes.
 
-**(e) "The ceiling will prorate the field's checks and they will riot."** On the
-ten-member fixture, proration touched one source in ten and moved 1.60 out of 354.30
-paid: 0.45 percent of the run, all of it on the most junior layer. Structurally,
-proration requires a source whose spine coverage is nearly full AND which sits under
-stacked structure: the baseline's realized spine draw is 14.6085 percent of CV against
-a 25-point pool, so the AVERAGE source carries about 10.4 points of headroom against
-layers targeted to draw 2 to 4 points. The honest completion of this answer is a
-measured one, and the spec makes it mandatory: metric 5 (pool pressure: share of
-sources with f2 or f3 below 1, factor distributions, prorated-away totals by layer)
-must be computed on the census runs and CARRIED IN ANY PRESENTATION of this plan, so
-the claim "proration is rare and junior" is shown from realized data or the plan is
-retuned before anyone sees it. No assurance substitutes for that number.
+**(e) "The ceiling will prorate the field's checks and they will riot."** (Rewritten
+v1.1, 2026-08-16, with the measured census numbers this section always demanded; the
+v1.0 text predicted from the ten-member fixture that proration would be "rare and
+junior", and the measurement KEPT the junior half and RETIRED the word "rare".) The
+realized presentation numbers, seeded March at the calibrated rates of record: **120
+of 1,001 sources prorate, 12.0 percent**, down from 333 at the draft rates; the
+prorated-away amounts are 638.00 on layer 2 and 305.68 on layer 3 (scale 6), together
+943.68 against 17,417.12 paid, about 5.4 percent of the run. The honest phrase is now:
+**proration is ROUTINE AND JUNIOR: a working feature, not an edge case.** Every
+prorated cent comes off layers 2 and 3; the spine is structurally untouchable (section
+7), so no member's live-plan-equivalent pay is ever reduced, and the field-facing
+sentence is exact: "your base plan pay is never prorated; the two bonus layers share
+what the cap leaves, and in a given month about one source in eight hits the cap."
+The counter-intuitive detail the red team is directed to verify (section 9): shrinking
+the senior rates GREW the junior layer's paid total, because proration relief flows
+downhill. These realized numbers, refreshed per run, must be CARRIED IN ANY
+PRESENTATION of this plan per metric 5; the v1.0 commitment stands, and this
+paragraph is its first discharge. No assurance substitutes for the number, including
+the retired one.
 
 **(f) The skeptic's strongest objection, raised against ourselves: "payout ratio
 CREEPS as the field professionalizes. More Builders and more balanced legs mean more
