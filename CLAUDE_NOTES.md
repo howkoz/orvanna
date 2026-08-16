@@ -1,5 +1,30 @@
 # ORVANNA Project Notes
 
+## 2026-08-16 Staff Console Facelift
+
+Howard flagged `staff.html` as too wordy and hard for a phone agent to use while taking an order.
+
+What changed:
+- `MLM-PILOT\www\staff.html` now uses a plain Orvanna text wordmark on the staff console instead of the old logo image treatment.
+- The top navigation is shorter: Portal, Shop, Library, Plan, FAQ, Support, Sign out.
+- The long demo disclaimer became three compact chips: Demo data, Test rail, Volume.
+- The order panel is now labeled `Phone order` and has a simple four-step call flow: Caller, Lines, Payment, Read back.
+- The payment section now shows three short guardrails instead of a long policy block.
+- The staged hosted-payment-link path is hidden while `PAYMENT_LINK_READY` is false, so agents see only working phone-order paths.
+- Order history is now `Recent orders`, capped at 18 rows per load with a bounded scroll area and a note that order lookup handles specific callbacks.
+- The totals box is sticky inside the order panel so the agent can see the total while working through payment.
+
+Verification:
+- Inline `staff.html` JavaScript syntax check passed.
+- `py MLM-PILOT\deploy\build_dist.py` passed with bundle hash `9cda0597ed9ef69d`.
+- Local browser check passed at desktop and mobile widths: compact nav, no horizontal overflow, hidden staged payment-link panel, and capped recent orders.
+- Live deploy verified at `https://orvanna.io/staff.html?codex_verify=staff_facet_20260816`: `Phone Orders`, `Recent orders`, and `Call guardrails` are present; old `Member portal` label is absent.
+- Live browser render verified: nav height 33.859375 px, no horizontal overflow at 1440 px, recent orders showing 18 of 229.
+
+Deploy:
+- Source commit: `fa2014c` (`Simplify staff phone order console`).
+- Public `orvanna.io` commit: `6c7d8f5` (`Simplify staff phone order console`).
+
 ## 2026-08-16 Folder Audit
 
 Reviewed the full ORVANNA workspace from `C:\Users\howar\Desktop\Desktop\ORVANNA`.
