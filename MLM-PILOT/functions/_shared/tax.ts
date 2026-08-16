@@ -28,10 +28,10 @@
 
    1. A MEMBER DESTINATION COMES FROM THE DATABASE, NEVER THE
       BROWSER. It is read from the signed-in member's row by
-      resolveTaxAddress below. A guest destination may come from the
-      checkout billing State/ZIP fields because this is a sandbox
-      pilot and the visible address fields are the shopper control.
-      The signed-in member path remains database-authoritative.
+      resolveTaxAddress below. A checkout destination may come from
+      the billing State/ZIP fields because this is a sandbox pilot
+      and the visible address fields are the shopper control. Member
+      attribution and tax destination are separate facts.
 
    2. EXEMPTION IS STRIPE'S DECISION, NOT THE PAGE'S. The page
       sends the tax identifier TEXT, this file decides whether it
@@ -174,6 +174,11 @@ function cleanZip(raw: string): string {
   return match ? match[0] : "";
 }
 
+function checkoutAddressSupplied(rawStateCode: string, rawZip: string): boolean {
+  const code = rawStateCode.trim().toUpperCase();
+  return GUEST_STATE_ADDRESSES[code] !== undefined && cleanZip(rawZip) !== "";
+}
+
 /* Map a guest's entered billing address to the tax address. Trimming
    and uppercasing here means the two callers cannot normalize
    differently. Anything without a known state is the house default. */
@@ -210,24 +215,19 @@ export function looksLikeTaxId(taxIdText: string): boolean {
    Returns the member's row id too, because create-payment needs it
    for attribution and would otherwise repeat this query.
 
-   THE GUEST ADDRESS FIELDS apply ONLY when no member row is
-   attached. The precedence, in words:
+   THE CHECKOUT ADDRESS FIELDS apply whenever State and ZIP are
+   supplied. The precedence, in words:
 
-     member found, address on file   the member's stored address,
-                                     guest fields are IGNORED
-     member found, no address        the house default, the state
-                                     fields are STILL ignored: an
-                                     attached member's tax basis is
-                                     the member record, exactly as
-                                     before these parameters existed
-     no member (empty code or miss)  the guest's billing State/ZIP,
-                                     house default for unknown State
+     member found, checkout address  member id is kept for credit,
+                                     checkout address is used for tax
+     member found, no checkout addr  member's stored address, then
+                                     the house default if missing
+     no member (empty code or miss)  checkout address, house default
+                                     for unknown State
 
-   Ignoring the guest fields whenever a member is attached is what keeps
-   signed-in members byte-for-byte unchanged, and it also means a
-   guest who credits a referring member gets that member's real
-   destination rather than their own typed address, which is the same rule
-   the checkout has always applied. */
+   This lets member attribution and billing address be separate
+   facts. The browser still cannot choose price or tax amount, only
+   the destination that Stripe Tax prices server side. */
 export async function resolveTaxAddress(
   client: DbClient,
   rawMemberCode: string,
@@ -259,6 +259,12 @@ export async function resolveTaxAddress(
   if (!m) {
     return {
       memberId: null,
+      address: guestAddressFor(rawGuestState, rawGuestZip, rawGuestCity, rawGuestLine1),
+    };
+  }
+  if (checkoutAddressSupplied(rawGuestState, rawGuestZip)) {
+    return {
+      memberId: m.id,
       address: guestAddressFor(rawGuestState, rawGuestZip, rawGuestCity, rawGuestLine1),
     };
   }

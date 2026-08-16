@@ -49,9 +49,9 @@
    paying (the same reasoning that gave confirm its own scope).
 
    No names, Tax ID values, card data, or raw IPs are stored or
-   logged. Guest billing State/ZIP can be sent by the shop so the
-   sandbox tax quote follows the visible checkout fields; member
-   destinations are still read from the database.
+   logged. Billing State/ZIP can be sent by the shop so the sandbox
+   tax quote follows the visible checkout fields while member codes
+   still credit the order.
    ============================================================ */
 
 import {
@@ -115,7 +115,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const taxIdText = typeof body.tax_id === "string" ? body.tax_id.trim().slice(0, 40) : "";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
-    /* Guest billing address fields. The State remains backward
+    /* Checkout billing address fields. The State remains backward
        compatible with the old guest_state field, while ZIP, city,
        and line1 let the shared resolver price from the visible
        checkout fields once this function version is deployed. */

@@ -57,6 +57,7 @@ What changed:
   - Examples: `NY`, `New York`, and `new york` all normalize to `NY`.
 - Follow-up: the billing State field is now a dropdown with all 50 states plus District of Columbia, so guest state selection is explicit instead of free text.
 - Follow-up: the account step no longer shows an Illinois tax estimate before login or guest State/ZIP entry. Tax is pending with a blank tax amount until either a member login supplies the stored address or a guest supplies State and ZIP.
+- Follow-up: the billing address now stays blank after member sign-in too. The shopper must enter State and ZIP before tax quotes or payment opens. Source Edge Function logic now separates attribution from tax destination: a member code can credit the order while the entered checkout address drives tax after function deploy.
 - Guest checkout also sends `guest_zip`, `guest_city`, and `guest_line1` for the ZIP-aware server path.
 - The address fields are now part of the payment amount signature, so editing State/ZIP forces a fresh quote and a fresh payment opening.
 - `MLM-PILOT\functions\quote-tax\index.ts` and `MLM-PILOT\functions\create-payment\index.ts` now parse the guest address fields identically.

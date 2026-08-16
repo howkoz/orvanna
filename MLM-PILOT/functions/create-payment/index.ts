@@ -56,9 +56,9 @@
 
    Secrets: only via Deno.env.get, names per spec section 3.
    No names, Tax ID values, card data, or raw IPs are stored or
-   logged. Guest billing State/ZIP can be sent by the shop so the
-   sandbox tax charge follows the visible checkout fields; member
-   destinations are still read from the database.
+   logged. Billing State/ZIP can be sent by the shop so the sandbox
+   tax charge follows the visible checkout fields while member codes
+   still credit the order.
    ============================================================ */
 
 import {
@@ -331,7 +331,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       body.channel === "staff_console" ? "staff_console" : "shop";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
-    /* Guest billing address fields: parsed IDENTICALLY to quote-tax,
+    /* Checkout billing address fields: parsed IDENTICALLY to quote-tax,
        on purpose, because the whole point of the shared resolver is
        that the address a shopper was quoted against is by
        construction the address they are charged against. */
