@@ -226,7 +226,11 @@ def assert_version_stamps() -> None:
 # into the public build: the team page, which tells the build story, is the
 # single place it belongs. DOCUMENTATION\ is not copied into dist (the build
 # copies www/ and site/ only, verified 2026-08-16), so it needs no entry here.
-NAME_ALLOWLIST = {"team.html"}
+# index.html added 2026-08-16: the homepage founder teaser is deliberate site
+# content under Howard's 2026-08-14 ruling that the real team, himself included,
+# tells the build story on the site. Comments and dated quotes elsewhere are
+# still leaks and still fail the lint.
+NAME_ALLOWLIST = {"team.html", "index.html"}
 NAME_LINT_TERMS = ("koziara", "howard")
 
 
