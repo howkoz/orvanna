@@ -80,6 +80,8 @@ APPLY_ORDER = [
     (MIGRATIONS / "025_subscription_policy_data.sql",   "025 classification and ladder data (S1)"),
     (MIGRATIONS / "026_renewal_engine.sql",             "026 renewal engine (S1)"),
     (MIGRATIONS / "027_bridge_covered_months_spread.sql", "027 bridge covered_months amendment (S1)"),
+    (MIGRATIONS / "028_run_limit.sql",                  "028 the run limit (ruling R9, spec v1.2 9B)"),
+    (MIGRATIONS / "029_live_dispatch_seam.sql",         "029 the live dispatch seam (S2 minimal)"),
     (SQL / "02_fixture_s1.sql",                         "fixture part 2: clock, cast, credentials, scripts"),
 ]
 
@@ -91,6 +93,8 @@ SIM_ORDER = [
     (SQL / "14_dec1_double_tick.sql",                   "FM1: the double tick of 2026-12-01"),
     (SQL / "15_price_change_and_ticks_to_jan31.sql",    "FM3: price change 2026-12-14, ticks to 2027-01-31"),
     (SQL / "16_skip_and_finish.sql",                    "catch-up: skip 2027-02-01, ticks to 2027-09-30"),
+    (SQL / "17_limit_run.sql",                          "R9: the run limit (23 due, limit 5; retry on a limited day)"),
+    (SQL / "18_live_seam.sql",                          "029: the live dispatch seam, to the rig's honest boundary"),
     (SQL / "20_commission_runs.sql",                    "commission runs Sep..Dec 2026 (unmodified engine)"),
     (SQL / "30_proof_battery.sql",                      "THE PROOF BATTERY"),
 ]

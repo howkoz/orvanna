@@ -40,8 +40,8 @@ artifacts.
    OQ4 billing-day transition, and a sanctioned frequency change.
 5. Runs September..December 2026 through the UNMODIFIED compensation engine,
    then the proof battery (`sql\30_proof_battery.sql`), where every proof
-   prints PASS or FAIL with its key numbers: 65 battery rows as of the fix
-   round.
+   prints PASS or FAIL with its key numbers: 75 battery rows as of the
+   028/029 increment (the run limit and the live dispatch seam).
 6. Writes the full transcript to `proof_output\transcript-<stamp>.txt` and
    exits nonzero on any FAIL or SQL error. A full run takes roughly 40
    seconds wall time (about 20 seconds of SQL plus container start-up).
@@ -74,6 +74,8 @@ charter's local-proof discipline made literal.
 | MA1..MA13 | The member-action year: every pause lane including T10a's frozen clock (spec v1.1 12.3 micro-example), resume paths, cancels, the 2017/2018 lanes, day-28 truncation, both reactivations (verifier H1 scenarios, QA M3) |
 | MG1..MG6 | The OQ4 transition rule to the letter (spec v1.1 erratum E3) and the schedule-column guard refusing raw frequency and anchor updates (verifier M1, M2) |
 | GX1..GX4 | Coverage never doubles; supersession hygiene; the outcome vocabulary fully alive (skipped_paused and void_cancelled both written, verifier L1) |
+| LM1..LM6 | Migration 028, the run limit (ruling R9, spec v1.2 9B): 23 due with limit 5 runs the deterministic first five, the remainder self-heals, a scheduled retry on a limited day processes regardless, the run row carries ran-N-of-M-due arithmetic |
+| LV1..LV4 | Migration 029, the live dispatch seam to the rig's honest boundary: sandbox-card seed, live attempts left dispatched for the worker, the sim reconciler never invents live truth, verdicts return through fn_record_live_verdict; the LIVE half is the deploy-round acceptance in 029's footer |
 
 The recorded proof run lives at
 `MLM-PILOT\docs\verification\S1-PROOF-RUN-2026-08-16.md`.

@@ -37,7 +37,7 @@ select 'B1: no attempt is left non-terminal at year end' as proof,
   from app.billing_attempts where outcome = 'dispatched';
 
 select 'B2: the crash batch billed exactly once each (60 of 60 paid)' as proof,
-       case when count(*) = 660 and count(*) filter (where rp.outcome = 'paid') = 660
+       case when count(*) = 720 and count(*) filter (where rp.outcome = 'paid') = 720
             then 'PASS'
             else 'FAIL: ' || count(*) || ' periods, '
                  || count(*) filter (where rp.outcome = 'paid') || ' paid' end as verdict
@@ -45,7 +45,8 @@ select 'B2: the crash batch billed exactly once each (60 of 60 paid)' as proof,
   join app.subscriptions s on s.id = rp.subscription_id
   join app.members m on m.id = s.member_id
  where m.member_code like 'GW-92%';
--- 660 = 60 members x 11 monthly cycles (2026-11-15 through 2027-09-15).
+-- 720 = 60 members x 12 monthly cycles (2026-11-15 through 2027-10-15; the
+-- clock ends 2027-11-07, before the thirteenth cycle).
 
 select 'B3: the scripted orphan (GW-9247 cycle 1) resolved on its ORIGINAL attempt row' as proof,
        case when count(*) = 1
@@ -89,12 +90,17 @@ select 'C2: the schema has NO stored-price path on subscriptions at all' as proo
 -- PROOF D (FM4, the skipped month): FRED, anchored 2026-10-31, twelve
 -- accounted cycles, zero gaps, Feb clamped to the 28th, back on the 31st.
 -- ---------------------------------------------------------------------------
-select 'D1: FRED has exactly twelve accounted cycles, all paid' as proof,
+-- FRED note: the sim now runs past his twelfth cycle (a thirteenth, 2027-10-31,
+-- bills in the segment 17 October ticks). The FM4 February-crossing proof is
+-- the TWELVE-cycle window, so D1/D2 scope to renewal_index 1 to 12; the
+-- thirteenth cycle is covered by the global audits (D3, GX1).
+select 'D1: FRED, the twelve-cycle FM4 window, all accounted, all paid' as proof,
        case when count(*) = 12 and count(*) filter (where rp.outcome = 'paid') = 12
             then 'PASS' else 'FAIL: ' || count(*) end as verdict
   from app.renewal_periods rp
   join app.subscriptions s on s.id = rp.subscription_id
-  join app.members m on m.id = s.member_id and m.member_code = 'GW-9005';
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9005'
+ where rp.renewal_index <= 12;
 
 -- The twelve dates PRINTED VERBATIM (QA L1: the proof document quotes the
 -- transcript rather than presenting an asserted-equal string as recorded):
@@ -103,6 +109,7 @@ select 'D2-print: FRED cycle ' || rp.renewal_index as label,
   from app.renewal_periods rp
   join app.subscriptions s on s.id = rp.subscription_id
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9005'
+ where rp.renewal_index <= 12
  order by rp.renewal_index;
 
 select 'D2: FRED cycle dates clamp and return, never drift' as proof,
@@ -115,7 +122,8 @@ select 'D2: FRED cycle dates clamp and return, never drift' as proof,
        end as verdict
   from app.renewal_periods rp
   join app.subscriptions s on s.id = rp.subscription_id
-  join app.members m on m.id = s.member_id and m.member_code = 'GW-9005';
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9005'
+ where rp.renewal_index <= 12;
 
 select 'D3: the cycle audit shows ZERO gaps across every billing-state subscription' as proof,
        case when count(*) = 0 then 'PASS' else 'FAIL: ' || count(*) || ' gaps' end as verdict
@@ -125,7 +133,7 @@ select 'D3: the cycle audit shows ZERO gaps across every billing-state subscript
 -- PROOF E (FM5, the corrupted credential): DANA.
 -- ---------------------------------------------------------------------------
 select 'E1: every DANA attempt stopped at pre-flight, classified internal_config' as proof,
-       case when count(*) = 13   -- exactly: 13 monthly cycles, Sep 2026 through Sep 2027 (QA L3: equality, not a floor)
+       case when count(*) = 15   -- exactly: 15 monthly cycles, Sep 2026 through Nov 2027 (QA L3: equality, not a floor)
              and bool_and(ba.outcome = 'preflight_failed'
                           and ba.decline_class = 'internal_config'
                           and ba.member_fault = false
@@ -137,6 +145,9 @@ select 'E1: every DANA attempt stopped at pre-flight, classified internal_config
   join app.subscriptions s on s.id = rp.subscription_id
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9004';
 
+-- DANA's count note: 15 cycles because the simulated run now extends to
+-- 2027-11-07 (the limit and live-seam segments); the last cycle (Nov 1,
+-- gathered in the limited first five) is her fifteenth pre-flight stop.
 select 'E2: zero retries ever ran for DANA (one attempt per cycle, no ladder)' as proof,
        case when max(ba.attempt_no) = 1 then 'PASS'
             else 'FAIL: max attempt_no ' || max(ba.attempt_no) end as verdict
@@ -157,7 +168,7 @@ select 'E3: DANA''s dunning and auto-cancel clocks are untouched (state active, 
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9004';
 
 select 'E4: DANA is surfaced in the staff attention queue as a system fault' as proof,
-       case when count(*) = 13 then 'PASS' else 'FAIL: ' || count(*) end as verdict,
+       case when count(*) = 15 then 'PASS' else 'FAIL: ' || count(*) end as verdict,
        count(*) as attention_rows
   from app.v_staff_attention_queue q
   join app.subscriptions s on s.id = q.subscription_id
@@ -385,8 +396,8 @@ select 'G8: pricing totals reconcile: every paid period equals its demo order to
 -- FQ: bi-monthly and semi-annual actually BILL, COVER and SPREAD (QA M2,
 -- verifier M5).
 -- ---------------------------------------------------------------------------
-select 'FQ1: OSCAR bi-monthly billed 7 cycles of 20000 cents covering 2 months each, all paid' as proof,
-       case when count(*) = 7
+select 'FQ1: OSCAR bi-monthly billed 8 cycles of 20000 cents covering 2 months each, all paid' as proof,
+       case when count(*) = 8   -- Sep/Nov 2026, Jan/Mar/May/Jul/Sep 2027, and Nov 2027 (the limited-run segment)
              and bool_and(rp.amount_cents = 20000 and rp.covered_months = 2
                           and rp.outcome = 'paid')
             then 'PASS' else 'FAIL: ' || count(*) end as verdict
@@ -404,8 +415,8 @@ select 'FQ2: OSCAR volume spreads to exactly 100.00 in each of the 12 months Sep
          where o.volume_month between date '2026-09-01' and date '2027-08-01'
          group by o.volume_month) x;
 
-select 'FQ3: SARA semi-annual billed 2 cycles of 60000 cents covering 6 months each, all paid' as proof,
-       case when count(*) = 2
+select 'FQ3: SARA semi-annual billed 3 cycles of 60000 cents covering 6 months each, all paid' as proof,
+       case when count(*) = 3   -- Oct 2026, Apr 2027, Oct 2027 (the sim now reaches October)
              and bool_and(rp.amount_cents = 60000 and rp.covered_months = 6
                           and rp.outcome = 'paid')
             then 'PASS' else 'FAIL: ' || count(*) end as verdict
@@ -669,7 +680,7 @@ select 'MG4: NORA quarterly-to-monthly through the sanctioned function: coverage
                             and rp.amount_cents = 30000 and rp.covered_months = 3
                             and rp.outcome = 'paid')
              and (select count(*) from app.renewal_periods rp
-                   where rp.subscription_id = s.id and rp.renewal_index > 1) = 9
+                   where rp.subscription_id = s.id and rp.renewal_index > 1) = 11
              and (select min(rp.scheduled_date) from app.renewal_periods rp
                    where rp.subscription_id = s.id and rp.renewal_index > 1) = date '2027-01-01'
              and not exists (select 1 from app.renewal_periods rp
@@ -750,3 +761,124 @@ select 'GX4: ZOE, cancellation unrelated to payment failure: her preflight-stopp
   from app.renewal_periods rp
   join app.subscriptions s on s.id = rp.subscription_id
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9021';
+
+-- ===========================================================================
+-- LM: THE RUN LIMIT (migration 028, ruling R9, spec v1.2 section 9B)
+-- ===========================================================================
+select 'LM1: the limited run record reads ran 5 of 23 due, 18 remaining' as proof,
+       case when limit_requested = 5 and due_count = 23
+             and processed_count = 5 and remaining_count = 18
+            then 'PASS'
+            else 'FAIL: ' || coalesce(limit_requested::text,'null') || '/'
+                 || due_count || '/' || processed_count || '/' || remaining_count
+       end as verdict
+  from app.billing_runs
+ where tick_date = date '2027-11-01' and status = 'final';
+
+select 'LM2: the deterministic first five (oldest due, then member code)' as proof,
+       case when string_agg(m.member_code, ',' order by m.member_code)
+            = 'GW-9000,GW-9001,GW-9004,GW-9006,GW-9007'
+            then 'PASS'
+            else 'FAIL: ' || string_agg(m.member_code, ',' order by m.member_code)
+       end as verdict
+  from app.renewal_periods rp
+  join app.billing_attempts ba on ba.renewal_period_id = rp.id and ba.attempt_no = 1
+  join app.billing_runs br on br.id = ba.run_id
+       and br.tick_date = date '2027-11-01' and br.status = 'final'
+  join app.subscriptions s on s.id = rp.subscription_id
+  join app.members m on m.id = s.member_id;
+
+select 'LM3: the remainder self-healed next tick, number six onward, zero strandings, FM1 held across limited runs' as proof,
+       case when (select due_count || '/' || processed_count || '/' || remaining_count
+                    from app.billing_runs
+                   where tick_date = date '2027-11-02' and status = 'final') = '18/18/0'
+             and (select count(*) from app.renewal_periods
+                   where scheduled_date = date '2027-11-01') = 23
+             and (select count(distinct subscription_id) from app.renewal_periods
+                   where scheduled_date = date '2027-11-01') = 23
+             and (select min(m.member_code)
+                    from app.renewal_periods rp
+                    join app.billing_attempts ba on ba.renewal_period_id = rp.id and ba.attempt_no = 1
+                    join app.billing_runs br on br.id = ba.run_id
+                         and br.tick_date = date '2027-11-02' and br.status = 'final'
+                    join app.subscriptions s on s.id = rp.subscription_id
+                    join app.members m on m.id = s.member_id
+                   where rp.scheduled_date = date '2027-11-01') = 'GW-9009'
+            then 'PASS' else 'FAIL' end as verdict;
+
+select 'LM4: a scheduled retry processes on a limited day REGARDLESS of the limit (9B rule 6)' as proof,
+       case when (select limit_requested || '/' || due_count || '/'
+                         || processed_count || '/' || remaining_count || '/' || attempts_made
+                    from app.billing_runs
+                   where tick_date = date '2027-11-04' and status = 'final') = '1/3/1/2/2'
+             and exists (select 1
+                           from app.billing_attempts ba
+                           join app.renewal_periods rp on rp.id = ba.renewal_period_id
+                           join app.subscriptions s on s.id = rp.subscription_id
+                           join app.members m on m.id = s.member_id
+                                and m.member_code = 'GW-9301'
+                          where ba.attempt_no = 2 and ba.attempt_kind = 'retry_soft'
+                            and ba.scheduled_for = date '2027-11-04'
+                            and ba.outcome = 'succeeded')
+            then 'PASS' else 'FAIL' end as verdict;
+
+select 'LM5: the limited day-4 remainder self-healed on Nov 5 (2 of 2), all three day-4 cycles paid once' as proof,
+       case when (select due_count || '/' || processed_count from app.billing_runs
+                   where tick_date = date '2027-11-05' and status = 'final') = '2/2'
+             and (select count(*) from app.renewal_periods rp
+                    join app.subscriptions s on s.id = rp.subscription_id
+                    join app.members m on m.id = s.member_id
+                   where m.member_code in ('GW-9313','GW-9314','GW-9315')
+                     and rp.outcome = 'paid') = 3
+            then 'PASS' else 'FAIL' end as verdict;
+
+select 'LM6: unlimited runs carry the arithmetic too: every final 028-era run has remaining_count = due minus processed' as proof,
+       case when count(*) = 0 then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.billing_runs
+ where status = 'final' and due_count is not null
+   and remaining_count <> due_count - processed_count;
+
+-- ===========================================================================
+-- LV: THE LIVE DISPATCH SEAM (migration 029), to the rig''s honest boundary
+-- ===========================================================================
+select 'LV1: the S2 seed carries ONLY the two non-3DS sandbox cards, expiry 01/2029' as proof,
+       case when count(*) = 10
+             and count(*) filter (where c.brand = 'visa' and c.last4 = '4242') = 5
+             and count(*) filter (where c.brand = 'mastercard' and c.last4 = '4444') = 5
+             and bool_and(c.expiry_month = 1 and c.expiry_year = 2029)
+             and bool_and(c.token_reference like 'sandbox-card:%')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.payment_credentials c
+  join app.members m on m.id = c.member_id
+ where m.member_code like 'GW-94%';
+
+select 'LV2: the live limited run: 2 of 2, dispatch_mode live on the run row' as proof,
+       case when limit_requested = 2 and due_count = 2 and processed_count = 2
+             and remaining_count = 0 and dispatch_mode = 'live'
+            then 'PASS' else 'FAIL' end as verdict
+  from app.billing_runs
+ where tick_date = date '2027-11-06' and status = 'final';
+
+select 'LV3: live verdicts resolved through the one shared path, real payment ids stamped, volume bridged to the covered month' as proof,
+       case when count(*) = 2
+             and bool_and(d.payment_status = 'succeeded')
+             and bool_and(d.payment_reference like 'pay_livetest_%')
+             and bool_and((d.processor_summary ->> 'simulated') = 'false')
+             and (select count(*) from app.orders o
+                    join app.members m2 on m2.id = o.member_id
+                   where m2.member_code in ('GW-9401', 'GW-9406')
+                     and o.volume_month = date '2027-11-01') = 2
+            then 'PASS' else 'FAIL' end as verdict
+  from app.demo_orders d
+  join app.members m on m.id = d.member_id
+ where m.member_code like 'GW-94%'
+   and d.payment_reference like 'pay_livetest_%';
+
+select 'LV4: simulated and live coexist: the Nov 7 seeds sim-billed normally beside the live strands' as proof,
+       case when count(*) = 2
+             and bool_and(d.payment_status = 'succeeded')
+             and bool_and(d.payment_reference like 'SIM-%')
+            then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.demo_orders d
+  join app.members m on m.id = d.member_id
+ where m.member_code in ('GW-9402', 'GW-9407');
