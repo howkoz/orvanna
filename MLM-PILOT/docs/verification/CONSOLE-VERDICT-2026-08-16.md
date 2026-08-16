@@ -245,3 +245,80 @@ requires the rail to have no record, which a prior charge contradicts;
 still, run the strand drill A7 twice in the deploy round for comfort);
 the member-portal redesign commit (4cb15c5), which is outside this gate's
 scope.
+
+---
+
+## Deploy record, 2026-08-16 (appended by the deploy engineer)
+
+The round this verdict authorized is executed. Gates cited: this verdict at commit
+1905283, the quality assurance gate at commit b48b331. Everything above this line is
+the verifier's and stands unedited.
+
+**Migrations.** `subscription_run_limit_028` (ledger version 20260816223743) and
+`live_dispatch_seam_029` (version 20260816223956), applied in order via the
+management tool. Ledger fidelity EXACT for both: stored statement md5 and length
+equal the local line-feed file content (028: md5 `9ad43f2db7003b9f821f011482c53d72`,
+27,455 bytes; 029: md5 `ea7f05c17457100f4543db7d6a280df9`, 31,997 bytes). Condition-4
+header notes ("APPLIED ... window CLOSED FOREVER") were written into both files
+BEFORE applying, so the applied bytes carry the freeze notice; the gated section 9
+hashes graded the pre-annotation bytes, and the delta is those header comments only.
+028's verification queries passed (single three-argument tick after 029, the four
+new columns, the exact ruling R9 limit-zero refusal); 029's structural checks passed
+(fn_record_live_verdict, fn_seed_s2_test_subscriptions, dispatch_mode defaults and
+check constraints, gibberish-dispatch refusal verbatim).
+
+**Functions.** billing-console version 1 (index.ts plus _shared edge.ts, pricing.ts,
+staff-auth.ts) and commission-report version 1 (index.ts plus _shared edge.ts,
+staff-auth.ts), both verify_jwt true (commission-report's header says platform
+JSON Web Token verification ON is fine, exactly like list-demo-orders).
+**Byte-compare: PASS, all seven files**, deployed bytes equal the repository git
+blobs by SHA-256 (Secure Hash Algorithm 256), and the two index.ts hashes equal this
+verdict's own gated hashes.
+
+**The clock act (V-A9): NOT PERFORMED, deliberately.** Migration 029's recorded
+operator procedure (its A1-A7 footer) prescribes NO clock initialization, and ruling
+OQ8 forbids a production sim clock without an explicit act. `app.sim_clock` is at
+ZERO rows (verified independently after all probes), `app.billing_schedule` has zero
+enabled rows, pg_cron is not installed: the engine is structurally inert. The clock
+act therefore stands as Howard's own recorded step, to run before his A2 press:
+initialize the clock via `app.fn_sim_clock_init` (clock date and engine epoch), then
+preview and confirm the epoch floor holds.
+
+**The seed (A1).** `app.fn_seed_s2_test_subscriptions('2026-08-16',
+GW-000001..GW-000010)` returned 10. `app.payment_credentials` holds exactly ten
+rows, the published Braintree sandbox pair only (five Visa 4242, five Mastercard
+5555-...-4444), all expiry 01/2029, ten distinct members, no other card shape in the
+table. Anchors staggered so exactly two subscriptions (GW-000001, GW-000006) are due
+on day one, matching the limit-2 design.
+
+**V-A8 to V-A13.** Byte-compares above (V-A8). Row-level security: every engine
+table rowsecurity true with zero policies; the one policy in the schema is the
+pre-existing S1 `demo_reader_select_subscriptions` on app.subscriptions backing the
+public demonstration views, not a product of this round. Finalized-months checksums
+byte-identical to the recorded values, verified twice by the executor and once
+independently by this engineer (commission_lines fc6575d5..., run_member_results
+aa34b9a4..., commission_runs 5bb7fdf1...). Role fences, live: anonymous refused 401
+on both functions; a GW-000001 member token refused 401 on both, bodies identical to
+the anonymous refusals. The admin-admitted half of V-A11, the V-A12 projection
+hygiene probe, and the QA-A15 preview all REQUIRE HOWARD: no staff or admin
+credential exists in the repository by design (migration 012 supplies them at apply
+time), so no session able to exercise the admitted paths could be minted from here.
+Baseline for Howard's V-A12 run: commission_runs 12, run_member_results 12,000,
+commission_lines 22,076, run_level_map 29,550, plus the three checksums; all must be
+unchanged after one projection call, and the response must contain no run id. The
+V-A13 Card Verification Code note is carried forward verbatim: the fixed CVC 123
+rides the published sandbox pair, and any CVC enforcement surprise during A3 stops
+the round.
+
+**Howard's next steps, exactly.** Page: https://orvanna.io/staff-operations.html
+(redirects to login.html?role=staff when signed out). Sign in as Orvanna_Staff with
+the staff password chosen at migration-012 apply time. First, the clock act (V-A9)
+above. Then the limit-2 run (A2, Howard's alone): in the RUN panel type 2 in
+"Number to run", set Dispatch to live, press Preview and read WHICH two
+subscriptions will bill (expect GW-000001 and GW-000006), then press the execute
+button twice (it arms on the first click and fires on the second). Expected run row:
+limit_requested 2, processed_count 2, dispatch_mode live. A3 (HyperSwitch
+verification of the two charges) follows on the processor side.
+
+Nothing else was touched: no live dispatch, no sim clock write, exactly two
+migrations and exactly two functions.

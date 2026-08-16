@@ -3,6 +3,12 @@
 -- Project: MLM Pilot (Orvanna persona, personal project)
 -- Date:    2026-08-16
 -- Author:  mlm-db-engineer
+--
+-- APPLIED TO THE CLOUD PROJECT 2026-08-16 (gated: console verifier verdict
+-- commit 1905283, quality assurance gate commit b48b331). The in-place-edit
+-- window on this file is CLOSED FOREVER as of that apply: any future change,
+-- however small, is a NEW numbered migration file.
+--
 -- Design:  MLM-PILOT\docs\SUBSCRIPTION-ENGINE-SPEC.md version 1.2, section 9B
 --          (six rules), ruling R9. Howard's words: "put a field that allows
 --          me to run a specific amount of subscriptions, if i want to run 5

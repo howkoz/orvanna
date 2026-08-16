@@ -3,6 +3,12 @@
 -- Project: MLM Pilot (Orvanna persona, personal project)
 -- Date:    2026-08-16
 -- Author:  mlm-db-engineer
+--
+-- APPLIED TO THE CLOUD PROJECT 2026-08-16 (gated: console verifier verdict
+-- commit 1905283, quality assurance gate commit b48b331). The in-place-edit
+-- window on this file is CLOSED FOREVER as of that apply: any future change,
+-- however small, is a NEW numbered migration file.
+--
 -- Design:  spec v1.2 sections 9 (step 8: "in S2, to the real rail as an
 --          off-session MIT; the state machine, classification, and bridge
 --          never know which processor answered") and 8.4 (the MIT and 3DS
