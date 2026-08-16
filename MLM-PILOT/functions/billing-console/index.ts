@@ -49,15 +49,18 @@
        corrupted event stream. When S2 arrives and the engine gains
        its real-rail clock, the same calls drive it unchanged.
 
-   WHY run_execute IS STRUCTURALLY DISABLED (not just gated):
-   Howard's OQ8 ruling is that the production console drives the
-   REAL pipeline only when S2 arrives. Today RUN NOW performs the
-   dry-run preview path ONLY: gather and price, create nothing.
-   The execute step is refused server-side with an honest
-   s2_pending answer even if someone hand-initialized the clock,
-   because EXECUTE_ENABLED below is a compile-time false. Flipping
-   it is the S2 change, made deliberately, with its own review;
-   no runtime data can flip it.
+   run_execute: LIVE AS OF MIGRATIONS 028 AND 029 (2026-08-16,
+   engine commit 61ebe26). The reserved S2 change has been made:
+   EXECUTE_ENABLED is true and the execute action implements 029's
+   live worker contract (see the worker block below). The gates
+   that replaced the old blanket refusal: dispatch must be
+   explicit in the payload; the engine must answer ready (the
+   three-argument tick, the verdict door, and the dispatch_mode
+   seam all present; for live dispatch additionally the seeded
+   sandbox credentials); and every engine refusal (clock, date
+   arithmetic, limit) surfaces verbatim. This function still never
+   writes app.sim_clock: initializing it is the deploy-round
+   operator's explicit act per 029's acceptance procedure.
 
    ------------------------------------------------------------
    THE PREVIEW, AND WHY THE INERT ANSWER REFUSES TO PRICE
@@ -90,11 +93,15 @@ import {
   checkRateLimit,
   errorResponse,
   getPool,
+  HYPERSWITCH_BASE_URL,
   isAllowedOrigin,
   jsonResponse,
+  mapHyperswitchStatus,
   preflight,
   type DbClient,
 } from "../_shared/edge.ts";
+
+import { CATALOG, toCents } from "../_shared/pricing.ts";
 
 import {
   auditStaffAction,
@@ -102,10 +109,15 @@ import {
   type StaffIdentity,
 } from "../_shared/staff-auth.ts";
 
-/* Compile-time execution switch. See the header: flipping this is
-   the S2 change. While false, run_execute always refuses with
-   s2_pending, whatever the database says. */
-const EXECUTE_ENABLED = false;
+/* Compile-time execution switch. FLIPPED TO TRUE 2026-08-16 with
+   migrations 028 (run limit) and 029 (live dispatch seam): this is
+   the S2 change the earlier build reserved, made deliberately, with
+   the engine contract of 029 implemented below (the live worker).
+   Execution still refuses server-side unless the payload's dispatch
+   mode is EXPLICIT and the engine answers ready (schema present;
+   for live dispatch, the seeded sandbox credentials exist); nothing
+   here ever initializes app.sim_clock. */
+const EXECUTE_ENABLED = true;
 
 /* Actions, a closed union: unknown actions are refused, so a
    future action is denied by default rather than silently
@@ -209,9 +221,11 @@ function honestyNotes(status: EngineStatus): string[] {
   }
   if (!status.clock_initialized) {
     notes.push(
-      "The renewal engine is deliberately inert in production (Phase S1, ruling OQ8): " +
-        "its clock is not initialized and no billing run can execute here. RUN NOW " +
-        "offers the dry-run preview only; execution arrives with Phase S2.",
+      "The renewal engine's clock is not initialized on this database, so no billing " +
+        "run can execute here yet. RUN NOW previews; an execute is refused honestly " +
+        "until the deploy round applies the engine seam (migrations 028 and 029), seeds " +
+        "the test credentials, and initializes the clock per the recorded acceptance " +
+        "procedure.",
     );
   }
   return notes;
@@ -616,18 +630,22 @@ async function actionRunPreview(
 
   const sample = (rows: unknown[], limit = 50) => rows.slice(0, limit);
 
-  /* ---- THE NUMBER-TO-RUN SELECTION (Howard's ruling). ----
-     With a limit N the preview must answer WHICH charges the first
-     N are, under ONE deterministic order the engine side (migration
-     028, authored concurrently) can reproduce exactly:
-       oldest due date first, then member code, then renewal index.
-     The due set is the run's whole chargeable work: due new cycles
-     and due UNCLIPPED retries together (a clipped retry never runs,
-     so it can never occupy a slot). The definition is stated here
-     in one sentence precisely so the gates can compare it with
-     028's implementation and flag any divergence loudly. */
+  /* ---- THE NUMBER-TO-RUN SELECTION, aligned to migration 028. ----
+     Reconciled 2026-08-16 in the ENGINE'S favor (the standing rule):
+       1. The limit bounds NEW CYCLE BILLINGS ONLY (028 / spec 9B
+          rule 6). Already-scheduled retries run regardless: a retry
+          is a promise already made on a C1-clipped date, and
+          deferring it behind a limit could vanish it as
+          skipped_clipped, distorting dunning for exactly the
+          members already in trouble. An earlier draft here limited
+          the combined set; that reading is REJECTED.
+       2. The order is 028's exactly: scheduled date ascending, then
+          member code, then subscription id, then renewal index
+          (total order even for a member holding two subscriptions).
+     due_total below is therefore 028's due_count (new cycles only,
+     measured before selection), and the WHICH list is recomputable
+     from the engine's own jsonb_agg ordering, byte for byte. */
   interface DueItem {
-    kind: "new_cycle" | "retry";
     subscription_id: number;
     member_code: string;
     renewal_index: number;
@@ -635,29 +653,14 @@ async function actionRunPreview(
     amount: number;
     detail: string;
   }
-  const dueItems: DueItem[] = [];
-  for (const r of newCycles.rows) {
-    dueItems.push({
-      kind: "new_cycle",
-      subscription_id: Number(r.subscription_id),
-      member_code: r.member_code,
-      renewal_index: r.renewal_index,
-      due_date: String(r.scheduled_date).slice(0, 10),
-      amount: num(r.amount),
-      detail: r.frequency_months + " month(s)",
-    });
-  }
-  for (const r of retryRows) {
-    dueItems.push({
-      kind: "retry",
-      subscription_id: Number(r.subscription_id),
-      member_code: r.member_code,
-      renewal_index: r.renewal_index,
-      due_date: String(r.next_retry_date).slice(0, 10),
-      amount: r.amount_cents / 100,
-      detail: "retry, class " + (r.decline_class ?? "unknown"),
-    });
-  }
+  const dueItems: DueItem[] = newCycles.rows.map((r) => ({
+    subscription_id: Number(r.subscription_id),
+    member_code: r.member_code,
+    renewal_index: r.renewal_index,
+    due_date: String(r.scheduled_date).slice(0, 10),
+    amount: num(r.amount),
+    detail: r.frequency_months + " month(s)",
+  }));
   dueItems.sort((a, b) =>
     a.due_date < b.due_date
       ? -1
@@ -667,6 +670,8 @@ async function actionRunPreview(
       ? -1
       : a.member_code > b.member_code
       ? 1
+      : a.subscription_id !== b.subscription_id
+      ? a.subscription_id - b.subscription_id
       : a.renewal_index - b.renewal_index
   );
   const selected = runLimit === null ? dueItems : dueItems.slice(0, runLimit);
@@ -681,15 +686,21 @@ async function actionRunPreview(
     preview: {
       tick_date: tickDate,
       /* The limit block: what a run capped at N would actually
-         charge, and how much due work would remain for later runs.
-         With no limit, selected covers everything due and remaining
-         is zero, so the page renders one truth either way. */
+         charge, and how much due work would remain for later runs
+         (self-healing through the next gather, no bookmark). Counts
+         are NEW CYCLES ONLY, matching 028's due_count arithmetic;
+         retries are never limited and are reported in their own
+         block. With no limit, selected covers everything due and
+         remaining is zero, so the page renders one truth either
+         way. */
       limit: {
         requested_n: runLimit,
         due_total: dueItems.length,
         selected_count: selected.length,
         remaining_count: dueItems.length - selected.length,
         selected_amount: Math.round(selectedAmount * 100) / 100,
+        retries_note:
+          "Already-scheduled retries are never limited (spec 9B rule 6); the retries block runs in full regardless of N.",
         selected: sample(selected),
       },
       new_cycles: {
@@ -735,23 +746,506 @@ async function actionRunPreview(
   });
 }
 
-/* ------------------------------------------------------------
-   run_execute: the confirm step after the preview. Refused today.
+/* ============================================================
+   THE LIVE WORKER (migration 029's contract, implemented to the
+   letter; the contract text lives in 029's header so nobody
+   improvises it, and this block is its one implementation).
 
-   Order of refusals, each audited, none reachable from the page
-   alone (a crafted request meets the same wall):
-     1. EXECUTE_ENABLED is false: s2_pending, always, in this
-        build. This is the OQ8 production-inertness ruling made
-        structural.
-     2. (When S2 flips the constant) clock uninitialized:
-        engine_inert.
-     3. (When S2 flips the constant) confirm !== true, or the
-        caller's expected counts disagree with a fresh gather:
-        the mandatory-preview discipline, so execution can never
-        run on stale eyes.
-   The eventual execute path is app.fn_billing_tick(clock + 1) on
-   this same connection; it is written nowhere else so there is
-   exactly one thing to review when S2 arrives.
+   The tick, invoked with dispatch 'live', creates each payment
+   attempt demo-order-shaped and leaves it in the honest
+   non-terminal state 'dispatched' stamped dispatch_mode 'live'.
+   This worker then, per attempt ORDERED BY ID:
+     1. reprices server-side through the _shared pricing mirror
+        (the same table create-payment prices from) and asserts
+        the repriced integer cents EQUAL the attempt's demo-order
+        total_cents; refuse on mismatch: the frozen period is the
+        promise, and a drifted catalog must stop the charge, not
+        reprice it;
+     2. HyperSwitch create WITH confirm, amount = the frozen
+        total_cents, currency USD, authentication_type no_three_ds
+        (ruling 8.4: a renewal is a Merchant Initiated Transaction;
+        no external authentication, no challenge flow, ever);
+     3. fresh retrieve with the exact integer amount match (the
+        same evidentiary bar the checkout holds);
+     4. writes the verdict through app.fn_record_live_verdict, the
+        engine's ONE write-back door, which funnels into the same
+        classification path, state machine, and bridge the
+        simulator uses.
+   Then app.fn_bridge_demo_orders(true).
+
+   CRASH RECOVERY (FM2 posture): on every invocation, BEFORE new
+   work, the worker sweeps every lingering dispatched live attempt
+   (any run): if its demo order carries a payment reference, the
+   truth is one retrieve away; otherwise the rail is searched by
+   metadata.billing_attempt_id through the payments list; a payment
+   found resolves through the same verdict door with no second
+   charge, and an attempt the rail has never seen is charged now,
+   which is safe precisely because the rail has never seen it.
+
+   ONE ARGUED DEVIATION from a literal reading of the contract:
+   this worker never records the 'processor_unreachable' verdict on
+   an AMBIGUOUS wire failure (a create or retrieve that timed out).
+   That verdict marks the order abandoned and schedules an infra
+   retry as a NEW attempt with a NEW charge; issuing it while the
+   original create may have landed is how double charges are born
+   (FM1 by way of FM2). An ambiguous failure instead leaves the
+   attempt 'dispatched', visible in the attention queue, and the
+   next sweep resolves it with CERTAINTY from the rail's own
+   ledger. The verdict option remains for a definitive
+   never-reached case a future operator tool may prove.
+   ============================================================ */
+
+/* The fixed synthetic billing block, the same ruling create-payment
+   records (2026-08-14): a demonstration address, never a member's
+   real one. Harmless to the no_three_ds path and satisfies any
+   connector that wants an address present. */
+const WORKER_BILLING_ADDRESS = {
+  address: {
+    line1: "1 Demonstration Way",
+    city: "Springfield",
+    state: "IL",
+    zip: "62701",
+    country: "US",
+    first_name: "Orvanna",
+    last_name: "Demo",
+  },
+};
+
+interface LiveAttempt {
+  attempt_id: number;
+  run_id: number;
+  demo_order_id: number;
+  order_number: string;
+  total_cents: number;
+  payment_reference: string | null;
+  items: unknown;
+  token_reference: string | null;
+  member_code: string;
+}
+
+interface WorkerStats {
+  recovered_resolved: number;
+  recovered_charged: number;
+  charged: number;
+  succeeded: number;
+  declined: number;
+  pending: number;
+  mismatches: number;
+  no_card: number;
+  notes: string[];
+}
+
+function newWorkerStats(): WorkerStats {
+  return {
+    recovered_resolved: 0,
+    recovered_charged: 0,
+    charged: 0,
+    succeeded: 0,
+    declined: 0,
+    pending: 0,
+    mismatches: 0,
+    no_card: 0,
+    notes: [],
+  };
+}
+
+/* The seeded sandbox marker of migration 029 section 4:
+   'sandbox-card:<number>:<month>:<year>'. ONLY the confirmed
+   non-3DS Braintree sandbox numbers are ever seeded (Howard's card
+   rule); this parser trusts nothing and refuses any other shape.
+   The real S2 path uses vaulted mandates and never stores a
+   number; this marker exists for the seeded TEST subscriptions
+   alone. */
+function parseSandboxCard(
+  token: string | null,
+): { number: string; month: string; year: string } | null {
+  if (!token || !token.startsWith("sandbox-card:")) return null;
+  const parts = token.split(":");
+  if (parts.length !== 4) return null;
+  const [, number, month, year] = parts;
+  if (!/^\d{12,19}$/.test(number)) return null;
+  if (!/^\d{1,2}$/.test(month) || !/^\d{4}$/.test(year)) return null;
+  return { number, month, year };
+}
+
+/* Reprice a renewal order from the pricing mirror: the engine's
+   items carry sku (the shop slug), quantity, and covered_months;
+   the month price comes from CATALOG's sub mode, never from the
+   stored line, so a stale stored copy can never reprice itself.
+   Renewals carry no activation fee and no tax (spec section 9
+   step 5 and the dispatch shape of migration 026), so the total
+   is exactly the sum of line cents. Null = the items are not a
+   renewal shape this worker understands, which is a refusal. */
+function repriceRenewalCents(items: unknown): number | null {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  let total = 0;
+  for (const raw of items) {
+    if (raw === null || typeof raw !== "object") return null;
+    const line = raw as Record<string, unknown>;
+    const sku = typeof line.sku === "string" ? line.sku : "";
+    const quantity = Number(line.quantity);
+    const coveredMonths = Number(line.covered_months ?? 1);
+    if (!(sku in CATALOG)) return null;
+    if (!Number.isInteger(quantity) || quantity < 1) return null;
+    if (![1, 2, 3, 6].includes(coveredMonths)) return null;
+    total += toCents(CATALOG[sku].sub.price) * coveredMonths * quantity;
+  }
+  return total;
+}
+
+async function loadLiveAttempts(
+  client: DbClient,
+  where: "lingering" | { run_id: number },
+): Promise<LiveAttempt[]> {
+  const filter = where === "lingering" ? "" : "and ba.run_id = $1";
+  const args = where === "lingering" ? [] : [where.run_id];
+  const rows = await client.queryObject<{
+    attempt_id: number;
+    run_id: number;
+    demo_order_id: number;
+    order_number: string;
+    total_cents: number;
+    payment_reference: string | null;
+    items: unknown;
+    token_reference: string | null;
+    member_code: string;
+  }>(
+    `select ba.id as attempt_id, ba.run_id, ba.demo_order_id,
+            o.order_number, o.total_cents, o.payment_reference, o.items,
+            c.token_reference, m.member_code
+       from app.billing_attempts ba
+       join app.demo_orders o on o.id = ba.demo_order_id
+       join app.renewal_periods rp on rp.id = ba.renewal_period_id
+       join app.subscriptions s on s.id = rp.subscription_id
+       join app.members m on m.id = s.member_id
+       left join app.payment_credentials c on c.id = s.credential_id
+      where ba.outcome = 'dispatched'
+        and ba.dispatch_mode = 'live'
+        ${filter}
+      order by ba.id`,
+    args,
+  );
+  return rows.rows.map((r) => ({
+    ...r,
+    attempt_id: Number(r.attempt_id),
+    run_id: Number(r.run_id),
+    demo_order_id: Number(r.demo_order_id),
+  }));
+}
+
+async function hsRetrieve(
+  apiKey: string,
+  paymentId: string,
+): Promise<Record<string, unknown> | "unreachable" | "error"> {
+  try {
+    const resp = await fetch(
+      `${HYPERSWITCH_BASE_URL}/payments/${encodeURIComponent(paymentId)}`,
+      {
+        method: "GET",
+        headers: { "api-key": apiKey },
+        signal: AbortSignal.timeout(15_000),
+      },
+    );
+    if (!resp.ok) return "error";
+    return (await resp.json()) as Record<string, unknown>;
+  } catch {
+    return "unreachable";
+  }
+}
+
+/* Search the rail by metadata.billing_attempt_id: the recovery path
+   of 029's contract. The list endpoint carries no metadata filter,
+   so recent payments are listed and matched here; renewal volume at
+   this scale sits comfortably inside one page. */
+async function hsFindByAttemptId(
+  apiKey: string,
+  attemptId: number,
+): Promise<Record<string, unknown> | null | "unreachable"> {
+  try {
+    const resp = await fetch(
+      `${HYPERSWITCH_BASE_URL}/payments/list?limit=100`,
+      {
+        method: "GET",
+        headers: { "api-key": apiKey },
+        signal: AbortSignal.timeout(15_000),
+      },
+    );
+    if (!resp.ok) return null;
+    const body = (await resp.json()) as { data?: unknown[] };
+    for (const p of body.data ?? []) {
+      const pay = p as Record<string, unknown>;
+      const meta = pay.metadata as Record<string, unknown> | null | undefined;
+      if (meta && String(meta.billing_attempt_id ?? "") === String(attemptId)) {
+        return pay;
+      }
+    }
+    return null;
+  } catch {
+    return "unreachable";
+  }
+}
+
+/* Apply a retrieved payment's truth to one attempt through the
+   engine's verdict door. Returns what happened, for the stats. */
+async function resolveFromPayment(
+  client: DbClient,
+  att: LiveAttempt,
+  hs: Record<string, unknown>,
+): Promise<"succeeded" | "declined" | "pending" | "mismatch"> {
+  const hsStatus = typeof hs.status === "string" ? hs.status : "unknown";
+  const paymentId = typeof hs.payment_id === "string" ? hs.payment_id : null;
+  const mapped = mapHyperswitchStatus(hsStatus);
+
+  if (mapped.status === "succeeded") {
+    /* The exact integer amount match, the checkout's evidentiary
+       bar, before any succeeded verdict is written. */
+    const amountOk = Number(hs.amount) === att.total_cents;
+    const receivedOk = hs.amount_received === undefined ||
+      hs.amount_received === null ||
+      Number(hs.amount_received) === att.total_cents;
+    if (!amountOk || !receivedOk) {
+      console.error(
+        `billing-console worker: AMOUNT MISMATCH on ${att.order_number} ` +
+          `(expected ${att.total_cents}); attempt ${att.attempt_id} left dispatched for a human`,
+      );
+      return "mismatch";
+    }
+    await client.queryArray(
+      `select app.fn_record_live_verdict($1, 'succeeded', null, $2)`,
+      [att.attempt_id, paymentId],
+    );
+    return "succeeded";
+  }
+
+  if (mapped.status === "failed") {
+    const declineCode = typeof hs.error_code === "string" && hs.error_code !== ""
+      ? hs.error_code
+      : String(mapped.reason ?? "declined");
+    await client.queryArray(
+      `select app.fn_record_live_verdict($1, 'declined', $2, $3)`,
+      [att.attempt_id, declineCode.slice(0, 64), paymentId],
+    );
+    return "declined";
+  }
+
+  /* Non-terminal on the rail: not this worker's call to make. The
+     attempt stays dispatched and the next sweep asks again. */
+  return "pending";
+}
+
+/* Charge one live attempt: reprice, create with confirm, stamp the
+   reference, retrieve, verdict. Every early return leaves the
+   attempt honestly 'dispatched' for the sweep. */
+async function chargeLiveAttempt(
+  client: DbClient,
+  apiKey: string,
+  att: LiveAttempt,
+  stats: WorkerStats,
+): Promise<void> {
+  /* Step 1: reprice from the mirror; the frozen total is the
+     promise and a drifted catalog stops the charge (FM3). */
+  const repriced = repriceRenewalCents(att.items);
+  if (repriced === null || repriced !== att.total_cents) {
+    stats.mismatches++;
+    console.error(
+      `billing-console worker: REPRICE MISMATCH on ${att.order_number} ` +
+        `(frozen ${att.total_cents}, repriced ${repriced}); attempt ${att.attempt_id} not charged`,
+    );
+    return;
+  }
+
+  /* The card: the seeded sandbox marker only. An attempt without
+     one is not chargeable by this worker (the vaulted-mandate path
+     is future work); it stays dispatched and visible. */
+  const card = parseSandboxCard(att.token_reference);
+  if (card === null) {
+    stats.no_card++;
+    console.error(
+      `billing-console worker: no chargeable credential on attempt ${att.attempt_id} (${att.order_number}); left dispatched`,
+    );
+    return;
+  }
+
+  /* Step 2: create WITH confirm, no_three_ds. A renewal is a
+     Merchant Initiated Transaction: no external authentication is
+     requested and no challenge flow can open (ruling 8.4; any
+     challenge on any renewal fails acceptance A3 outright). */
+  let createResp: Response;
+  try {
+    createResp = await fetch(`${HYPERSWITCH_BASE_URL}/payments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "api-key": apiKey },
+      body: JSON.stringify({
+        amount: att.total_cents,
+        currency: "USD",
+        capture_method: "automatic",
+        confirm: true,
+        authentication_type: "no_three_ds",
+        payment_method: "card",
+        payment_method_data: {
+          card: {
+            card_number: card.number,
+            card_exp_month: card.month.padStart(2, "0"),
+            card_exp_year: card.year,
+            card_holder_name: "Orvanna Demo",
+            /* Sandbox card verification value: the seeded numbers
+               are the published Braintree sandbox pair, which
+               accept any three digits. Never a real card's value,
+               because never a real card. */
+            card_cvc: "123",
+          },
+        },
+        billing: WORKER_BILLING_ADDRESS,
+        description:
+          `Orvanna renewal ${att.order_number} (test mode, no real money)`,
+        metadata: {
+          channel: "renewal_engine",
+          billing_attempt_id: String(att.attempt_id),
+          order_number: att.order_number,
+        },
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch {
+    /* Ambiguous wire failure: the create may or may not have
+       landed. NO verdict (see the argued deviation above); the
+       attempt stays dispatched and the next sweep resolves it from
+       the rail's own ledger. */
+    stats.pending++;
+    stats.notes.push(
+      `attempt ${att.attempt_id}: create unreachable; left for the sweep`,
+    );
+    return;
+  }
+
+  if (!createResp.ok) {
+    /* The rail answered and refused the request itself (malformed,
+       misconfigured): nothing was created. Status code only, never
+       the body wholesale. Left dispatched, loud, for a human; the
+       sweep will confirm the rail never saw it and try again. */
+    stats.pending++;
+    console.error(
+      `billing-console worker: HyperSwitch POST /payments returned ${createResp.status} on attempt ${att.attempt_id}`,
+    );
+    return;
+  }
+
+  const created = (await createResp.json()) as Record<string, unknown>;
+  const paymentId = typeof created.payment_id === "string"
+    ? created.payment_id
+    : null;
+
+  if (paymentId !== null) {
+    /* Bookkeeping, immediately: the reference is what makes the
+       next crash recoverable by direct retrieve instead of a list
+       search. payment_status is untouched here; only the engine's
+       verdict door moves it. */
+    await client.queryArray(
+      `update app.demo_orders set payment_reference = $1
+        where id = $2 and payment_reference is null`,
+      [paymentId, att.demo_order_id],
+    );
+  }
+
+  stats.charged++;
+
+  /* Step 3: the FRESH retrieve. The create response is not trusted
+     as the verdict, exactly as the checkout never trusts its
+     confirm response: one retrieve path, one evidentiary bar. */
+  if (paymentId === null) {
+    stats.pending++;
+    console.error(
+      `billing-console worker: create returned no payment_id on attempt ${att.attempt_id}; left for the sweep`,
+    );
+    return;
+  }
+  const hs = await hsRetrieve(apiKey, paymentId);
+  if (hs === "unreachable" || hs === "error") {
+    stats.pending++;
+    stats.notes.push(
+      `attempt ${att.attempt_id}: retrieve failed after create; left for the sweep`,
+    );
+    return;
+  }
+
+  const outcome = await resolveFromPayment(client, att, hs);
+  if (outcome === "succeeded") stats.succeeded++;
+  else if (outcome === "declined") stats.declined++;
+  else if (outcome === "mismatch") stats.mismatches++;
+  else stats.pending++;
+}
+
+/* The FM2 sweep: every lingering dispatched live attempt, resolved
+   from the rail's own ledger before any new work. */
+async function sweepLiveStrands(
+  client: DbClient,
+  apiKey: string,
+  stats: WorkerStats,
+): Promise<void> {
+  const strands = await loadLiveAttempts(client, "lingering");
+  for (const att of strands) {
+    let payment: Record<string, unknown> | null = null;
+    if (att.payment_reference) {
+      const hs = await hsRetrieve(apiKey, att.payment_reference);
+      if (hs === "unreachable" || hs === "error") {
+        stats.pending++;
+        continue;
+      }
+      payment = hs;
+    } else {
+      const found = await hsFindByAttemptId(apiKey, att.attempt_id);
+      if (found === "unreachable") {
+        stats.pending++;
+        continue;
+      }
+      payment = found;
+    }
+
+    if (payment !== null) {
+      const outcome = await resolveFromPayment(client, att, payment);
+      if (outcome === "pending") stats.pending++;
+      else {
+        stats.recovered_resolved++;
+        if (outcome === "succeeded") stats.succeeded++;
+        else if (outcome === "declined") stats.declined++;
+        else stats.mismatches++;
+      }
+    } else {
+      /* The rail has never seen this attempt: charging it now is
+         safe by construction (no payment exists to double). */
+      stats.recovered_charged++;
+      await chargeLiveAttempt(client, apiKey, att, stats);
+    }
+  }
+}
+
+/* ------------------------------------------------------------
+   run_execute: the confirm step after the mandatory preview.
+
+   Gates, in order, each refusal audited, none reachable from the
+   page alone (a crafted request meets the same walls):
+     1. dispatch must be EXPLICIT: 'live' or 'simulated', never
+        defaulted by page or server (029's contract line).
+     2. tick_date must be a real date; limit per ruling R9.
+     3. The engine must answer READY: migrations 028 and 029
+        present (the three-argument tick, the verdict door, the
+        dispatch_mode seam). Before the deploy round applies them,
+        this refusal is the honest state of the cloud.
+     4. For live dispatch additionally: the HyperSwitch key is
+        configured and the migration 029 seeded sandbox credentials
+        exist (Howard's card rule made data; without them there is
+        nothing chargeable and 'live' would be a lie).
+     5. The engine's own refusals (clock uninitialized, wrong tick
+        date, bad limit) surface VERBATIM as engine_refused.
+   NOTHING here writes app.sim_clock, ever: its initialization is
+   the deploy-round operator's explicit act, recorded in 029's
+   acceptance procedure.
+
+   Note on OQ8 (simulations never run in production): dispatch
+   'simulated' exists in the payload because 029's contract names
+   it for the proof environments; every invocation is audited with
+   its dispatch mode, so a simulated run against the wrong database
+   is at least never a silent one.
    ------------------------------------------------------------ */
 async function actionRunExecute(
   req: Request,
@@ -760,46 +1254,197 @@ async function actionRunExecute(
   ipHash: string,
   params: Record<string, unknown>,
 ): Promise<Response> {
-  /* The number-to-run limit persists into the execute payload
-     (Howard's ruling): parsed with the SAME parser as the preview,
-     recorded in the audit line, and handed to app.fn_billing_tick's
-     limit parameter when S2 enables execution (migration 028). */
-  const runLimit = parseRunLimit(params.run_limit);
-  if (runLimit === "invalid") {
-    return errorResponse(
-      req,
-      400,
-      "bad_limit",
-      "Number to run is blank for all due, or a positive whole number.",
-    );
-  }
-
-  /* Deliberately before any other check: this build cannot
-     execute, full stop. */
-  if (!EXECUTE_ENABLED) {
+  const refuse = async (
+    httpStatus: number,
+    code: string,
+    message: string,
+    detail: Record<string, unknown> = {},
+  ) => {
     await auditStaffAction(client, {
       actor: identity.user,
       actor_role: identity.role,
       action: "billing_run_execute",
       target: "billing_runs",
       outcome: "refused",
-      outcome_code: "s2_pending",
+      outcome_code: code,
       ip_hash: ipHash,
-      detail: { run_limit: runLimit },
+      detail,
     });
-    return errorResponse(
-      req,
+    return errorResponse(req, httpStatus, code, message);
+  };
+
+  if (!EXECUTE_ENABLED) {
+    return await refuse(
       409,
       "s2_pending",
-      "Executing a billing run arrives with Phase S2. Today the console previews only: the engine is deliberately inert in production, and no run can be executed from here.",
+      "Executing a billing run is disabled in this build.",
     );
   }
 
-  /* Unreachable in this build. Kept minimal on purpose: the S2
-     builder extends THIS block (clock gate, confirm gate, fresh
-     re-gather comparison, then select app.fn_billing_tick(...)),
-     with its own spec amendment and both gates. */
-  return errorResponse(req, 500, "internal_error", "Unreachable.");
+  const runLimit = parseRunLimit(params.run_limit ?? params.limit);
+  if (runLimit === "invalid") {
+    return await refuse(
+      400,
+      "bad_limit",
+      "Number to run is blank for all due, or a positive whole number.",
+    );
+  }
+
+  const dispatch = params.dispatch;
+  if (dispatch !== "live" && dispatch !== "simulated") {
+    return await refuse(
+      400,
+      "dispatch_required",
+      "Say explicitly how to dispatch: live (the real test rail) or simulated (the scripted processor). The console never defaults this.",
+      { dispatch: String(dispatch ?? "") },
+    );
+  }
+
+  const tickDateRaw = typeof params.tick_date === "string"
+    ? params.tick_date.trim()
+    : "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(tickDateRaw)) {
+    return await refuse(
+      400,
+      "bad_tick_date",
+      "The tick date is YYYY-MM-DD.",
+      { tick_date: tickDateRaw },
+    );
+  }
+
+  /* Gate 3: is the engine's execute seam actually present? */
+  const ready = await client.queryObject<{
+    tick_fn: boolean;
+    verdict_fn: boolean;
+    seam_col: boolean;
+    sandbox_creds: number;
+  }>(
+    `select
+       to_regprocedure('app.fn_billing_tick(date,integer,text)') is not null as tick_fn,
+       to_regprocedure('app.fn_record_live_verdict(bigint,text,text,text)') is not null as verdict_fn,
+       exists (select 1 from information_schema.columns
+                where table_schema = 'app' and table_name = 'billing_attempts'
+                  and column_name = 'dispatch_mode') as seam_col,
+       (select count(*) from app.payment_credentials
+         where token_reference like 'sandbox-card:%'
+           and retired_on is null)::int as sandbox_creds`,
+  );
+  const r = ready.rows[0];
+  if (!r?.tick_fn || !r?.verdict_fn || !r?.seam_col) {
+    return await refuse(
+      409,
+      "engine_not_ready",
+      "The engine's execute seam (migrations 028 and 029) is not applied to this database yet; the deploy round applies it after the gates. Until then the console previews only.",
+      { tick_fn: r?.tick_fn, verdict_fn: r?.verdict_fn, seam_col: r?.seam_col },
+    );
+  }
+
+  const apiKey = Deno.env.get("HYPERSWITCH_API_KEY");
+  if (dispatch === "live") {
+    if (!apiKey) {
+      return await refuse(
+        500,
+        "not_configured",
+        "The payment rail is not configured on this function.",
+      );
+    }
+    if ((r.sandbox_creds ?? 0) < 1) {
+      return await refuse(
+        409,
+        "live_credentials_missing",
+        "No seeded sandbox credentials exist (migration 029's test-subscription seed has not run), so a live dispatch has nothing chargeable. Seed first, per the deploy-round acceptance.",
+      );
+    }
+  }
+
+  const stats = newWorkerStats();
+
+  /* FM2 FIRST: sweep lingering live strands before any new work. */
+  if (dispatch === "live" && apiKey) {
+    await sweepLiveStrands(client, apiKey, stats);
+  }
+
+  /* THE TICK. The engine's own refusals (clock, date arithmetic,
+     limit) are the rules and surface verbatim. */
+  let runId: number;
+  try {
+    const tick = await client.queryObject<{ run_id: number }>(
+      `select app.fn_billing_tick($1::date, $2, $3) as run_id`,
+      [tickDateRaw, runLimit, dispatch],
+    );
+    runId = Number(tick.rows[0]?.run_id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await auditStaffAction(client, {
+      actor: identity.user,
+      actor_role: identity.role,
+      action: "billing_run_execute",
+      target: "billing_runs",
+      outcome: "refused",
+      outcome_code: "engine_refused",
+      ip_hash: ipHash,
+      detail: {
+        tick_date: tickDateRaw,
+        run_limit: runLimit,
+        dispatch,
+        engine_message: message.slice(0, 500),
+      },
+    });
+    return errorResponse(req, 409, "engine_refused", message);
+  }
+
+  /* THE WORKER: this run's live attempts, ordered by id. */
+  if (dispatch === "live" && apiKey) {
+    const attempts = await loadLiveAttempts(client, { run_id: runId });
+    for (const att of attempts) {
+      await chargeLiveAttempt(client, apiKey, att, stats);
+    }
+    /* Contract step 4: the bridge, idempotently, so verdicts
+       recorded after the tick's own bridge still book volume. */
+    await client.queryArray(`select app.fn_bridge_demo_orders(true)`);
+  }
+
+  /* The run row, with 028's arithmetic, read back as the answer. */
+  const runRow = await client.queryObject<Record<string, unknown>>(
+    `select br.id, br.tick_date, br.status, br.subscriptions_due,
+            br.attempts_made, br.succeeded, br.declined,
+            to_jsonb(br) as raw
+       from app.billing_runs br where br.id = $1`,
+    [runId],
+  );
+  const row = runRow.rows[0] ?? {};
+  const { raw: rowRaw, ...rowKnown } = row;
+
+  await auditStaffAction(client, {
+    actor: identity.user,
+    actor_role: identity.role,
+    action: "billing_run_execute",
+    target: `billing_run:${runId}`,
+    outcome: "allowed",
+    outcome_code: null,
+    ip_hash: ipHash,
+    detail: {
+      tick_date: tickDateRaw,
+      run_limit: runLimit,
+      dispatch,
+      run_id: runId,
+      worker: { ...stats, notes: stats.notes.slice(0, 10) },
+    },
+  });
+
+  return jsonResponse(req, 200, {
+    action: "run_execute",
+    run_id: runId,
+    tick_date: tickDateRaw,
+    dispatch,
+    run_limit: runLimit,
+    run: {
+      ...rowKnown,
+      id: runId,
+      limit_info: pickLimitInfo(rowRaw as Record<string, unknown>),
+    },
+    worker: dispatch === "live" ? stats : null,
+  });
 }
 
 /* ------------------------------------------------------------
@@ -808,30 +1453,37 @@ async function actionRunExecute(
    the run row itself (migration 024 deviation D4), so the two
    families can never hide inside each other's statistics.
    ------------------------------------------------------------ */
-/* Migration 028 (the number-to-run limit on the engine side, being
-   authored concurrently) adds ran-N-of-M-due-R-remaining fields to
-   the run row. Their exact column names are 028's to fix, so this
-   console reads them TOLERANTLY from the row's JSON image: the
-   candidate spellings below are tried in order, absent means null,
-   and nothing errors before 028 applies. When 028 lands, the first
-   matching spelling here should be aligned to its real names as a
-   one-line follow-up. */
+/* Migration 028's run-record arithmetic, ALIGNED to its real
+   column names (landed in commit 61ebe26): limit_requested (null =
+   unlimited), due_count, processed_count, remaining_count, plus
+   migration 029's dispatch_mode. Still read from the row's JSON
+   image rather than named in SQL, because the cloud database may
+   not carry 028/029 until the deploy round applies them: absent
+   means null, and nothing errors either side of the apply. */
 function pickLimitInfo(
   raw: Record<string, unknown> | null | undefined,
-): { run_limit: number | null; due_remaining: number | null } {
-  const pick = (names: string[]): number | null => {
+): {
+  limit_requested: number | null;
+  due_count: number | null;
+  processed_count: number | null;
+  remaining_count: number | null;
+  dispatch_mode: string | null;
+} {
+  const pickNum = (name: string): number | null => {
     if (!raw) return null;
-    for (const n of names) {
-      const v = raw[n];
-      if (v !== undefined && v !== null && Number.isFinite(Number(v))) {
-        return Number(v);
-      }
-    }
-    return null;
+    const v = raw[name];
+    return v !== undefined && v !== null && Number.isFinite(Number(v))
+      ? Number(v)
+      : null;
   };
   return {
-    run_limit: pick(["run_limit", "limit_n", "ran_limit", "requested_limit"]),
-    due_remaining: pick(["due_remaining", "remaining_due", "due_left"]),
+    limit_requested: pickNum("limit_requested"),
+    due_count: pickNum("due_count"),
+    processed_count: pickNum("processed_count"),
+    remaining_count: pickNum("remaining_count"),
+    dispatch_mode: raw && typeof raw.dispatch_mode === "string"
+      ? raw.dispatch_mode
+      : null,
   };
 }
 
