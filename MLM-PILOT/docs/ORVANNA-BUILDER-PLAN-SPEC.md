@@ -1,4 +1,19 @@
-# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.1
+# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.2
+
+**Amendment 2026-08-16, v1.2 (the red-team gate's price, paid).** The red-team review
+(`docs\verification\ORVANNA-BUILDER-RED-TEAM-2026-08-16.md`, commit 5170cc8) ruled NOT
+PRESENTABLE YET with an exact path to PASS. Its strongest finding, attack 2b, BROKE a
+claim this spec made: the section 6 retention-agent story was stated universally and
+is measured TRUE only for the one to two nearest Builder generations and SIGN-INVERTED
+above a pool-binding stack. This amendment: names and owns the LAPSE-BENEFIT INVERSION
+in section 6 and corrects 12A(c) (item 1, with the new standing metric 6 in section
+12); re-anchors the anti-gaming and double-pay arithmetic of sections 11, 12A(b), and
+12A(d) to the calibrated rates of record (item 2; every conclusion STRENGTHENS at the
+rates of record); adds the member-level proration exposure and the normative
+shaved-line statement rule to 12A(e) (item 3); and binds the three presentation rules
+into section 13 (item 4). The waterfall, the walk, the gates, the calibration honesty,
+and the regulatory posture survived every executed attack; what is amended here is
+what the spec SAID, brought level with what the engine DOES.
 
 **Amendment 2026-08-16, v1.1 (the build landed, commit 5a5ff33, proof
 `docs\verification\PLAN5-PROOF-RUN-2026-08-16.md`; the calibration residue ruled).**
@@ -174,9 +189,11 @@ qualified structure: ranks are monthly-pure (live plan rule), so the Builder set
 monthly-pure, so the override walk's boundaries and recipients are monthly-pure; legs
 are re-ranked monthly, so the second-strongest leg and the multiplier are monthly-pure.
 Nothing is permanent, grandfathered, or banked. A downline Builder who lapses stops
-paying their sponsor THAT MONTH. The upline therefore has a monthly, personal,
-exactly-priced reason to keep their people qualified and building: the plan makes the
-upline the downline's retention agent, structurally rather than rhetorically.
+paying their sponsor THAT MONTH. (Scoped v1.2, 2026-08-16, corrected by red-team
+attack 2b, engine-measured:) the retention-agent dynamic is TRUE, monthly, personal,
+and exactly priced, FOR THE ONE TO TWO BUILDER GENERATIONS NEAREST THE LAPSE, the
+people whose override the lapse erases. It is NOT universal, and above a pool-binding
+stack it inverts; section 6A names that honestly.
 
 **Two-month worked example (fixture DECAY, four members).** A sponsors B; B sponsors C
 and D. Subscriptions: every member holds one domain agent ($100.00, 100 PV), so SV 100
@@ -205,6 +222,43 @@ so A's ENTIRE month-over-month loss is the override on B's Builder status. That 
 is the retention agency made visible: A's check tells A precisely what keeping C
 active was worth. The lab's watched-account delta components (lab spec section 10.2)
 attribute it: from_reach_lost on the override line, everything else zero.
+
+### 6A. The lapse-benefit inversion, named and owned (v1.2, 2026-08-16, red-team attack 2b)
+
+**The finding, engine-measured, not argued.** Above any POOL-BINDING stack, a downline
+Builder's lapse RAISES senior checks, because a lapse removes claims from bound pools
+and Law B's proration relief flows to everyone else claiming those sources. The red
+team built it: fixture REDTEAM-P5-RELIEF, 19 members, eight nested Builders over a
+source whose pool binds at f2 = 0.526315. One mid-stack Builder (B7) lapses to SV
+0.00, the field loses 100.00 SV of real monthly revenue, and SIX checks RISE: the top
+earner E goes +7.44 (its second-leg bonus rose 10.60 to 15.00 while the bonus BASIS
+fell), B1 through B4 each rise, while the two nearest Builder generations lose hard
+(B6 -17.00, B5 -11.29) and the lapsed member loses everything (-25.89). Company
+payout FELL 36.37; f2 on the bound source went 0.526315 to 1; the cap held on both
+sides to the cent. Less volume, more bonus, measured. The system-level version was
+already on this spec's record (the junior layer GREW under calibration because
+proration relief flows downhill, section 9); this is the same arithmetic seen from
+one member's chair, and it was stated nowhere until the red team measured it.
+
+**The honest scoping, which is also the bound.** The senior upline above a binding
+stack is not the lapse's retention agent; the senior upline is the lapse BENEFICIARY.
+Three facts keep this an incentive blind spot rather than a hole. One: it CANNOT be
+actively farmed; a member cannot make a downline lapse, only decline to help one
+recover, and red-team attacks 1 and 4 confirmed no active construction extracts it.
+Two: the gain is CAPPED BY LAW B; it is exactly the freed share of already-bound
+pools (+7.44 on a 212.91 check, 3.5 percent, in the hostile fixture), never new
+money, and company cost goes DOWN on every lapse. Three: the near generations, the
+people actually positioned to act, still lose the most, so the retention incentive
+points the right way where intervention is possible. At the calibrated rates of
+record this is not a corner: 120 of 1,001 census sources bind, so the inversion is
+live in any presentation month and must be named before a hostile consultant names
+it.
+
+**The standing watch (required per-run metric, added to section 12 as metric 6):**
+per consecutive run pair, the count of members whose total pay ROSE attributable to a
+downline lapse (a member leaving the qualified or Builder set), with the summed gain,
+computed from the watch machinery's delta components and the proration traces. The
+inversion is watched, never rediscovered.
 
 ## 7. Law B: the bank cannot break, by waterfall
 
@@ -399,24 +453,31 @@ self-purchase from spiking a month's SV or TV to snatch Leader or Director for a
 override month: a $2,000.00 one-time purchase arrives as 200 PV a month for ten
 months, not 2,000 once.
 
-**Funding fake Builders loses money, arithmetically.** The obvious attack on layer 2:
-create and fund a downline account into Builder so its group pays you generation 1.
-Cost: the puppet Builder needs SV 100 plus two active legs at SV 100 each = $300.00 a
-month of real money. Yield: generation 1 on group CV 240.00 = 9.60, plus spine level 1
-on the puppet 8.00 and level 2 on its legs 8.00 = 25.60 a month best case. Spend
-300.00 to collect 25.60: the attack loses 274.40 a month, every month, forever,
-because decay (Law A) makes it a subscription, not a purchase. The 20-percent-of-
-revenue ceiling makes this structural: no plan funded under the cap can ever return
-more than 20 cents of commission on a self-funded dollar, so every self-funding attack
-on every layer loses at least 80 percent.
+**Funding fake Builders loses money, arithmetically.** (Re-anchored v1.2 to the
+calibrated rates of record; the red team EXECUTED this attack at those rates, runs 98
+and 99, and it loses HARDER than the draft arithmetic said.) The obvious attack on
+layer 2: create and fund a downline account into Builder so its group pays you
+generation 1. Cost: the puppet Builder needs SV 100 plus two active legs at SV 100
+each = $300.00 a month of real money. Yield, engine-measured: generation 1 on group
+CV 240.00 at 0.015 = 3.60, plus spine 24.00 and second-leg bonus 1.60, a marginal
+attack yield of 21.20 a month against 300.00 of spend: **7.07 cents returned per
+attack dollar, a 92.9 percent monthly loss, forever**, because decay (Law A) makes
+the puppet a subscription, not a purchase. The 20-percent-of-revenue ceiling makes
+this structural: no plan funded under the cap can ever return more than 20 cents of
+commission on a self-funded dollar, so every self-funding attack on every layer loses
+at least 80 percent; this one loses 93.
 
-**Leg-stacking cannot game layer 3.** Stacking everyone in one leg: no second leg, no
-bonus, by construction. Splitting a fixed downline volume V across k equal legs pays
-second_leg_rate x multiplier(k) x V / k: at k = 2, 0.05 x 1.00 x V/2 = 0.0250 x V; at
-k = 3, 0.05 x 1.15 x V/3 = 0.0192 x V; at k = 4, 0.05 x 1.25 x V/4 = 0.0156 x V. Two
-balanced legs is the optimum, the multiplier softens but never reverses the dilution,
-so width-spam (many shell legs) strictly loses. And shell legs cannot even count: the
-multiplier counts ACTIVE legs, which need real qualified frontline members.
+**Leg-stacking cannot game layer 3.** (Re-anchored v1.2; red-team attack 1 executed
+all three arrangements at the rates of record and the dilution held to the cent.)
+Stacking everyone in one leg: no second leg, no bonus, by construction. Splitting a
+fixed downline volume V across k equal legs pays second_leg_rate x multiplier(k) x
+V / k: at k = 2, 0.020 x 1.00 x V/2 = 0.0100 x V; at k = 3, 0.020 x 1.15 x V/3 =
+0.0077 x V; at k = 4, 0.020 x 1.25 x V/4 = 0.0063 x V. Two balanced legs is the
+optimum, the multiplier softens but never reverses the dilution, so width-spam (many
+shell legs) strictly loses; the red team's executed table (same six recruits, three
+arrangements) also showed splitting FORFEITS overrides. And shell legs cannot even
+count: the multiplier counts ACTIVE legs, which need real qualified frontline
+members.
 
 **Waterfall arbitrage: none.** Claims attach to sources by structure (tree position),
 not by earner choice; a member cannot route a claim toward a source with a richer
@@ -447,6 +508,10 @@ grids, residue displayed, no live credentials):
 5. **Pool pressure:** share of sources with f2 < 1 or f3 < 1, the distribution of
    factors, and total prorated-away amounts by layer. This is Law B's gauge: how hard
    the cap is working.
+6. **Lapse-benefit exposure (added v1.2, required by red-team attack 2b):** per
+   consecutive run pair, the count of members whose total pay ROSE attributable to a
+   downline lapse, with the summed gain (section 6A). Watched every run, so the
+   inversion's real size is a number on the record, never a hope.
 
 **The honest behavioral caveat, stated once and inherited by every readout:** the lab
 replays RECORDED volumes under different rules. It proves how this plan REDISTRIBUTES
@@ -462,9 +527,11 @@ document. The reader is assumed unfriendly and numerate.
 
 **(a) "Overrides on group volume stack across generations and nested Builders; the
 budget blows up."** The claims stack without limit; the PAYMENT cannot. Worked worst
-case: a source with CV 80.00 (pool 20.00) sitting under TEN nested Builders, so layer
-2 claims against it total 10 x 6 percent x 80.00 = 48.00, two point four times its
-entire pool. Case one, full spine above it (five qualified ancestors in depth): spine
+case (draft-rate teaching arithmetic, like the section 10 fixture; the conclusion is
+rate-independent, and the red team's cold census sweep at the rates of record found
+the worst real source at 0.56 of its pool with ZERO of 1,001 over): a source with CV
+80.00 (pool 20.00) sitting under TEN nested Builders, so layer 2 claims against it
+total 10 x 6 percent x 80.00 = 48.00, two point four times its entire pool. Case one, full spine above it (five qualified ancestors in depth): spine
 pays 25 percent x 80.00 = 20.00, the pool is exhausted, f2 = 0, and every one of the
 48.00 in override claims pays 0.00. Case two, partial spine (qualified ancestors at
 levels 1 and 3 only): spine pays 8.00 + 4.00 = 12.00, R2 = 8.00, f2 = 8.00 / 48.00 =
@@ -479,21 +546,26 @@ bought it, monthly, and pay is on the second-STRONGEST leg as the month actually
 landed. The splitting attack is worked in section 11 and loses: fixed downline volume
 V across k equal legs pays 0.0250 x V at k = 2, 0.0192 x V at k = 3, 0.0156 x V at
 k = 4; the optimum is two real balanced legs, which is not a leak, it is the design
-goal wearing its own name. Funding an artificial second leg costs $100.00 a month of
-real subscription to return at most 0.0575 x 80.00 = 4.60: a 95 percent monthly loss,
-forever, because decay re-prices it every month. Directing genuine new recruits into
-the weaker leg IS profitable, and that is the intended behavior, paid at the designed
-rate under the cap.
+goal wearing its own name. (Re-anchored v1.2 to the rates of record:) funding an
+artificial second leg costs $100.00 a month of real subscription to return at most
+0.025 x 80.00 = 2.00: a 98 percent monthly loss, forever, because decay re-prices it
+every month. Directing genuine new recruits into the weaker leg IS profitable, and
+that is the intended behavior, paid at the designed rate under the cap. One qualifier
+the red team added and this answer now carries: the RANKING channel cannot be gamed
+downward or upward, but the WATERFALL channel has the passive inversion of section
+6A, which is named, bounded, and watched there.
 
 **(c) "Monthly decay churns leaders who have one bad month."** Stated honestly: v1 has
 no grace months, inherited from the live plan, and the tradeoff is real. Three things
 bound the damage. First, the qualification bar is low and wide: 100.00 SV is one
 domain agent, and CUSTOMER volume counts (live plan v1.2), so a working leader's
-qualification rarely hinges on a single order of their own. Second, the decay lands
-FIRST on the upline's override, and the upline is precisely the person positioned and
-now paid to intervene, which is Law A working as designed: the plan does not punish
-the bad month, it prices, for the sponsor, what preventing it is worth (section 6:
-9.60 to the cent in the fixture). Third, the lab MEASURES it: metric 4 counts decay
+qualification rarely hinges on a single order of their own. Second (scoped v1.2 per attack 2b), the decay lands
+FIRST on the one to two NEAREST Builder generations' overrides, and those uplines are
+precisely the people positioned and now paid to intervene, which is Law A working as
+designed: the plan does not punish the bad month, it prices, for the sponsor, what
+preventing it is worth (section 6: 9.60 to the cent in the fixture). Above a
+pool-binding stack the sign inverts and seniors gain from a lapse; that is section
+6A, named there with the engine numbers, bounded by Law B, and watched by metric 6. Third, the lab MEASURES it: metric 4 counts decay
 events and their summed override deltas per month, so the churn cost is an observed
 number before this plan is ever presented, not a hope. If observed decay is too sharp,
 a one-month Builder grace is a single parameter away (open question 8), and adding it
@@ -501,14 +573,15 @@ would be a spec amendment, not a redesign.
 
 **(d) "This double-pays the same volume."** Every override plan in the industry pays
 multiple people on one order; the honest question is whether the SUM is bounded.
-Follow one order's dollar: M8's month is one $100.00 domain agent subscription (plus a
-$50.00 support agent, CV 80.00 total, pool 20.00). Layer 1: M3 earns 8.00 at level 1,
-M1 earns 4.00 at level 2: 12.00. Layer 2: M8 sits in Builder M3's group, so M1's
-generation 1 override claims 4 percent x 80.00 = 3.20. Layer 3: M8 heads M3's
-second-strongest leg, so M3's bonus claims 5 percent x 80.00 = 4.00. Total: 12.00 +
-3.20 + 4.00 = 19.20 of a 20.00 cap, three layers, four payments, 0.80 unspent, to the
-cent (section 10's waterfall table, row M8). And row M10 shows the boundary case: the
-same accounting drives a source's payout INTO the cap and stops it there exactly
+Follow one order's dollar (re-anchored v1.2 to the rates of record, red-team
+confirmed): M8's month is one $100.00 domain agent subscription (plus a $50.00
+support agent, CV 80.00 total, pool 20.00). Layer 1: M3 earns 8.00 at level 1, M1
+earns 4.00 at level 2: 12.00. Layer 2: M8 sits in Builder M3's group, so M1's
+generation 1 override claims 0.015 x 80.00 = 1.20. Layer 3: M8 heads M3's
+second-strongest leg, so M3's bonus claims 0.020 x 80.00 = 1.60. Total: 12.00 + 1.20
++ 1.60 = 14.80 of a 20.00 cap, three layers, four payments, 5.20 unspent, to the
+cent. And section 10's row M10 shows the boundary case at the fixture's draft rates:
+the same accounting drives a source's payout INTO the cap and stops it there exactly
 (10.00 of 10.00, the junior claim prorated from 2.00 to 0.40). The plan never pays
 more than the 20 percent of revenue the company already promises today; it pays the
 SAME ceiling to more purposes.
@@ -532,6 +605,23 @@ downhill. These realized numbers, refreshed per run, must be CARRIED IN ANY
 PRESENTATION of this plan per metric 5; the v1.0 commitment stands, and this
 paragraph is its first discharge. No assurance substitutes for the number, including
 the retired one.
+
+(Extended v1.2, red-team attack 4: the MEMBER-level exposure rides beside the
+source-level number on every surface, because members are what riot, not sources.)
+Seeded March at the rates of record: **35 of the 207 paid members, 17 percent, carry
+at least one shaved line**; the worst-shaved member loses 324.14, and the worst RATIO
+is 21 percent of that member's gross claims. The exhibit that states the problem in
+one row, GW-000044's bonus line: rate 0.020, basis 120.00, paid 0.18 against a
+rate-times-basis of 2.40, a 93 percent haircut that depends on OTHER people's claims
+on shared sources, per source, at scale 6, and is not recomputable from anything the
+member can see. Therefore, AS NORMATIVE SPEC TEXT: **any member-facing statement of
+this plan MUST print, on every prorated line, the CLAIMED amount, the PAID amount,
+and a one-line reason** ("this order reached its 20 percent cap; the bonus layers
+shared what remained"), sourced from the engine's per-line traces, which already hold
+the data (l2_traces, l3_trace). A shaved line a member cannot recompute is survivable
+only when the statement itself shows the claim, the paid, and the why; this rule is
+part of the PLAN now, not a lab internals feature, and any build of a member-facing
+surface without it fails its gate.
 
 **(f) The skeptic's strongest objection, raised against ourselves: "payout ratio
 CREEPS as the field professionalizes. More Builders and more balanced legs mean more
@@ -570,6 +660,35 @@ in standing to the verifier and QA gates: the plan is not presentable until all 
 have passed, and a red-team finding that breaks a mechanism reopens this spec, not the
 slide deck.
 
+**The three presentation rules (v1.2, 2026-08-16, binding on any deck, page, or
+conversation about this plan; from red-team attacks 5, 6, and 7):**
+
+1. **The cost-drift chart is a standing exhibit.** Every presentation shows the
+   measured trajectory of percent of CV across the seven computed months (February
+   18.5594 rising to July 19.6812, about 0.22 points a month at this field maturity),
+   presented as what it is: real, intended, and bounded above at 25 percent of CV per
+   source by Law B. The drift is shown climbing toward a ceiling it cannot cross;
+   hiding it would hand a hostile reader the chart to draw themselves.
+2. **Law A is presented with the GW-000294 exhibit, not only the tidy fixture.** A
+   real census member whose entire check is one 7.80 override sees it go to **0.00 in
+   one month** because a Builder two hops down missed qualification once: a 100
+   percent wipe on someone else's bad month, attributed entirely to from_reach_lost.
+   That is the no-grace reality, shown honestly beside the section 6 fixture's 9.60,
+   with the countermeasure stated (hold more than one Builder and more than one leg).
+   Open question 8 (the grace month) is re-decided by Howard WITH this exhibit and
+   section 6A in hand.
+3. **The development premium is THE pull number; "wide reach" is never claimed.**
+   The pitch leads with spec metric 2 as the red team computed it: within the same SV
+   band, members who developed at least one Builder out-earn equal-volume members who
+   did not by **7.9x to 92x** (52.47 versus 6.66 at SV 100 to 149; 725.57 versus 7.90
+   at 150 to 299; 955.31 versus 11.77 at 300 plus), said in the same breath as the
+   participation counts (24 members hold that position; 44 earn any structure money;
+   the top five capture 90.2 percent of the structure budget). The 22.9 percent
+   structure-linked share is never shown without those companions. And the reach
+   claim is BANNED: 207 of 1,001 paid versus the baseline's 206 and stairstep's 448
+   is on the record; the honest sentence is "same paid population, radically deeper
+   development premium", never "wide reach".
+
 ## 14. Open questions for Howard (defaults stand unless he overrides)
 
 1. **Pool rate.** The coordinator sketch said the cap is "20 percent of Commissionable
@@ -598,11 +717,17 @@ slide deck.
 7. **A name for the field.** 'orvanna_builder' is the plan_code; if this plan ever
    leaves the lab, it needs a member-facing name and a booklet. Default: lab-only
    until Howard says otherwise.
-8. **A one-month Builder grace (raised by hostile question (c)).** Should a member who
-   held Builder-or-above last month keep override-boundary status through one lapsed
-   month? Default: NO for v1, monthly-pure like everything else, because grace blunts
-   the retention-agent dynamic that is Law A's point; revisit only if the measured
-   decay events (metric 4) on census months show churn worth buying back.
+8. **A one-month Builder grace (raised by hostile question (c); re-framed v1.2 by the
+   red team).** Should a member who held Builder-or-above last month keep
+   override-boundary status through one lapsed month? Default: NO for v1, monthly-pure
+   like everything else, and the red team CONCURS with no-grace, with two sharpenings
+   now on the record for Howard's re-decision: grace would blunt the near-upline's
+   retention incentive (the original reason) while doing NOTHING about the section 6A
+   inversion, which lives in the waterfall, not the rank decay; and the decision
+   should be made with the GW-000294 exhibit (a 100 percent single-month check wipe)
+   and section 6A in hand, not on the tidy fixture alone. Also on the record: the
+   seeded census is growth-biased with almost no churn, so no volatility claim rides
+   on seeded months without the section 12 behavioral caveat attached.
 
 ---
 
