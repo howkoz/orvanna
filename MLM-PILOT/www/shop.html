@@ -244,6 +244,13 @@
                     <option value="WI">Wisconsin</option>
                     <option value="WY">Wyoming</option>
                   </select>
+                  <!-- Currency and state coherence (quality assurance
+                       finding L-O2, 2026-08-16): under a non-USD display
+                       currency this select is LOCKED to the currency's
+                       demonstration country, because a GBP total priced
+                       "for California" is a display that contradicts
+                       itself. The script sets the lock and this note. -->
+                  <p class="field-hint" id="billStateCurrencyNote" hidden>Locked while a non-USD currency is selected: GBP prices from the United Kingdom, EUR from Ireland, CHF from Switzerland. Switch the currency back to USD to pick a state.</p>
                 </div>
                 <div>
                   <label class="field-label" for="billZip">Postal code</label>
@@ -1249,6 +1256,24 @@
     billZipInput.value = a.zip;
   }
 
+  /* CURRENCY AND STATE COHERENCE (quality assurance finding L-O2,
+     2026-08-16). A persisted GBP display used to accept a United
+     States state pick and paint "estimate, for California" under a
+     GBP total: every money guard held, but the display contradicted
+     itself. Under a non-USD currency the State/region select is now
+     LOCKED to the currency's demonstration country (which
+     applyCurrencyAddressDefault has just set) with an honest note;
+     back on USD it unlocks and the note comes down. The lock plays
+     fair with the payment-state inert machinery: that machinery
+     snapshots and restores the disabled flag around a flight, so a
+     currency lock present before a flight survives it. */
+  function syncStateFieldForCurrency() {
+    var locked = selectedCurrency() !== 'USD';
+    billStateInput.disabled = locked;
+    var note = document.getElementById('billStateCurrencyNote');
+    if (note) note.hidden = !locked;
+  }
+
   function taxDestinationReady() {
     if (!LIVE_PAYMENTS) return true;
     if (accountMode === 'member' || accountMode === 'guest') return guestTaxAddressReady();
@@ -1622,6 +1647,10 @@
       plaidAuthorize.textContent = plaidAuthorizeLabel();
     }
     if (plaidResult) plaidResult.textContent = 'No payment has been created. Nothing has been charged.';
+    /* the ending hides this spinner (an honest ending is not
+       processing anything); a fresh run gets it back */
+    var plaidSpinner = document.querySelector('.plaid-processing');
+    if (plaidSpinner) plaidSpinner.hidden = false;
     if (plaidBankName) plaidBankName.textContent = selectedPlaidBankName();
     document.querySelectorAll('.plaid-bank').forEach(function (bank) { bank.hidden = false; });
     document.querySelectorAll('.plaid-account').forEach(function (acct) {
@@ -1748,18 +1777,33 @@
       });
     });
   });
+  /* THE PLAID ENDING TELLS THE TRUTH (verifier finding O-H1, quality
+     assurance finding M-O1, fixed 2026-08-16). The old ending handed
+     the authorize click to demoPlaceOrder, which minted an order
+     number in the REAL ORV namespace that no server knew (the lookup
+     would answer "no order with that number exists"), rendered the
+     real confirmation view, cleared the cart, and printed the real
+     receipt's boilerplate claim that the payment "ran through the
+     Orvanna orchestration layer": nothing ran through anything, the
+     wizard makes zero network calls by design. The ending now stays
+     INSIDE the panel as an explicit staged preview: no order number
+     is minted anywhere in this path (the lookup-will-deny-it defect
+     is impossible by construction), the cart is untouched, and the
+     copy says exactly what exists (nothing) and where the real
+     ending will come from (the open-banking rail, Phase S2 of the
+     subscription work). */
   if (plaidAuthorize) {
     plaidAuthorize.addEventListener('click', function () {
       plaidAuthorize.disabled = true;
       plaidAuthorize.textContent = 'Authorizing';
       plaidSetStep('done');
-      plaidResult.textContent = 'Securely returning to Orvanna. Nothing real has been charged.';
+      plaidResult.textContent = 'Checking with the sandbox. Nothing real has been charged.';
       window.setTimeout(function () {
-        if (plaidPanel) plaidPanel.hidden = true;
-        demoPlaceOrder({
-          paymentLabel: 'Plaid/Open Banking sandbox',
-          demoNote: 'Plaid sandbox checkout complete. This preview placed a demo order and did not create a real Open Banking payment or charge real money.'
-        });
+        /* the spinner comes down: nothing is processing, and a
+           spinner over this message would imply something is */
+        var spinner = document.querySelector('.plaid-processing');
+        if (spinner) spinner.hidden = true;
+        plaidResult.textContent = 'End of the sandbox preview. No order was created, no order number exists, and nothing was charged: the Open Banking payment path is not wired to the payment rail yet. This is the exact point where the real bank authorization will complete once the open-banking rail lands (Phase S2 of the subscription work). Your cart is unchanged. Use Back to checkout to keep shopping or to pay by card.';
         plaidAuthorize.disabled = false;
         plaidAuthorize.textContent = plaidAuthorizeLabel();
       }, 650);
@@ -1769,10 +1813,15 @@
   if (currencySelect) {
     updateCurrencyHint();
     syncBankAvailability();
+    /* the currency persists in localStorage, so a page can LOAD
+       non-USD: the state lock has to be right from the first paint,
+       not only after the first change */
+    syncStateFieldForCurrency();
     currencySelect.addEventListener('change', function () {
       displayCurrency = CURRENCIES[currencySelect.value] ? currencySelect.value : 'USD';
       try { window.localStorage.setItem(CURRENCY_STORAGE_KEY, displayCurrency); } catch (e) { /* display only */ }
       applyCurrencyAddressDefault();
+      syncStateFieldForCurrency();
       updateCurrencyHint();
       syncBankAvailability();
       if (payMethod === 'bank') setPayMethod('bank');
