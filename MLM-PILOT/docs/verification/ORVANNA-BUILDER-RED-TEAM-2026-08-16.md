@@ -534,3 +534,71 @@ your statement marks any reduced line with what it would have paid and why.
 up; only product volume pays), your own purchases (they keep you active; they
 never earn you commission), one giant leg, and shell accounts (bonuses count
 only ACTIVE legs: real people with real 100 SV months).
+
+---
+
+## RE-INSPECTION, same day: spec v1.2 (commit c33208b) inspected against the required list. RULING FLIPPED TO PASS.
+
+The architect amended the spec the same day, per the charter's discipline. I
+re-inspected commit c33208b against MY OWN required list only, item by item,
+checking every number the amendment quotes against the engine runs I made.
+
+**Item 1 (the inversion, from attack 2b): PAID.** New section 6A names and
+owns the lapse-benefit inversion with my fixture's numbers quoted correctly
+to the cent (f2 0.526315 to 1, E +7.44 with the bonus rising 10.60 to 15.00
+on a falling basis, B6 -17.00, B5 -11.29, B7 -25.89, company -36.37, six
+checks rising, 120 of 1,001 sources binding); the retention-agent claim is
+scoped to the one to two nearest Builder generations in section 6 AND in
+12A(c); the Law B bound and the cannot-be-farmed scoping are stated as I
+required; and lapse-benefit exposure is standing metric 6 in section 12,
+computed per consecutive run pair. This is exactly the amendment I priced.
+
+**Item 2 (stale rates in 11, 12A(b), 12A(d)): PAID, with one leftover
+sentence.** Section 11's fund-a-Builder and leg-stacking arithmetic is
+re-anchored to the rates of record with my executed numbers (7.07 cents per
+attack dollar; 0.0100 / 0.0077 / 0.0063 x V); 12A(d) is re-anchored (14.80
+of 20.00, 5.20 unspent, matching my derivation); 12A(a) is correctly marked
+as draft-rate teaching arithmetic with my census sweep (worst source 0.56 of
+pool, zero of 1,001 over) cited. LOW residue 1: 12A(b) line 547 still prints
+the DRAFT splitting sequence "0.0250 x V at k = 2, 0.0192 x V at k = 3,
+0.0156 x V at k = 4" while citing "worked in section 11", and section 11 now
+prints the re-anchored sequence: a one-sentence internal contradiction left
+behind by the re-anchoring. One line to fix; the correct numbers sit one hop
+away, so it cannot mislead a reader into a wrong conclusion, only into
+catching the inconsistency.
+
+**Item 3 (member-level proration exposure and the statement rule): PAID.**
+12A(e) now carries 35 of 207 paid members (17 percent), the worst-member
+ratio (21 percent of gross claims), the GW-000044 exhibit, and, as NORMATIVE
+spec text, the claimed / paid / one-line-reason rule for every prorated line
+on any member-facing statement, with a build-gate teeth clause. That is the
+commitment I required, stated stronger than I asked. LOW residue 2: the
+exhibit prints "paid 0.18"; the engine trace is 0.177777 and the plan's own
+floor-on-prorated rule makes the member-visible line 0.17. One cent, but it
+sits in the paragraph that legislates statement exactness, so it should be
+corrected to 0.17 (or quoted at trace precision).
+
+**Item 4 (the presentation rules): PAID.** Section 13 now binds all three:
+the drift chart as a standing exhibit (18.5594 to 19.6812, correctly
+quoted), the GW-000294 wipe beside the tidy fixture with the countermeasure
+stated, the 7.9x to 92x development premium as THE pull number with the
+participation companions (24 / 44 / 90.2 percent) and the reach claim
+BANNED with 207 versus 206 versus 448 on the record. Open question 8 is
+re-framed with both exhibits and my no-grace concurrence recorded, and the
+seeded-census churn honesty note landed too.
+
+Cosmetic note, not blocking: section 11's re-anchored fund-a-Builder
+sentence lists yield components summing to the attacker's post-attack total
+(29.20) while naming the marginal yield (21.20) without printing the 8.00
+pre-existing base; a numerate reader reconciles it via the cited runs 98 and
+99, but printing the 8.00 would close the gap.
+
+**RE-INSPECTION RULING: the red-team gate is a PASS.** All four required
+items are substantively discharged with my engine numbers quoted correctly;
+the two LOW residues above (the 12A(b) draft-sequence sentence and the
+GW-000044 cent) are owed to the architect as one-line corrections in the
+next touch of the spec, and neither restores a broken claim nor weakens a
+bound. With verifier PASS, QA PASS, and this PASS, plan five
+'orvanna_builder' has cleared all three gates named by its spec section 13
+and is PRESENTABLE, subject to the section 13 presentation rules, which are
+now the spec's own.
