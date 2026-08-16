@@ -1,6 +1,15 @@
-# Subscription Engine Specification, version 1.0
+# Subscription Engine Specification, version 1.1
 
-As of 2026-08-16. Author: mlm-architect. Status: SPECIFICATION for Phase S1
+As of 2026-08-16 (v1.1, same day: three errata the S1 gates forced. E1: the
+section 4.2 sketch formula corrected to `(n - 1) * frequency_months`, verifier
+ruling on D6, the builder was right. E2: the dunning-to-paused lane T10a added,
+resolving the 12.3 versus 5.2 contradiction the verifier flagged as M3, with
+exact clock semantics for both pause lanes. E3: the OQ4 billing-day transition
+rule restated to the letter with worked dates, verifier finding M1, and the
+coverage rule generalized to "next uncovered month" to make it consistent.
+Plus verifier M4 recorded as open question OQ10. v1.0 was the initial
+specification, earlier the same day). Author: mlm-architect. Status:
+SPECIFICATION for Phase S1
 (schema plus state machine plus simulated clock). Live charging is Phase S2;
 dunning surfaces are Phase S3. This spec refines the research brief
 (`SUBSCRIPTION-ENGINE-BRIEF-2026-08-16.md`); where it deviates, section 3 says why.
@@ -123,8 +132,18 @@ period rather than hiding it).
 Derivation, stated so builder and verifier reach the same dates independently:
 
 ```
-scheduled_date(n) = clamp_day( add_months(anchor_date, n * frequency_months + shift_months(n)) )
+scheduled_date(n) = clamp_day( add_months(anchor_date, (n - 1) * frequency_months + shift_months(n)) )
 ```
+
+> **ERRATUM E1, 2026-08-16 (verifier ruling on deviation D6): the v1.0 sketch
+> read `n * frequency_months`, which contradicted this section's own prose
+> ("the first renewal bills on that date", the anchor), the worked example
+> below (anchor 2026-02-04, renewals on the 4th), Howard's ruling R1, and
+> section 4.3's coverage continuity, because the anchor month would have been
+> covered by nothing. The correct formula, and the one the builder
+> implemented, is `(n - 1) * frequency_months`: renewal 1 bills ON the anchor
+> date, renewal 2 one frequency later. The error is preserved here as a dated
+> note because both S1 gates cite it.**
 
 where `n` is the renewal index (1 = first renewal), `add_months` is calendar
 month arithmetic on the anchor's day of month, `clamp_day` reduces the day to
@@ -148,7 +167,10 @@ place it bites.
 ### 4.3 Coverage
 
 - A billing on date D covers the calendar month containing D, plus the next
-  `frequency_months - 1` calendar months.
+  `frequency_months - 1` calendar months. (v1.1, erratum E3: this sentence
+  describes the unbroken-schedule special case; the governing general rule is
+  that every billing covers the NEXT UNCOVERED month(s), section 12.1
+  sentence 1, which matters after a billing-day change.)
 - The initial checkout covers the calendar month of purchase as period zero
   (the bridge already books it; no proration, per the brief's Q2 logic: a
   part-month price would break the PV equals dollars invariant).
@@ -198,7 +220,8 @@ Transitions not listed are forbidden and the state-log trigger refuses them.
 | T7 | past_due | past_due | A retry declines soft or ambiguous and scheduled attempts remain before the escalation point. |
 | T8 | past_due | dunning | Escalation: soft class after the plus-8 retry fails; ambiguous class after both backoff retries fail; any class immediately when the surviving ladder is empty (truncation, section 8.3). |
 | T9 | past_due | card_update_required | A retry declines hard, or authentication_required. |
-| T10 | past_due | paused | Member pauses while past_due; remaining retries for the period are cancelled; the period stays unpaid (section 12.3). |
+| T10 | past_due | paused | Member pauses while past_due; remaining retries for the period are cancelled; the period stays unpaid; the OQ2 counter RESET applies (section 12.3). |
+| T10a | dunning | paused | (Added v1.1, erratum E2, verifier M3.) Member pauses while in dunning; remaining retries cancelled; the period stays unpaid; the unpaid-months clock FREEZES rather than resets (section 12.3). |
 | T11 | past_due | cancelled | Member cancels, or code 2017 or 2018 on a retry. |
 | T12 | dunning | active | A remaining soft-ladder retry succeeds, or the member completes a fresh checkout for the period. |
 | T13 | dunning | card_update_required | A remaining retry declines hard, or authentication_required. |
@@ -236,6 +259,7 @@ stateDiagram-v2
     dunning --> card_update_required: hard or authentication_required (T13)
     dunning --> suspended: suspension checkpoint (T14)
     dunning --> cancelled: cancel or 2017/2018 (T15)
+    dunning --> paused: member pauses, clock freezes (T10a)
     card_update_required --> active: fresh CIT checkout (T16)
     card_update_required --> suspended: checkpoint without update (T17)
     card_update_required --> cancelled: member cancels (T18)
@@ -787,18 +811,42 @@ is the arithmetic case for OQ1's default.
 
 ### 12.1 Date change mid-cycle: the double-billing rule (R1 consequence)
 
-Rule: coverage is continuous; a date change never creates a coverage gap and
-never doubles a covered month. The transition charge runs on the FIRST
-occurrence of the new billing day strictly after the change request, and it
-covers the next uncovered month(s). Consequence, stated plainly: the change
-month may contain TWO billings of the same subscription (the old-schedule
-charge and the transition charge), exactly once per date change, disclosed to
-the member at change time. After the transition charge, the schedule is the
-new day, recurring per the frequency. Example: monthly, day 5, August billed
-and covered; member changes to day 25 on Aug 10; transition charge Aug 25
-covers September; two charges land in August, September is covered once, no
-month is ever double-covered. Retries on a transition charge follow the normal
-ladder, clipped in the transition charge's own calendar month.
+> Restated v1.1, erratum E3 (verifier M1): the S1 engine implemented a
+> different reading (the next cycle simply adopts the new day inside its own
+> anchor month, billing 2028-03-25 in the probe below), and its disclosure
+> event text did not match its own behavior. That reading is REJECTED. The
+> rule below is the accepted OQ4 rule, stated to the letter so the builder
+> can implement it verbatim.
+
+The rule, in four numbered sentences the builder implements literally:
+
+1. **The governing coverage rule** (generalizing section 4.3, which describes
+   the unbroken-schedule special case): every billing covers the NEXT
+   UNCOVERED calendar month(s), `frequency_months` of them; coverage never
+   gaps and never doubles.
+2. **The transition charge runs on the FIRST occurrence of the new billing
+   day STRICTLY AFTER the change request date.** Occurrences in short months
+   are subject to the section 12.5 clamp.
+3. **Consequence, accepted and disclosed:** one calendar month, the change
+   month, may contain TWO billings of the same subscription (the already-run
+   old-schedule charge and the transition charge), exactly once per date
+   change; the disclosure is shown to the member at change time and the
+   `billing_day_change` event records it. No proration.
+4. **After the transition charge, the schedule is the new day recurring per
+   the frequency**, each charge covering the next uncovered month(s) per
+   sentence 1. Retries on any transition charge follow the normal ladder,
+   clipped in the transition charge's own calendar month (C1, C2).
+
+The worked date example, which is the acceptance test (it is the verifier's
+own probe): monthly subscription, billing day 1. The charge of 2028-02-01
+runs and covers February 2028. On 2028-02-02 the member changes the billing
+day to 25. The first occurrence of day 25 strictly after 2028-02-02 is
+**2028-02-25**: the transition charge runs THAT day and covers March 2028
+(the next uncovered month). February 2028 contains two billings, exactly
+once, disclosed. Thereafter: 2028-03-25 covers April 2028, 2028-04-25 covers
+May 2028, and so on. The rejected S1 reading billed nothing until
+2028-03-25; under this rule that date is the SECOND new-day charge, not the
+first.
 
 ### 12.2 Pause mechanics (R3)
 
@@ -811,14 +859,43 @@ unpaid; they do NOT count toward the R4 auto-cancel counter. Auto-resume fires
 at the tick after the pause window ends (T19); an early resume re-derives the
 schedule with the actual months skipped.
 
-### 12.3 Pause during past_due or dunning
+### 12.3 Pause during past_due (T10) and during dunning (T10a)
 
-Accepted (T10). Remaining retries for the open period are cancelled
-(`skipped_clipped` attempts), the period freezes as unpaid, its volume is gone
-forever (R2), and the pause covers the following periods. Recommended default,
-OQ2: the pause RESETS the consecutive-unpaid counter, because a member who
-pauses has engaged, which is the opposite of the silent churn R4 exists to
-sweep out; the unpaid period itself still stands.
+> Rewritten v1.1, erratum E2. The v1.0 text promised pause "during past_due
+> or dunning" while table 5.2 defined only the past_due lane; the builder
+> followed the table and the verifier flagged the contradiction (M3). The
+> dunning lane now exists as T10a, and the two lanes carry deliberately
+> DIFFERENT unpaid-clock semantics, stated precisely below. Howard may
+> override either; until he does, this is the one answer the builder
+> implements.
+
+Common mechanics, both lanes: remaining retries for the open period are
+cancelled (`skipped_clipped` attempts), the period freezes as unpaid, its
+volume is gone forever (R2), and the pause covers the following months per
+12.2. The difference is what happens to the consecutive-unpaid-months clock
+(12.7):
+
+- **T10, pause from past_due: the clock RESETS.** This is OQ2's accepted
+  wording, scoped exactly as worded: pausing WHILE PAST_DUE resets the
+  consecutive-unpaid counter. After resume, counting starts fresh; the
+  pre-pause unpaid month stands as history but chains with nothing. Rationale
+  unchanged: a member who engages early, before dunning ever starts, is the
+  opposite of the silent churn R4 exists to sweep out.
+- **T10a, pause from dunning: the clock FREEZES and resume restores it where
+  it stood.** The pre-pause unpaid month keeps its count of one; paused
+  months are excluded from counting as always (12.2) but do NOT break the
+  chain; on resume the count continues from one. Worked micro-example:
+  September fails its whole ladder, dunning, member pauses on October 1 for
+  one month; October is skipped_paused, count holds at one; auto-resume
+  November 1; if November's billing also fully fails, that is the second
+  consecutive counted unpaid month and auto-cancel fires December 1 (T22).
+  Rationale for freezing rather than resetting: dunning means the notices
+  have gone out and suspension is imminent; a reset here would let a member
+  ride an indefinite loop of fail, pause-at-dunning, resume, fail, with the
+  counter never reaching two. Freeze keeps the pause honest (a real pause,
+  no billing, no volume) without making it an auto-cancel evasion device.
+
+The OQ2 row in section 15 remains accepted for its literal scope, T10 only.
 
 ### 12.4 Cancellation during dunning
 
@@ -1052,14 +1129,15 @@ mechanism, section 9A.
 | # | Question | Recommended default, so nothing blocks |
 |---|---|---|
 | OQ1 | **THE FLAGGED ONE (R6): confirm that multi-month frequencies spread their volume**, one product-month of PV per covered calendar month, calendar contained, per section 4.4 and worked example C. | **Spread.** The alternative breaks every per-month threshold the plan calibrates against and makes identical money qualify differently by billing frequency. |
-| OQ2 | Does pausing while past_due reset the consecutive-unpaid counter (12.3)? | **Yes.** A pausing member has engaged; R4 targets silent churn. The unpaid period itself still stands. |
+| OQ2 | Does pausing while past_due reset the consecutive-unpaid counter (12.3)? | **Yes.** A pausing member has engaged; R4 targets silent churn. The unpaid period itself still stands. (v1.1 scope note: this reset is scoped to its literal wording, the T10 past_due lane only; the T10a dunning lane FREEZES the clock instead, section 12.3, Howard may override.) |
 | OQ3 | Billing-day picks of 27 through 31: allow with a disclosed truncated-or-empty retry ladder, or restrict picks to days 1 through 26 so the full ladder always survives? | **Allow 1 through 28 with disclosure; reserve 29 through 31 to the clamp rule only.** Freedom with a plain warning beats a rule members will read as arbitrary; day 28 is the worst allowed case and is fully specified (8.3). |
-| OQ4 | Confirm the double-billing transition rule (12.1): transition charge on the first new-day occurrence after the change, at most one double-billed calendar month per change, no proration, disclosed at change time. | **Yes.** It is the only rule of the candidates that keeps coverage continuous and PV equals dollars intact. |
+| OQ4 | Confirm the double-billing transition rule (12.1): transition charge on the first new-day occurrence after the change, at most one double-billed calendar month per change, no proration, disclosed at change time. | **Yes.** It is the only rule of the candidates that keeps coverage continuous and PV equals dollars intact. (v1.1: restated to the letter with the 2028-02-25 worked example after the S1 engine implemented a different reading, erratum E3.) |
 | OQ5 | Confirm the single bridge amendment (section 7): `sub` lines carrying covered_months spread by the existing materialised-slice mechanism. | **Yes.** Parameterises a proven mechanism; touches no ruling. Gated with OQ1. |
 | OQ6 | Reactivation re-anchors the billing schedule to the reactivation date by default (12.6)? | **Yes**, with an optional member pick at reactivation. The old anniversary belongs to a lapsed promise. |
 | OQ7 | Suspension checkpoint for billing days 27 through 31 at month end rather than day 26 (rule C2)? | **Yes.** A day-28 billing cannot be judged unpaid on day 26, two days before it runs. |
 | OQ8 | S1's simulated year runs in a reset environment or Supabase branch, never production (section 10)? | **Reset environment.** Production carries six finalized months whose protection triggers would, correctly, fight the simulation. |
 | OQ9 | (FM3) When a catalog price changes, does the next renewal simply bill the new price, or is member notification required before it may bill? | **Bill the new price at the next renewal, printed on the run report and on the member's billing history.** It is the honest reading of a subscription at catalog price, and the notification half is a member-surface (Phase S3) question that must not gate the engine. If Howard wants notice-before-increase, it becomes an S3 rule: a price rise takes effect on the first renewal at least N days after the notice event, N his call. |
+| OQ10 | (v1.1, verifier finding M4; needed before Phase S3, not before re-gate) Early resume from pause: the S1 engine refuses a resume inside the first paused month, and a two-month pause resumed after one month keeps the full two-month schedule shift, both narrower than 12.2's "re-derives the schedule with the actual months skipped". Accept the narrowing, or require true early resume? | **Month-granular early resume.** A resume request during any paused month takes effect on the first day of the NEXT month, and the schedule shift becomes the number of whole months actually skipped (a one-month resume of a two-month pause shifts by one, not two). This honors 12.2's intent, needs no sub-month or negative shift representation (the design change the verifier warned about), and keeps every date whole-month arithmetic. Resuming inside the first paused month therefore means: that month completes as skipped_paused, billing resumes the next month, shift one. |
 
 ## 16. What this specification deliberately did not do
 
