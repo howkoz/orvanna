@@ -1,12 +1,13 @@
 # The Comp Plan Lab, database layer (`db\lab\`)
 
-Phases L1 and L2 of the Comp Plan Lab: the plan engine interface, the
-scenario derivation layer carrying the IDENTITY scenario, and all FOUR
-launch plans (unilevel baseline, binary with both placement strategies,
-matrix 3 by 7 with both strategies at width 3, stairstep-breakaway), plus
-the completed-run freeze. Built by mlm-comp-engineer, 2026-08-16, to
-`docs\COMP-LAB-SPEC.md` version 1.2 (THE LAW; read it before touching
-anything here). L1 closed both gates 2026-08-16; L2 gates pending.
+Phases L1 through L3 of the Comp Plan Lab: the plan engine interface, all
+FOUR launch plans (unilevel baseline, binary with both placement
+strategies, matrix 3 by 7, stairstep-breakaway), the completed-run freeze,
+SCENARIOS (the five mutation kinds, replay, stacking to depth 3, month
+scoping), and WATCHED ACCOUNTS (per-run snapshots with decomposed deltas).
+Built by mlm-comp-engineer, 2026-08-16, to `docs\COMP-LAB-SPEC.md` version
+1.3 (THE LAW; read it before touching anything here). L1 and L2 closed both
+gates 2026-08-16; L3 gates pending.
 
 Acronym key: Multi-Level Marketing (MLM), Structured Query Language (SQL),
 Sales Volume (SV), Commissionable Volume (CV), Row-Level Security (RLS),
@@ -37,6 +38,8 @@ be edited away.
 | `011_lab_plan_stairstep.sql` | Plan `'stairstep_breakaway'`: bottom-up Group Volume (GV) with breakaway exclusion, bracket differential rounded once at the line, generation 1 and 2 overrides, and an executable monotonicity assertion recorded in the run notes. Read its header for the two interpretation flags. |
 | `012_lab_execute_plan_l2.sql` | The dispatcher covers all four plans; matrix places at its plan_params width. |
 | `013_lab_run_freeze_fix.sql` | Freeze fix found by the probe itself: BEFORE UPDATE triggers see stored GENERATED columns of NEW as not yet computed, so 008's archive equality test had to exclude them (over-strict, never leaky; see header). |
+| `014_lab_scenario_replay.sql` | Phase L3: the mutation machinery. Effective-list flattening (root-first, seq order), replay of all five kinds with loud refusals (missing refs, root removal, cycles), the ratified remove_member roll-up, month scoping, synthetic identities per spec 9.4, `sv_override` as the one volume path, lock-time shape validation and the depth-3 stack cap. Read its five design decisions. |
+| `015_lab_watch_snapshots.sql` | Phase L3: `lab.watch_snapshots` (freeze-covered), the soft-cap warning, `fn_write_watch_snapshots` (six-bucket decomposition joined by member code, aggregate basis movements, the bucket-sum-equals-delta invariant enforced in code), `fn_run_plan` v2 with the named-baseline sixth parameter, and the mini-base fixture support (`fn_load_mini_base`, `fn_run_mini_fixture`). |
 | `100_proof_isolation.sql` | L1 isolation proof: app inventory unchanged, zero grants, RLS on, no writes to app, `'final'` impossible, name wall holds, no deletes. |
 | `101_proof_identity.sql` | Creates the March 2026 census unilevel run and proves the identity scenario's derived set equals the census row for row. |
 | `102_proof_parity.sql` | Lab unilevel versus the REAL finalized March run: every line, both totals, member results with the one explained GW-000 census-drift row. |
@@ -48,9 +51,14 @@ be edited away.
 | `108_proof_matrix_fixtures.sql` | Matrix hand examples on the mini and ten-member trees (both strategies), plus the binary width-2 equivalence re-runs at the draft 0.20 rate. |
 | `109_proof_stairstep_fixtures.sql` | Stairstep hand examples: the mini tree (no breakaways) and the seven-member PROOF-STAIR breakaway chain that exercises every stairstep reason code including generation 2. |
 | `110_census_l2_runs.sql` | Census March runs at the ruled binary rates (0.105 / 0.110), matrix and stairstep census runs, determinism digests, the four-plan comparison record, the cap-binding re-test, reason-code coverage, and the isolation re-check. |
+| `111_proof_scenario_s1.sql` | Spec 9.5 replayed by the real machinery: LAB-S1-1 (id 10,000,001) under M2, unilevel 46.00 with deltas +4.00/+8.00 in from_added_members, binary spill to M4.left with zero deltas and flush rising to 360.00. |
+| `112_proof_scenario_s2.sql` | Spec 10.3 exactly: the four watched rows, M1 losing 4.00 (pure level shift) under unilevel and doubling 16.00 to 32.00 under binary A with basis movements gained [M2, M5] lost [M3]. |
+| `113_proof_stack_and_months.sql` | The stacked scenario S1X (unilevel 50.00, binary A 40.00; M1's watch row = +4.00 added minus 4.00 shifted = 0.00), month-scoped removal (July present, August gone), the depth-4 lock refusal, and the root-removal replay refusal. |
+| `114_proof_l3_sweep.sql` | Five recipes (unilevel, binary A/B at ruled rates, matrix A, stairstep) over S1, S2, and the stack; SEMANTIC code-keyed determinism over every same-recipe pair plus BYTE-ORDER determinism for the same-flow duplicates; the spec 10.2 component invariant over all snapshots; the isolation re-check with the subscriptions-build attribution note. |
 
-Recorded proof output: `..\..\docs\verification\LAB-L1-PROOF-RUN-2026-08-16.md`
-and `..\..\docs\verification\LAB-L2-PROOF-RUN-2026-08-16.md`.
+Recorded proof output: `..\..\docs\verification\LAB-L1-PROOF-RUN-2026-08-16.md`,
+`..\..\docs\verification\LAB-L2-PROOF-RUN-2026-08-16.md`, and
+`..\..\docs\verification\LAB-L3-PROOF-RUN-2026-08-16.md`.
 
 ## How to run everything, from nothing
 
@@ -72,6 +80,9 @@ design.
 5. Run `105` then `106` (determinism pair runs, then calibration).
 6. Run `107` (freeze probe), `108` and `109` (matrix and stairstep hand
    examples), then `110` (L2 census runs and the comparison record).
+7. Run `111`, `112`, `113`, `114` in order (S1, S2, the stack and month
+   probes, then the five-recipe sweep; 111 creates the watchlist and the
+   mini-base baselines the later scripts name).
 
 To run a plan ad hoc:
 
@@ -121,3 +132,12 @@ appends a NEW run with identical output; runs are never edited or deleted
   rates (0.105 bfs_spill, 0.110 volume_balanced, spec v1.2); the section 6
   hand examples and their fixture proofs deliberately stay at the draft
   0.20. Every run records its rate in plan_params.
+- **Scenario workflow**: insert the scenario as DRAFT, insert its mutations,
+  then lock (the lock validates shape, profile grain, and the depth-3 cap;
+  existence and cycles are checked at replay and fail the run loudly).
+  Volume profiles are non-negative multiples of 50.00, either
+  {"sv_per_month": X} or a per-month map.
+- **Fixture base ids are 1..5** (LAB- codes, `sv_override` volumes) so the
+  normative synthetic id rule (10,000,000 + ordinal) cannot collide; the
+  L1/L2 fixture runs used 10000001..5 and are frozen history, which is why
+  cross-run comparisons join by member CODE, never by id.
