@@ -216,3 +216,10 @@ Follow-up wallet approval previews:
 - Approving either sheet then places the same demo order and lands on the normal confirmation page. No real Google Pay, PayPal, card, or bank account is touched.
 - Card remains the only live HyperSwitch payment form on the storefront. Wallets no longer wake up the card form in the background.
 - `staff-operations.html` also had a tracked bad `../site/index.html` link that blocked the deploy build; it now points to `index.html`.
+
+Follow-up billing location dropdown cleanup:
+- The billing State/Country dropdown no longer mixes GB, IE, CH and U.S. states in one long list.
+- USD rebuilds the select with only U.S. states, labels the field `State`, and labels the postal field `ZIP code`.
+- GBP rebuilds the select with only `United Kingdom`, EUR with only `Ireland`, and CHF with only `Switzerland`; the field label becomes `Country` and the postal field label becomes `Postal code`.
+- Switching back to USD clears the demo overseas address instead of leaving Dublin or London under a USD checkout.
+- Tax display copy now uses country names such as `Ireland` instead of forcing two-letter country codes into the customer-facing label.
