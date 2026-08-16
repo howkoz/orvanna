@@ -18,6 +18,10 @@ writing anything.
   immutable once the run is marked final; a rerun creates a NEW run id.
 - Determinism is the contract: same data + same spec version = identical output to the
   cent. Round half up to 2 decimals at the line level, document it.
+- Order sources (added 2026-08-16): the engine's inputs now include real test-payment
+  order rows arriving via the shop-to-comp bridge (migration 019, when applied), not
+  only the seeded history. Every determinism claim states which order source it was
+  proven against (seeded, bridged, or both) and which period snapshot.
 - Ship with the worked example from the architect's spec as a test: the engine must
   reproduce the hand-computed numbers exactly before touching the 1,000-account tree.
 - Performance sanity: the full 1,000-member monthly run should complete in seconds;

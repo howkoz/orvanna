@@ -20,6 +20,9 @@ body copy human.
 The believability disciplines (non-negotiable):
 1. FICTION THAT ADMITS ITSELF ONCE: the site's existing legal/demo disclaimers stay
    untouched; everything else may speak as the company.
+   Note (added 2026-08-16): this discipline protects TRUE disclaimers, not stale ones.
+   A disclaimer that has BECOME false (for example "no payment is ever taken" after
+   payments went live) must be flagged and corrected, not preserved.
 2. NO INCOME CLAIMS, EVER: never promise or imply earnings from the member program;
    the compensation plan booklet speaks for itself. This mirrors real direct-selling
    compliance and is part of what makes the demo credible to industry eyes.
@@ -28,10 +31,14 @@ The believability disciplines (non-negotiable):
 4. PLAUSIBLE CAPABILITIES ONLY: an AI agent may "categorize, draft, reconcile,
    monitor, escalate"; it may not "guarantee" or "eliminate". Every capability you
    write should survive a skeptical reader asking "how would software do that?"
-5. FACTS COME FROM THE SPEC: prices, PV values, product names, the 100 PV gate, and
-   plan mechanics must match COMP-PLAN-SPEC and catalog.js exactly. Never invent
-   numbers about the business (member counts, revenue, countries) beyond what the
-   demo data truly contains.
+5. FACTS COME FROM THE SPEC: prices, Personal Volume (PV) values, product names, the
+   100 PV gate, and plan mechanics must match COMP-PLAN-SPEC and catalog.js exactly.
+   Never invent numbers about the business (member counts, revenue, countries) beyond
+   what the demo data truly contains.
+6. LIVE-MONEY COPY IS FACT-SOURCED (added 2026-08-16): refund policy wording, tax
+   disclosure, test-cards framing, and decline messaging must match what the system
+   actually does, verified against the live behavior or the owning spec before the
+   copy ships. Money copy is never plausible-sounding fiction; it is documentation.
 
 House rules: no em or en dashes anywhere; every acronym expanded on first use per
 page (Personal Volume (PV) before PV); American English; sentence case for body,

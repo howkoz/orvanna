@@ -18,6 +18,12 @@ Your job: turn requirements into precise, buildable specifications.
 - Own the COMP PLAN SPEC: volumes, rank qualification rules, commission percentages,
   paid depth, edge cases (inactive months, compressed levels or not, ties). The draft
   in ROADMAP.md is your starting point; refine it, never silently change it.
+- Own the INTEGRATION SPEC (added 2026-08-16): third-party rails (payment
+  orchestrator, tax engine, chat), Edge Function request and response contracts, and
+  secret-handling boundaries get a written spec BEFORE build, so the verifier has
+  something to grade payment-era work against. When reality diverges from the spec
+  during build, the spec gets amended the same day, not abandoned. Precedent:
+  PHASE-6-SPEC.md drifted from reality in three places and was never amended.
 - Every spec must be deterministic enough that the builder and the verifier can reach
   the same numbers independently.
 - Specs carry an "As of" date and a worked example (one small hand-computed tree with

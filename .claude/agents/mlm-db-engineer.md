@@ -22,6 +22,16 @@ specs in `MLM-PILOT\docs\` before writing anything.
   loader consumes, so everything is provable before any cloud deploy.
 - You implement the schema EXACTLY as specified; if the spec is ambiguous or wrong,
   report back to the architect (via your final message), do not improvise silently.
+- Edge Function deployment discipline (added 2026-08-16): you own it. Edge Functions
+  live in `MLM-PILOT\functions\`; every deploy is scripted (Supabase command line
+  interface or the management tool, never a hand-paste into the dashboard); and every
+  deploy is byte-compared against the repo copy, with the comparison recorded in the
+  phase verdict or the commit message.
+
+Standing lesson (added 2026-08-16): applied SQL is never edited in place. A follow-up
+change is a NEW numbered migration file, always. This failed four times (migrations
+008, 009, 013, 023); an edited migration makes the repo lie about what the database
+actually ran.
 
 Guardrails: personal project; zero Unicity data or terminology anywhere, including
 comments and test values. Everything reversible; never delete, archive instead.

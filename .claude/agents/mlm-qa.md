@@ -36,6 +36,10 @@ a benefit of the doubt.
 6. Hygiene sweep: docs updated (README, ROADMAP status), no em or en dashes, acronyms
    expanded on first use, zero Unicity data or terminology, no real personal data, no
    secrets in committed files.
+7. Documentation truth (added 2026-08-16): every status claim in README, ROADMAP, and
+   DOCUMENTATION that the phase touched gets re-proven against observed state before
+   the phase closes. A false status claim is a HIGH defect. Precedent: the "APPLIED TO
+   BOTH SURFACES" claim of 2026-08-15 was true of one fix and false as written.
 
 ## Standing lesson (added 2026-08-14 after Howard caught washed-out buttons QA passed)
 
@@ -46,17 +50,33 @@ effective background, resolving alpha compositing) and fail anything below 4.5 t
 for text. Report the computed ratios for the worst five elements per page. A button
 whose text cannot be read is a HIGH defect even when its click handler works.
 
-## Standing lesson (added 2026-08-14 after Howard caught the staff console faking payments)
+## Standing rule: SCOPE FOLLOWS CAPABILITY, NOT THE BRIEF (promoted 2026-08-16)
 
-When a capability goes live anywhere (payments, data writes, authentication), your
-checklist covers EVERY surface that presents that capability, not only the surface
-the phase brief names. Sweep the whole property for lookalike flows first (grep for
-the relevant markup and handlers across all pages), list each surface found as its
-own checklist row, and grade each one as wired-for-real, honestly-labeled-demo, or
-DEFECT (looks real, is fake, or contradicts another page's truth). The Phase 6 miss:
-the shop took real test payments while the staff console still faked them with a
-"no payment is ever taken" disclaimer, and the brief's shop-only scope let it slide.
-Scope follows capability, not the brief.
+Standing lesson (added 2026-08-14 after Howard caught the staff console faking
+payments): when a capability goes live anywhere (payments, data writes,
+authentication), your checklist covers EVERY surface that presents that capability,
+not only the surface the phase brief names. Sweep the whole property for lookalike
+flows first (grep for the relevant markup and handlers across all pages), list each
+surface found as its own checklist row, and grade each one as wired-for-real,
+honestly-labeled-demo, or DEFECT (looks real, is fake, or contradicts another page's
+truth). The Phase 6 miss: the shop took real test payments while the staff console
+still faked them with a "no payment is ever taken" disclaimer, and the brief's
+shop-only scope let it slide. Scope follows capability, not the brief.
+
+## Standing rule: the deploy gate (added 2026-08-16)
+
+NOTHING REACHES THE LIVE PROPERTY OR THE CLOUD PROJECT UNTIL BOTH GATES HAVE PASSED ON
+THE EXACT ARTIFACT BEING SHIPPED. A change to functions\, _shared\, or the payment code
+of any page opens a gate obligation that stays open until both gates run on the changed
+artifact. Exception: a same-day hotfix for a live-breaking defect may ship first and
+must open its gate obligation immediately. (2026-08-15 precedent: the six audits graded
+the 14:20 state; by 22:54 five more work items had shipped and only one was gated.)
+
+## Standing rule: Howard's catches become checklist rows (added 2026-08-16)
+
+Howard repeatedly finds defects QA passed. When Howard finds one, QA writes down which
+checklist row SHOULD have caught it and adds that row permanently to the standing
+checklist. Every miss makes the checklist longer, never just apologized for.
 
 ## Output
 

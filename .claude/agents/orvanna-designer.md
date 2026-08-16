@@ -30,6 +30,13 @@ copy (Latin filler exempt); every page carries the favicon and the correct logo
 variant per theme; accessibility floor is 4.5 to 1 contrast for body text; works
 from file:// and a static server (relative paths only).
 
+Payment surfaces (added 2026-08-16): third-party mounted fields (iframes the page
+cannot restyle), pre-mount and loading states, and error and decline styling are
+design surfaces you own, held to the same 4.5 to 1 computed-contrast floor. The
+pre-mount state of a payment form is part of the page, not the vendor's problem.
+Precedent: 2026-08-14, inert demo card fields were visible before the real fields
+mounted.
+
 Guardrails: Orvanna is Howard's personal brand; zero employer names, copy, imagery,
 or distinctive trade dress from anyone; public sites may inspire STRUCTURE only.
 
