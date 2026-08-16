@@ -153,6 +153,69 @@ discard-reopen behavior).
 
 ---
 
+# DATED NOTE: the discoverability delta, graded 2026-08-16 (commit c66608a)
+
+Narrow delta gate on the owner's two discoverability catches (shop.html plus
+payments.js), command-line instruments only. VERDICT: PASS. Deploy YES from
+the verifier's half; the functions-first-or-together ordering note from the
+main verdict above still governs, since this commit rides on the same
+undeployed picker feature.
+
+**1. The words-only seam.** The engine's `decorateTaxLabel` hook is called
+after the label is built and may only replace the label string (a falsy
+return keeps the engine's wording); it has no access to the signature
+payload or the button, and the figure paints take `tax_cents` and
+`total_cents` from the totals object, not from anything the decorator
+returns. The SHOP'S SHIPPED DECORATOR IS VERIFIED PURE: it reads three
+fields of the totals object and two page states, writes nothing, and builds
+its replacement label from page constants only (no server strings enter the
+`innerHTML` path). One LOW observation, D-L1: the words-only property is
+held by convention, not construction. The engine hands the decorator the
+LIVE totals object (the same reference `getServerTotals` and
+`onTotalsApplied` later read) BEFORE painting the figures, so a mutating
+decorator could in principle move the painted tax, the painted total, and
+the button amount. No such path exists in shipped code; passing a copy, or
+freezing the object, would turn the engine comment's WORDS ONLY contract
+into a property. Not blocking.
+
+**2. One control, one truth.** The picker was MOVED, not mirrored: exactly
+one `guestTaxState` select and one `guestTaxStateRow` element exist in the
+page (counted); the billing panel holds only a pointer comment. The engine
+wiring is byte-unchanged from the version this verdict already passed:
+`guest_state: guestTaxState()` appears exactly twice (signature payload and
+create payload), `#guestTaxState` remains in the inert list, and the single
+change listener still walks renderSummary into the quote debounce and the
+discard-and-reopen. All four visibility writes are accounted for and
+consistent (markup default hidden; shown on guest and on signed-out; hidden
+on member sign-in; the renderSummary rule `!LIVE_PAYMENTS || accountMode
+=== 'member'` covering every re-render including the undecided chooser
+moment, where the figure on screen is genuinely guest-priced).
+
+**3. One guest path, two doors.** `continueAsGuest` is a single named
+function; the chooser's guest button and the new inline
+"Continue as guest instead" button both bind exactly it. Refusal and
+recovery travel together (`showSigninError` raises the inline button,
+`hideSigninError` drops both, and both retry paths clear the previous
+refusal). No second guest implementation exists.
+
+**4. Guardrails.** Zero em or en dashes in both files; the new user-facing
+copy carries no acronyms, no Unicity terminology, no owner name. A pleasant
+side effect recorded for the P-M1 ledger: `guestTaxDefaultUnpicked`
+excludes the typed-referral-code case, so the decorator now correctly
+refuses to claim Illinois when a referral code will actually price the
+order; the pre-quote estimate label still names the picked state in that
+case, so P-M1 stands as recorded, awaiting the owner's ruling.
+
+Hashes at c66608a: `MLM-PILOT\www\shop.html`
+`afcb98187e8a07b585c1962c6a631ad221bf27e6a3b2f677be60896c744092bd`;
+`MLM-PILOT\www\js\payments.js`
+`37a123bba8fff7cc2e2bca1d59cad5a3a58140a8fc37a8aff1fdf778e1994d71`.
+
+Not probed: the two flows in a real browser (refused sign-in to inline
+guest door; picker-at-chooser visibility): QA's half.
+
+---
+
 ## Deploy record, 2026-08-16 (appended by the deploy engineer)
 
 This section is the deploy log for the server half this verdict authorized. It is
