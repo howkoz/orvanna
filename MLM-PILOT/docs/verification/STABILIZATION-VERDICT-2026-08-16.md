@@ -254,3 +254,136 @@ migration ledger. Nothing else was written anywhere.
 - The five agent charters I did not quote (architect, comp engineer, database
   engineer, site builder, designer, writer): diffed for scope, not graded line
   by line.
+
+---
+
+# DELTA: the fix round, graded 2026-08-16 (commits d06468e and 7d57f43)
+
+Delta gate on the fix round only, command-line instruments only (the Browser
+pane belonged to the quality assurance agent). Prior verdict above: PASS with
+findings M1, M2, M3 and three LOWs.
+
+## UPDATED VERDICT: PASS. Deploy YES from the verifier's half.
+
+Every finding from the morning gate is closed on evidence. No new MEDIUM or
+HIGH found in the delta. Two residual nits, both LOW-grade observations that do
+not block deploy, are recorded at the end.
+
+## Finding-by-finding
+
+**M1 CLOSED, and the closure is verified against the live system.** The three
+surfaces now tell one story: 4000 0000 0000 2503 is the primary recommended
+challenge card, end-to-end verified; 4111 1111 1111 1111 also challenges,
+server-verified only, its ending still pending a click-through; 2370 and 2701
+are labeled "documented by Braintree, not yet run". TEST-CARDS.html now defines
+a three-grade evidence system (end-to-end verified, server-verified,
+documented) and grades the challenge rows under it, the withdrawn 2026-08-15
+claims about 4111 are marked withdrawn in the page comment rather than deleted,
+and the superseded section carries a same-day refinement note. I verified the
+new central claim myself: `confirm-payment` for order ORV-2026-08-0XWV5X
+returns `payment_status: succeeded`, `total_cents: 11025`, `tax_cents: 1025`,
+exactly matching the figures cited in all three files. The escalation
+condition attached to M1 in the morning verdict is dissolved: the recommended
+card's promised ending is now proven, not promised.
+
+**M2 CLOSED.** `shop.html` `liveStart` now records the amount signature at
+entry (`engine.setOpenedFor(liveAmountSignature())`), mirroring the staff
+console. Trace of the previously failing path: decline runs `resetPayment`
+(signature nulled), retry press reaches `liveStart` through `liveSubmit`, the
+signature is recorded, the trailing `liveEnsureCheckout` re-check compares
+equal and returns at its guard. No discard, no second create. The auto-open
+path records the same value twice in the same tick, which is idempotent. The
+H1 protection is intact: a total that genuinely moves during the open still
+mismatches and still discards.
+
+**M3 CLOSED AT THE ENGINE LEVEL, which covers all callers.**
+`outcomeMessage` now computes `isSessionOrder` (receipt `order_number` equals
+`state.orderNumber`) and consults `sawChallenge` only when it is true.
+Adversarial traces, all clean: the staff lookup of a foreign order no longer
+matches the session order number, so the flag is never consulted; the staff
+lookup of the session's OWN order matches and correctly keeps the
+challenge-aware wording; the shop lookup adopts the looked-up order number
+(the L2 fix) but explicitly clears `sawChallenge` in the same block before
+rendering, so adoption cannot smuggle the flag through; both resume paths set
+the flag only from the session's own stored order before receipts for that
+same order arrive.
+
+**L1 CLOSED.** The staff console's private `esc` is gone (definition count
+zero); it aliases `window.OrvannaPayments.esc` the way the shop does.
+
+**L2 CLOSED.** The shop lookup adopts the looked-up order into
+`liveState.orderNumber`, discarding any open unconfirmed checkout payment
+first and leaving a bank-held (`checkOnly`) payment alone, so the in-flight
+branch's "Check again" button now has a live order number behind it.
+
+**L3 CLOSED.** `closeChallengeChrome` fires `onChallengeClose` on every close
+path, before the focus work, with a comment recording why; the early-return
+past the hook is gone.
+
+**The two pre-existing staff em dashes are also gone** (the placeholder glyphs
+at the old lines 2132 and 2174 are now the word "none"): dash count across
+`payments.js`, `shop.html`, `staff.html`, and `TEST-CARDS.html` is zero.
+
+## Repo-ahead-of-cloud check (item 5): CONFIRMED AS DESIGNED
+
+`functions\_shared\staff-auth.ts` and `functions\refund-payment\index.ts` both
+carry dated comments stating plainly: finding N-M1 implemented 2026-08-16, NOT
+YET DEPLOYED, deploy owes a byte-compare against the cloud copy plus both
+gates per the standing rule, the repo knowingly ahead of the cloud. The change
+itself is audit-log-only (refusals that pass the signature check now carry the
+verified username instead of "anonymous"; refusals with no established
+identity still audit as "anonymous"; nothing new is returned to callers).
+`git diff --name-only` across the fix commits shows NO other file under
+`functions\` changed. The gate obligation on these two files is OPEN by
+design and transfers to the deploy that ships them.
+
+## Build and hashes (item 6)
+
+`py MLM-PILOT\deploy\build_dist.py` run by me after the fix round: exit 0, all
+four gates pass (stamp `?v=ebca52ce441f`, stamp assertion, name lint, secret
+scan), 34 files, bundle sha256 e9e8e4a33a9f7e5b.
+
+SHA-256 of the delta-graded artifacts as committed at 7d57f43:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `MLM-PILOT\www\js\payments.js` | `c8857a3b063d590f5867a53c9ca248ac7fec574d985681925b218c8e62e945bd` |
+| `MLM-PILOT\www\shop.html` | `a40b993a5ce8e9769d50d40220eb220fc153c6686b504c632877de74548fa498` |
+| `MLM-PILOT\www\staff.html` | `6db5eb89c91ee059143a24ae569871626a87e4aea1ad4ba6319aea5f8bb992fb` |
+| `MLM-PILOT\docs\TEST-CARDS.html` | `b195873b13d6b6a87b8d08cca2ab58a69fca25ccd7b84a8ab6ec140922553252` |
+| `MLM-PILOT\functions\_shared\staff-auth.ts` | `d6450043eb83aec33697eda2e738bceee31307ca4d1f0b4280e9ded5e3d3bc1b` |
+| `MLM-PILOT\functions\refund-payment\index.ts` | `47d35ee77391c0e39518899c4fbaa1eb78305a624b5e4e195158a2fad5e20433` |
+| `MLM-PILOT\www\css\corporate.css` | `1e602f25d8f5b0a902c24f237525da2ea0f9fcdc966120dd4017f303a8220d6e` |
+| `MLM-PILOT\www\css\library.css` | `5c920600c6144febf7dfd29936d9a94b6714980512f43919da3c6be4f694c88b` |
+| `MLM-PILOT\www\library-agent.html` | `fb78bdb0e9109b66cb8a182db04d2cd869ead7912b4a5314c4bbe55c14865303` |
+| `MLM-PILOT\deploy\build_dist.py` (unchanged since morning gate) | `248798e028eb0c5ee7d6c57aa1ccbd14a70494e1e8423ca6baab19a93fd746e7` |
+
+## Residual observations, LOW, not blocking
+
+**R1.** In TEST-CARDS' new three-grade system, the 4242 4242 4242 4242 row
+claims "end-to-end verified on the live rail" and the 5555 row says only
+"Succeeds" with no grade; neither cites a dated run or an order number on the
+BRAINTREE rail specifically (the 2026-08-15 ROADMAP list containing them dates
+from the simulator era, where real 3-D Secure cards were refused). Near-certain
+to be true for frictionless success cards, but the document now holds itself to
+the citation standard, and these two rows are its only rows that do not meet
+it.
+
+**R2.** The shop lookup's adopt-order behavior, while a session payment is
+parked at the bank (`checkOnly`), overwrites `liveState.orderNumber` with the
+looked-up order and clears the session's `sawChallenge` memory; a later "Check
+this order again" press then polls the adopted order, and the session order's
+challenge-aware wording is lost for the rest of the page life (recoverable on
+reload from resume storage). Niche, no money impact, and the pre-fix code lost
+the wording the same way; recorded so the behavior is chosen rather than
+accidental.
+
+## What I did NOT probe in the delta
+
+- The interactive click-through of 4111's ending (the one remaining unproven
+  card ending; correctly labeled as such on every surface).
+- The N-M1 audit-log behavior against a live endpoint (the code is
+  undeployed by design; its gate obligation transfers to the deploy).
+- The quality assurance findings closed in the same round (M1, M2, L1, L2,
+  L4, L6 of the QA report): their closures were read in passing and looked
+  consistent, but grading them is QA's half, not mine.
