@@ -1,4 +1,4 @@
-# Comp Plan Lab Specification, version 1.3
+# Comp Plan Lab Specification, version 1.4
 
 As of 2026-08-16. Written by mlm-architect on Howard's green light of the same day, his
 words: "start running different comp plan runs... binary, unilevel and so on and then we
@@ -41,6 +41,16 @@ the scoped exception to the section 1.2 rounding invariant), and the builder's s
 hand examples are appended as sections 6.5 and 6.6, discharging the L2 deliverable
 "hand example for each appended to this spec".
 
+**Amendment 2026-08-16, v1.4 (four ratifications from the L3 gates).** The L3 build
+passed the verifier gate (`docs\verification\LAB-L3-VERDICT-2026-08-16.md`: one MEDIUM
+and three LOWs, all spec-wording items owed here, none against the build) and the QA
+gate recorded its LOW-1 (`docs\qa\LAB-L3-QA-2026-08-16.md`). This amendment lands all
+four: the lock-time validation scoping sentence in section 9.2 (the MEDIUM), the sixth
+defaulted parameter ratified in the section 1.1 signature of record, the flushed-CV
+aggregation sentence in section 5's breakage row, and the stairstep mixed-case
+snapshot sentence in section 10.2. Wording only; every behavior was verified correct
+as built.
+
 The lab is a WHAT-IF machine. It takes the same members, the same tree, and the same
 month of volume that the real engine reads, runs them through alternative compensation
 plans, and puts the results side by side. Nothing the lab produces is ever money, ever a
@@ -73,13 +83,18 @@ One call per (plan, month, parameter set). Declared entry point:
 ```
 lab.fn_run_plan(p_period date, p_plan_code text, p_params jsonb,
                 p_placement_strategy text,
-                p_scenario_code text default 'IDENTITY') returns bigint  -- run id
+                p_scenario_code text default 'IDENTITY',
+                p_baseline_run_id bigint default null) returns bigint  -- run id
 ```
 
 (Amended v1.2, 2026-08-16, ratifying the build's fifth parameter, verifier LOW note 1:
 `p_scenario_code` defaults to 'IDENTITY', so every four-argument call behaves exactly
-as v1.1 declared, and scenario runs name their scenario explicitly. This is the
-signature of record.)
+as v1.1 declared, and scenario runs name their scenario explicitly. Amended again
+v1.4, same day, ratifying the sixth parameter per the same precedent, L3 verifier LOW
+1: `p_baseline_run_id` defaults to null, making section 8 question 11's named baseline
+callable; a five-argument or four-argument call behaves exactly as before, and the
+default baseline rule of question 11 applies when it is null. This is the signature of
+record.)
 
 The implementation may read, and only read:
 
@@ -483,7 +498,7 @@ total_earned.
 | Earner concentration | Sort earners by total_earned descending, ties by member id ascending. Top 1 percent share = sum of the top ceil(0.01 x n) members' earnings / total_payout. Top 10 percent share = same with ceil(0.10 x n). |
 | Gini-style index | Sort ALL n members ascending by total_earned, ties by member id. G = (2 x sum over i of (i x x_i)) / (n x sum of x_i) minus (n + 1) / n, with i = 1..n. If total payout is 0, G = 0 by definition. Range 0 (perfect equality) to near 1 (one earner takes all). |
 | Members earning anything | Count with total_earned > 0, and as percent of n. |
-| Breakage | Per plan, all recomputable from lines and results: UNILEVEL and MATRIX: reachable ceiling minus paid, where reachable = sum over sources of rate x source CV over only the ancestor levels that EXIST above that source (the spec section 7.4 decomposition: structural ceiling = no-upline-exists + breakage + paid); BINARY: (rate x pay-leg CV summed over members with two non-empty legs) minus paid, plus capped remainders, with flushed strong-leg value (rate x (strong minus pay leg)) reported separately and labeled 'unmatched, not breakage'; STAIRSTEP: (0.20 x total CV) minus paid, labeled 'differential retained by company'. |
+| Breakage | Per plan, all recomputable from lines and results: UNILEVEL and MATRIX: reachable ceiling minus paid, where reachable = sum over sources of rate x source CV over only the ancestor levels that EXIST above that source (the spec section 7.4 decomposition: structural ceiling = no-upline-exists + breakage + paid); BINARY: (rate x pay-leg CV summed over members with two non-empty legs) minus paid, plus capped remainders, with flushed strong-leg value (rate x (strong minus pay leg)) reported separately and labeled 'unmatched, not breakage'. (Clarified v1.4, 2026-08-16, L3 verifier LOW 2: flushed totals are computed FROM LINES, summed over members WITH a pay line in the run, never from per-member flags alone; a one-legged member's strong leg produced no pay line, so its value is no-pay, not flush, which is what section 9.5's own 360.00 figure already computes.); STAIRSTEP: (0.20 x total CV) minus paid, labeled 'differential retained by company'. |
 | Per-member deltas | One row per member per plan pair: earnings under each plan, delta, delta percent, rank under each. Rendered as an OPEN grid: every row, every column, sortable by clicking any header, no baked-in filters. Howard filters in the grid (his standing preference: build queries open). Default sort: delta descending, so who wins leads and who loses closes. |
 
 Per-plan cards across the top (payout percent, earners, Gini, top-10 share), the
@@ -834,6 +849,18 @@ scoping the mutation within the run window; null means the whole window).
 A reference that is missing when a run replays the list FAILS the run loudly. A
 mutation is never silently skipped; a half-applied scenario is worse than no run.
 
+**Lock-time validation is SHAPE-ONLY (normative, v1.4, 2026-08-16, closing the L3
+verifier's MEDIUM).** Locking a scenario validates SHAPE: the per-kind required fields,
+the 50.00 volume-profile grain (section 8 question 10), and the stack-depth cap
+(question 7). EXISTENCE and CYCLE checks (targets exist at their point in the replay;
+a move does not land inside its own subtree) run AT REPLAY, per run, and fail the run
+loudly per the paragraph above. The v1.1 table column "Validation at lock, re-checked
+at run" is superseded by this split. The reason is structural, not convenience: a
+scenario's references are resolved against the run's own derived tree (fixture
+scenarios reference members that exist only inside a run), so existence at lock time
+is not a well-defined question in general, and pretending to check it would certify
+nothing.
+
 ### 9.3 The orphaned-downline rule, argued
 
 **Rule: remove_member reattaches the removed member's frontline members to the removed
@@ -954,6 +981,14 @@ says so instead of pretending: delta_components carries
 {"decomposable": false, "basis_before": ..., "basis_after": ...,
 "basis_members_gained": [...], "basis_members_lost": [...]} and the report shows the
 raw delta plus these basis movements, labeled "basis movement, not attribution".
+
+(Added v1.4, 2026-08-16, L3 verifier LOW 3, adopting the reading the verifier
+confirmed as the honest implementation of this section: STAIRSTEP is the one plan that
+emits BOTH line kinds, per-source override lines and an aggregate differential line,
+so its watch snapshot carries a MIXED component object: the six per-source buckets
+computed over the override lines, plus an aggregate differential basis movement,
+with decomposable = false for the object as a whole and the sum-to-delta invariant
+spanning both parts together.)
 
 ### 10.3 Worked watched-account example S2: one account, two plans, opposite directions
 
