@@ -1093,3 +1093,24 @@ written. Rulings, recorded verbatim by the coordinator:
 
 Phase S1 is cleared to build. Per the standing rule, nothing applies to the cloud
 project until both gates pass on the exact artifacts.
+
+## Addendum 2: Howard's S2 test-plan requirement, 2026-08-16
+
+Howard's direction for Phase S2 (real charging), verbatim intent: renewals must be seen
+hitting Braintree through the orchestrator, using cards that do NOT trigger 3-D Secure.
+
+S2 test plan, recorded as a requirement:
+1. Happy-path renewal cards are the NON-CHALLENGE cards on the current rail:
+   4242 4242 4242 4242 and 5555 5555 5555 4444 (expiry 01/29). Simulated members'
+   stored credentials carry these. Every renewal appears in the HyperSwitch dashboard
+   as its own payment with channel renewal_engine, so a batch is observable payment by
+   payment against the orchestrator.
+2. One deliberate saboteur: exactly one test member's credential carries the challenge
+   card 4000 0000 0000 2503, to prove the Merchant Initiated Transaction invariant live:
+   the renewal comes back requires_customer_action, the engine classifies it failed with
+   reason authentication_required, never waits for an absent cardholder, and routes the
+   subscription to card_update_required. Watching this one fail correctly is part of the
+   acceptance, equal in weight to the successes.
+3. The decline card 4000 1111 1111 1115 exercises the soft-decline retry ladder against
+   the real rail; Braintree's 2000.00 to 3000.00 amount-decline band is available for
+   amount-triggered failures where a cart can legitimately reach it.
