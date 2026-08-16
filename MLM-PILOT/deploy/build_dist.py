@@ -6,6 +6,12 @@ Assembles a publishable static package under deploy/dist/:
 Rewrites the five cross-folder links so everything is relative and works
 both at https://orvanna.io/ and at any preview URL with a path prefix.
 
+2026-08-16 (stabilization Step 0): the build now also stamps svg assets,
+asserts that every local css/js/svg reference carries a ?v= cache stamp,
+fails on the owner's name outside the team page, and fails on secret-shaped
+strings anywhere in the output. See the individual gate functions for why
+each exists.
+
 Run:  py deploy/build_dist.py
 """
 import hashlib
@@ -107,6 +113,26 @@ def link_check() -> list:
 
 ASSET_VERSION_RE = re.compile(r"\?v=[0-9A-Za-z._-]+")
 
+# 2026-08-16: the stamp now covers .svg as well as .css and .js. The logo was
+# redesigned on 2026-08-15 and shipped at 19:06, and returning visitors kept
+# seeing the cached old one, because svg references carried no version stamp
+# at all. Scalable Vector Graphics (SVG) files are cached exactly like
+# stylesheets, so they need exactly the same treatment.
+STAMPABLE_SUFFIXES = (".css", ".js", ".svg")
+
+# Reference targets that leave the site or are not fetchable files. These are
+# skipped by the stamping, the stamp assertion, and nothing else.
+EXTERNAL_PREFIXES = (
+    "http://", "https://", "mailto:", "data:", "//", "javascript:", "tel:", "#",
+)
+
+# Any href/src whose target ends in .svg with no query string. Group 1 is the
+# attribute plus opening quote, group 2 the target, group 3 the closing quote.
+SVG_BARE_REF_RE = re.compile(r"""((?:href|src)=["'])([^"'?#]+\.svg)(["'])""")
+
+# Any href/src at all, full attribute value captured, for the assertion pass.
+ANY_REF_RE = re.compile(r"""(?:href|src)=["']([^"']+)["']""")
+
 
 def stamp_assets() -> str:
     """Rewrite every ?v= asset query to a hash of the actual asset bytes.
@@ -129,7 +155,7 @@ def stamp_assets() -> str:
     """
     assets = sorted(
         p for p in DIST.rglob("*")
-        if p.is_file() and p.suffix.lower() in (".css", ".js") and ".git" not in p.parts
+        if p.is_file() and p.suffix.lower() in STAMPABLE_SUFFIXES and ".git" not in p.parts
     )
     digest = hashlib.sha256()
     for p in assets:
@@ -138,14 +164,143 @@ def stamp_assets() -> str:
     stamp = digest.hexdigest()[:12]
 
     stamped = 0
+    added = 0
+
+    def add_stamp_to_bare_svg(match: "re.Match") -> str:
+        # 2026-08-16: svg references in the pages carry no ?v= at all, so the
+        # replace pass above never touches them. Rather than hand-editing the
+        # reference in every page, the build ADDS the stamp here. Local targets
+        # only; external URLs are left alone.
+        nonlocal added
+        prefix, target, quote = match.groups()
+        if target.startswith(EXTERNAL_PREFIXES):
+            return match.group(0)
+        added += 1
+        return f"{prefix}{target}?v={stamp}{quote}"
+
     for page in DIST.rglob("*.html"):
         text = page.read_text(encoding="utf-8")
         new_text, hits = ASSET_VERSION_RE.subn(f"?v={stamp}", text)
-        if hits:
+        new_text = SVG_BARE_REF_RE.sub(add_stamp_to_bare_svg, new_text)
+        if new_text != text:
             page.write_text(new_text, encoding="utf-8")
-            stamped += hits
-    print(f"asset cache stamp: ?v={stamp} applied to {stamped} references")
+        stamped += hits
+    print(f"asset cache stamp: ?v={stamp} applied to {stamped} references, "
+          f"added to {added} bare svg references")
     return stamp
+
+
+def assert_version_stamps() -> None:
+    """Every local stylesheet, script, and svg reference must carry a ?v= stamp.
+
+    Added 2026-08-16. The stamping pass above can only REWRITE a stamp that is
+    already there (except for svg, where it adds one). A stylesheet or script
+    reference written without ?v= deploys silently and then serves stale from
+    every returning visitor's cache; that is exactly how the 2026-08-15 z-index
+    fix reached only new visitors. So after stamping, an unstamped local
+    reference is a build failure, not a warning.
+    """
+    problems = []
+    for page in sorted(DIST.rglob("*.html")):
+        if ".git" in page.parts:
+            continue
+        text = page.read_text(encoding="utf-8")
+        for ref in ANY_REF_RE.findall(text):
+            if ref.startswith(EXTERNAL_PREFIXES):
+                continue
+            path_part = ref.split("?", 1)[0].split("#", 1)[0]
+            if not path_part.lower().endswith(STAMPABLE_SUFFIXES):
+                continue
+            if "?v=" not in ref:
+                problems.append(f"{page.relative_to(DIST).as_posix()} -> {ref}")
+    if problems:
+        for p in problems:
+            print(f"  unstamped reference: {p}")
+        fail(f"{len(problems)} local asset reference(s) carry no ?v= cache stamp; "
+             "they would deploy cache-stale for returning visitors")
+    print("stamp assertion: every local css/js/svg reference carries ?v=")
+
+
+# The one allowed public location for the owner's name (dist-relative posix
+# paths). Decided 2026-08-16 after the third recurrence of the name leaking
+# into the public build: the team page, which tells the build story, is the
+# single place it belongs. DOCUMENTATION\ is not copied into dist (the build
+# copies www/ and site/ only, verified 2026-08-16), so it needs no entry here.
+NAME_ALLOWLIST = {"team.html"}
+NAME_LINT_TERMS = ("koziara", "howard")
+
+
+def name_lint() -> None:
+    """Fail the build if the owner's name appears outside the team page.
+
+    Added 2026-08-16, third recurrence of this finding. Orvanna is presented
+    as its own company; the owner's real name in shop pages, consoles, or
+    scripts breaks that and has had to be swept out three times. The Step 0
+    sweep removes the current stragglers; this lint keeps them from returning.
+    Case-insensitive, scans every html and js file that ships.
+    """
+    problems = []
+    for page in sorted(DIST.rglob("*")):
+        if not page.is_file() or ".git" in page.parts:
+            continue
+        if page.suffix.lower() not in (".html", ".js"):
+            continue
+        rel = page.relative_to(DIST).as_posix()
+        if rel in NAME_ALLOWLIST:
+            continue
+        text = page.read_text(encoding="utf-8", errors="ignore")
+        for lineno, line in enumerate(text.splitlines(), 1):
+            low = line.lower()
+            for term in NAME_LINT_TERMS:
+                if term in low:
+                    problems.append(f"{rel}:{lineno}: '{term}': {line.strip()[:90]}")
+                    break
+    if problems:
+        for p in problems:
+            print(f"  name leak: {p}")
+        fail(f"{len(problems)} owner-name reference(s) outside the allowed team page; "
+             "sweep them (Step 0) or, if genuinely intentional, add the page to "
+             "NAME_ALLOWLIST with a dated note")
+    print("name lint: owner name confined to the team page")
+
+
+# Secret shapes that must never ship in the public build. Added 2026-08-16.
+# Deliberately NOT matched: the Supabase anon key (a JSON Web Token starting
+# eyJ, public by design) and the HyperSwitch publishable key (pk_snd_, public
+# by design; the lookbehind below refuses to match snd_ when preceded by a
+# word character or underscore, which is what keeps pk_snd_ safe).
+SECRET_PATTERNS = (
+    (re.compile(r"sk_(?:test|live)_[0-9A-Za-z]{8,}"), "Stripe secret key"),
+    (re.compile(r"(?<![0-9A-Za-z_])snd_[0-9A-Za-z]{8,}"), "HyperSwitch secret key"),
+    (re.compile(r"SUPABASE_DB_URL"), "Supabase database connection variable"),
+    (re.compile(r"service_role"), "Supabase service role marker"),
+)
+SECRET_SCAN_SKIP_SUFFIXES = (
+    ".jpg", ".jpeg", ".png", ".gif", ".ico", ".webp",
+    ".woff", ".woff2", ".ttf", ".otf", ".pdf",
+)
+
+
+def secret_scan() -> None:
+    """Fail the build if any shipping file contains a secret-shaped string."""
+    problems = []
+    for page in sorted(DIST.rglob("*")):
+        if not page.is_file() or ".git" in page.parts:
+            continue
+        if page.suffix.lower() in SECRET_SCAN_SKIP_SUFFIXES:
+            continue
+        rel = page.relative_to(DIST).as_posix()
+        text = page.read_text(encoding="utf-8", errors="ignore")
+        for pattern, label in SECRET_PATTERNS:
+            m = pattern.search(text)
+            if m:
+                # Print the shape and location, never the matched value itself.
+                problems.append(f"{rel}: {label} (matches {pattern.pattern})")
+    if problems:
+        for p in problems:
+            print(f"  secret shape: {p}")
+        fail(f"{len(problems)} secret-shaped string(s) in the public build")
+    print("secret scan: no secret-shaped strings in the build")
 
 
 def main() -> None:
@@ -196,6 +351,13 @@ def main() -> None:
     broken = link_check()
     if broken:
         fail("broken links: " + "; ".join(broken))
+
+    # Build gates added 2026-08-16 (stabilization Step 0): each one exits
+    # nonzero on failure, so nothing cache-stale, name-leaking, or
+    # secret-bearing can reach the deploy repo through this script.
+    assert_version_stamps()
+    name_lint()
+    secret_scan()
 
     files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)
     total = sum(p.stat().st_size for p in files)
