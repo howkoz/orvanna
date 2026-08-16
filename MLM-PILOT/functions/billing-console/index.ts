@@ -434,11 +434,36 @@ async function actionScheduleSet(
    Clock absent (production today): the honest inert answer; see
    the file header for why no dollar figure is claimed.
    ------------------------------------------------------------ */
+/* THE NUMBER-TO-RUN LIMIT (Howard's ruling, 2026-08-16 evening).
+   Blank means all due; a positive integer N means exactly N.
+   Parsed in ONE place so preview and execute cannot disagree about
+   what a limit is. Returns null for "all due", a number for N, or
+   an Error-shaped string for a refusal. */
+function parseRunLimit(value: unknown): number | null | "invalid" {
+  if (value === undefined || value === null || value === "") return null;
+  const n = Number(value);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1 || n > 100000) {
+    return "invalid";
+  }
+  return n;
+}
+
 async function actionRunPreview(
   req: Request,
   client: DbClient,
+  params: Record<string, unknown>,
 ): Promise<Response> {
   const status = await engineStatus(client);
+
+  const runLimit = parseRunLimit(params.run_limit);
+  if (runLimit === "invalid") {
+    return errorResponse(
+      req,
+      400,
+      "bad_limit",
+      "Number to run is blank for all due, or a positive whole number.",
+    );
+  }
 
   if (!status.clock_initialized) {
     const backlog = await client.queryObject<{
@@ -464,6 +489,10 @@ async function actionRunPreview(
       engine: status,
       honesty_notes: honestyNotes(status),
       inert: true,
+      /* The number-to-run intent is echoed even in the inert
+         answer, so the console shows the limit it will carry into
+         the S2 execute payload. */
+      requested_run_limit: runLimit,
       preview: null,
       backlog: {
         active_subscriptions_with_past_derived_dates: b?.backlog_subs ?? 0,
@@ -587,13 +616,82 @@ async function actionRunPreview(
 
   const sample = (rows: unknown[], limit = 50) => rows.slice(0, limit);
 
+  /* ---- THE NUMBER-TO-RUN SELECTION (Howard's ruling). ----
+     With a limit N the preview must answer WHICH charges the first
+     N are, under ONE deterministic order the engine side (migration
+     028, authored concurrently) can reproduce exactly:
+       oldest due date first, then member code, then renewal index.
+     The due set is the run's whole chargeable work: due new cycles
+     and due UNCLIPPED retries together (a clipped retry never runs,
+     so it can never occupy a slot). The definition is stated here
+     in one sentence precisely so the gates can compare it with
+     028's implementation and flag any divergence loudly. */
+  interface DueItem {
+    kind: "new_cycle" | "retry";
+    subscription_id: number;
+    member_code: string;
+    renewal_index: number;
+    due_date: string;
+    amount: number;
+    detail: string;
+  }
+  const dueItems: DueItem[] = [];
+  for (const r of newCycles.rows) {
+    dueItems.push({
+      kind: "new_cycle",
+      subscription_id: Number(r.subscription_id),
+      member_code: r.member_code,
+      renewal_index: r.renewal_index,
+      due_date: String(r.scheduled_date).slice(0, 10),
+      amount: num(r.amount),
+      detail: r.frequency_months + " month(s)",
+    });
+  }
+  for (const r of retryRows) {
+    dueItems.push({
+      kind: "retry",
+      subscription_id: Number(r.subscription_id),
+      member_code: r.member_code,
+      renewal_index: r.renewal_index,
+      due_date: String(r.next_retry_date).slice(0, 10),
+      amount: r.amount_cents / 100,
+      detail: "retry, class " + (r.decline_class ?? "unknown"),
+    });
+  }
+  dueItems.sort((a, b) =>
+    a.due_date < b.due_date
+      ? -1
+      : a.due_date > b.due_date
+      ? 1
+      : a.member_code < b.member_code
+      ? -1
+      : a.member_code > b.member_code
+      ? 1
+      : a.renewal_index - b.renewal_index
+  );
+  const selected = runLimit === null ? dueItems : dueItems.slice(0, runLimit);
+  const selectedAmount = selected.reduce((a, r) => a + r.amount, 0);
+
   return jsonResponse(req, 200, {
     action: "run_preview",
     engine: status,
     honesty_notes: honestyNotes(status),
     inert: false,
+    requested_run_limit: runLimit,
     preview: {
       tick_date: tickDate,
+      /* The limit block: what a run capped at N would actually
+         charge, and how much due work would remain for later runs.
+         With no limit, selected covers everything due and remaining
+         is zero, so the page renders one truth either way. */
+      limit: {
+        requested_n: runLimit,
+        due_total: dueItems.length,
+        selected_count: selected.length,
+        remaining_count: dueItems.length - selected.length,
+        selected_amount: Math.round(selectedAmount * 100) / 100,
+        selected: sample(selected),
+      },
       new_cycles: {
         count: newCycles.rows.length,
         amount: Math.round(newAmount * 100) / 100,
@@ -660,7 +758,22 @@ async function actionRunExecute(
   client: DbClient,
   identity: StaffIdentity,
   ipHash: string,
+  params: Record<string, unknown>,
 ): Promise<Response> {
+  /* The number-to-run limit persists into the execute payload
+     (Howard's ruling): parsed with the SAME parser as the preview,
+     recorded in the audit line, and handed to app.fn_billing_tick's
+     limit parameter when S2 enables execution (migration 028). */
+  const runLimit = parseRunLimit(params.run_limit);
+  if (runLimit === "invalid") {
+    return errorResponse(
+      req,
+      400,
+      "bad_limit",
+      "Number to run is blank for all due, or a positive whole number.",
+    );
+  }
+
   /* Deliberately before any other check: this build cannot
      execute, full stop. */
   if (!EXECUTE_ENABLED) {
@@ -672,7 +785,7 @@ async function actionRunExecute(
       outcome: "refused",
       outcome_code: "s2_pending",
       ip_hash: ipHash,
-      detail: {},
+      detail: { run_limit: runLimit },
     });
     return errorResponse(
       req,
@@ -695,6 +808,33 @@ async function actionRunExecute(
    the run row itself (migration 024 deviation D4), so the two
    families can never hide inside each other's statistics.
    ------------------------------------------------------------ */
+/* Migration 028 (the number-to-run limit on the engine side, being
+   authored concurrently) adds ran-N-of-M-due-R-remaining fields to
+   the run row. Their exact column names are 028's to fix, so this
+   console reads them TOLERANTLY from the row's JSON image: the
+   candidate spellings below are tried in order, absent means null,
+   and nothing errors before 028 applies. When 028 lands, the first
+   matching spelling here should be aligned to its real names as a
+   one-line follow-up. */
+function pickLimitInfo(
+  raw: Record<string, unknown> | null | undefined,
+): { run_limit: number | null; due_remaining: number | null } {
+  const pick = (names: string[]): number | null => {
+    if (!raw) return null;
+    for (const n of names) {
+      const v = raw[n];
+      if (v !== undefined && v !== null && Number.isFinite(Number(v))) {
+        return Number(v);
+      }
+    }
+    return null;
+  };
+  return {
+    run_limit: pick(["run_limit", "limit_n", "ran_limit", "requested_limit"]),
+    due_remaining: pick(["due_remaining", "remaining_due", "due_left"]),
+  };
+}
+
 async function actionRunHistory(
   req: Request,
   client: DbClient,
@@ -720,14 +860,17 @@ async function actionRunHistory(
     promo_hook_identity: boolean | null;
     mit_invariant_ok: boolean | null;
     notes: string | null;
+    raw: Record<string, unknown>;
   }>(
-    `select id, tick_date, engine_version, clock_source, status,
-            started_at, finished_at, subscriptions_due, attempts_made,
-            succeeded, declined, attempts_reconciled,
-            member_fault_failures, system_fault_failures,
-            promo_hook_identity, mit_invariant_ok, notes
-       from app.billing_runs
-      order by id desc
+    `select br.id, br.tick_date, br.engine_version, br.clock_source,
+            br.status, br.started_at, br.finished_at,
+            br.subscriptions_due, br.attempts_made,
+            br.succeeded, br.declined, br.attempts_reconciled,
+            br.member_fault_failures, br.system_fault_failures,
+            br.promo_hook_identity, br.mit_invariant_ok, br.notes,
+            to_jsonb(br) as raw
+       from app.billing_runs br
+      order by br.id desc
       limit $1 offset $2`,
     [limit, offset],
   );
@@ -736,7 +879,10 @@ async function actionRunHistory(
   );
   return jsonResponse(req, 200, {
     action: "run_history",
-    runs: runs.rows.map((r) => ({ ...r, id: Number(r.id) })),
+    runs: runs.rows.map((r) => {
+      const { raw, ...known } = r;
+      return { ...known, id: Number(r.id), limit_info: pickLimitInfo(raw) };
+    }),
     total: total.rows[0]?.total ?? 0,
     limit,
     offset,
@@ -753,12 +899,14 @@ async function actionRunDetail(
     return errorResponse(req, 400, "bad_run_id", "That is not a run number.");
   }
   const run = await client.queryObject<Record<string, unknown>>(
-    `select id, tick_date, engine_version, clock_source, status,
-            started_at, finished_at, subscriptions_due, attempts_made,
-            succeeded, declined, attempts_reconciled,
-            member_fault_failures, system_fault_failures,
-            promo_hook_identity, mit_invariant_ok, notes
-       from app.billing_runs where id = $1`,
+    `select br.id, br.tick_date, br.engine_version, br.clock_source,
+            br.status, br.started_at, br.finished_at,
+            br.subscriptions_due, br.attempts_made,
+            br.succeeded, br.declined, br.attempts_reconciled,
+            br.member_fault_failures, br.system_fault_failures,
+            br.promo_hook_identity, br.mit_invariant_ok, br.notes,
+            to_jsonb(br) as raw
+       from app.billing_runs br where br.id = $1`,
     [runId],
   );
   if (!run.rows[0]) {
@@ -798,9 +946,14 @@ async function actionRunDetail(
     [runId],
   );
 
+  const { raw: runRaw, ...runKnown } = run.rows[0];
   return jsonResponse(req, 200, {
     action: "run_detail",
-    run: { ...run.rows[0], id: Number(run.rows[0].id) },
+    run: {
+      ...runKnown,
+      id: Number(run.rows[0].id),
+      limit_info: pickLimitInfo(runRaw as Record<string, unknown>),
+    },
     attempts: attempts.rows.map((a) => ({
       ...a,
       attempt_id: Number(a.attempt_id),
@@ -1503,10 +1656,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
         );
         break;
       case "run_preview":
-        response = await actionRunPreview(req, client);
+        response = await actionRunPreview(req, client, body);
         break;
       case "run_execute":
-        response = await actionRunExecute(req, client, auth.identity, ipHash);
+        response = await actionRunExecute(
+          req,
+          client,
+          auth.identity,
+          ipHash,
+          body,
+        );
         break;
       case "run_history":
         response = await actionRunHistory(req, client, body);
