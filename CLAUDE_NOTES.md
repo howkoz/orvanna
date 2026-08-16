@@ -164,3 +164,5 @@ Follow-up Stripe Tax currency staging:
 - The tax answer is converted back into Orvanna's existing USD-base cents contract before the browser paints totals, because the order table still does not store settlement currency.
 - `create-payment` remains explicitly USD for now, so payment settlement cannot silently mix a non-USD tax quote with USD order records.
 - Non-USD currency choices seed demo tax addresses: GBP uses GB/London, EUR uses IE/Dublin, and CHF uses CH/Zurich.
+- Until the Supabase `quote-tax` function can be deployed, the browser blocks live server tax quotes for non-USD currencies so the old deployed function cannot fall back to IL and overwrite the IE/GB/CH estimate.
+- The Plaid tile is still staged, but selecting it now updates the visible wallet note and status line immediately instead of appearing inert.
