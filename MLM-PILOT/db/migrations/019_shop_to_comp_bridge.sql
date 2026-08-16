@@ -7,9 +7,20 @@
 --          Plain path:
 --          C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md
 --
--- STATUS: NOT APPLIED. Proposed only. Nothing in this file has been run against
---         the live project. Migration 018 is likewise proposed and unapplied, so
---         019 is the next free number either way.
+-- STATUS: APPLIED 2026-08-16 to the live project (mlm-pilot, oiyibdczkokegaxkwulv)
+--         as migration shop_to_comp_bridge_019, on Howard's straight-to-production
+--         ruling. All seven policy decisions in section 4 of the design doc were
+--         answered by Howard by 2026-08-16 and every constant below matches his
+--         rulings; see MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md.
+--         From this point this file is FROZEN: applied SQL is never edited, a
+--         follow-up change is a new numbered migration.
+--         WORLD MOVED BETWEEN WRITING AND APPLYING, recorded rather than hidden:
+--         migrations 018 (tax integrity hardening), 022 (refunds) and 023 (refund
+--         guard fix) were applied BEFORE this file. Migration 022 added 'refunded'
+--         and 'partially_refunded' payment states, so policy P8's opening sentence
+--         ("no refunded state at all") describes the world of 2026-08-15, not
+--         today. The bridge is unaffected: the state gate is 'succeeded' only, so
+--         a refunded order simply produces no volume.
 --
 -- Acronym key, spelled out once: Personal Volume (PV), Sales Volume (SV),
 -- Commissionable Volume (CV), Team Volume (TV), Stock Keeping Unit (SKU, a short

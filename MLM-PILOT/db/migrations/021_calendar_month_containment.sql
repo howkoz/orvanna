@@ -9,7 +9,15 @@
 --          month".
 -- Design:  DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md, section 11.
 --
--- STATUS: NOT APPLIED. Proposed only.
+-- STATUS: APPLIED 2026-08-16 to the live project (mlm-pilot, oiyibdczkokegaxkwulv)
+--         as migration calendar_month_containment_021, immediately after 020, on
+--         Howard's straight-to-production ruling. Decision record:
+--         MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md.
+--         Note: migration 022 (refunds) was applied BEFORE this file even though
+--         its header names 021 in its run order; 022 detects the state of 019 and
+--         021 at run time and behaves correctly either way.
+--         From this point this file is FROZEN: applied SQL is never edited, a
+--         follow-up change is a new numbered migration.
 --
 -- LAYERS ON TOP OF 019 AND 020, EDITS NEITHER. Migration 019 is byte-for-byte
 -- unchanged and remains the file the verifier is recomputing against.

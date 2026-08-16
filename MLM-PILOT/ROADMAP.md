@@ -779,8 +779,24 @@ current truth:
 
 Current plan of record: docs\STABILIZATION-PLAN-2026-08-16.md.
 
-## Next small step (updated 2026-08-16)
+## Next small step (updated 2026-08-16, evening)
 
-Execute the stabilization plan, docs\STABILIZATION-PLAN-2026-08-16.md, Steps 0
-through 5 in order. Then open the subscription engine, architect-first, on the
-stable ground the plan leaves behind.
+THE BRIDGE IS LIVE. Howard answered all seven shop-to-comp policy decisions
+(record: docs\decisions\2026-08-16-bridge-seven-decisions.md) and migrations
+019, 020, and 021 were applied straight to production on his explicit ruling.
+Real sales now feed the commission engine: 11 live orders bridged (2,000.00
+Sales Volume, August 2026), 3,950.00 Personal Volume retained visibly on house
+account GW-000, finalized months proven byte-identical by checksum, and the
+whole path proven idempotent.
+
+Next, in order:
+
+1. END OF AUGUST, BY HAND: the first real commission run. Bridge, retain,
+   run, finalize, exactly per section 7 of migration 019 and the decision
+   record's "What happens next".
+2. Then open the SUBSCRIPTION ENGINE, architect-first, on this stable ground
+   (real monthly billing is what makes months two through ten of the spread
+   schedule meet real money).
+
+Earlier stabilization-plan items not yet closed remain tracked in
+docs\STABILIZATION-PLAN-2026-08-16.md.

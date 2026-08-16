@@ -8,7 +8,12 @@
 --          for now" and "lets make an ID that is the top of the tree like GW-000".
 -- Design:  DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md, section 10.
 --
--- STATUS: NOT APPLIED. Proposed only.
+-- STATUS: APPLIED 2026-08-16 to the live project (mlm-pilot, oiyibdczkokegaxkwulv)
+--         as migration house_account_020, immediately after 019, on Howard's
+--         straight-to-production ruling. Decision record:
+--         MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md.
+--         From this point this file is FROZEN: applied SQL is never edited, a
+--         follow-up change is a new numbered migration.
 --
 -- LAYERS ON TOP OF 019, DOES NOT EDIT IT. Migration 019 is byte-for-byte
 -- unchanged and remains the file the verifier is recomputing against. This file

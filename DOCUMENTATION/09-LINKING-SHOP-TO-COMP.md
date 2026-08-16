@@ -213,6 +213,10 @@ run covers it.
 
 ### Decision 4.2: packs and bundles carry the parent's Personal Volume, children show zero. Confirm?
 
+> **ANSWERED BY HOWARD, 2026-08-16.** Confirmed: a pack is ONE product row carrying the
+> parent's Personal Volume, children never gain volume. The 019 default (policy P5) stands
+> unchanged. Full record: `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`.
+
 The four multi-agent items are Manager Agent ($200.00), Ignition Pack ($200.00), Momentum
 Pack ($400.00) and Constellation Pack ($800.00). Each names its children in
 `catalog.js`, and each carries its own price and Personal Volume.
@@ -252,6 +256,15 @@ exploding is not even neutral. See decision 4.6.
 
 ### Decision 4.3: what happens to volume when an order is refunded or charged back?
 
+> **ANSWERED BY HOWARD, 2026-08-16.** Before a month is published: remove the bridged rows
+> and rerun the month (019's design). After publication: RERUN THE ORIGINAL MONTH, as a
+> SUPERSEDING VERSIONED RUN, never an edit: new run id, old run frozen as history with a
+> visible superseded-by marker (the v1.2 to v1.3 rerun precedent). Two recorded defaults:
+> monthly volume may go negative arithmetic-wise inside a rerun (it is a recomputation, not
+> a stored negative), and member notification is the superseded-by marker on the statement.
+> Policy recording only; no clawback code is built. Full record:
+> `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`.
+
 **First, the state of the world, stated accurately.** `app.demo_orders.payment_status`
 permits exactly five values: `created`, `processing`, `succeeded`, `failed`, `abandoned`.
 There is no refunded state. `app.orders.status` permits `completed` and `refunded`, but
@@ -286,6 +299,10 @@ refunds exist.
 
 ### Decision 4.4: does volume count at order creation, or only when payment reaches `succeeded`?
 
+> **ANSWERED BY HOWARD, 2026-08-16.** Confirmed: volume counts ONLY at processor-confirmed
+> `succeeded` (the 019 default, policy P1). Full record:
+> `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`.
+
 **Only `succeeded` is defensible. I recommend it, and I would push back hard on anything
 else.**
 
@@ -315,6 +332,11 @@ made wrong by a row moving underneath it.
 
 ### Decision 4.5: which month does an order belong to when it settles after a month boundary?
 
+> **ANSWERED BY HOWARD, 2026-08-16.** Option A confirmed: creation month forever, and the
+> bridge REFUSES to write into a published month and reports the rows (021's trigger is the
+> database backstop). Full record:
+> `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`.
+
 The engine's existing rule, from the specification's section 6.3, is that an order belongs
 to the volume month stamped at creation in Coordinated Universal Time, and that stamp never
 moves. The new question the live shop creates is what to do when the payment succeeds in
@@ -342,6 +364,10 @@ visible marker on the order saying it was shifted, because an unexplained shift 
 the kind of thing that destroys trust in a statement.
 
 ### Decision 4.6: should a pack be one product, or should it explode into its component agents?
+
+> **ANSWERED BY HOWARD, 2026-08-16.** Option A confirmed: a pack is its own product row and
+> is never exploded into components (the 019 default, policy P5, same ruling as 4.2). Full
+> record: `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`.
 
 The task asked this as part of the tier question, and it deserves its own decision because
 the two answers produce different money.
