@@ -97,7 +97,9 @@ content, and the fixtures pin them:
   generation 1 to S5 480.00 and generation 2 to S3 240.00 (across the S4
   boundary); on S4's group: generation 1 to S3 480.00 and NO generation 2
   (no boundary above), exactly the spec's "a breakaway found under a
-  breakaway" clause. Company **6,032.00** = 24.4409 percent of CV
+  breakaway" clause. Company **6,032.00** = 24.4408 percent of CV (corrected 2026-08-16
+  by the coordinator per the L2 verdict's adjudication: 6,032.00 / 24,680.00 = 24.44084...,
+  fifth decimal 4, so 24.4408; originally printed 24.4409)
   24,680.00, six members paid, breakaway flags exactly S4 and S6.
 - MONOTONICITY, asserted in the run output as demanded: the plan function
   computes the minimum differential over ALL members, RAISES if negative

@@ -662,7 +662,8 @@ generation 1 to S3 = 480.00, and no breakaway sits above S4, so its generation 2
 not exist, which is the walk model's defining clause in action. S3 thus collects a
 generation 1 AND a generation 2 in one month, from different breakaways. Totals: S1
 8.00, S2 4.00, S3 740.00, S4 1,800.00, S5 1,080.00, S6 2,400.00, S7 0.00. Company =
-6,032.00 = 24.4409 percent of CV 24,680.00, six members paid, under the 26 percent
+6,032.00 = 24.4408 percent of CV 24,680.00 (corrected 2026-08-16 by the coordinator per
+the L2 verdict's adjudication; originally printed 24.4409), six members paid, under the 26 percent
 stacked-breakaway ceiling of section 4.4.
 
 ---
