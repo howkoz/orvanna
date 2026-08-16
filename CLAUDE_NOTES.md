@@ -149,3 +149,10 @@ Follow-up correction:
 - USD now disables the Plaid/Bank account button instead of allowing a click that only explains failure afterward.
 - The payment method row now uses wordmark-style payment marks for Apple Pay, GPay, PayPal, Card, and Plaid instead of generic line icons.
 - Browser check confirmed USD disables Plaid with the ACH/bank-debit explanation, while GBP keeps Plaid selectable and still shows the staged settlement message without creating a payment.
+
+Follow-up wallet enablement:
+- HyperSwitch sandbox API confirmed the Braintree connector now exposes wallet methods for `google_pay` and `paypal`.
+- The checkout enables Google Pay and PayPal as USD sandbox options and opens the secure HyperSwitch widget for them.
+- The HyperSwitch payment widget now includes `walletReturnUrl`, which wallet redirects need in order to return to Orvanna cleanly.
+- Apple Pay remains disabled in the Orvanna UI until the Braintree Apple Pay domain setup is complete.
+- Plaid/Open Banking remains staged behind GBP/EUR readiness and is still disabled for USD.
