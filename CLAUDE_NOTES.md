@@ -166,3 +166,9 @@ Follow-up Stripe Tax currency staging:
 - Non-USD currency choices seed demo tax addresses: GBP uses GB/London, EUR uses IE/Dublin, and CHF uses CH/Zurich.
 - Until the Supabase `quote-tax` function can be deployed, the browser blocks live server tax quotes for non-USD currencies so the old deployed function cannot fall back to IL and overwrite the IE/GB/CH estimate.
 - The Plaid tile is still staged, but selecting it now updates the visible wallet note and status line immediately instead of appearing inert.
+
+Follow-up Plaid panel:
+- The Plaid tile now opens a page-owned sandbox panel modeled after the OTP overlay pattern, so selecting Plaid no longer looks like it only changed button text.
+- The panel shows the visible checkout total, the current two-letter country code, a few sandbox bank choices, and a final "nothing charged" authorization preview.
+- This is intentionally not Plaid Link yet. The real backend still needs order currency storage and a HyperSwitch Open Banking create-payment path before Plaid can create an actual payment.
+- Browser smoke check confirmed GBP checkout opens the panel above the sticky order summary, shows country `GB`, matches the sticky total, and updates the authorization preview message.
