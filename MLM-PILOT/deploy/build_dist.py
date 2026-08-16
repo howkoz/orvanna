@@ -307,6 +307,28 @@ def secret_scan() -> None:
     print("secret scan: no secret-shaped strings in the build")
 
 
+def currency_mirror_check() -> None:
+    """Fail the build if the client and server currency rate tables drift.
+
+    Verifier finding O-M3 (2026-08-16): the conversion rates live in
+    www/shop.html (what the shopper sees) and functions/_shared/tax.ts
+    (what the tax quote says), with nothing keeping them equal. The
+    checker applies the pricing mirror's discipline (spec check V6):
+    shop.html is the declared source of truth, tax.ts is the mirror,
+    and any drift in either direction fails this build, so a drifted
+    table cannot ship.
+    """
+    import subprocess
+    checker = ROOT / "functions" / "_shared" / "check_currency_mirror.py"
+    result = subprocess.run(
+        [sys.executable, str(checker)], capture_output=True, text=True)
+    for line in (result.stdout or "").strip().splitlines():
+        print(f"currency mirror: {line}")
+    if result.returncode != 0:
+        fail("currency rate mirror drifted (see lines above); "
+             "shop.html CURRENCIES and tax.ts TAX_CURRENCY_RATES must match")
+
+
 def main() -> None:
     www, site = ROOT / "www", ROOT / "site"
     for required in (www, site):
@@ -362,6 +384,7 @@ def main() -> None:
     assert_version_stamps()
     name_lint()
     secret_scan()
+    currency_mirror_check()
 
     files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)
     total = sum(p.stat().st_size for p in files)

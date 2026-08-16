@@ -69,7 +69,19 @@ const STRIPE_TAX_URL = "https://api.stripe.com/v1/tax/calculations";
    Stripe Tax in the selected display currency and convert the answer
    back into the USD-base cents contract the browser already expects.
    That keeps the page honest while the database currency migration is
-   not done yet. */
+   not done yet.
+
+   LOCKSTEP CONTRACT (verifier finding O-M3, 2026-08-16): this table
+   is the MIRROR of the single source of truth, the CURRENCIES table
+   in www/shop.html, exactly as pricing.ts mirrors catalog.js. It must
+   stay rate for rate and code for code identical: the page's table
+   converts what the shopper SEES, this one converts what the quote
+   SAYS, and any difference makes the displayed conversion and the
+   quoted tax disagree by design. Parity is mechanically enforced by
+   functions/_shared/check_currency_mirror.py, which the deploy build
+   (deploy/build_dist.py) runs and fails on any drift, the same
+   discipline as the pricing mirror's check V6. If a rate changes in
+   shop.html it changes here in the same commit. */
 const TAX_CURRENCY_RATES: Record<string, number> = {
   USD: 1,
   GBP: 0.79,
