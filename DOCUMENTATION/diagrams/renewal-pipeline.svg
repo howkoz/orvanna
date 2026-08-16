@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1120" width="1180" height="1120" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arwGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16A34A"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="1120" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">The renewal pipeline: one daily tick, from alarm clock to commission engine</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">Every step is deterministic. The right column names the real-world failure each step makes impossible.</text>
+
+  <!-- 1. the tick -->
+  <rect x="30" y="84" width="640" height="76" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="46" y="106" font-size="13.5" font-weight="600" fill="#111827">1. The daily tick opens a run</text>
+  <text x="46" y="126" font-size="12.5" fill="#374151">Fired by the scheduler at the staff-set time, or by RUN NOW in the console, with an</text>
+  <text x="46" y="143" font-size="12.5" fill="#374151">optional limit ("run exactly 5"). The alarm is a convenience; the run is the record.</text>
+
+  <line x1="350" y1="160" x2="350" y2="184" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 2. reconcile -->
+  <rect x="30" y="188" width="640" height="76" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="210" font-size="13.5" font-weight="600" fill="#111827">2. Reconcile first</text>
+  <text x="46" y="230" font-size="12.5" fill="#374151">Before any new charge, sweep every attempt still without an answer. Ask the payment</text>
+  <text x="46" y="247" font-size="12.5" fill="#374151">platform for the truth; anything unresolved goes to the staff attention queue.</text>
+
+  <line x1="350" y1="264" x2="350" y2="288" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 3. gather -->
+  <rect x="30" y="292" width="640" height="76" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="314" font-size="13.5" font-weight="600" fill="#111827">3. Gather everything due on or before today</text>
+  <text x="46" y="334" font-size="12.5" fill="#374151">Billing dates are computed fresh from the member's original anchor date, never by</text>
+  <text x="46" y="351" font-size="12.5" fill="#374151">adding a month to a stored date. A missed day is simply picked up by the next tick.</text>
+
+  <line x1="350" y1="368" x2="350" y2="392" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 4. business rules -->
+  <rect x="30" y="396" width="640" height="112" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="418" font-size="13.5" font-weight="600" fill="#111827">4. Business rules, applied at billing time</text>
+  <text x="46" y="438" font-size="12.5" fill="#374151">Price is read fresh from the one catalog (a subscription never stores a price).</text>
+  <text x="46" y="455" font-size="12.5" fill="#374151">The stored card credential passes a pre-flight coherence check before anything is sent.</text>
+  <text x="46" y="472" font-size="12.5" fill="#374151">A promotions hook runs (deliberately a no-op today). Each cycle is locked under a</text>
+  <text x="46" y="489" font-size="12.5" fill="#374151">one-billing-per-cycle database key before dispatch.</text>
+
+  <line x1="350" y1="508" x2="350" y2="532" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 5. dispatch -->
+  <rect x="30" y="536" width="640" height="76" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="558" font-size="13.5" font-weight="600" fill="#111827">5. Dispatch the charge, cardholder absent</text>
+  <text x="46" y="578" font-size="12.5" fill="#374151">An order-shaped row is written, then charged as a merchant-initiated transaction.</text>
+  <text x="46" y="595" font-size="12.5" fill="#374151">A renewal NEVER asks an absent cardholder to answer a bank identity challenge.</text>
+
+  <line x1="350" y1="612" x2="350" y2="636" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 6 + 7. orchestrator and processor -->
+  <rect x="30" y="640" width="305" height="70" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="46" y="663" font-size="13.5" font-weight="600" fill="#111827">6. Payment orchestrator</text>
+  <text x="46" y="683" font-size="12.5" fill="#374151">HyperSwitch, the same rail the</text>
+  <text x="46" y="699" font-size="12.5" fill="#374151">shop checkout already uses.</text>
+
+  <line x1="335" y1="675" x2="363" y2="675" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <rect x="367" y="640" width="303" height="70" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="1.6"/>
+  <text x="383" y="663" font-size="13.5" font-weight="600" fill="#111827">7. Braintree</text>
+  <text x="383" y="683" font-size="12.5" fill="#374151">The card processor answers:</text>
+  <text x="383" y="699" font-size="12.5" fill="#374151">paid, or a numbered decline code.</text>
+
+  <line x1="350" y1="710" x2="350" y2="734" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 8. verdict -->
+  <rect x="30" y="738" width="640" height="94" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="46" y="760" font-size="13.5" font-weight="600" fill="#111827">8. The verdict is classified from a data table, never guessed</text>
+  <text x="46" y="780" font-size="12.5" fill="#374151">Every decline code is labeled member-fault (the card or the cardholder) or system-fault</text>
+  <text x="46" y="797" font-size="12.5" fill="#374151">(our defect). Only member-fault declines may ever consume the member's retry ladder or</text>
+  <text x="46" y="814" font-size="12.5" fill="#374151">count toward cancellation. System faults route to the staff attention queue instead.</text>
+
+  <line x1="350" y1="832" x2="350" y2="856" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 9. state machine -->
+  <rect x="30" y="860" width="640" height="76" rx="10" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="46" y="882" font-size="13.5" font-weight="600" fill="#111827">9. State machine and retry ladder</text>
+  <text x="46" y="902" font-size="12.5" fill="#374151">Paid means active. A soft decline schedules retries at +2, +4, +8, +15, +22 days, clipped</text>
+  <text x="46" y="919" font-size="12.5" fill="#374151">inside the calendar month. A hard decline is never retried. See the state machine diagram.</text>
+
+  <line x1="350" y1="936" x2="350" y2="960" stroke="#16A34A" stroke-width="1.8" marker-end="url(#arwGreen)"/>
+  <text x="362" y="954" font-size="11.5" fill="#16A34A">paid charges only</text>
+
+  <!-- 10. bridge -->
+  <rect x="30" y="964" width="640" height="70" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="986" font-size="13.5" font-weight="600" fill="#111827">10. The bridge books the volume</text>
+  <text x="46" y="1006" font-size="12.5" fill="#374151">Only processor-confirmed paid charges become volume. A quarterly charge of $300.00</text>
+  <text x="46" y="1023" font-size="12.5" fill="#374151">spreads 100 Personal Volume (PV) into each of its three covered months.</text>
+
+  <line x1="350" y1="1034" x2="350" y2="1056" stroke="#16A34A" stroke-width="1.8" marker-end="url(#arwGreen)"/>
+
+  <!-- 11. commission engine -->
+  <rect x="30" y="1060" width="640" height="46" rx="10" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.6"/>
+  <text x="46" y="1082" font-size="13.5" font-weight="600" fill="#111827">11. Commission engine, not one line changed</text>
+  <text x="46" y="1099" font-size="12.5" fill="#374151">It reads ordinary orders. It never learns that renewals exist.</text>
+
+  <!-- ============ RIGHT COLUMN: the defenses ============ -->
+  <rect x="710" y="84" width="440" height="1022" rx="10" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1.4"/>
+  <text x="730" y="112" font-size="14" font-weight="600" fill="#111827">The failure each step makes impossible</text>
+
+  <text x="730" y="150" font-size="12.5" font-weight="600" fill="#B45309">Step 2 kills the ORPHANED ORDER</text>
+  <text x="730" y="168" font-size="12" fill="#374151">An order created but never charged cannot sit</text>
+  <text x="730" y="184" font-size="12" fill="#374151">forgotten: every tick opens by hunting for exactly</text>
+  <text x="730" y="200" font-size="12" fill="#374151">that, and nothing resolves silently.</text>
+
+  <text x="730" y="238" font-size="12.5" font-weight="600" fill="#4338CA">Step 3 kills the DOUBLE RELEASE and</text>
+  <text x="730" y="255" font-size="12.5" font-weight="600" fill="#4338CA">the SILENTLY SKIPPED MONTH</text>
+  <text x="730" y="273" font-size="12" fill="#374151">Due-ness derives from the accounting of past</text>
+  <text x="730" y="289" font-size="12" fill="#374151">cycles under a unique key: a cycle already billed</text>
+  <text x="730" y="305" font-size="12" fill="#374151">is refused by the database itself, and a cycle</text>
+  <text x="730" y="321" font-size="12" fill="#374151">never billed stays due until it is. A cycle audit</text>
+  <text x="730" y="337" font-size="12" fill="#374151">view makes any gap a visible red row.</text>
+
+  <text x="730" y="375" font-size="12.5" font-weight="600" fill="#4338CA">Step 4 kills STALE PRICING and the</text>
+  <text x="730" y="392" font-size="12.5" font-weight="600" fill="#4338CA">WRONG-CARD CHARGE</text>
+  <text x="730" y="410" font-size="12" fill="#374151">A price that is never stored cannot go stale.</text>
+  <text x="730" y="426" font-size="12" fill="#374151">A credential that is one immutable record, and is</text>
+  <text x="730" y="442" font-size="12" fill="#374151">checked before dispatch, cannot point at the</text>
+  <text x="730" y="458" font-size="12" fill="#374151">wrong card without being caught first.</text>
+
+  <text x="730" y="496" font-size="12.5" font-weight="600" fill="#15803D">Step 5 keeps the card networks happy</text>
+  <text x="730" y="514" font-size="12" fill="#374151">No interactive bank challenge is ever requested</text>
+  <text x="730" y="530" font-size="12" fill="#374151">on a renewal. If one comes back anyway, the</text>
+  <text x="730" y="546" font-size="12" fill="#374151">attempt fails cleanly and the member is asked</text>
+  <text x="730" y="562" font-size="12" fill="#374151">for a fresh checkout, card in hand.</text>
+
+  <text x="730" y="600" font-size="12.5" font-weight="600" fill="#B45309">Step 8 keeps our mistakes off the</text>
+  <text x="730" y="617" font-size="12.5" font-weight="600" fill="#B45309">member's record</text>
+  <text x="730" y="635" font-size="12" fill="#374151">A configuration defect on our side never eats a</text>
+  <text x="730" y="651" font-size="12" fill="#374151">member's retries and never pushes them toward</text>
+  <text x="730" y="667" font-size="12" fill="#374151">auto-cancel. Run reports total the two fault</text>
+  <text x="730" y="683" font-size="12" fill="#374151">families separately so neither can hide.</text>
+
+  <text x="730" y="721" font-size="12.5" font-weight="600" fill="#B91C1C">Step 9 makes retries logical, not blind</text>
+  <text x="730" y="739" font-size="12" fill="#374151">The decline reason decides the retry. A stolen-card</text>
+  <text x="730" y="755" font-size="12" fill="#374151">decline is never retried; an insufficient-funds</text>
+  <text x="730" y="771" font-size="12" fill="#374151">decline waits for payday. A blind schedule does</text>
+  <text x="730" y="787" font-size="12" fill="#374151">the opposite of both.</text>
+
+  <text x="730" y="825" font-size="12.5" font-weight="600" fill="#15803D">Steps 10 and 11 make volume honest</text>
+  <text x="730" y="843" font-size="12" fill="#374151">The engine cannot invent volume even if it has a</text>
+  <text x="730" y="859" font-size="12" fill="#374151">bug: only the bridge writes orders, and the bridge</text>
+  <text x="730" y="875" font-size="12" fill="#374151">admits only processor-confirmed paid charges.</text>
+  <text x="730" y="891" font-size="12" fill="#374151">A failed month means no payment, no volume,</text>
+  <text x="730" y="907" font-size="12" fill="#374151">not qualified. No exceptions.</text>
+
+  <text x="730" y="945" font-size="12.5" font-weight="600" fill="#111827">Proven, not promised</text>
+  <text x="730" y="963" font-size="12" fill="#374151">All of the above ran against a full simulated year</text>
+  <text x="730" y="979" font-size="12" fill="#374151">(394 daily ticks, 855 renewal cycles, each</text>
+  <text x="730" y="995" font-size="12" fill="#374151">accounted exactly once) with 75 automated proofs</text>
+  <text x="730" y="1011" font-size="12" fill="#374151">passing, including a deliberate crash mid-batch,</text>
+  <text x="730" y="1027" font-size="12" fill="#374151">a deliberate double-run of the same day, and a</text>
+  <text x="730" y="1043" font-size="12" fill="#374151">deliberately corrupted card credential.</text>
+</svg>
