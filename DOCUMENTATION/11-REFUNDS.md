@@ -1315,6 +1315,53 @@ money and was done on an order created for the purpose.
    "showing N of M", the member code appears, and the refunded order shows its refunded
    amount.
 
+### 16.3 Deploy log: N-M1 verified_user fix, 2026-08-16
+
+Deployed by the database engineer agent through the Supabase management tool (the
+command line interface has no stored credential on this machine), gated by both
+verdict deltas of 2026-08-16: verifier `fc9de7f` PASS and quality assurance `7da7002`
+PASS, which named this deploy as its condition.
+
+**What went out.** Two functions, each with its complete import closure, mirroring
+the platform's existing file layout (`functions/<name>/index.ts` plus sibling
+`functions/_shared/` files):
+
+| Function | Version before | Version after | Files in bundle |
+|---|---|---|---|
+| `refund-payment` | 2 | 3 | `index.ts`, `_shared/edge.ts`, `_shared/staff-auth.ts`, `_shared/refund-rules.ts` |
+| `list-demo-orders` | 6 | 7 | `index.ts`, `_shared/edge.ts`, `_shared/staff-auth.ts`, `_shared/refund-rules.ts` |
+
+Both kept `verify_jwt: true`, their existing setting. The substantive change is
+finding N-M1: `StaffAuthResult` refusals now carry `verified_user` when the token's
+signature verified (expired, unknown_user, wrong_role), and `refund-payment` audits
+`auth.verified_user ?? "anonymous"` instead of a bare `"anonymous"`. The other file
+deltas (`refund-rules.ts`, `list-demo-orders/index.ts`) were confirmed by diff to be
+header-comment changes only, no behavior change.
+
+**Byte-compare: PASS, all eight files.** Every file was fetched back from the
+platform after deploy and its SHA-256 (Secure Hash Algorithm 256) hash compared
+against the repository git blob (the line-feed canonical form; the Windows working
+tree carries carriage-return line-feed endings from autocrlf, the git blobs are what
+prior deploys shipped). All eight cloud files matched the repository byte for byte:
+`index.ts` for refund-payment 37,958 bytes `13862f98...`, `staff-auth.ts` 18,126
+bytes `78a8e894...`, `refund-rules.ts` 12,792 bytes `72069420...`, `edge.ts` 29,051
+bytes `832db864...`, and list-demo-orders `index.ts` 15,514 bytes `280afc3d...`.
+
+**Live probes, all non-destructive, all passed:**
+
+| Probe | Result |
+|---|---|
+| `POST refund-payment`, no session token, Origin `https://orvanna.io` | `401 not_authorised`; audit row id 22, actor `anonymous`, code `bad_signature` (the known label defect from the deploy night; correct actor, since no signature verified) |
+| `GET list-demo-orders`, default list | `HTTP 200`, orders JSON with member codes, totals, and refund state |
+| `POST refund-payment` with a `GW-000001` member token from `demo-login` | `401 not_authorised`; audit row id 23, actor `GW-000001`, code `wrong_role` |
+
+That last row is N-M1 **proven live**: a wrong-role refusal whose audit line names
+the cryptographically verified username in the database spelling, where the old code
+discarded it as `anonymous`. The comment blocks inside the deployed files still read
+"NOT YET DEPLOYED" for N-M1; they were shipped verbatim on purpose, because editing
+them would have broken the byte-compare against the gated sources. They can be
+corrected in a follow-up commit and redeploy.
+
 ---
 
 ## 17. Decisions awaiting Howard
