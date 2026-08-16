@@ -80,7 +80,7 @@ flowchart LR
   end
 
   subgraph OURS_SERVER["Ours: Supabase project mlm-pilot"]
-    F["Edge Functions (Deno)<br/>quote-tax, create-payment,<br/>confirm-payment, payment-webhook,<br/>record-tax, list-demo-orders, demo-login"]
+    F["Edge Functions (Deno)<br/>quote-tax, create-payment,<br/>confirm-payment, payment-webhook,<br/>record-tax, list-demo-orders,<br/>demo-login, refund-payment"]
     D["Postgres 17<br/>app schema, locked<br/>seven public v_demo_ views"]
   end
 
@@ -110,7 +110,7 @@ flowchart LR
 |---|---|---|---|
 | The static site (`MLM-PILOT\www\` and `MLM-PILOT\site\`) | **Ours** | Every page a visitor sees: corporate home, shop, product pages, team page, sign-in, staff console, and the member office. | Cannot be down on its own; it is files. See GitHub Pages. |
 | GitHub Pages, public repository `howkoz/orvanna.io` | Theirs | Serves those files at https://orvanna.io with HTTPS and the custom domain. | The whole site is unreachable. Nothing else can compensate; it is the front door. |
-| Supabase Edge Functions | **Ours** (running on their platform) | The seven server programs listed in section 4. They hold every secret and do every write. | Checkout, sign-in and the live-orders list stop. Reading the corporate pages and the member office still works, because those read the database views directly. |
+| Supabase Edge Functions | **Ours** (running on their platform) | The eight server programs: `quote-tax`, `create-payment`, `confirm-payment`, `payment-webhook`, `record-tax`, `list-demo-orders`, `demo-login` and `refund-payment`. They hold every secret and do every write. *(Corrected 2026-08-16: this row and the diagram above previously said seven; `refund-payment` went live 2026-08-16 and had not been counted.)* | Checkout, sign-in, refunds and the live-orders list stop. Reading the corporate pages and the member office still works, because those read the database views directly. |
 | Supabase Postgres | **Ours** (their managed platform) | The `app` schema holds members, orders, ranks, commission runs, live demo orders, the rate-limit ledger and the sign-in accounts. Seven read-only views are the only thing the public may see. | The member office and staff lookups show nothing. Checkout also stops, because an order row is written before a payment is opened. |
 | HyperSwitch sandbox (app.hyperswitch.io, test mode) | Theirs | The payment orchestrator. It opens payments, routes them to a card connector, and serves `HyperLoader.js`, the browser widget that collects the card. | No new payment can be opened, and the shop says so. Browsing, the member office, and orders already placed are unaffected. Payments already in flight are settled later by the webhook or by the next check. |
 | Braintree sandbox | Theirs | The card connector behind HyperSwitch, and the thing that actually raises the 3-D Secure (3DS) challenge. Merchant connector `mca_eE4v07QwkYUSyF55vrUC`. | Cards decline or hang. HyperSwitch still answers our questions, and our order row never says succeeded, so nothing is ever recorded as paid that was not. |
@@ -132,7 +132,7 @@ for each row so anyone can repeat it.
 
 | Language | Runtime | Where it lives | Why it is there | How this was verified |
 |---|---|---|---|---|
-| TypeScript | Deno, inside Supabase Edge Functions | `MLM-PILOT\functions\` : seven function folders plus `_shared\edge.ts`, `_shared\pricing.ts`, `_shared\tax.ts` | This is the only place that may hold a secret. A static site cannot keep a private key, so anything needing one lives here. Types matter most where money is counted. | Read all ten TypeScript files. They call `Deno.serve` and `Deno.env.get`, and import over HTTPS from `deno.land`, which is the Deno way and not the Node way. |
+| TypeScript | Deno, inside Supabase Edge Functions | `MLM-PILOT\functions\` : eight function folders plus `_shared\edge.ts`, `_shared\pricing.ts`, `_shared\tax.ts`, `_shared\staff-auth.ts`, `_shared\refund-rules.ts` and `_shared\refund-rules.test.ts` (`_shared\` also holds one Python checker, `check_pricing_mirror.py`, counted in the Python row below). *(Corrected 2026-08-16: this cell previously said seven folders and three shared files; the refunds work of 2026-08-16 added `refund-payment` and three shared TypeScript files.)* | This is the only place that may hold a secret. A static site cannot keep a private key, so anything needing one lives here. Types matter most where money is counted. | Read the TypeScript files. They call `Deno.serve` and `Deno.env.get`, and import over HTTPS from `deno.land`, which is the Deno way and not the Node way. |
 | Plain browser JavaScript | The visitor's browser | Inline `<script>` blocks inside each page, plus two shared files: `www\js\catalog.js` and `site\js\app.js` | No framework, no compiler, no dependency tree. A page is readable as shipped, and a change is a text edit followed by a copy. | Searched the whole project for `package.json`, `node_modules`, `.jsx`, `.tsx`, `vite.config` and `webpack`. **Zero results.** No import statements or modules in the page scripts; they are ordinary scripts. |
 | HTML | The browser | `www\index.html`, `shop.html`, `product.html`, `team.html`, `login.html`, `staff.html`, and `site\index.html` | Seven pages, hand written. | Directory listing plus reading the head of each file. |
 | CSS | The browser | `www\css\corporate.css`, `shop.css`, `staff.css`, and `site\css\portal.css` | Shared visual system across pages. | Counted `<link rel="stylesheet">` tags in every page; found no inline `<style>` blocks at all. |
@@ -469,7 +469,7 @@ value that has ever appeared in a chat window is regenerated before use.
 
 | Secret name | What it is for | Read by |
 |---|---|---|
-| `HYPERSWITCH_API_KEY` | The secret key that authorizes opening and retrieving payments. | `create-payment`, `confirm-payment`, `payment-webhook` (through the shared truth function) |
+| `HYPERSWITCH_API_KEY` | The secret key that authorizes opening and retrieving payments, and issuing refunds. | `create-payment`, `confirm-payment`, `payment-webhook` (through the shared truth function), and `refund-payment` (directly, at `refund-payment\index.ts` line 596). *(Corrected 2026-08-16: `refund-payment` was missing from this row.)* |
 | `HYPERSWITCH_PUBLISHABLE_KEY` | The public key handed to the browser widget. Public by design, vaulted anyway so a key swap is one dashboard edit. | `create-payment` |
 | `HYPERSWITCH_HASH_KEY` | The key the webhook signature is checked against. | `payment-webhook` |
 | `STRIPE_SECRET_KEY` | Authorizes tax calculations and tax transaction records. | `_shared\tax.ts` (through `quote-tax` and `create-payment`) and `record-tax` |
@@ -499,7 +499,17 @@ day the rail is real.
    `www\js\payments.js`. The project's own code audit rates it the highest-leverage
    item in the project. It has not been done.
 
-2. **Some database changes are not in the repository.** The tax columns on
+2. **Some database changes are not in the repository.** *(Corrected 2026-08-16:
+   this limitation is now closed on all three counts, and the original text below
+   is kept for the record. The tax columns and the `demo_address_*` columns DO
+   appear in migration files: `015_member_tax_addresses.sql` (the five
+   `demo_address_*` columns), `016_order_tax_provenance.sql` (`tax_source`,
+   `tax_calculation_id`, `tax_reason`, `tax_jurisdiction`) and
+   `017_tax_transaction_record.sql` (`tax_transaction_id`,
+   `tax_transaction_at`), all recovered into the folder on 2026-08-15. The
+   numbering no longer skips 009 or 013: `009_rank_qualification_gate_POINTER.md`
+   records ledger entry 009, and `013_demo_orders_created_at_index.sql` was
+   written 2026-08-15.)* The original claim: the tax columns on
    `app.demo_orders` (`tax_source`, `tax_calculation_id`, `tax_reason`,
    `tax_jurisdiction`, `tax_transaction_id`, `tax_transaction_at`) and the
    `demo_address_*` columns on `app.members` are read and written by the functions but

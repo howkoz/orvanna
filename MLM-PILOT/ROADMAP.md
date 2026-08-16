@@ -141,6 +141,17 @@ asymmetry (spec-accepted), list accepts POST, list JSON raw dollars number.
 First-day scoreboard on the processor: 8+ payments, 5+ succeeded, 1 failed by
 design, $105.00 to $1,425.00 range, all via stripe_test (pretendpay idle).
 
+CORRECTION 2026-08-16: the "PHASE 6 CLOSED, BOTH GATES PASS" certification
+above is HISTORICAL, not current. Both gates genuinely passed on 2026-08-14,
+but they graded the dummy-connector rail (pretendpay_default and
+stripe_test_default, HyperSwitch's built-in simulators). That rail was replaced
+on 2026-08-15 by the Braintree sandbox connector, which changed the processor,
+the 3-D Secure (3DS) mode, the challenge presentation and the payment
+lifecycle, so the gates certify a payment rail that no longer exists. The text
+above is left standing as the record of what was true that day. The current
+rail's gate status is tracked in docs\STABILIZATION-PLAN-2026-08-16.md
+(Step 3: gate every live surface).
+
 Phase 6.2 (queued 2026-08-14, Howard: "we should apply the taxjar engine to the
 site"): REAL TAX ENGINE via HyperSwitch's Tax Processor connector (TaxJar).
 Architect-first, because it moves tax computation from our create-payment mirror
@@ -354,6 +365,10 @@ any rank above Member. Full rules: `docs\COMP-PLAN-SPEC.md` v1.3.
    line inside the demo is the AI agent marketplace.
 
 ## Next small step
+
+> SUPERSEDED 2026-08-16: this section is historical; it dates from the Phase 3
+> and Phase 4 rounds and is left standing unchanged. The LIVE next small step is
+> at the very end of this file, where the next step always lives.
 
 Phase 3 CLOSED 2026-08-13, both gates PASS (verifier: independent six-month
 recomputation matched the cloud to the cent, 0 HIGH; QA: 38 of 42 rows, 0 HIGH).
@@ -736,3 +751,36 @@ STILL OPEN across the project, none of it blocking:
 - The external 3DS path (3DSecure.io) still returns HE_00 and is parked; the
   processor's own 3-D Secure is what runs today.
 - Office landing page QA findings M2, M3 and M4 remain Howard's calls.
+
+CORRECTED 2026-08-16 (documentation truth reset, Step 0 of the stabilization
+plan). The block above is left standing as history; its first line was written
+on 2026-08-15 and went stale the same day, and it UNDERSTATED the problem. The
+current truth:
+
+- The gates DID run over the checkout work, retroactively, on 2026-08-15
+  between 14:23 and 14:43: docs\qa\FULL-AUDIT-2026-08-15.md and
+  docs\verification\FULL-AUDIT-2026-08-15.md, and BOTH returned verdict FAIL.
+  Then the Stripe Tax round (15:11 to 16:20 the same day) changed the checkout
+  again, and THAT state carries no gate of any kind.
+- The shop-to-comp bridge dry run was graded: verdict GATE: FAIL on
+  documentation grounds, with the money arithmetic passing
+  (docs\verification\BRIDGE-DRY-RUN-VERDICT.md).
+- The refunds engine passed both gates, but the staff refund screen is
+  ungraded (docs\verification\REFUNDS-VERDICT-2026-08-15.md).
+- The staff console has never had a verifier gate in its existence.
+- Key rotation SHELVED by Howard 2026-08-16: total demo site, sandbox money
+  only; revisit before any real-money milestone.
+- orvanna.ai still needs its forward to orvanna.io (unchanged).
+- The external 3DS path (3DSecure.io) still returns HE_00 and is parked
+  (unchanged).
+- Office landing QA findings M2, M3 and M4 remain Howard's calls (unchanged),
+  and finding H2 (Earnings Mix segment label contrast) is restored as OPEN in
+  DOCUMENTATION\06-QA-AND-VERIFICATION.md after being dropped from that ledger.
+
+Current plan of record: docs\STABILIZATION-PLAN-2026-08-16.md.
+
+## Next small step (updated 2026-08-16)
+
+Execute the stabilization plan, docs\STABILIZATION-PLAN-2026-08-16.md, Steps 0
+through 5 in order. Then open the subscription engine, architect-first, on the
+stable ground the plan leaves behind.

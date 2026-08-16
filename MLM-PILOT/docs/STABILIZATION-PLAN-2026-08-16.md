@@ -202,3 +202,14 @@ Step 4 runs in parallel at any point. Step 5 is the door to the subscription eng
 - `docs\qa\office-landing-QA-verdict.md`, `DOCUMENTATION\06-QA-AND-VERIFICATION.md`
 - Fresh 2026-08-16 four-track repo audit (front end, server, gates, charters) run by the
   coordinator; findings incorporated above.
+
+---
+
+## Addendum 2026-08-16: Howard's ruling on Step 1
+
+Howard's ruling, 2026-08-16: the Step 1 credential rotations are SHELVED. This is a total
+demo site and only sandbox money can move, so rotating the burned sandbox credentials buys
+no real risk reduction today. The code hygiene items of Step 1 fold into Step 2 and are
+still owed: removal of the dead raw card number fields from `www\staff.html`, and the
+staff-auth audit logging fix (finding N-M1). Revisit the rotations before any real-money
+milestone; that trigger stands.

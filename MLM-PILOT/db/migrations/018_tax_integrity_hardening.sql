@@ -1,6 +1,6 @@
--- Migration 018: PROPOSED, NOT APPLIED. Howard decides.
--- Purpose: close two gaps on app.demo_orders that the database currently does
---          not enforce, both found during the data model documentation pass of
+-- Migration 018: APPLIED 2026-08-16.
+-- Purpose: close two gaps on app.demo_orders that the database did not
+--          enforce, both found during the data model documentation pass of
 --          2026-08-15:
 --            1. tax_source is nullable, so the silent fallback that migration
 --               016 argues against is still reachable.
@@ -9,12 +9,24 @@
 -- Project: MLM Pilot (Orvanna, personal project)
 --
 -- ===========================================================================
--- STATUS: PROPOSED. NOT APPLIED TO PRODUCTION. NOT IN THE LIVE LEDGER.
+-- STATUS: APPLIED TO PRODUCTION 2026-08-16.
+-- Live ledger version 20260816000812, name tax_integrity_hardening.
 -- ===========================================================================
--- This file exists so the fix can be read and judged before it is real. It was
--- written during a documentation and recovery task whose scope explicitly
--- excluded touching production. Do not apply it by reflex; read the two
--- decisions below first, because one of them is a genuine judgement call.
+-- CORRECTION 2026-08-16 (documentation truth reset, Step 0 of
+-- docs\STABILIZATION-PLAN-2026-08-16.md): until today this file was named
+-- 018_PROPOSED_tax_integrity_hardening.sql and this banner read, in capitals,
+-- "STATUS: PROPOSED. NOT APPLIED TO PRODUCTION. NOT IN THE LIVE LEDGER."
+-- Both statements were the opposite of the truth: the migration was applied to
+-- production on 2026-08-16 as ledger version 20260816000812. The filename and
+-- header were corrected the same day (finding N-M3 in
+-- DOCUMENTATION\06-QA-AND-VERIFICATION.md section 4.1b). The drafting history
+-- below is preserved unchanged because it explains the judgement call that was
+-- made.
+--
+-- This file was originally written so the fix could be read and judged before
+-- it was real. It was written during a documentation and recovery task whose
+-- scope explicitly excluded touching production. The two decisions below were
+-- read before applying; option (a), default 'flat_fallback', is what shipped.
 --
 -- PRE-FLIGHT, ALREADY CHECKED AGAINST LIVE DATA (read-only) 2026-08-15:
 --   117 demo orders exist.

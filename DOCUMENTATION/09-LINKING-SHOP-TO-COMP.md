@@ -505,6 +505,17 @@ Plain paths:
 the dry run against that exact file, and changing it underneath them would invalidate their
 work. Everything the two answered decisions required is layered on top in 020 and 021.
 
+> **CORRECTION 2026-08-16.** The paragraph above was true when written and is now false in
+> both of its claims. The verifier's recomputation FINISHED on 2026-08-15 (verdict in
+> section 9.5), and 019 WAS edited after grading, to carry the corrections that verdict
+> forced (see the "Fixed" column of the section 9.5 table: P8's recovery procedure, the
+> timezone pin, the reset-script procedure, the idempotency guard, among others). The
+> Secure Hash Algorithm 256-bit (SHA-256) fingerprints prove the edit: the graded file was
+> `ce919b36...` (recorded in `docs\verification\BRIDGE-DRY-RUN-VERDICT.md`), the file on
+> disk today hashes to `cf8c9f15...` (measured 2026-08-16). The file remains UNAPPLIED, so
+> nothing production-side is affected; but anyone re-running the verifier's queries must
+> know they will be grading a newer file than the verdict did.
+
 ---
 
 ## 8. The dry run: what today's real sales would actually pay
@@ -825,6 +836,11 @@ belongs in the artifact next to the number.** That is why Queries 3b and 3c now 
 times in `DOCUMENTATION\02-DATA-MODEL.md`, the database engineer's document, at lines 375,
 422, 856, 894 and 907. The live count is 117, confirmed directly. That document has its own
 owner and I have not edited it; it is flagged here so the right person corrects it.
+
+> **RESOLVED 2026-08-16.** The paragraph above did its job and is now itself out of date:
+> `02-DATA-MODEL.md` was corrected and today contains zero occurrences of the 115 figure
+> (checked by search on 2026-08-16). It reads 117 where it counts orders. The flag is kept
+> as the record of the handoff working.
 
 ---
 

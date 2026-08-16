@@ -464,11 +464,20 @@ events; whether our connector sends them is unverified.** The design does not de
 webhook and treats it as a bonus.
 
 **And this is not theoretical, because we already run a webhook that would swallow them.**
-See section 13.
+See section 14 (corrected 2026-08-16: previously said section 13).
 
 ---
 
 ## 5. What has been written
+
+> **CORRECTION 2026-08-16.** This section is preserved as PRE-APPLY HISTORY and
+> its opening sentence is no longer true: everything below has since been
+> applied and deployed. The current truth is the status table in this
+> document's header. One filename below has also changed: the migration shipped
+> as `022_refunds.sql`; the name `022_PROPOSED_refunds_NOT_APPLIED.sql` cited
+> in the table and the plain paths no longer exists on disk. The section is
+> left standing because it records what was written and why, before any of it
+> was real.
 
 Nothing below is applied and nothing is deployed.
 
@@ -1015,7 +1024,9 @@ Recorded rather than fixed, and none blocks the refund path.
    `app.demo_orders`, so the same class of problem applies to any future truncate of the demo
    order tables. Same fix, same place.
 3. **No reconciliation sweep for stuck refunds.** A refund left at `pending` or `requested` is
-   only settled when somebody revisits that order, or by the webhook patch in section 13. The
+   only settled when somebody revisits that order, or by the webhook patch in section 14
+   (corrected 2026-08-16: this previously pointed at section 13, which is the tax reversal
+   section; the webhook patch is section 14). The
    index `demo_order_refunds_unsettled_idx` exists so such a sweep is a one-query job, and
    `POST /refunds/list` (section 4.3) is the right tool for it.
 4. **The refunded state is not on any public view.** The anon surface is unchanged by
@@ -1263,6 +1274,11 @@ money and was done on an order created for the purpose.
 2. **Deploy `refund-payment` with platform JWT verification disabled**, exactly as
    `payment-webhook` is deployed, because the Authorization header carries our staff token
    rather than the platform key. Deploy `_shared/staff-auth.ts` alongside it.
+   *(STALE INSTRUCTION, corrected 2026-08-16: this is NOT what happened, and it should not
+   be followed on a redeploy. The function was deployed WITH `verify_jwt: true`, because the
+   staff token travels in `x-orvanna-session` rather than `Authorization`, so the two never
+   collide. See the marked table above this list and the deploy box at the top of the
+   document. The wording is kept because this list is the original specification.)*
 3. **Re-run the rule tests against the deployed code**, so the module that shipped is the
    module that was proven: `node --experimental-strip-types functions/_shared/refund-rules.test.ts`.
    Expect 19 of 19.
@@ -1339,8 +1355,8 @@ earnings only; (c) recoverable as a debt.
 needs no negative balance concept, and (c) is a promise the system cannot currently keep.
 
 **D5. Patch `payment-webhook` to handle refund events, or leave it?**
-*Options:* (a) patch it as specified in section 13; (b) leave it and rely on a staff member
-revisiting the order.
+*Options:* (a) patch it as specified in section 14 (corrected 2026-08-16: previously said
+section 13); (b) leave it and rely on a staff member revisiting the order.
 **Recommendation: (a), as a small separate task after the refund path is verified.**
 
 **D6. Should partial refunds follow, and when?**

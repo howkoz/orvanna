@@ -666,7 +666,7 @@ remaining deliberate differences are listed in section 8.
 | `20260815182513` | `015_member_tax_addresses` | Added the five `demo_address_*` columns to `app.members`, defaulted everyone to a house address so tax can never silently become zero, and set three teaching accounts to real California, Florida and New York postal codes. | `015_member_tax_addresses.sql`, recovered verbatim 2026-08-15 |
 | `20260815190816` | `016_order_tax_provenance` | Added `tax_source`, `tax_calculation_id`, `tax_reason`, `tax_jurisdiction`, back-filled existing rows to `flat_mirror_5pct`, and added the `tax_source` check constraint and column comments. | `016_order_tax_provenance.sql`, recovered 2026-08-15 with one added existence check around the `add constraint` so a rebuild is re-runnable |
 | `20260815191928` | `017_tax_transaction_record` | Added `tax_transaction_id` and `tax_transaction_at` plus the partial index the recorder job reads, so a completed sale is booked for reporting and not only quoted. | `017_tax_transaction_record.sql`, recovered verbatim 2026-08-15 |
-| not applied | `018_PROPOSED_tax_integrity_hardening.sql` | **Proposed, not applied, not in the ledger.** Makes `tax_source` NOT NULL with a default, and adds a check tying `total_cents` to the sum of its four parts. Addresses risks 3 and 4 in section 13. Howard decides. | `018_PROPOSED_tax_integrity_hardening.sql`, drafted 2026-08-15 |
+| `20260816000812` | `tax_integrity_hardening` | **APPLIED 2026-08-16.** Makes `tax_source` NOT NULL defaulting to `flat_fallback`, and adds the check tying `total_cents` to the sum of its four parts. Closes risks 3 and 4 in section 13. *(Corrected 2026-08-16: this row previously read "Proposed, not applied, not in the ledger... Howard decides", which had become the opposite of the truth.)* | `018_tax_integrity_hardening.sql`, drafted 2026-08-15, applied and renamed from `018_PROPOSED_tax_integrity_hardening.sql` on 2026-08-16 |
 
 ---
 
@@ -674,8 +674,10 @@ remaining deliberate differences are listed in section 8.
 
 Migrations 001 through 007 from `db\migrations\`, then
 `db\comp\001_comp_engine.sql`, then the data loaders, then the runs, then
-migrations 010 through 017. Migration 018 is not in the run order until it is
-approved.
+migrations 010 through 018. *(Corrected 2026-08-16: this sentence previously
+ended at 017 and said "Migration 018 is not in the run order until it is
+approved". 018 was applied to production on 2026-08-16, ledger version
+`20260816000812`, and is now part of the run order.)*
 
 After the 2026-08-15 recovery, a rebuild from the repository reproduces the live
 schema, with three deliberate and recorded differences:
@@ -690,6 +692,9 @@ schema, with three deliberate and recorded differences:
    `demo_orders_created_at_desc_idx`, because migration 013's file was written
    to do what its ledger entry claims rather than to reproduce a no-op.
 3. **Migration 018 exists in the repository and not in production**, on purpose.
+   *(Corrected 2026-08-16: no longer true. 018 was applied to production on
+   2026-08-16, ledger version `20260816000812`, so this difference is closed and
+   the repository and production agree on it.)*
 
 All three are listed in `db\README.md` under "Known differences between this
 repository and production".
@@ -890,27 +895,26 @@ changed; this document only records it.
    still disagree there until Howard decides. Worth knowing before deciding: an
    ascending b-tree can be scanned backwards, so the practical gain is small.
 
-3. **OPEN, with a proposed fix drafted. `tax_source` is nullable and its check
-   constraint explicitly permits null.** The whole argument for the column,
-   written into migration 016 itself, is that a fallback must never be silent. A
-   nullable column with a null-permitting check leaves the silent case
-   reachable. Today the Edge Function always supplies a value and zero of the
-   117 live rows are null, but that is a habit of the code, not a guarantee of
-   the database. `018_PROPOSED_tax_integrity_hardening.sql` makes it `not null`
-   with a default and is **not applied**. It contains one genuine judgement
-   call, about whether the default should be `flat_fallback` or a new
-   `unspecified` value, which is written up in the file for Howard to settle.
+3. **CLOSED 2026-08-16.** *(Corrected 2026-08-16: this risk previously read
+   "OPEN, with a proposed fix drafted ... not applied". Migration 018 was
+   applied to production on 2026-08-16, ledger version `20260816000812`.)*
+   The original risk, kept for the record: `tax_source` was nullable and its
+   check constraint explicitly permitted null, while the whole argument for the
+   column, written into migration 016 itself, is that a fallback must never be
+   silent. `018_tax_integrity_hardening.sql` now makes it `not null` with the
+   default `flat_fallback`, the option the file argues for as the weakest
+   claim a forgotten value can make.
 
-4. **OPEN, with a proposed fix drafted. Nothing enforces that `total_cents`
-   equals its parts.** There is no check constraint tying `total_cents` to
+4. **CLOSED 2026-08-16.** *(Corrected 2026-08-16: this risk previously read
+   "OPEN, with a proposed fix drafted ... not applied". Migration 018 was
+   applied to production on 2026-08-16, ledger version `20260816000812`, and
+   the check constraint is live.)* The original risk, kept for the record:
+   nothing enforced that `total_cents` equals
    `subtotal_one_cents + subtotal_sub_cents + activation_fee_cents + tax_cents`.
-   The function recomputes rather than adjusts, which is the right instinct, but
-   a single arithmetic slip in a future edit would be stored without complaint,
-   and `total_cents` is the figure the payment is actually opened for. The
-   constraint is in migration 018, **not applied**. Pre-flight already run
-   read-only against live data: all 117 rows satisfy it today, so it would
-   validate without a failing row. Re-run that count immediately before
-   applying, because the table grows on its own.
+   The function recomputes rather than adjusts, which is the right instinct,
+   but a single arithmetic slip in a future edit would have been stored without
+   complaint, and `total_cents` is the figure the payment is actually opened
+   for. The database now refuses such a row on write.
 
 5. **`items` is unvalidated `jsonb`.** Nothing in the database requires the
    array shape the code writes. If the pricing code changes shape, old and new

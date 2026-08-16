@@ -6,6 +6,15 @@ Written by the two graders themselves: `mlm-verifier` (correctness) and `mlm-qa`
 (completeness). Neither of us built any of the product described here. That is the
 whole point of us.
 
+> **CORRECTION 2026-08-16.** The attribution above overclaims. This document
+> compiles work from more hands than the two graders: of the six audits of
+> 2026-08-15 that section 4.1 summarises, `DB-AUDIT-2026-08-15.md` was written
+> by `mlm-db-engineer`, `COPY-AUDIT-2026-08-15.md` by `orvanna-writer`, and
+> `ARCHITECTURE-AUDIT-2026-08-15.md` by `mlm-architect`, none of whom is a
+> grader, and the first and third of whom BUILT parts of the product they
+> audited. The section 4.1 source table has always attributed each audit
+> correctly; this banner corrects the opening sentence that did not.
+
 State of the record: **end of 2026-08-15, carried into the small hours of
 2026-08-16.** Section 0 is the two-minute version.
 
@@ -205,6 +214,7 @@ document is a missing gate, not an implied pass.**
 | Office landing (retroactive gate on live code) | Rebuilt member portal home | not gated | **FAIL** (2 HIGH contrast, 5 MEDIUM, 4 LOW) | 2026-08-14 | **No. Failed, and shipped anyway by Howard's own explicit ruling that no rollback was warranted.** |
 | Full audit sweep, six areas | Everything, treated as unreviewed | **FAIL** (4 HIGH, 9 MEDIUM, 6 LOW) | **FAIL** (2 HIGH, 8 MEDIUM, 8 LOW) | 2026-08-15 | **No. Both gates failed.** |
 | Stripe Tax (quote-tax, record-tax, migrations 015 to 017) | Real destination-based tax on the live checkout | **no document exists** | **no document exists** | 2026-08-15 | **No gate of any kind has ever been run on this.** |
+| Shop-to-comp bridge dry run (migration 019 design, unapplied) | Whether today's real shop orders would pay correct commissions through the designed bridge | **GATE: FAIL** (documentation findings: 2 HIGH narrative errors, the money arithmetic itself PASSED and reconciled to the cent) | **no QA gate has been run** | 2026-08-15 | **No. Verifier gate only, and it failed on documentation grounds.** Verdict: `MLM-PILOT\docs\verification\BRIDGE-DRY-RUN-VERDICT.md`. *(Row added 2026-08-16: this gate had been omitted from the table entirely.)* |
 | Refunds (migrations 018, 022, 023; `refund-payment`; `list-demo-orders` v6) | The refund engine and the one live refund | **PASS** (0 HIGH on the engine) | **CONDITIONAL PASS** (endpoint complete; the screen ungraded) | 2026-08-16 | **Partly. The endpoint closes. The staff screen has never been graded, and this gate raised one HIGH on the checkout.** |
 | Four new pages: Conductor Library index, per-agent detail, compensation brochure, FAQ, Conductor explainer | New public surface, new vocabulary | **no document exists** | **no document exists** | 2026-08-15 | **No gate of any kind has been run on any of them.** |
 
@@ -304,6 +314,10 @@ Every finding raised by a gate or an audit, its severity, and its status as of
 2026-08-15. Statuses marked **verified** were re-checked directly in the working
 tree while writing this document. Statuses marked *not re-verified* are reported as
 the audit left them, and should be treated as unknown rather than as closed.
+Definition added 2026-08-16: throughout this ledger, "FIXED, verified" means the
+builder or this document's author re-checked the fix themselves; it counts as
+GATE evidence only where a dated verdict file under `docs\qa\` or
+`docs\verification\` is cited on the row.
 
 ### 4.1 The audit of 2026-08-15, six areas
 
@@ -383,7 +397,7 @@ across every page and both themes. 9,690 passed.
 | # | Severity | Finding | Status |
 |---|---|---|---|
 | Q-H1 | HIGH | Shop primary buttons are unreadable while disabled: computed **1.70 to 1** against a 4.5 to 1 floor. Reproduced live on the checkout button and on the pay button during every payment open. | **FIXED, verified.** Commit `f7329f1` replaced the fade with a real disabled treatment. |
-| Q-H2 | HIGH | Portal light theme: the QUALIFIED and NOT QUALIFIED signal fails, five instances, 3.28 to 1 and 4.12 to 1. The single most important status in the member office. | **FIXED, verified.** The colour tokens were restated and re-measured at 6.72 to 1 and 5.53 to 1. |
+| Q-H2 | HIGH | Portal light theme: the QUALIFIED and NOT QUALIFIED signal fails, five instances, 3.28 to 1 and 4.12 to 1. The single most important status in the member office. | **FIXED, builder-reported.** The colour tokens were restated and the re-measurements of 6.72 to 1 and 5.53 to 1 were reported by the builder. *(Corrected 2026-08-16: this row previously said "verified", but no gate artifact records those two numbers; they are builder-reported and have not been independently re-measured.)* |
 | Q-M1 | MEDIUM | The shop tells the shopper "any values continue, including empty fields" directly beneath a real payment button. False on a live rail. | **FIXED, verified.** Zero occurrences of the phrase across `www\`, `site\` and `deploy\dist\`. |
 | Q-M2 | MEDIUM | "Express options place the order in one step." All three express buttons are disabled and place nothing. | **FIXED, verified.** Zero occurrences of the phrase anywhere in the shipped tree. |
 | Q-M3 | MEDIUM | The disabled express buttons look identical to the working one. No disabled rule exists for them at all. A shopper taps Apple Pay and gets silence. | **OPEN.** The sentence was removed, the visual treatment was not re-measured by this pass. Treat as unknown, not closed. |
@@ -481,7 +495,7 @@ never been graded, and the gate found one HIGH on the checkout while looking.
 | 4 | 1 FAIL at MEDIUM out of 36 rows | Not re-verified. |
 | 5 | 0 HIGH; 1 MEDIUM, an authoring comment naming Howard in the catalog file | **That specific comment was fixed. The same defect class then recurred at roughly ten times the volume** and is now finding V-M7 and W-H7. |
 | 6 | 0 HIGH; both MEDIUMs fixed and re-verified in the same session; a backlog of 6 items banked | Backlog **OPEN**: inert card fields present pre-mount, thin pre-mount framing, the rate-limiter race, an accepted asymmetry, a list endpoint that accepts the wrong method, and raw dollar figures in a response. |
-| Office landing | 2 HIGH contrast, 5 MEDIUM, 4 LOW. **Verdict FAIL.** | H1 was fixed. **M2, M3 and M4 remain open by Howard's own call.** M5, the PV versus SV naming split, is still live on the shop. |
+| Office landing | 2 HIGH contrast, 5 MEDIUM, 4 LOW. **Verdict FAIL.** | H1 was fixed. **H2 is OPEN: the Earnings Mix segment labels fail contrast in both themes, 2.98 to 1 (white on the level 3 indigo, dark theme) and 4.00 to 1 (light theme), against the 4.5 to 1 floor; `site\css\portal.css` lines 770 to 776.** *(Restored 2026-08-16: H2 had been silently dropped from this ledger; no fix for it is recorded anywhere, so it is OPEN. Source: `MLM-PILOT\docs\qa\office-landing-QA-verdict.md` finding H2.)* **M2, M3 and M4 remain open by Howard's own call.** M5, the PV versus SV naming split, is still live on the shop. |
 
 ### 4.3 The honest summary of the ledger
 
