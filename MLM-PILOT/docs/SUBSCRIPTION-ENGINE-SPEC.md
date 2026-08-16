@@ -1073,3 +1073,23 @@ outcome, because the simulated processor and the real rail feed the same
 pipeline at the same step. And nothing touches the six finalized months: the
 engine creates future demo-order rows only, and every guard that already
 protects history keeps protecting it.
+
+---
+
+## Addendum: Howard's rulings on the open questions, 2026-08-16 evening
+
+All nine open questions were put to Howard the same evening the specification was
+written. Rulings, recorded verbatim by the coordinator:
+
+- OQ1 (multi-month volume spread): CONFIRMED, spread across covered months. A quarterly
+  billing of a 100 Personal Volume product places 100 in each covered month.
+- OQ3 (billing days 29 to 31): RULED, allow through the 28th only; anchors that would
+  land on the 29th to 31st normalize to the 28th, disclosed at signup.
+- OQ2, OQ4, OQ5, OQ6, OQ7, OQ8, OQ9: recommended defaults ACCEPTED as written (pause
+  resets the unpaid counter; the double-billing transition rule stands; the bridge
+  spread amendment proceeds with OQ1; reactivation re-anchors; the month-end checkpoint
+  stands; simulations run in a reset environment and never production; a price change
+  bills at the next renewal, notification is a Phase S3 rule if wanted).
+
+Phase S1 is cleared to build. Per the standing rule, nothing applies to the cloud
+project until both gates pass on the exact artifacts.
