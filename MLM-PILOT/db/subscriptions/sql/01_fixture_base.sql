@@ -41,6 +41,23 @@ from (values
     ('GW-9004', 'Dana Proof',   'dana@example.com'),     -- FM5 corrupted credential
     ('GW-9005', 'Fred Proof',   'fred@example.com'),     -- FM4 day-31 anchor
     ('GW-9006', 'Hank Proof',   'hank@example.com'),     -- FM3 price change
+    -- The fix-round cast (gate verdicts of 2026-08-16): every member action
+    -- and both missing frequencies, driven inside the scripted year.
+    ('GW-9007', 'Oscar Proof',  'oscar@example.com'),    -- bi-monthly (QA M2)
+    ('GW-9008', 'Sara Proof',   'sara@example.com'),     -- semi-annual (QA M2)
+    ('GW-9009', 'Nora Proof',   'nora@example.com'),     -- frequency change (verifier M2)
+    ('GW-9010', 'Paula Proof',  'paula@example.com'),    -- billing-day change, OQ4 letter (verifier M1)
+    ('GW-9011', 'Pete Proof',   'pete@example.com'),     -- pause mid-ladder, the H1 case (T10)
+    ('GW-9012', 'Quinn Proof',  'quinn@example.com'),    -- pause during dunning, clock freeze (T10a)
+    ('GW-9013', 'Rita Proof',   'rita@example.com'),     -- pause from active + early-resume refusal (T5)
+    ('GW-9014', 'Sam Proof',    'sam@example.com'),      -- early resume, allowed path (T19)
+    ('GW-9015', 'Tina Proof',   'tina@example.com'),     -- cancel during dunning (T15)
+    ('GW-9016', 'Uma Proof',    'uma@example.com'),      -- decline 2017, cancel this subscription (T4)
+    ('GW-9017', 'Vic Proof',    'vic@example.com'),      -- decline 2018, cancel EVERY subscription
+    ('GW-9018', 'Walt Proof',   'walt@example.com'),     -- day-28 zero-ladder + reactivation from suspended (T21)
+    ('GW-9019', 'Xena Proof',   'xena@example.com'),     -- hard decline + reactivation from card_update_required (T16)
+    ('GW-9020', 'Yves Proof',   'yves@example.com'),     -- hard decline, no action: T17 then auto-cancel
+    ('GW-9021', 'Zoe Proof',    'zoe@example.com'),      -- corrupted credential, then cancels: void_cancelled (verifier L1)
     ('GW-9101', 'Legacy One',   'legacy.one@example.com'),
     ('GW-9102', 'Legacy Two',   'legacy.two@example.com'),
     ('GW-9103', 'Legacy Three', 'legacy.three@example.com')

@@ -31,12 +31,20 @@ artifacts.
    the outcome scripts that are the whole year's scripted adversity.
 4. Drives the simulated year 2026-09-01 through 2027-09-30 (394 daily ticks,
    one day deliberately skipped), interposing the crash lever, the catalog
-   price change, and the skipped day exactly where an operator would stand.
+   price change, the skipped day, AND (since the 2026-08-16 fix round) the
+   full member-action year at its scripted dates: pause mid-ladder, pause
+   from dunning, pause from active, an early-resume refusal and an allowed
+   early resume, cancel during dunning, a cancel that voids system-fault
+   periods, the 2017 and 2018 cancellation lanes, the day-28 zero-ladder
+   case, reactivations from suspended and from card_update_required, the
+   OQ4 billing-day transition, and a sanctioned frequency change.
 5. Runs September..December 2026 through the UNMODIFIED compensation engine,
    then the proof battery (`sql\30_proof_battery.sql`), where every proof
-   prints PASS or FAIL with its key numbers.
+   prints PASS or FAIL with its key numbers: 65 battery rows as of the fix
+   round.
 6. Writes the full transcript to `proof_output\transcript-<stamp>.txt` and
-   exits nonzero on any FAIL or SQL error.
+   exits nonzero on any FAIL or SQL error. A full run takes roughly 40
+   seconds wall time (about 20 seconds of SQL plus container start-up).
 
 Flags: `--keep` leaves the container up for inspection
 (`docker exec -it mlm-s1-proof psql -U postgres -d mlm`); `--port N` changes
@@ -62,6 +70,10 @@ charter's local-proof discipline made literal.
 | W-A*, W-B*, W-C* | The spec section 11 worked examples, to the cent, through the real bridge and the real comp engine |
 | S1..S2 | The 6.1 evolution backfill and the engine-epoch guard |
 | G1..G8 | The section 14 invariants (R2 structural, ladder discipline, rule C1, promo hook identity, MIT invariant, fault-family separation, clock continuity) |
+| FQ1..FQ4 | Bi-monthly and semi-annual billing, coverage and spread (QA M2, verifier M5) |
+| MA1..MA13 | The member-action year: every pause lane including T10a's frozen clock (spec v1.1 12.3 micro-example), resume paths, cancels, the 2017/2018 lanes, day-28 truncation, both reactivations (verifier H1 scenarios, QA M3) |
+| MG1..MG6 | The OQ4 transition rule to the letter (spec v1.1 erratum E3) and the schedule-column guard refusing raw frequency and anchor updates (verifier M1, M2) |
+| GX1..GX4 | Coverage never doubles; supersession hygiene; the outcome vocabulary fully alive (skipped_paused and void_cancelled both written, verifier L1) |
 
 The recorded proof run lives at
 `MLM-PILOT\docs\verification\S1-PROOF-RUN-2026-08-16.md`.

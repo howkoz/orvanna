@@ -44,7 +44,9 @@
 -- month, to a monthly member, which is the property the plan's per-month
 -- thresholds require (worked example C, spec section 11).
 --
--- WHAT CHANGES IN THE FUNCTION BODY, precisely two things:
+-- WHAT CHANGES IN THE FUNCTION BODY, precisely three things (the third was
+-- added in the 2026-08-16 fix round for spec v1.1 erratum E3; the file was
+-- still unapplied everywhere, so the coordinator ruled the fix lands here):
 --   1. The slicing rule in step 1 reads the per-line covered_months field
 --      (written by the renewal engine, migration 026): n_slices =
 --        mode 'one'  -> 10 (policy P4, unchanged)
@@ -55,6 +57,12 @@
 --   2. The line insert divides price and PV by n_slices for 'sub' lines the
 --      same way it always did for 'one' lines (the arithmetic was already
 --      per-slice; only the slice count was mode-hardcoded).
+--   3. Every slice's volume month shifts by the per-line
+--      covered_month_offset (default 0): the OQ4 transition charge bills in
+--      the change month but covers the NEXT UNCOVERED month (v1.1 12.1
+--      sentence 1), so its volume must land in the covered months to keep
+--      PV equals dollars true per calendar month. Zero for every shop line
+--      and every unbroken-schedule engine line, so nothing else moves.
 --
 -- RUN ORDER: after 026 (the engine that writes covered_months), before the
 -- first tick that bills a multi-month frequency.
@@ -103,7 +111,17 @@ begin
                (it.value ->> 'unit_price')::numeric     as line_price,
                (it.value ->> 'unit_pv')::numeric        as line_pv,
                coalesce((it.value ->> 'covered_months')::int, 1)
-                                                        as covered_months
+                                                        as covered_months,
+               -- Fix round (spec v1.1 erratum E3): a day-change TRANSITION
+               -- charge bills in the change month and covers the NEXT
+               -- UNCOVERED month, so its volume must book to the covered
+               -- months, not the billing month. The engine stamps the
+               -- per-line covered_month_offset (months from the creation
+               -- month to the first covered month; zero on an unbroken
+               -- schedule, so every shop line and every pre-fix engine line
+               -- behaves exactly as before) and every slice shifts by it.
+               coalesce((it.value ->> 'covered_month_offset')::int, 0)
+                                                        as covered_month_offset
         from app.demo_orders d
         cross join lateral jsonb_array_elements(d.items) it
         where d.payment_status = v_state_gate            -- POLICY P1
@@ -130,7 +148,7 @@ begin
            -- month and later slices in the following covered months, exactly
            -- worked example C.
            ((date_trunc('month', sl.created_at at time zone 'UTC')::date)
-              + (gs.n * interval '1 month'))::date          as volume_month,
+              + ((sl.covered_month_offset + gs.n) * interval '1 month'))::date as volume_month,
            sl.shop_sku,
            sl.billing_mode,
            sl.quantity,

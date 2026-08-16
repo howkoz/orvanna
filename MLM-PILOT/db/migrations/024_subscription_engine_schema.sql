@@ -63,6 +63,45 @@
 --       (spec 12.5, failure mode FM4) handles them; that defensive path is
 --       exactly what proof D exercises with a day-31 anchor.
 --
+-- FIX ROUND OF 2026-08-16 (spec v1.1, verifier verdict S1-VERDICT-2026-08-16,
+-- QA verdict S1-QA-2026-08-16; nothing applied anywhere, so per the
+-- coordinator's explicit ruling the fixes land IN this file before first
+-- apply; the edit window closes at cloud apply):
+--   F1 (verifier H1/L2). SUPERSESSION HYGIENE, structural: when a successor
+--       attempt row is written for a renewal period, every earlier attempt's
+--       next_action pointer is cleared to 'superseded' by trigger, so no
+--       stale 'retry' pointer can ever mislead a later consumer. This is the
+--       root cause of the pause crash the verifier probed (fn_sub_pause
+--       iterated stale pointers and collided on the attempt key), fixed
+--       where the staleness is BORN, not where it happened to hurt.
+--   F2 (verifier M2). frequency_months and billing_anchor_date are GUARDED:
+--       a raw UPDATE re-derives the whole schedule and mints duplicate
+--       charges for already-covered months (the verifier's probe: four
+--       duplicates). Changes are only accepted from the sanctioned
+--       schedule-change functions (migration 026), which set the session
+--       flag orvanna.subscription_schedule_change around their own writes
+--       after computing rebase semantics that respect covered months.
+--   F3 (spec v1.1 erratum E2, verifier M3). The dunning-to-paused lane T10a
+--       exists in the transition guard; its clock-freeze semantics live in
+--       the engine's auto-cancel derivation (026).
+--   F4 (spec v1.1 errata E2/E3). app.subscription_events gains the REBASE
+--       columns (rebase_anchor_date, rebase_covered_month_first) and the
+--       'frequency_change' event type: every schedule-shaping action (pause,
+--       billing-day change, frequency change, reactivation) RESOLVES ITS
+--       CONSEQUENCE INTO DATA at event time (the migration 021 principle):
+--       the first re-based cycle's billing date and first covered month are
+--       computed once, stored on the event, and every later derivation is a
+--       pure replay. The old shift_months arithmetic is superseded by this
+--       one mechanism.
+--   F5 (verifier L1). The outcome vocabulary is now fully WRITTEN, not
+--       partly dead: 'skipped_paused' rows are materialised for paused
+--       months (spec v1.1 12.2/12.3 keep them explicitly, including the T10a
+--       micro-example), and 'void_cancelled' marks a cancelled-while-open
+--       period that carries NO member-fault decline (a cancellation
+--       unrelated to payment failure), while 12.4's letter keeps
+--       payment-failed periods 'unpaid'.
+--   F6 (verifier L3). Same-state self-transitions: documented at the guard.
+--
 -- RUN ORDER: after 001 through 023 (023 exists as a pointer; its refund guard
 -- is not a dependency). Before 025, 026, 027.
 -- =============================================================================
@@ -149,6 +188,52 @@ comment on column app.subscriptions.state is
     'trigger subscriptions_state_transition_guard; nothing returns to active '
     'except a processor-confirmed succeeded payment.';
 
+-- -----------------------------------------------------------------------------
+-- 1b. THE SCHEDULE-CHANGE GUARD (fix round F2, verifier M2)
+--
+--     A raw UPDATE of frequency_months or billing_anchor_date re-derives the
+--     entire schedule and mints duplicate charges for months an earlier
+--     billing already covered: the verifier probed exactly that (a quarterly
+--     switched to monthly by hand produced four duplicate charges on the
+--     next tick, 500.00 Sales Volume in a 100.00 month). The FM1 key is per
+--     (subscription_id, renewal_index) and cannot stop a re-derivation, so
+--     the guard sits on the COLUMNS: they change only through the sanctioned
+--     schedule-change functions (app.fn_sub_change_frequency and
+--     app.fn_sub_reactivate_sim in migration 026), which compute rebase
+--     semantics that respect covered months and set the session flag
+--     orvanna.subscription_schedule_change = '1' strictly around their own
+--     write. billing_day is deliberately NOT guarded here: under the rebase
+--     derivation the month progression of every future cycle is fixed by
+--     the latest rebase anchor, so a raw day edit can move a date within
+--     its month but can never duplicate or skip a covered month; the
+--     sanctioned path for it (fn_sub_change_billing_day) exists for the
+--     OQ4 transition-charge semantics, not for safety.
+-- -----------------------------------------------------------------------------
+create or replace function app.subscriptions_guard_schedule_columns()
+returns trigger
+language plpgsql
+as $$
+begin
+    if (new.frequency_months    is distinct from old.frequency_months
+        or new.billing_anchor_date is distinct from old.billing_anchor_date)
+       and coalesce(current_setting('orvanna.subscription_schedule_change', true), '') <> '1'
+    then
+        raise exception
+            'subscription % schedule columns (frequency_months, billing_anchor_date) may only change '
+            'through the sanctioned schedule-change functions; a raw update re-derives covered history '
+            'and mints duplicate charges (verifier finding M2)',
+            old.id;
+    end if;
+    return new;
+end;
+$$;
+
+drop trigger if exists subscriptions_schedule_columns_guard on app.subscriptions;
+create trigger subscriptions_schedule_columns_guard
+    before update of frequency_months, billing_anchor_date on app.subscriptions
+    for each row
+    execute function app.subscriptions_guard_schedule_columns();
+
 -- No next_billing_date column, DELIBERATELY (spec 6.1, the E16 footgun rule):
 -- the next billing date is a lens (app.v_subscription_next_billing, migration
 -- 026), never a store an operator could forget to update.
@@ -174,13 +259,19 @@ language plpgsql
 as $$
 begin
     if new.state = old.state then
-        return new;  -- idempotent repeat, including T1's active self-transition
+        -- Same-state repeats are allowed for EVERY state, by design (fix
+        -- round F6, verifier L3): T1 (active to active) is the spec's one
+        -- RECORDED no-op, and the other six self-pairs exist so idempotent
+        -- re-application of an action (a second cancel click, a replayed
+        -- event) is harmless rather than an error. The event stream, not
+        -- this guard, is what distinguishes a recorded no-op from silence.
+        return new;
     end if;
 
     if not (
         (old.state = 'active'      and new.state in ('past_due', 'card_update_required', 'cancelled', 'paused'))            -- T2 T3 T4 T5
      or (old.state = 'past_due'    and new.state in ('active', 'dunning', 'card_update_required', 'paused', 'cancelled'))   -- T6 T8 T9 T10 T11
-     or (old.state = 'dunning'     and new.state in ('active', 'card_update_required', 'suspended', 'cancelled'))           -- T12 T13 T14 T15
+     or (old.state = 'dunning'     and new.state in ('active', 'card_update_required', 'suspended', 'paused', 'cancelled')) -- T12 T13 T14 T10a T15 (T10a added by spec v1.1 erratum E2)
      or (old.state = 'card_update_required' and new.state in ('active', 'suspended', 'cancelled'))                          -- T16 T17 T18
      or (old.state = 'paused'      and new.state in ('active', 'cancelled'))                                                -- T19 T20
      or (old.state = 'suspended'   and new.state in ('active', 'cancelled'))                                                -- T21 T22
@@ -326,7 +417,8 @@ create table if not exists app.subscription_events (
     subscription_id               bigint not null references app.subscriptions (id),
     event_type                    text not null check (event_type in
                                     ('created', 'state_change', 'billing_day_change',
-                                     'pause', 'resume', 'cancel_request', 'reactivation')),
+                                     'pause', 'resume', 'cancel_request', 'reactivation',
+                                     'frequency_change')),   -- added in the fix round (F4, verifier M2)
     occurred_on                   date not null,   -- simulated or real clock date, UTC
     from_state                    text,
     to_state                      text,
@@ -336,6 +428,20 @@ create table if not exists app.subscription_events (
     pause_months                  int check (pause_months in (1, 2)),
     pause_until                   date,            -- materialised: occurred_on + pause_months months
     effective_from_renewal_index  int,             -- materialised: first renewal index this event moves
+    -- THE REBASE COLUMNS (fix round F4, spec v1.1 errata E2 and E3). A
+    -- schedule-shaping event (pause, billing_day_change, frequency_change,
+    -- reactivation) resolves its consequence into these two dates at event
+    -- time: the billing date of the first re-based cycle and the first
+    -- calendar month that cycle covers. From then on every cycle n at or
+    -- after effective_from_renewal_index derives as
+    --   billing month  = month(rebase_anchor_date) + (n - r) * frequency
+    --   covered month  = rebase_covered_month_first + (n - r) * frequency
+    -- so the bill-month-versus-covered-month offset a day-change transition
+    -- creates (E3 sentence 4: the transition charge bills in the change
+    -- month and covers the NEXT UNCOVERED month) persists by construction,
+    -- and no incremental or shift arithmetic exists to drift.
+    rebase_anchor_date            date,
+    rebase_covered_month_first    date,
     actor                         text,            -- 'engine', 'member', or a staff username
     billing_attempt_id            bigint           -- FK added in section 6, after billing_attempts
 );
@@ -513,7 +619,7 @@ create table if not exists app.billing_attempts (
     decline_code       text,
     decline_class      text,
     member_fault       boolean,
-    next_action        text,                 -- 'retry' | 'infra_immediate' | 'dunning' | 'card_update' | 'attention' | 'none'
+    next_action        text,                 -- 'retry' | 'infra_immediate' | 'dunning' | 'card_update' | 'attention' | 'none' | 'superseded'
     next_retry_date    date,                 -- when next_action is a retry: the surviving C1-clipped date
     next_retry_step    int,                  -- and the ladder step that date belongs to
     unique (renewal_period_id, attempt_no)
@@ -560,6 +666,39 @@ create trigger billing_attempts_outcome_guard
     before update on app.billing_attempts
     for each row
     execute function app.billing_attempts_guard_outcome();
+
+-- Supersession hygiene (fix round F1, verifier H1 root cause and L2): the
+-- moment a successor attempt exists, every earlier attempt of the same
+-- renewal period stops being an actionable pointer. Without this, a
+-- superseded attempt's next_action stayed 'retry' forever, and any consumer
+-- that iterated attempts rather than the latest one (the pause function did;
+-- the future console's retry queue would) acted on ghosts: the probed crash
+-- was fn_sub_pause inserting a skipped_clipped row per stale pointer and
+-- colliding on (renewal_period_id, attempt_no). Structural fix at the point
+-- the staleness is BORN: an AFTER INSERT trigger clears the predecessors, so
+-- no code path can forget. The outcome guard above permits this update
+-- (outcome and identity fields are untouched).
+create or replace function app.billing_attempts_supersede_predecessors()
+returns trigger
+language plpgsql
+as $$
+begin
+    update app.billing_attempts ba
+       set next_action     = 'superseded',
+           next_retry_date = null,
+           next_retry_step = null
+     where ba.renewal_period_id = new.renewal_period_id
+       and ba.attempt_no < new.attempt_no
+       and ba.next_action is distinct from 'superseded';
+    return null;
+end;
+$$;
+
+drop trigger if exists billing_attempts_supersession_hygiene on app.billing_attempts;
+create trigger billing_attempts_supersession_hygiene
+    after insert on app.billing_attempts
+    for each row
+    execute function app.billing_attempts_supersede_predecessors();
 
 -- The deferred FK from the event stream, now that attempts exist.
 do $$

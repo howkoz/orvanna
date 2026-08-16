@@ -55,6 +55,25 @@
 --     partial state a real crash leaves. The lever is invisible unless
 --     deliberately set and cannot exist in a fresh session.
 --
+-- FIX ROUND OF 2026-08-16 (spec v1.1, both gate verdicts; edited in place
+-- before first apply per the coordinator's explicit ruling, the one window
+-- where that is allowed):
+--   The schedule derivation is rewritten onto the REBASE model (migration
+--   024 fix F4): pause, billing-day change, frequency change and
+--   reactivation each resolve (r, first billing date, first covered month)
+--   into their event row, and every later cycle derives from that in
+--   lockstep, so the OQ4 transition rule (spec v1.1 erratum E3) is
+--   implemented to the letter, paused months materialise as skipped_paused
+--   periods (12.2), frequency changes respect covered months (verifier M2),
+--   and the old shift arithmetic is gone. fn_sub_pause accepts the T10a
+--   dunning lane (erratum E2) and no longer trips over superseded retry
+--   pointers (verifier H1; the root fix is 024's supersession hygiene
+--   trigger). Auto-cancel is lane-aware (fn_sub_unpaid_streak: T10 resets
+--   the clock, T10a freezes it). fn_sub_cancel writes void_cancelled for
+--   open periods with no member-fault decline (verifier L1). Dispatch
+--   carries covered_month_offset per line for migration 027's slice
+--   stamping, so volume always books to the COVERED months.
+--
 -- RUN ORDER: after 024 and 025, before 027. The tick calls
 -- app.fn_bridge_demo_orders, whose covered_months amendment is 027; apply
 -- 027 before the first tick that bills a multi-month frequency.
@@ -113,20 +132,64 @@ comment on function app.fn_scheduled_date(date, int, int) is
 
 
 -- -----------------------------------------------------------------------------
--- 1.2 app.fn_sub_scheduled_date: the same arithmetic fed by stored facts
+-- 1.2 THE REBASE DERIVATION (rewritten in the 2026-08-16 fix round, spec
+--     v1.1 errata E2 and E3, verifier findings H1 context, M1, M2)
 --
---     Resolves, for one subscription and renewal index n:
---       the governing anchor      (re-anchored by the latest reactivation,
---                                  spec 12.6 and ruling OQ6)
---       the effective day         (latest billing_day_change event with
---                                  effective_from_renewal_index at most n,
---                                  else the stored pick, else the anchor day)
---       the pause shift           (sum of pause_months over pause events
---                                  effective at or before n, counted only
---                                  since the governing anchor, spec 12.2)
---     Everything comes from app.subscriptions plus the append-only event
---     stream: derived, never stored (the E16 footgun rule).
+--     One mechanism now carries every schedule-shaping action. A pause, a
+--     billing-day change, a frequency change, and a reactivation each write
+--     a REBASE onto their event row at action time (fix round F4 of
+--     migration 024): the first re-based cycle's index r, its billing date
+--     (rebase_anchor_date, A), and its first covered month
+--     (rebase_covered_month_first, M), all computed ONCE from the accounting
+--     as it stood, the migration 021 resolve-into-data principle. From then
+--     on, for any cycle n at or after r:
+--
+--       billing date(n)       = clamp(effective day, month(A) + (n - r) * f)
+--       covered first(n)      = M + (n - r) * f months
+--
+--     with f the subscription's frequency. Both progress in lockstep, so
+--     the bill-month-versus-covered-month offset a day-change transition
+--     creates (spec v1.1 12.1 sentence 4: the transition charge bills in
+--     the change month and covers the NEXT UNCOVERED month, and thereafter
+--     2028-03-25 covers April) persists by construction, coverage never
+--     gaps and never doubles, and no shift or incremental arithmetic
+--     exists anywhere to drift (FM4). Cycles BEFORE the latest rebase are
+--     frozen history in app.renewal_periods and are not re-derivable, by
+--     design: the function returns null for them, and every consumer
+--     (gather, next-billing lens, cycle audit) works at or after r.
+--
+--     The effective day is always coalesce(billing_day, day of
+--     billing_anchor_date): the member's stored pick, else the anchor's own
+--     day. A day-31 legacy anchor keeps clamping correctly through any
+--     rebase because the DAY comes from the anchor chain, never from a
+--     clamped rebase date.
 -- -----------------------------------------------------------------------------
+create or replace function app.fn_sub_effective_day(p_subscription_id bigint)
+returns int
+language sql
+stable
+as $$
+    select coalesce(s.billing_day, extract(day from s.billing_anchor_date)::int)
+      from app.subscriptions s where s.id = p_subscription_id
+$$;
+
+create or replace function app.fn_sub_rebase(p_subscription_id bigint)
+returns table (r int, anchor date, covered date)
+language sql
+stable
+as $$
+    select e.effective_from_renewal_index,
+           e.rebase_anchor_date,
+           e.rebase_covered_month_first
+      from app.subscription_events e
+     where e.subscription_id = p_subscription_id
+       and e.rebase_anchor_date is not null
+       and e.rebase_covered_month_first is not null
+       and e.effective_from_renewal_index is not null
+     order by e.id desc
+     limit 1
+$$;
+
 create or replace function app.fn_sub_scheduled_date(
     p_subscription_id bigint,
     p_n int
@@ -135,61 +198,80 @@ language plpgsql
 stable
 as $$
 declare
-    v_sub          app.subscriptions%rowtype;
-    v_reanchor_idx int;
-    v_day          int;
-    v_shift        int;
-    v_periods      int;
+    v_sub    app.subscriptions%rowtype;
+    v_day    int;
+    v_rebase record;
+begin
+    select * into v_sub from app.subscriptions where id = p_subscription_id;
+    if not found or p_n < 1 then
+        return null;
+    end if;
+    v_day := coalesce(v_sub.billing_day, extract(day from v_sub.billing_anchor_date)::int);
+
+    select * into v_rebase from app.fn_sub_rebase(p_subscription_id);
+    if v_rebase.r is not null then
+        if p_n < v_rebase.r then
+            return null;   -- frozen history; the period rows hold the truth
+        end if;
+        return app.fn_scheduled_date(v_rebase.anchor, v_day,
+                                     (p_n - v_rebase.r) * v_sub.frequency_months);
+    end if;
+
+    return app.fn_scheduled_date(v_sub.billing_anchor_date, v_day,
+                                 (p_n - 1) * v_sub.frequency_months);  -- deviation D6
+end;
+$$;
+
+create or replace function app.fn_sub_covered_month_first(
+    p_subscription_id bigint,
+    p_n int
+) returns date
+language plpgsql
+stable
+as $$
+declare
+    v_sub    app.subscriptions%rowtype;
+    v_rebase record;
+    v_date   date;
 begin
     select * into v_sub from app.subscriptions where id = p_subscription_id;
     if not found or p_n < 1 then
         return null;
     end if;
 
-    -- The governing re-anchor, if any (subscriptions.billing_anchor_date is
-    -- updated by reactivation, so the column already holds the right anchor;
-    -- the event tells us which renewal index it governs from).
-    select e.effective_from_renewal_index
-      into v_reanchor_idx
-      from app.subscription_events e
-     where e.subscription_id = p_subscription_id
-       and e.event_type = 'reactivation'
-     order by e.id desc
-     limit 1;
-
-    -- Effective day: latest billing-day change at or before n, else the pick.
-    select e.new_billing_day
-      into v_day
-      from app.subscription_events e
-     where e.subscription_id = p_subscription_id
-       and e.event_type = 'billing_day_change'
-       and e.effective_from_renewal_index <= p_n
-     order by e.id desc
-     limit 1;
-    if v_day is null then
-        v_day := v_sub.billing_day;   -- may still be null: anchor-day rule
+    select * into v_rebase from app.fn_sub_rebase(p_subscription_id);
+    if v_rebase.r is not null then
+        if p_n < v_rebase.r then
+            return null;
+        end if;
+        return (date_trunc('month', v_rebase.covered)::date
+                + make_interval(months => (p_n - v_rebase.r) * v_sub.frequency_months))::date;
     end if;
 
-    -- Pause shift: whole-period deferral, counted since the governing anchor.
-    select coalesce(sum(e.pause_months), 0)
-      into v_shift
-      from app.subscription_events e
-     where e.subscription_id = p_subscription_id
-       and e.event_type = 'pause'
-       and e.effective_from_renewal_index <= p_n
-       and (v_reanchor_idx is null or e.effective_from_renewal_index >= v_reanchor_idx);
-
-    if v_reanchor_idx is not null and p_n >= v_reanchor_idx then
-        -- Post-reactivation: the reactivation CIT covers its own month;
-        -- renewals recur from the new anchor one full period later
-        -- (spec 12.6: forward only, re-anchored).
-        v_periods := (p_n - v_reanchor_idx + 1) * v_sub.frequency_months + v_shift;
-    else
-        v_periods := (p_n - 1) * v_sub.frequency_months + v_shift;  -- deviation D6
-    end if;
-
-    return app.fn_scheduled_date(v_sub.billing_anchor_date, v_day, v_periods);
+    -- Unbroken schedule: a billing covers the month containing its own date
+    -- (spec 4.3's special case of the v1.1 general rule).
+    v_date := app.fn_sub_scheduled_date(p_subscription_id, p_n);
+    return date_trunc('month', v_date)::date;
 end;
+$$;
+
+-- The next uncovered calendar month: the month after everything any period
+-- row (paid, unpaid, skipped_paused, void_cancelled: coverage was DUE
+-- regardless of how it resolved) already covers. The v1.1 general coverage
+-- rule (12.1 sentence 1) keys every rebase to this.
+create or replace function app.fn_sub_next_uncovered_month(p_subscription_id bigint)
+returns date
+language sql
+stable
+as $$
+    select coalesce(
+        (select max((date_trunc('month', rp.covered_month_first)::date
+                     + make_interval(months => rp.covered_months))::date)
+           from app.renewal_periods rp
+          where rp.subscription_id = p_subscription_id),
+        date_trunc('month', app.fn_sub_scheduled_date(p_subscription_id, 1))::date,
+        date_trunc('month', (select billing_anchor_date from app.subscriptions
+                              where id = p_subscription_id))::date)
 $$;
 
 
@@ -408,6 +490,7 @@ declare
     v_order_id bigint;
     v_attempt  bigint;
     v_order_no text;
+    v_offset   int;
 begin
     select * into v_period from app.renewal_periods where id = p_period_id;
     select * into v_sub    from app.subscriptions   where id = v_period.subscription_id;
@@ -426,6 +509,20 @@ begin
     v_order_no := 'REN-' || v_period.subscription_id || '-'
                   || v_period.renewal_index || '-' || p_attempt_no;
 
+    -- The covered-month offset: how many months the FIRST covered month sits
+    -- after the creation month. Zero on an unbroken schedule; one after a
+    -- day-change transition (the charge bills in the change month and covers
+    -- the next uncovered month, spec v1.1 12.1); it can be negative only in
+    -- the catch-up-across-a-month-boundary edge, where the bridge's
+    -- finalized-month trigger is the correct backstop. Migration 027's
+    -- bridge amendment reads it per line and shifts every slice by it, so
+    -- volume always books to the COVERED months, keeping PV equals dollars
+    -- true per calendar month.
+    v_offset := (extract(year from v_period.covered_month_first)::int * 12
+                 + extract(month from v_period.covered_month_first)::int)
+              - (extract(year from p_tick)::int * 12
+                 + extract(month from p_tick)::int);
+
     insert into app.demo_orders
         (order_number, created_at, created_by_channel, member_id,
          referral_code_entered, items, activation,
@@ -443,7 +540,8 @@ begin
              'quantity',       v_sub.quantity,
              'unit_price',     round(v_price * v_period.covered_months, 2),
              'unit_pv',        round(v_pv    * v_period.covered_months, 2),
-             'covered_months', v_period.covered_months)),
+             'covered_months', v_period.covered_months,
+             'covered_month_offset', v_offset)),
          'standard',
          0,
          v_period.amount_cents,
@@ -767,6 +865,94 @@ end;
 $$;
 
 
+-- -----------------------------------------------------------------------------
+-- 3.5 app.fn_sub_unpaid_streak: the R4 counter, derived, lane-aware
+--
+--     Rewritten in the fix round for spec v1.1 erratum E2. Walks calendar
+--     months backward from the month before p_asof and counts consecutive
+--     UNPAID months, where:
+--       a PAID month (including a reactivation CIT's coverage) BREAKS the
+--         chain;
+--       a skipped_paused month behaves by its pause LANE, read from the
+--         pause event that materialised it: T10a (paused from dunning)
+--         FREEZES the clock, the month is excluded but the chain continues
+--         through it; T10 (from past_due) and T5 (from active) RESET it,
+--         the walk stops (OQ2's accepted wording, scoped to its letter);
+--       an unpaid period month, or an uncovered month the subscription was
+--         due to cover (a suspension gap), COUNTS;
+--       months before the subscription's first covered month stop the walk.
+--     The spec v1.1 12.3 micro-example is the acceptance case: September
+--     fails its ladder, pause-at-dunning covers October, November fails:
+--     the streak at December 1 is two (November and September, October
+--     excluded but not breaking), and auto-cancel fires.
+-- -----------------------------------------------------------------------------
+create or replace function app.fn_sub_unpaid_streak(
+    p_subscription_id bigint,
+    p_asof date
+) returns int
+language plpgsql
+stable
+as $$
+declare
+    v_m         date;
+    v_count     int := 0;
+    v_first_cov date;
+    v_p         record;
+    v_lane      text;
+    v_i         int;
+begin
+    select min(covered_month_first) into v_first_cov
+      from app.renewal_periods where subscription_id = p_subscription_id;
+    if v_first_cov is null then
+        return 0;   -- never due to cover anything yet
+    end if;
+
+    v_m := (date_trunc('month', p_asof::timestamp) - interval '1 month')::date;
+
+    for v_i in 1..36 loop
+        exit when v_m < v_first_cov;
+
+        select rp.* into v_p
+          from app.renewal_periods rp
+         where rp.subscription_id = p_subscription_id
+           and v_m between rp.covered_month_first
+                       and (rp.covered_month_first
+                            + make_interval(months => rp.covered_months - 1))::date
+         order by rp.outcome = 'paid' desc   -- a paid cover wins any overlap
+         limit 1;
+
+        if found then
+            if v_p.outcome = 'paid' then
+                exit;                          -- covered: the chain breaks
+            elsif v_p.outcome = 'skipped_paused' then
+                select e.from_state into v_lane
+                  from app.subscription_events e
+                 where e.subscription_id = p_subscription_id
+                   and e.event_type = 'pause'
+                   and e.effective_from_renewal_index = v_p.renewal_index + 1
+                 order by e.id desc limit 1;
+                if v_lane = 'dunning' then
+                    null;                      -- T10a: excluded, chain continues
+                else
+                    exit;                      -- T10 / T5: the clock RESET here
+                end if;
+            elsif v_p.outcome in ('unpaid') then
+                v_count := v_count + 1;
+            else
+                exit;                          -- void_cancelled or open: no chain
+            end if;
+        else
+            v_count := v_count + 1;            -- due but uncovered: suspension gap
+        end if;
+
+        v_m := (date_trunc('month', v_m::timestamp) - interval '1 month')::date;
+    end loop;
+
+    return v_count;
+end;
+$$;
+
+
 -- =============================================================================
 -- PART 4: THE TICK (spec section 9, one date, every step deterministic)
 -- =============================================================================
@@ -1063,7 +1249,11 @@ begin
              covered_month_first, covered_months, amount_cents, pv_total)
         values
             (r.subscription_id, r.renewal_index, r.sched,
-             date_trunc('month', r.sched)::date, v_sub.frequency_months,
+             -- Coverage from the derivation, not from the billing date: a
+             -- day-change transition charge bills in the change month and
+             -- covers the NEXT UNCOVERED month (spec v1.1 12.1 sentence 1).
+             app.fn_sub_covered_month_first(r.subscription_id, r.renewal_index),
+             v_sub.frequency_months,
              (round(v_sub.quantity * v_price * v_sub.frequency_months, 2) * 100)::int,
              round(v_sub.quantity * v_pv * v_sub.frequency_months, 2))
         on conflict (subscription_id, renewal_index) do nothing
@@ -1153,43 +1343,23 @@ begin
     end loop;
 
     -- ---- T22: the auto-cancel sweep, month-start ticks (R4, spec 12.7). ----
-    -- Derived, never stored: the two most recent whole calendar months are
-    -- both unpaid (due to be covered, no volume booked, not paused, and not
-    -- excused by a pause per the OQ2 ruling) and the state is suspended.
+    -- Derived, never stored, and LANE-AWARE since the fix round (spec v1.1
+    -- erratum E2): fn_sub_unpaid_streak walks backward counting consecutive
+    -- unpaid months, with paused months excluded; a T10a (pause-at-dunning)
+    -- month FREEZES the clock (the chain continues through it), a T10 or T5
+    -- pause RESETS it (the walk stops). Two counted months cancel a
+    -- suspended subscription.
     if extract(day from p_date)::int = 1 then
         for r in
             select s.id
               from app.subscriptions s
              where s.state = 'suspended'
-               and not exists (   -- OQ2: a pause engagement resets the counter
-                   select 1 from app.subscription_events e
-                    where e.subscription_id = s.id and e.event_type = 'pause'
-                      and e.pause_until >= (date_trunc('month', p_date::timestamp)
-                                            - interval '2 months')::date)
-               and not exists (   -- month minus 2 covered or excused?
-                   select 1 from app.renewal_periods rp
-                    where rp.subscription_id = s.id
-                      and rp.outcome in ('paid', 'skipped_paused')
-                      and (date_trunc('month', p_date::timestamp) - interval '2 months')::date
-                          between rp.covered_month_first
-                              and (rp.covered_month_first
-                                   + make_interval(months => rp.covered_months - 1))::date)
-               and not exists (   -- month minus 1 covered or excused?
-                   select 1 from app.renewal_periods rp
-                    where rp.subscription_id = s.id
-                      and rp.outcome in ('paid', 'skipped_paused')
-                      and (date_trunc('month', p_date::timestamp) - interval '1 month')::date
-                          between rp.covered_month_first
-                              and (rp.covered_month_first
-                                   + make_interval(months => rp.covered_months - 1))::date)
-               and exists (       -- it was due to be covered at all by then
-                   select 1 from app.renewal_periods rp
-                    where rp.subscription_id = s.id
-                      and rp.covered_month_first
-                          <= (date_trunc('month', p_date::timestamp) - interval '2 months')::date)
+               and app.fn_sub_unpaid_streak(s.id, p_date) >= 2
         loop
             perform app.fn_record_state(r.id, 'cancelled',
-                'T22: two consecutive unpaid calendar months while suspended (R4)',
+                'T22: two consecutive counted unpaid calendar months while '
+                'suspended (R4; paused months excluded, T10a months freeze '
+                'rather than break the chain, spec v1.1 12.3)',
                 p_date, 'engine');
         end loop;
     end if;
@@ -1254,7 +1424,21 @@ comment on function app.fn_billing_tick(date) is
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- 5.1 Pause (T5/T10, R3, spec 12.2/12.3)
+-- 5.1 Pause (T5 from active, T10 from past_due, T10a from dunning)
+--
+--     Rewritten in the fix round to spec v1.1 erratum E2 and to the H1 root
+--     cause. Mechanics common to all three lanes (12.2, 12.3): remaining
+--     retries for any open period are cancelled ON THE RECORD (one
+--     skipped_clipped successor per live pointer; the supersession hygiene
+--     trigger of migration 024 then retires the pointer structurally), the
+--     open period freezes unpaid, its volume is gone forever (R2), and the
+--     paused months are MATERIALISED as one skipped_paused renewal-period
+--     row covering exactly the paused calendar months (12.2's outcome
+--     vocabulary, now written, fix F5), followed by a REBASE that puts the
+--     next real cycle one pause-length later. The lanes differ only in what
+--     the auto-cancel clock does (12.3): T10 RESETS it, T10a FREEZES it;
+--     both semantics live in fn_sub_unpaid_streak, which reads the lane
+--     from the pause event's recorded from_state.
 -- -----------------------------------------------------------------------------
 create or replace function app.fn_sub_pause(
     p_subscription_id bigint,
@@ -1264,63 +1448,109 @@ create or replace function app.fn_sub_pause(
 language plpgsql
 as $$
 declare
-    v_sub   app.subscriptions%rowtype;
-    v_tick  date;
-    v_eff   int;
-    v_r     record;
+    v_sub     app.subscriptions%rowtype;
+    v_tick    date;
+    v_day     int;
+    v_r       record;
+    v_rebase  record;
+    v_delta   int := 0;
+    v_uncov   date;   -- first paused month = next uncovered month
+    v_m       date;   -- first covered month AFTER the pause
+    v_a       date;   -- billing date of the first post-pause cycle
+    v_skip_ix int;
+    v_lane    text;
 begin
     if p_months not in (1, 2) then
         raise exception 'a pause is 1 or 2 months (ruling R3), not %', p_months;
     end if;
     select clock_date into v_tick from app.sim_clock;
     select * into v_sub from app.subscriptions where id = p_subscription_id;
-    if v_sub.state not in ('active', 'past_due') then
-        raise exception 'subscription % in state % cannot pause (T5 from active, T10 from past_due only)',
+    if v_sub.state not in ('active', 'past_due', 'dunning') then
+        raise exception
+            'subscription % in state % cannot pause (T5 from active, T10 from past_due, T10a from dunning; spec v1.1 5.2)',
             p_subscription_id, v_sub.state;
     end if;
+    v_lane := case v_sub.state when 'active' then 'T5'
+                               when 'past_due' then 'T10' else 'T10a' end;
 
-    v_eff := coalesce((select max(renewal_index) from app.renewal_periods
-                        where subscription_id = p_subscription_id), 0) + 1;
+    -- Cancel remaining retries, on the record (12.3 common mechanics). Only
+    -- the LATEST attempt of a period can hold a live pointer (migration
+    -- 024's supersession hygiene), so this loop is one row per open period.
+    for v_r in
+        select ba.run_id, ba.renewal_period_id, ba.attempt_no,
+               ba.next_retry_date, ba.next_retry_step, ba.decline_class
+          from app.billing_attempts ba
+          join app.renewal_periods rp on rp.id = ba.renewal_period_id
+         where rp.subscription_id = p_subscription_id
+           and rp.outcome = 'open'
+           and ba.next_action in ('retry', 'infra_immediate')
+           and ba.attempt_no = (select max(b2.attempt_no)
+                                  from app.billing_attempts b2
+                                 where b2.renewal_period_id = ba.renewal_period_id)
+    loop
+        insert into app.billing_attempts
+            (run_id, renewal_period_id, attempt_no, attempt_kind,
+             ladder_step, scheduled_for, outcome, decline_class, next_action)
+        values
+            (v_r.run_id, v_r.renewal_period_id, v_r.attempt_no + 1,
+             'retry_soft', v_r.next_retry_step,
+             coalesce(v_r.next_retry_date, v_tick), 'skipped_clipped',
+             v_r.decline_class, 'none');
+        -- The hygiene trigger has already marked the old pointer 'superseded'.
+    end loop;
 
-    if v_sub.state = 'past_due' then
-        -- Spec 12.3: remaining retries are cancelled on the record, the open
-        -- period freezes unpaid, its volume is gone forever (R2).
-        for v_r in
-            select ba.id, ba.renewal_period_id, ba.attempt_no,
-                   ba.next_retry_date, ba.next_retry_step, ba.decline_class
-              from app.billing_attempts ba
-              join app.renewal_periods rp on rp.id = ba.renewal_period_id
-             where rp.subscription_id = p_subscription_id
-               and rp.outcome = 'open'
-               and ba.next_action in ('retry', 'infra_immediate')
-        loop
-            insert into app.billing_attempts
-                (run_id, renewal_period_id, attempt_no, attempt_kind,
-                 ladder_step, scheduled_for, outcome, decline_class, next_action)
-            select ba.run_id, v_r.renewal_period_id, v_r.attempt_no + 1,
-                   'retry_soft', v_r.next_retry_step,
-                   coalesce(v_r.next_retry_date, v_tick), 'skipped_clipped',
-                   v_r.decline_class, 'none'
-              from app.billing_attempts ba where ba.id = v_r.id;
-            update app.billing_attempts set next_action = 'none' where id = v_r.id;
-        end loop;
+    if v_sub.state in ('past_due', 'dunning') then
         update app.renewal_periods set outcome = 'unpaid'
          where subscription_id = p_subscription_id and outcome = 'open';
     end if;
 
-    insert into app.subscription_events
-        (subscription_id, event_type, occurred_on, pause_months, pause_until,
-         effective_from_renewal_index, cause, actor)
+    -- Materialise the paused months and the rebase (fix F4/F5).
+    v_day   := app.fn_sub_effective_day(p_subscription_id);
+    v_uncov := app.fn_sub_next_uncovered_month(p_subscription_id);
+    v_m     := (v_uncov + make_interval(months => p_months))::date;
+
+    select * into v_rebase from app.fn_sub_rebase(p_subscription_id);
+    if v_rebase.r is not null then
+        -- Preserve the bill-month-versus-covered-month offset a prior
+        -- day-change transition created (E3 sentence 4: it persists).
+        v_delta := (extract(year from v_rebase.covered)::int * 12
+                    + extract(month from v_rebase.covered)::int)
+                 - (extract(year from v_rebase.anchor)::int * 12
+                    + extract(month from v_rebase.anchor)::int);
+    end if;
+    v_a := app.fn_scheduled_date((v_m - make_interval(months => v_delta))::date, v_day, 0);
+
+    v_skip_ix := coalesce((select max(renewal_index) from app.renewal_periods
+                            where subscription_id = p_subscription_id), 0) + 1;
+
+    insert into app.renewal_periods
+        (subscription_id, renewal_index, scheduled_date, covered_month_first,
+         covered_months, amount_cents, pv_total, outcome)
     values
-        (p_subscription_id, 'pause', v_tick, p_months,
-         (v_tick + make_interval(months => p_months))::date, v_eff,
-         'member pause for ' || p_months || ' month(s); every renewal from index '
-         || v_eff || ' defers ' || p_months || ' whole month(s) (spec 12.2)',
+        (p_subscription_id, v_skip_ix, v_tick, v_uncov, p_months, 0, 0,
+         'skipped_paused');
+
+    insert into app.subscription_events
+        (subscription_id, event_type, occurred_on, from_state, pause_months,
+         pause_until, effective_from_renewal_index, rebase_anchor_date,
+         rebase_covered_month_first, cause, actor)
+    values
+        (p_subscription_id, 'pause', v_tick, v_sub.state, p_months,
+         (v_tick + make_interval(months => p_months))::date,
+         v_skip_ix + 1, v_a, v_m,
+         v_lane || ': pause ' || p_months || ' month(s); months '
+         || to_char(v_uncov, 'YYYY-MM') || ' onward skipped_paused (period index '
+         || v_skip_ix || '); next billing rebased to ' || v_a
+         || ' covering ' || to_char(v_m, 'YYYY-MM')
+         || case v_lane when 'T10a'
+                then '; the consecutive-unpaid clock FREEZES and resumes where it stood (spec v1.1 12.3)'
+                when 'T10'
+                then '; the consecutive-unpaid clock RESETS (OQ2, spec v1.1 12.3)'
+                else '' end,
          p_actor);
 
     perform app.fn_record_state(p_subscription_id, 'paused',
-        case v_sub.state when 'active' then 'T5' else 'T10' end || ': member pause',
-        v_tick, p_actor);
+        v_lane || ': member pause from ' || v_sub.state, v_tick, p_actor);
 end;
 $$;
 
@@ -1395,8 +1625,12 @@ begin
         return;  -- idempotent
     end if;
 
-    -- Spec 12.4: remaining retries cancelled, the open period stays unpaid,
-    -- no refund concept exists in this engine.
+    -- Spec 12.4: remaining retries cancelled. The open period's resolution
+    -- (fix round F5, verifier L1): 'unpaid' when a member-fault decline sits
+    -- on the record (payment failure is why it is open, 12.4's letter);
+    -- 'void_cancelled' when NO member-fault decline exists (the cancellation
+    -- is unrelated to payment failure: a preflight-stopped or never-attempted
+    -- period), so the ledger stops calling a non-payment-story "unpaid".
     update app.billing_attempts ba
        set next_action = 'none'
       from app.renewal_periods rp
@@ -1404,8 +1638,13 @@ begin
        and rp.subscription_id = p_subscription_id
        and rp.outcome = 'open'
        and ba.next_action in ('retry', 'infra_immediate');
-    update app.renewal_periods set outcome = 'unpaid'
-     where subscription_id = p_subscription_id and outcome = 'open';
+    update app.renewal_periods rp
+       set outcome = case when exists (select 1 from app.billing_attempts ba
+                                        where ba.renewal_period_id = rp.id
+                                          and ba.outcome = 'declined'
+                                          and ba.member_fault)
+                          then 'unpaid' else 'void_cancelled' end
+     where rp.subscription_id = p_subscription_id and rp.outcome = 'open';
 
     insert into app.subscription_events
         (subscription_id, event_type, occurred_on, cause, actor)
@@ -1427,7 +1666,23 @@ end;
 $$;
 
 -- -----------------------------------------------------------------------------
--- 5.4 Billing-day change (spec 12.1: the double-billing transition rule, OQ4)
+-- 5.4 Billing-day change: the OQ4 transition rule TO THE LETTER
+--
+--     Rewritten in the fix round per spec v1.1 erratum E3 (verifier M1),
+--     whose four sentences this implements literally:
+--       1. every billing covers the NEXT UNCOVERED month(s);
+--       2. the transition charge runs on the FIRST occurrence of the new
+--          billing day STRICTLY AFTER the change request date;
+--       3. the change month may therefore contain two billings, exactly
+--          once per change, disclosed at change time, no proration;
+--       4. thereafter the schedule is the new day recurring per the
+--          frequency, each charge covering the next uncovered month(s).
+--     The acceptance example (the verifier's own probe): day 1 changed to
+--     day 25 on 2028-02-02 bills the transition charge 2028-02-25 covering
+--     March 2028; thereafter 2028-03-25 covers April. The rebase mechanism
+--     represents this exactly: r = next unaccounted cycle, A = the
+--     transition date, M = the next uncovered month, and the bill-versus-
+--     covered offset persists for every later cycle.
 -- -----------------------------------------------------------------------------
 create or replace function app.fn_sub_change_billing_day(
     p_subscription_id bigint,
@@ -1437,30 +1692,132 @@ create or replace function app.fn_sub_change_billing_day(
 language plpgsql
 as $$
 declare
+    v_sub  app.subscriptions%rowtype;
     v_tick date;
-    v_old  int;
-    v_eff  int;
+    v_r    int;
+    v_a    date;   -- the transition charge date (E3 sentence 2)
+    v_m    date;   -- the next uncovered month it covers (E3 sentence 1)
 begin
     if p_new_day not between 1 and 28 then
         raise exception 'billing day picks run 1 to 28 (OQ3 ruling); % is not allowed', p_new_day;
     end if;
     select clock_date into v_tick from app.sim_clock;
-    select billing_day into v_old from app.subscriptions where id = p_subscription_id;
+    select * into v_sub from app.subscriptions where id = p_subscription_id;
+    if v_sub.state <> 'active' then
+        raise exception
+            'subscription % in state % cannot change its billing day in S1 (active only; other states resolve their open period first)',
+            p_subscription_id, v_sub.state;
+    end if;
 
-    v_eff := coalesce((select max(renewal_index) from app.renewal_periods
-                        where subscription_id = p_subscription_id), 0) + 1;
+    -- Sentence 2: the first occurrence of the new day STRICTLY AFTER today.
+    v_a := make_date(extract(year from v_tick)::int,
+                     extract(month from v_tick)::int, p_new_day);
+    if v_a <= v_tick then
+        v_a := (v_a + interval '1 month')::date;   -- day <= 28: always exists
+    end if;
+
+    -- Sentence 1: it covers the next uncovered month(s).
+    v_m := app.fn_sub_next_uncovered_month(p_subscription_id);
+    v_r := coalesce((select max(renewal_index) from app.renewal_periods
+                      where subscription_id = p_subscription_id), 0) + 1;
 
     update app.subscriptions set billing_day = p_new_day
      where id = p_subscription_id;
 
     insert into app.subscription_events
         (subscription_id, event_type, occurred_on, old_billing_day,
-         new_billing_day, effective_from_renewal_index, cause, actor)
+         new_billing_day, effective_from_renewal_index, rebase_anchor_date,
+         rebase_covered_month_first, cause, actor)
     values
-        (p_subscription_id, 'billing_day_change', v_tick, v_old, p_new_day, v_eff,
-         'billing day change effective renewal ' || v_eff || '. DISCLOSED AT '
-         || 'CHANGE TIME (spec 12.1): the change month may contain two '
-         || 'billings, exactly once; coverage never gaps and never doubles.',
+        (p_subscription_id, 'billing_day_change', v_tick, v_sub.billing_day,
+         p_new_day, v_r, v_a, v_m,
+         'billing day ' || coalesce(v_sub.billing_day::text, '(anchor day)')
+         || ' to ' || p_new_day || '. DISCLOSED AT CHANGE TIME (spec v1.1 '
+         || '12.1, the OQ4 rule to the letter): the transition charge runs '
+         || to_char(v_a, 'YYYY-MM-DD') || ', the first occurrence of the new '
+         || 'day strictly after the change, and covers '
+         || to_char(v_m, 'YYYY-MM') || ', the next uncovered month; the '
+         || 'change month may contain two billings, exactly once; thereafter '
+         || 'the new day recurs per the frequency, each charge covering the '
+         || 'next uncovered month(s); coverage never gaps and never doubles; '
+         || 'no proration.',
+         p_actor);
+end;
+$$;
+
+-- -----------------------------------------------------------------------------
+-- 5.4b Frequency change (NEW in the fix round, verifier M2)
+--
+--     The sanctioned path the schedule-column guard (migration 024, fix F2)
+--     exists to protect. Semantics that respect covered months, by the same
+--     rebase mechanism: the new frequency takes effect at the NEXT UNCOVERED
+--     month; everything already covered stays covered exactly once; the
+--     first new-frequency charge bills on the effective day in that month
+--     (minus any persisting day-change offset), so no cycle is ever
+--     re-derived, duplicated, or skipped. The raw-UPDATE path the verifier
+--     probed (four duplicate charges) is refused by the guard trigger.
+-- -----------------------------------------------------------------------------
+create or replace function app.fn_sub_change_frequency(
+    p_subscription_id bigint,
+    p_new_frequency int,
+    p_actor text default 'member'
+) returns void
+language plpgsql
+as $$
+declare
+    v_sub    app.subscriptions%rowtype;
+    v_tick   date;
+    v_day    int;
+    v_rebase record;
+    v_delta  int := 0;
+    v_r      int;
+    v_a      date;
+    v_m      date;
+begin
+    if p_new_frequency not in (1, 2, 3, 6) then
+        raise exception 'frequency is 1, 2, 3 or 6 months (ruling R1), not %', p_new_frequency;
+    end if;
+    select clock_date into v_tick from app.sim_clock;
+    select * into v_sub from app.subscriptions where id = p_subscription_id;
+    if v_sub.state <> 'active' then
+        raise exception
+            'subscription % in state % cannot change frequency in S1 (active only)',
+            p_subscription_id, v_sub.state;
+    end if;
+    if v_sub.frequency_months = p_new_frequency then
+        return;   -- idempotent
+    end if;
+
+    v_day := app.fn_sub_effective_day(p_subscription_id);
+    v_m   := app.fn_sub_next_uncovered_month(p_subscription_id);
+    v_r   := coalesce((select max(renewal_index) from app.renewal_periods
+                        where subscription_id = p_subscription_id), 0) + 1;
+
+    select * into v_rebase from app.fn_sub_rebase(p_subscription_id);
+    if v_rebase.r is not null then
+        v_delta := (extract(year from v_rebase.covered)::int * 12
+                    + extract(month from v_rebase.covered)::int)
+                 - (extract(year from v_rebase.anchor)::int * 12
+                    + extract(month from v_rebase.anchor)::int);
+    end if;
+    v_a := app.fn_scheduled_date((v_m - make_interval(months => v_delta))::date, v_day, 0);
+
+    perform set_config('orvanna.subscription_schedule_change', '1', true);
+    update app.subscriptions set frequency_months = p_new_frequency
+     where id = p_subscription_id;
+    perform set_config('orvanna.subscription_schedule_change', '', true);
+
+    insert into app.subscription_events
+        (subscription_id, event_type, occurred_on,
+         effective_from_renewal_index, rebase_anchor_date,
+         rebase_covered_month_first, cause, actor)
+    values
+        (p_subscription_id, 'frequency_change', v_tick, v_r, v_a, v_m,
+         'frequency ' || v_sub.frequency_months || ' to ' || p_new_frequency
+         || ' month(s), effective at the next uncovered month '
+         || to_char(v_m, 'YYYY-MM') || ', first new-frequency charge '
+         || to_char(v_a, 'YYYY-MM-DD') || '; covered months are respected, '
+         || 'nothing re-derives, nothing double-bills (verifier M2 semantics)',
          p_actor);
 end;
 $$;
@@ -1485,10 +1842,18 @@ create or replace function app.fn_sub_reactivate_sim(
 language plpgsql
 as $$
 declare
-    v_sub  app.subscriptions%rowtype;
-    v_tick date;
-    v_cred bigint;
-    v_eff  int;
+    v_sub      app.subscriptions%rowtype;
+    v_tick     date;
+    v_cred     bigint;
+    v_open     app.renewal_periods%rowtype;
+    v_price    numeric(10,2);
+    v_pv       numeric(10,2);
+    v_cit_ix   int;
+    v_r        int;
+    v_day      int;
+    v_a        date;
+    v_m        date;
+    v_covered_note text;
 begin
     select clock_date into v_tick from app.sim_clock;
     select * into v_sub from app.subscriptions where id = p_subscription_id;
@@ -1513,22 +1878,75 @@ begin
          'sim:' || p_brand || ':' || p_subscription_id, v_tick)
     returning id into v_cred;
 
-    v_eff := coalesce((select max(renewal_index) from app.renewal_periods
-                        where subscription_id = p_subscription_id), 0) + 1;
+    -- What the CIT covers (fix round, spec letter):
+    --   T16 (card_update_required, spec 5.2): "the payment re-establishes
+    --   the credential and covers the open period if inside the same
+    --   calendar month, else the next period forward". An open period whose
+    --   covered month is the reactivation month resolves 'paid'.
+    --   T21 (suspended, spec 12.6): "the payment covers the calendar month
+    --   of the reactivation payment as its first covered month, forward
+    --   only, no back-billing": a paid bookkeeping period is materialised
+    --   for the CIT's coverage (in Path B the shop checkout itself is out
+    --   of scope; the period row records coverage so the audit and the
+    --   auto-cancel derivation see an unbroken ledger; real volume arrives
+    --   through the bridge from the real checkout in production).
+    select * into v_open
+      from app.renewal_periods rp
+     where rp.subscription_id = p_subscription_id
+       and rp.outcome = 'open'
+       and rp.covered_month_first = date_trunc('month', v_tick)::date
+     limit 1;
 
+    if found then
+        update app.renewal_periods set outcome = 'paid' where id = v_open.id;
+        v_r := (select max(renewal_index) from app.renewal_periods
+                 where subscription_id = p_subscription_id) + 1;
+        v_covered_note := 'the CIT covers the open period (index '
+                          || v_open.renewal_index || ', same calendar month, T16)';
+    else
+        select p.price, p.volume_points into v_price, v_pv
+          from app.products p where p.id = v_sub.product_id;
+        v_cit_ix := coalesce((select max(renewal_index) from app.renewal_periods
+                               where subscription_id = p_subscription_id), 0) + 1;
+        insert into app.renewal_periods
+            (subscription_id, renewal_index, scheduled_date,
+             covered_month_first, covered_months, amount_cents, pv_total, outcome)
+        values
+            (p_subscription_id, v_cit_ix, v_tick,
+             date_trunc('month', v_tick)::date, v_sub.frequency_months,
+             (round(v_sub.quantity * v_price * v_sub.frequency_months, 2) * 100)::int,
+             round(v_sub.quantity * v_pv * v_sub.frequency_months, 2),
+             'paid');
+        v_r := v_cit_ix + 1;
+        v_covered_note := 'the CIT covers ' || to_char(v_tick, 'YYYY-MM')
+                          || ' forward (bookkeeping period index ' || v_cit_ix || ', T21)';
+    end if;
+
+    -- OQ6 re-anchor, through the schedule-column guard's sanctioned path.
+    perform set_config('orvanna.subscription_schedule_change', '1', true);
     update app.subscriptions
        set credential_id = v_cred,
-           billing_anchor_date = v_tick        -- OQ6: re-anchor to reactivation
+           billing_anchor_date = v_tick
      where id = p_subscription_id;
+    perform set_config('orvanna.subscription_schedule_change', '', true);
+
+    -- Rebase: the next engine cycle starts where the CIT's coverage ends.
+    -- The member's stored day pick survives re-anchoring (it is their
+    -- stored choice); without a pick, the day follows the new anchor.
+    v_day := app.fn_sub_effective_day(p_subscription_id);
+    v_m   := app.fn_sub_next_uncovered_month(p_subscription_id);
+    v_a   := app.fn_scheduled_date(v_m, v_day, 0);   -- delta resets at reactivation
 
     insert into app.subscription_events
         (subscription_id, event_type, occurred_on,
-         effective_from_renewal_index, cause, actor)
+         effective_from_renewal_index, rebase_anchor_date,
+         rebase_covered_month_first, cause, actor)
     values
-        (p_subscription_id, 'reactivation', v_tick, v_eff,
-         'fresh cardholder-present payment; re-anchored to ' || v_tick
-         || ' (OQ6); coverage forward only, no back-billing (12.6); unpaid '
-         || 'history stays unpaid forever', p_actor);
+        (p_subscription_id, 'reactivation', v_tick, v_r, v_a, v_m,
+         'fresh cardholder-present payment; ' || v_covered_note
+         || '; re-anchored to ' || v_tick || ' (OQ6); next engine cycle '
+         || to_char(v_a, 'YYYY-MM-DD') || ' covering ' || to_char(v_m, 'YYYY-MM')
+         || '; unpaid history stays unpaid forever (12.6)', p_actor);
 
     perform app.fn_record_state(p_subscription_id, 'active',
         case v_sub.state when 'suspended' then 'T21' else 'T16' end
@@ -1666,7 +2084,7 @@ expected as (
        and gs.n >= coalesce((select e.effective_from_renewal_index
                                from app.subscription_events e
                               where e.subscription_id = s.id
-                                and e.event_type = 'reactivation'
+                                and e.rebase_anchor_date is not null
                               order by e.id desc limit 1), 1)
 )
 select e.subscription_id,
@@ -1732,6 +2150,12 @@ comment on view app.v_staff_attention_queue is
 -- =============================================================================
 revoke execute on function app.fn_scheduled_date(date, int, int)            from public;
 revoke execute on function app.fn_sub_scheduled_date(bigint, int)           from public;
+revoke execute on function app.fn_sub_covered_month_first(bigint, int)      from public;
+revoke execute on function app.fn_sub_effective_day(bigint)                 from public;
+revoke execute on function app.fn_sub_rebase(bigint)                        from public;
+revoke execute on function app.fn_sub_next_uncovered_month(bigint)          from public;
+revoke execute on function app.fn_sub_unpaid_streak(bigint, date)           from public;
+revoke execute on function app.fn_sub_change_frequency(bigint, int, text)   from public;
 revoke execute on function app.fn_normalize_anchor(date)                    from public;
 revoke execute on function app.fn_classify(text, date)                      from public;
 revoke execute on function app.fn_surviving_retry(text, int, date, date)    from public;

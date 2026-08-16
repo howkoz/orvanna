@@ -96,6 +96,15 @@ select 'D1: FRED has exactly twelve accounted cycles, all paid' as proof,
   join app.subscriptions s on s.id = rp.subscription_id
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9005';
 
+-- The twelve dates PRINTED VERBATIM (QA L1: the proof document quotes the
+-- transcript rather than presenting an asserted-equal string as recorded):
+select 'D2-print: FRED cycle ' || rp.renewal_index as label,
+       rp.scheduled_date, rp.outcome
+  from app.renewal_periods rp
+  join app.subscriptions s on s.id = rp.subscription_id
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9005'
+ order by rp.renewal_index;
+
 select 'D2: FRED cycle dates clamp and return, never drift' as proof,
        case when string_agg(rp.scheduled_date::text, ',' order by rp.renewal_index)
             = '2026-10-31,2026-11-30,2026-12-31,2027-01-31,2027-02-28,'
@@ -116,7 +125,7 @@ select 'D3: the cycle audit shows ZERO gaps across every billing-state subscript
 -- PROOF E (FM5, the corrupted credential): DANA.
 -- ---------------------------------------------------------------------------
 select 'E1: every DANA attempt stopped at pre-flight, classified internal_config' as proof,
-       case when count(*) >= 12
+       case when count(*) = 13   -- exactly: 13 monthly cycles, Sep 2026 through Sep 2027 (QA L3: equality, not a floor)
              and bool_and(ba.outcome = 'preflight_failed'
                           and ba.decline_class = 'internal_config'
                           and ba.member_fault = false
@@ -148,7 +157,7 @@ select 'E3: DANA''s dunning and auto-cancel clocks are untouched (state active, 
   join app.members m on m.id = s.member_id and m.member_code = 'GW-9004';
 
 select 'E4: DANA is surfaced in the staff attention queue as a system fault' as proof,
-       case when count(*) >= 12 then 'PASS' else 'FAIL: ' || count(*) end as verdict,
+       case when count(*) = 13 then 'PASS' else 'FAIL: ' || count(*) end as verdict,
        count(*) as attention_rows
   from app.v_staff_attention_queue q
   join app.subscriptions s on s.id = q.subscription_id
@@ -366,3 +375,378 @@ select 'G8: pricing totals reconcile: every paid period equals its demo order to
   join app.billing_attempts ba on ba.renewal_period_id = rp.id and ba.outcome = 'succeeded'
   join app.demo_orders d on d.id = ba.demo_order_id
  where rp.outcome = 'paid' and d.total_cents <> rp.amount_cents;
+
+-- ===========================================================================
+-- FIX-ROUND PROOFS (2026-08-16, spec v1.1, both gate verdicts).
+-- FQ = frequencies, MA = member actions, MG = guards, GX = new globals.
+-- ===========================================================================
+
+-- ---------------------------------------------------------------------------
+-- FQ: bi-monthly and semi-annual actually BILL, COVER and SPREAD (QA M2,
+-- verifier M5).
+-- ---------------------------------------------------------------------------
+select 'FQ1: OSCAR bi-monthly billed 7 cycles of 20000 cents covering 2 months each, all paid' as proof,
+       case when count(*) = 7
+             and bool_and(rp.amount_cents = 20000 and rp.covered_months = 2
+                          and rp.outcome = 'paid')
+            then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.renewal_periods rp
+  join app.subscriptions s on s.id = rp.subscription_id
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9007';
+
+select 'FQ2: OSCAR volume spreads to exactly 100.00 in each of the 12 months Sep 2026 to Aug 2027' as proof,
+       case when count(*) = 12 and bool_and(x.sv = 100.00)
+            then 'PASS' else 'FAIL: ' || count(*) || ' months' end as verdict
+  from (select o.volume_month, sum(ol.quantity * ol.unit_volume)::numeric(12,2) as sv
+          from app.orders o
+          join app.order_lines ol on ol.order_id = o.id
+          join app.members m on m.id = o.member_id and m.member_code = 'GW-9007'
+         where o.volume_month between date '2026-09-01' and date '2027-08-01'
+         group by o.volume_month) x;
+
+select 'FQ3: SARA semi-annual billed 2 cycles of 60000 cents covering 6 months each, all paid' as proof,
+       case when count(*) = 2
+             and bool_and(rp.amount_cents = 60000 and rp.covered_months = 6
+                          and rp.outcome = 'paid')
+            then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.renewal_periods rp
+  join app.subscriptions s on s.id = rp.subscription_id
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9008';
+
+select 'FQ4: SARA volume spreads to exactly 100.00 in each of the 12 months Oct 2026 to Sep 2027' as proof,
+       case when count(*) = 12 and bool_and(x.sv = 100.00)
+            then 'PASS' else 'FAIL: ' || count(*) || ' months' end as verdict
+  from (select o.volume_month, sum(ol.quantity * ol.unit_volume)::numeric(12,2) as sv
+          from app.orders o
+          join app.order_lines ol on ol.order_id = o.id
+          join app.members m on m.id = o.member_id and m.member_code = 'GW-9008'
+         where o.volume_month between date '2026-10-01' and date '2027-09-01'
+         group by o.volume_month) x;
+
+-- ---------------------------------------------------------------------------
+-- MA: the member-action year (verifier H1 scenarios, QA M3).
+-- ---------------------------------------------------------------------------
+select 'MA1: PETE paused mid-ladder WITHOUT error (the H1 case): T10 event, retry clipped on the record, period unpaid' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'pause'
+                            and e.from_state = 'past_due'
+                            and e.occurred_on = date '2026-09-04')
+             and exists (select 1 from app.billing_attempts ba
+                          join app.renewal_periods rp on rp.id = ba.renewal_period_id
+                         where rp.subscription_id = s.id and rp.renewal_index = 1
+                           and ba.outcome = 'skipped_clipped')
+             and (select rp.outcome from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.renewal_index = 1) = 'unpaid'
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9011';
+
+select 'MA2: PETE paused months materialised skipped_paused (Oct+Nov), auto-resumed Nov 4, next cycle Dec 1 paid' as proof,
+       case when exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id and rp.outcome = 'skipped_paused'
+                            and rp.covered_month_first = date '2026-10-01'
+                            and rp.covered_months = 2)
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'resume'
+                            and e.occurred_on = date '2026-11-04')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2026-12-01'
+                            and rp.outcome = 'paid')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9011';
+
+select 'MA3: QUINN paused FROM DUNNING (T10a lane exists), October skipped_paused, resumed Oct 12' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'pause'
+                            and e.from_state = 'dunning'
+                            and e.occurred_on = date '2026-09-12')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id and rp.outcome = 'skipped_paused'
+                            and rp.covered_month_first = date '2026-10-01'
+                            and rp.covered_months = 1)
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'resume'
+                            and e.occurred_on = date '2026-10-12')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9012';
+
+select 'MA4: QUINN, the frozen clock (spec v1.1 12.3 micro-example): November fails, suspended Nov 26, auto-cancel DEC 1 counting September plus November through the paused October' as proof,
+       case when (select rp.outcome from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.scheduled_date = date '2026-11-01') = 'unpaid'
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'suspended'
+                            and e.occurred_on = date '2026-11-26')
+             and s.state = 'cancelled'
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'cancelled'
+                            and e.occurred_on = date '2026-12-01'
+                            and e.cause like 'T22%')
+            then 'PASS' else 'FAIL: state ' || s.state end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9012';
+
+select 'MA5: RITA early resume inside the first paused month REFUSED (exactly one resume event, the Nov 20 auto-resume), then Dec 1 paid' as proof,
+       case when (select count(*) from app.subscription_events e
+                   where e.subscription_id = s.id and e.event_type = 'resume') = 1
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'resume'
+                            and e.occurred_on = date '2026-11-20')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2026-12-01'
+                            and rp.outcome = 'paid')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9013';
+
+select 'MA6: SAM early resume ALLOWED after one whole month (resume event Nov 10, active, next cycle Jan 1 paid, Nov+Dec skipped_paused)' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'resume'
+                            and e.occurred_on = date '2026-11-10'
+                            and e.cause like 'early resume%')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id and rp.outcome = 'skipped_paused'
+                            and rp.covered_month_first = date '2026-11-01'
+                            and rp.covered_months = 2)
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2027-01-01'
+                            and rp.outcome = 'paid')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9014';
+
+select 'MA7: TINA cancelled during dunning (T15) on Sep 12: no attempt after Sep 9, period frozen unpaid' as proof,
+       case when s.state = 'cancelled'
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'cancelled'
+                            and e.occurred_on = date '2026-09-12'
+                            and e.cause like 'T15%')
+             and (select max(ba.scheduled_for) from app.billing_attempts ba
+                   join app.renewal_periods rp on rp.id = ba.renewal_period_id
+                  where rp.subscription_id = s.id
+                    and ba.outcome in ('succeeded','declined')) = date '2026-09-09'
+             and (select rp.outcome from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.renewal_index = 1) = 'unpaid'
+            then 'PASS' else 'FAIL: state ' || s.state end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9015';
+
+select 'MA8: UMA decline 2017 cancels THIS subscription same day (T4), period unpaid' as proof,
+       case when s.state = 'cancelled'
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'cancelled'
+                            and e.occurred_on = date '2026-09-01'
+                            and e.cause like 'T4%2017%')
+            then 'PASS' else 'FAIL: state ' || s.state end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9016';
+
+select 'MA9: VIC decline 2018 cancels EVERY subscription he holds; the second never billed at all' as proof,
+       case when count(*) = 2
+             and bool_and(s.state = 'cancelled')
+             and sum(case when p.sku = 'AGT-S-001'
+                          then (select count(*) from app.renewal_periods rp
+                                 where rp.subscription_id = s.id)
+                          else 0 end) = 0
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9017'
+  join app.products p on p.id = s.product_id;
+
+select 'MA10: WALT day-28 zero-survivor ladder (spec 8.3 named case): one attempt only, dunning same day, suspended at MONTH END Sep 30' as proof,
+       case when (select count(*) from app.billing_attempts ba
+                   join app.renewal_periods rp on rp.id = ba.renewal_period_id
+                  where rp.subscription_id = s.id and rp.renewal_index = 1) = 1
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'dunning'
+                            and e.occurred_on = date '2026-09-28')
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'suspended'
+                            and e.occurred_on = date '2026-09-30')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9018';
+
+select 'MA11: WALT reactivated from suspended (T21) on Oct 10: CIT coverage booked for October, next cycle Nov 28 paid, coherent credential minted' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.event_type = 'reactivation'
+                            and e.occurred_on = date '2026-10-10')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id and rp.outcome = 'paid'
+                            and rp.covered_month_first = date '2026-10-01'
+                            and rp.scheduled_date = date '2026-10-10')
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2026-11-28'
+                            and rp.outcome = 'paid')
+             and exists (select 1 from app.payment_credentials c
+                          where c.member_id = s.member_id and c.retired_on is null
+                            and c.brand = 'mastercard')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9018';
+
+select 'MA12: XENA hard decline then reactivation from card_update_required (T16): the same-month CIT covers the open period (index 1 paid), next cycle Oct 15 paid' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'card_update_required'
+                            and e.occurred_on = date '2026-09-01')
+             and (select rp.outcome from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.renewal_index = 1) = 'paid'
+             and exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2026-10-15'
+                            and rp.outcome = 'paid')
+             and s.state = 'active'
+            then 'PASS' else 'FAIL: state ' || s.state end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9019';
+
+select 'MA13: YVES, no card update: suspended at the checkpoint (T17, Sep 26) then auto-cancelled Nov 1 (T22)' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'suspended'
+                            and e.occurred_on = date '2026-09-26'
+                            and e.cause like 'T17%')
+             and exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id and e.to_state = 'cancelled'
+                            and e.occurred_on = date '2026-11-01'
+                            and e.cause like 'T22%')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9020';
+
+-- ---------------------------------------------------------------------------
+-- MG: the OQ4 letter and the frequency guard (verifier M1 and M2).
+-- ---------------------------------------------------------------------------
+select 'MG1: PAULA transition charge ran 2027-03-25 covering APRIL (the E3 letter); March holds exactly two billings' as proof,
+       case when exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2027-03-25'
+                            and rp.covered_month_first = date '2027-04-01'
+                            and rp.outcome = 'paid')
+             and (select count(*) from app.renewal_periods rp
+                   where rp.subscription_id = s.id
+                     and rp.scheduled_date between date '2027-03-01' and date '2027-03-31') = 2
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9010';
+
+select 'MG2: PAULA thereafter: 2027-04-25 covers MAY, and April volume is exactly 100.00 booked once' as proof,
+       case when exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id
+                            and rp.scheduled_date = date '2027-04-25'
+                            and rp.covered_month_first = date '2027-05-01'
+                            and rp.outcome = 'paid')
+             and (select sum(ol.quantity * ol.unit_volume) from app.orders o
+                   join app.order_lines ol on ol.order_id = o.id
+                  where o.member_id = s.member_id
+                    and o.volume_month = date '2027-04-01') = 100.00
+             and (select sum(ol.quantity * ol.unit_volume) from app.orders o
+                   join app.order_lines ol on ol.order_id = o.id
+                  where o.member_id = s.member_id
+                    and o.volume_month = date '2027-05-01') = 100.00
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9010';
+
+select 'MG3: PAULA''s disclosure event describes what the engine actually does (transition date and next-uncovered-month coverage named)' as proof,
+       case when exists (select 1 from app.subscription_events e
+                          where e.subscription_id = s.id
+                            and e.event_type = 'billing_day_change'
+                            and e.cause like '%2027-03-25%'
+                            and e.cause like '%next uncovered month%'
+                            and e.cause like '%two billings%')
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9010';
+
+select 'MG4: NORA quarterly-to-monthly through the sanctioned function: coverage respected, first monthly charge Jan 1, nine monthly cycles of 10000' as proof,
+       case when exists (select 1 from app.renewal_periods rp
+                          where rp.subscription_id = s.id and rp.renewal_index = 1
+                            and rp.amount_cents = 30000 and rp.covered_months = 3
+                            and rp.outcome = 'paid')
+             and (select count(*) from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.renewal_index > 1) = 9
+             and (select min(rp.scheduled_date) from app.renewal_periods rp
+                   where rp.subscription_id = s.id and rp.renewal_index > 1) = date '2027-01-01'
+             and not exists (select 1 from app.renewal_periods rp
+                              where rp.subscription_id = s.id and rp.renewal_index > 1
+                                and (rp.amount_cents <> 10000 or rp.covered_months <> 1))
+            then 'PASS' else 'FAIL' end as verdict
+  from app.subscriptions s
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9009';
+
+create temp table probe_results (proof text, verdict text);
+do $probe$
+declare
+    v_oscar bigint;
+begin
+    select s.id into v_oscar
+      from app.subscriptions s
+      join app.members m on m.id = s.member_id
+     where m.member_code = 'GW-9007';
+    begin
+        update app.subscriptions set frequency_months = 6 where id = v_oscar;
+        insert into probe_results values
+            ('MG5: a RAW frequency_months update is REFUSED by the schedule-column guard',
+             'FAIL: the raw update went through');
+    exception when others then
+        insert into probe_results values
+            ('MG5: a RAW frequency_months update is REFUSED by the schedule-column guard',
+             'PASS');
+    end;
+    begin
+        update app.subscriptions set billing_anchor_date = date '2020-01-01' where id = v_oscar;
+        insert into probe_results values
+            ('MG6: a RAW billing_anchor_date update is REFUSED by the schedule-column guard',
+             'FAIL: the raw update went through');
+    exception when others then
+        insert into probe_results values
+            ('MG6: a RAW billing_anchor_date update is REFUSED by the schedule-column guard',
+             'PASS');
+    end;
+end
+$probe$;
+select proof, verdict from probe_results order by proof;
+
+-- ---------------------------------------------------------------------------
+-- GX: new global invariants.
+-- ---------------------------------------------------------------------------
+select 'GX1: no calendar month is covered twice by any subscription (coverage never doubles, v1.1 12.1)' as proof,
+       case when count(*) = 0 then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from (select rp.subscription_id,
+               (rp.covered_month_first + make_interval(months => gs.n))::date as covered_m
+          from app.renewal_periods rp
+          cross join lateral generate_series(0, rp.covered_months - 1) as gs(n)
+         group by 1, 2
+        having count(*) > 1) dup;
+
+select 'GX2: supersession hygiene holds: no live retry pointer exists on any non-latest attempt' as proof,
+       case when count(*) = 0 then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.billing_attempts ba
+ where ba.next_action in ('retry', 'infra_immediate')
+   and exists (select 1 from app.billing_attempts b2
+                where b2.renewal_period_id = ba.renewal_period_id
+                  and b2.attempt_no > ba.attempt_no);
+
+select 'GX3: the outcome vocabulary is fully alive: skipped_paused and void_cancelled both occur in the ledger' as proof,
+       case when count(*) filter (where outcome = 'skipped_paused') = 4
+             and count(*) filter (where outcome = 'void_cancelled') = 2
+            then 'PASS (skipped_paused 4: one marker each for PETE, QUINN, '
+                 || 'RITA, SAM, pauses of 2, 1, 2, 2 months; void_cancelled '
+                 || '2: ZOE September and October)'
+            else 'FAIL: skipped_paused '
+                 || count(*) filter (where outcome = 'skipped_paused')
+                 || ', void_cancelled '
+                 || count(*) filter (where outcome = 'void_cancelled') end as verdict
+  from app.renewal_periods;
+
+select 'GX4: ZOE, cancellation unrelated to payment failure: her preflight-stopped periods read void_cancelled, never unpaid' as proof,
+       case when count(*) = 2 and bool_and(rp.outcome = 'void_cancelled')
+            then 'PASS' else 'FAIL: ' || count(*) end as verdict
+  from app.renewal_periods rp
+  join app.subscriptions s on s.id = rp.subscription_id
+  join app.members m on m.id = s.member_id and m.member_code = 'GW-9021';

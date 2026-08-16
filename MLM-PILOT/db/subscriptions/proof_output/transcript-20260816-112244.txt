@@ -1,0 +1,792 @@
+S1 proof run, 2026-08-16T11:22:44.138556
+repo: C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT
+container mlm-s1-proof started (postgres:latest, host port 55439)
+postgres ready
+
+===== APPLY [rig bootstrap (roles, quiet notices)] 00_bootstrap.sql (0.4s) =====
+DO
+ALTER DATABASE
+
+===== APPLY [001 core tables] 001_app_schema_core_tables.sql (0.5s) =====
+CREATE SCHEMA
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+
+===== APPLY [002 integrity triggers] 002_integrity_triggers.sql (0.4s) =====
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+
+===== APPLY [003 row level security] 003_row_level_security.sql (0.4s) =====
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+DO
+DO
+GRANT
+GRANT
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+DO
+
+===== APPLY [004 ranks seed] 004_ranks_seed.sql (0.4s) =====
+INSERT 0 5
+
+===== APPLY [005 demo views] 005_demo_views.sql (0.4s) =====
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+ALTER VIEW
+DO
+
+===== APPLY [006 immutability hardening] 006_immutability_hardening.sql (0.4s) =====
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+
+===== APPLY [007 customers] 007_customers.sql (0.5s) =====
+CREATE TABLE
+CREATE INDEX
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+GRANT
+CREATE POLICY
+DO
+CREATE VIEW
+CREATE VIEW
+ALTER VIEW
+ALTER VIEW
+DO
+
+===== APPLY [comp engine v1.3 (the 008/009 pointer target)] 001_comp_engine.sql (0.4s) =====
+CREATE TABLE
+CREATE INDEX
+ALTER TABLE
+CREATE FUNCTION
+CREATE FUNCTION
+REVOKE
+REVOKE
+
+===== APPLY [010 demo orders] 010_demo_orders.sql (0.5s) =====
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TABLE
+ALTER TABLE
+ALTER TABLE
+DO
+
+===== APPLY [013 demo orders index] 013_demo_orders_created_at_index.sql (0.4s) =====
+CREATE INDEX
+COMMENT
+
+===== APPLY [fixture part 1: products, members, legacy subscriptions] 01_fixture_base.sql (0.6s) =====
+INSERT 0 12
+INSERT 0 1
+INSERT 0 9
+INSERT 0 60
+INSERT 0 3
+
+===== APPLY [015 member tax addresses] 015_member_tax_addresses.sql (0.7s) =====
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 70
+UPDATE 0
+UPDATE 0
+UPDATE 0
+
+===== APPLY [016 order tax provenance] 016_order_tax_provenance.sql (0.5s) =====
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 0
+DO
+COMMENT
+COMMENT
+
+===== APPLY [017 tax transaction record] 017_tax_transaction_record.sql (0.5s) =====
+ALTER TABLE
+ALTER TABLE
+COMMENT
+CREATE INDEX
+
+===== APPLY [018 tax integrity hardening] 018_tax_integrity_hardening.sql (0.4s) =====
+UPDATE 0
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+DO
+COMMENT
+DO
+
+===== APPLY [019 shop-to-comp bridge] 019_shop_to_comp_bridge.sql (0.4s) =====
+ALTER TABLE
+ALTER TABLE
+COMMENT
+INSERT 0 4
+CREATE TABLE
+COMMENT
+INSERT 0 16
+ALTER TABLE
+DO
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMENT
+ALTER TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+REVOKE
+COMMENT
+
+===== APPLY [020 house account] 020_house_account.sql (0.5s) =====
+ALTER TABLE
+CREATE INDEX
+COMMENT
+INSERT 0 1
+CREATE TABLE
+CREATE INDEX
+COMMENT
+COMMENT
+ALTER TABLE
+DO
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+REVOKE
+CREATE VIEW
+COMMENT
+CREATE VIEW
+COMMENT
+CREATE VIEW
+CREATE VIEW
+DO
+
+===== APPLY [021 calendar-month containment] 021_calendar_month_containment.sql (0.4s) =====
+CREATE FUNCTION
+CREATE TRIGGER
+COMMENT
+CREATE VIEW
+COMMENT
+
+===== APPLY [022 refunds] 022_refunds.sql (0.5s) =====
+ALTER TABLE
+ALTER TABLE
+COMMENT
+CREATE FUNCTION
+CREATE TABLE
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TABLE
+COMMENT
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+COMMENT
+REVOKE
+CREATE VIEW
+COMMENT
+CREATE VIEW
+COMMENT
+CREATE VIEW
+COMMENT
+ALTER TABLE
+ALTER TABLE
+DO
+
+===== APPLY [024 subscription engine schema (S1)] 024_subscription_engine_schema.sql (0.6s) =====
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+UPDATE 3
+UPDATE 1
+ALTER TABLE
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+COMMENT
+CREATE TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+ALTER TABLE
+COMMENT
+CREATE TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+COMMENT
+CREATE TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+DO
+CREATE TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE TABLE
+CREATE INDEX
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE TABLE
+COMMENT
+CREATE TABLE
+COMMENT
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE TABLE
+COMMENT
+CREATE TABLE
+INSERT 0 1
+COMMENT
+ALTER TABLE
+ALTER TABLE
+COMMENT
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+DO
+
+===== APPLY [025 classification and ladder data (S1)] 025_subscription_policy_data.sql (0.4s) =====
+INSERT 0 28
+INSERT 0 14
+
+===== APPLY [026 renewal engine (S1)] 026_renewal_engine.sql (0.5s) =====
+CREATE FUNCTION
+COMMENT
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+COMMENT
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+DO
+CREATE VIEW
+COMMENT
+CREATE VIEW
+COMMENT
+CREATE VIEW
+COMMENT
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+
+===== APPLY [027 bridge covered_months amendment (S1)] 027_bridge_covered_months_spread.sql (0.4s) =====
+CREATE FUNCTION
+REVOKE
+COMMENT
+
+===== APPLY [fixture part 2: clock, cast, credentials, scripts] 02_fixture_s1.sql (0.4s) =====
+ fn_sim_clock_init 
+-------------------
+ 
+(1 row)
+
+INSERT 0 7
+INSERT 0 60
+INSERT 0 2
+UPDATE 2
+INSERT 0 3
+INSERT 0 6
+INSERT 0 1
+
+===== RUN [ticks 2026-09-01 .. 2026-11-14 (worked examples A/B, auto-cancel)] 10_ticks_sep_to_nov14.sql (1.6s) =====
+DO
+             label              | clock_date 
+--------------------------------+------------
+ segment 10 complete, clock now | 2026-11-14
+(1 row)
+
+===== RUN [FM2: the crash after 47 of 60 dispatches] 11_crash_tick.sql (0.6s) =====
+ set_config 
+------------
+ 47
+(1 row)
+
+ crashed_run_id 
+----------------
+             76
+(1 row)
+
+       label       | status  |                                notes                                 
+-------------------+---------+----------------------------------------------------------------------
+ crash: run status | running | SIMULATED CRASH after 47 dispatches (FM2 scenario); run left running
+(1 row)
+
+          label           | dispatched_attempts 
+--------------------------+---------------------
+ crash: stranded attempts |                  47
+(1 row)
+
+            label             | clock_date 
+------------------------------+------------
+ crash: clock did not advance | 2026-11-14
+(1 row)
+
+             label              | orphaned_rows 
+--------------------------------+---------------
+ crash: attention queue orphans |            47
+(1 row)
+
+===== RUN [FM2: the recovery rerun (reconciler + gather)] 12_recover_tick.sql (0.5s) =====
+ recovery_run_id 
+-----------------
+              77
+(1 row)
+
+              label               | periods | distinct_subscriptions | paid 
+----------------------------------+---------+------------------------+------
+ recover: batch periods accounted |      60 |                     60 |   60
+(1 row)
+
+                       label                       | max_attempts_per_cycle | min_attempts_per_cycle 
+---------------------------------------------------+------------------------+------------------------
+ recover: attempts per batch cycle (must all be 1) |                      1 |                      1
+(1 row)
+
+                         label                          | demo_orders | succeeded 
+--------------------------------------------------------+-------------+-----------
+ recover: batch demo orders (must be 60, all succeeded) |          60 |        60
+(1 row)
+
+                      label                       | still_dispatched 
+--------------------------------------------------+------------------
+ recover: stranded attempts remaining (must be 0) |                0
+(1 row)
+
+                               label                                | id |   status   | attempts_reconciled |                                notes                                 
+--------------------------------------------------------------------+----+------------+---------------------+----------------------------------------------------------------------
+ recover: run rows for 2026-11-15 (crashed superseded, rerun final) | 76 | superseded |                     | SIMULATED CRASH after 47 dispatches (FM2 scenario); run left running
+ recover: run rows for 2026-11-15 (crashed superseded, rerun final) | 77 | final      |                  47 | 
+(2 rows)
+
+===== RUN [ticks 2026-11-16 .. 2026-11-30] 13_ticks_nov16_nov30.sql (0.7s) =====
+DO
+             label              | clock_date 
+--------------------------------+------------
+ segment 13 complete, clock now | 2026-11-30
+(1 row)
+
+===== RUN [FM1: the double tick of 2026-12-01] 14_dec1_double_tick.sql (0.5s) =====
+ first_run_id 
+--------------
+           93
+(1 row)
+
+SELECT 1
+ double_tick_run_id 
+--------------------
+                 94
+(1 row)
+
+                              label                               | new_periods | new_attempts | new_demo_orders | new_orders 
+------------------------------------------------------------------+-------------+--------------+-----------------+------------
+ double-tick: new rows created by the second tick (all must be 0) |           0 |            0 |               0 |          0
+(1 row)
+
+                                label                                 | id |   status   
+----------------------------------------------------------------------+----+------------
+ double-tick: run rows for 2026-12-01 (first superseded, rerun final) | 93 | superseded
+ double-tick: run rows for 2026-12-01 (first superseded, rerun final) | 94 | final
+(2 rows)
+
+                          label                           | periods_scheduled_today | distinct_subscriptions 
+----------------------------------------------------------+-------------------------+------------------------
+ double-tick: one billing for 2026-12-01 per subscription |                       6 |                      6
+(1 row)
+
+===== RUN [FM3: price change 2026-12-14, ticks to 2027-01-31] 15_price_change_and_ticks_to_jan31.sql (1.3s) =====
+DO
+UPDATE 1
+              label              |    sku    | price  | volume_points 
+---------------------------------+-----------+--------+---------------
+ price change applied 2026-12-14 | AGT-D-002 | 110.00 |        110.00
+(1 row)
+
+DO
+             label              | clock_date 
+--------------------------------+------------
+ segment 15 complete, clock now | 2027-01-31
+(1 row)
+
+===== RUN [catch-up: skip 2027-02-01, ticks to 2027-09-30] 16_skip_and_finish.sql (5.3s) =====
+ fn_sim_clock_skip 
+-------------------
+ 
+(1 row)
+
+DO
+                              label                              | periods_due_feb1 | paid | attempted_on_min | attempted_on_max 
+-----------------------------------------------------------------+------------------+------+------------------+------------------
+ catch-up: cycles scheduled for the missed day (billed on Feb 2) |                6 |    5 | 2027-02-02       | 2027-02-02
+(1 row)
+
+             label              | clock_date 
+--------------------------------+------------
+ segment 16 complete, clock now | 2027-09-30
+(1 row)
+
+===== RUN [commission runs Sep..Dec 2026 (unmodified engine)] 20_commission_runs.sql (0.4s) =====
+ run_sep 
+---------
+       1
+(1 row)
+
+ run_oct 
+---------
+       2
+(1 row)
+
+ run_nov 
+---------
+       3
+(1 row)
+
+ run_dec 
+---------
+       4
+(1 row)
+
+      label      | id |   period   | spec_version | status  
+-----------------+----+------------+--------------+---------
+ commission runs |  1 | 2026-09-01 | v1.3         | running
+ commission runs |  2 | 2026-10-01 | v1.3         | running
+ commission runs |  3 | 2026-11-01 | v1.3         | running
+ commission runs |  4 | 2026-12-01 | v1.3         | running
+(4 rows)
+
+===== RUN [THE PROOF BATTERY] 30_proof_battery.sql (2.6s) =====
+              proof              | verdict 
+---------------------------------+---------
+ A1: one final run per tick date | PASS
+(1 row)
+
+                        proof                        | verdict | run_rows 
+-----------------------------------------------------+---------+----------
+ A2: superseded rerun evidence exists for 2026-12-01 | PASS    |        2
+(1 row)
+
+                           proof                           | verdict | periods 
+-----------------------------------------------------------+---------+---------
+ A3: every cycle accounted exactly once (the FM1 key held) | PASS    |     752
+(1 row)
+
+                      proof                      | verdict 
+-------------------------------------------------+---------
+ B1: no attempt is left non-terminal at year end | PASS
+(1 row)
+
+                            proof                             | verdict 
+--------------------------------------------------------------+---------
+ B2: the crash batch billed exactly once each (60 of 60 paid) | PASS
+(1 row)
+
+                                     proof                                      | verdict | attempts_for_cycle_1 
+--------------------------------------------------------------------------------+---------+----------------------
+ B3: the scripted orphan (GW-9247 cycle 1) resolved on its ORIGINAL attempt row | PASS    |                    1
+(1 row)
+
+                         proof                          | verdict 
+--------------------------------------------------------+---------
+ B4: the crashed run row survives as superseded history | PASS
+(1 row)
+
+                            proof                            | verdict | dec_cents | jan_cents 
+-------------------------------------------------------------+---------+-----------+-----------
+ C1: HANK Dec billed the old price, Jan the new, to the cent | PASS    |     10000 |     11000
+(1 row)
+
+                              proof                              | verdict 
+-----------------------------------------------------------------+---------
+ C2: the schema has NO stored-price path on subscriptions at all | PASS
+(1 row)
+
+                         proof                          | verdict 
+--------------------------------------------------------+---------
+ D1: FRED has exactly twelve accounted cycles, all paid | PASS
+(1 row)
+
+                       proof                        | verdict 
+----------------------------------------------------+---------
+ D2: FRED cycle dates clamp and return, never drift | PASS
+(1 row)
+
+                                    proof                                    | verdict 
+-----------------------------------------------------------------------------+---------
+ D3: the cycle audit shows ZERO gaps across every billing-state subscription | PASS
+(1 row)
+
+                                  proof                                   | verdict | preflight_stops 
+--------------------------------------------------------------------------+---------+-----------------
+ E1: every DANA attempt stopped at pre-flight, classified internal_config | PASS    |              13
+(1 row)
+
+                                 proof                                 | verdict 
+-----------------------------------------------------------------------+---------
+ E2: zero retries ever ran for DANA (one attempt per cycle, no ladder) | PASS
+(1 row)
+
+                                              proof                                               | verdict 
+--------------------------------------------------------------------------------------------------+---------
+ E3: DANA's dunning and auto-cancel clocks are untouched (state active, zero member-fault events) | PASS
+(1 row)
+
+                                proof                                | verdict | attention_rows 
+---------------------------------------------------------------------+---------+----------------
+ E4: DANA is surfaced in the staff attention queue as a system fault | PASS    |             13
+(1 row)
+
+                           proof                            | verdict 
+------------------------------------------------------------+---------
+ E5: never reached the processor: DANA has zero demo orders | PASS
+(1 row)
+
+                                    proof                                    | verdict 
+-----------------------------------------------------------------------------+---------
+ W-A1: ANN A attempt trail is decline,decline,decline,success on Sep 1,3,5,9 | PASS
+(1 row)
+
+                   proof                    | verdict 
+--------------------------------------------+---------
+ W-A2: ANN A September SV is exactly 100.00 | PASS
+(1 row)
+
+                             proof                             | verdict 
+---------------------------------------------------------------+---------
+ W-A3: Beth earns exactly 8.00 from ANN A in the September run | PASS
+(1 row)
+
+                              proof                              | verdict 
+-----------------------------------------------------------------+---------
+ W-B1: ANN B ran six attempts on Sep 1,3,5,9,16,23, all declined | PASS
+(1 row)
+
+                                                proof                                                 | verdict 
+------------------------------------------------------------------------------------------------------+---------
+ W-B2: ANN B entered dunning when the plus-8 retry failed (Sep 9), suspended at the Sep 26 checkpoint | PASS
+(1 row)
+
+                              proof                               | verdict 
+------------------------------------------------------------------+---------
+ W-B3: ANN B September SV is 0.00 and the period is frozen unpaid | PASS
+(1 row)
+
+                           proof                           | verdict 
+-----------------------------------------------------------+---------
+ W-B4: Beth has NO commission line from ANN B in September | PASS
+(1 row)
+
+                                       proof                                       | verdict 
+-----------------------------------------------------------------------------------+---------
+ W-B5: ANN B auto-cancelled on Nov 1 after two consecutive unpaid months (T22, R4) | PASS
+(1 row)
+
+                          proof                           | verdict 
+----------------------------------------------------------+---------
+ W-C1: CARL's Oct 1 quarterly billing charged 30000 cents | PASS
+(1 row)
+
+                              proof                              | verdict 
+-----------------------------------------------------------------+---------
+ W-C2: the bridge spread it into exactly 100 PV in Oct, Nov, Dec | PASS
+(1 row)
+
+                              proof                               | verdict 
+------------------------------------------------------------------+---------
+ W-C3: Beth earns exactly 8.00 from CARL in EACH of Oct, Nov, Dec | PASS
+(1 row)
+
+                                          proof                                          | verdict 
+-----------------------------------------------------------------------------------------+---------
+ S1: legacy rows backfilled exactly (monthly, anchored at start_month, states preserved) | PASS
+(1 row)
+
+                                proof                                | verdict 
+---------------------------------------------------------------------+---------
+ S2: the engine epoch stopped any catch-up billing of seeded history | PASS
+(1 row)
+
+                            proof                             | verdict 
+--------------------------------------------------------------+---------
+ G1: no volume without a succeeded demo order (R2 structural) | PASS
+(1 row)
+
+                                                    proof                                                    | verdict 
+-------------------------------------------------------------------------------------------------------------+---------
+ G2: no retry ever followed a hard, cancellation, config, duplicate, auth, or internal_config classification | PASS
+(1 row)
+
+                                    proof                                    | verdict 
+-----------------------------------------------------------------------------+---------
+ G3: no executed attempt outside its billing month or above day 26 (rule C1) | PASS
+(1 row)
+
+                                    proof                                     | verdict | final_runs 
+------------------------------------------------------------------------------+---------+------------
+ G4: every run asserts the promo hook was identity and the MIT invariant held | PASS    |        394
+(1 row)
+
+                                      proof                                       | verdict 
+----------------------------------------------------------------------------------+---------
+ G5: member-fault and system-fault failures are reported separately and never mix | PASS
+(1 row)
+
+                                 proof                                  | verdict 
+------------------------------------------------------------------------+---------
+ G6: the attention queue is empty of orphans and cycle gaps at year end | PASS
+(1 row)
+
+                                             proof                                              | verdict 
+------------------------------------------------------------------------------------------------+---------
+ G7: the clock advance log is day-continuous (the deliberate skip wrote its own logged advance) | PASS
+(1 row)
+
+                                    proof                                    | verdict 
+-----------------------------------------------------------------------------+---------
+ G8: pricing totals reconcile: every paid period equals its demo order total | PASS
+(1 row)
+
+===== HARNESS VERDICT =====
+ALL PROOFS PASS
+transcript: C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\db\subscriptions\proof_output\transcript-20260816-112244.txt
+container kept: docker exec -it mlm-s1-proof psql -U postgres -d mlm
