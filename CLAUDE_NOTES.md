@@ -178,3 +178,8 @@ Follow-up Plaid shopper simulation:
 - The panel now simulates the shopper flow: choose sandbox bank, enter sandbox credentials, consent, choose an account, see a processing handoff, then land on the normal order confirmation page.
 - The final Plaid authorization button includes the visible checkout amount, for example `Authorize EUR 289.80`.
 - The IE/GB billing row was cleaned up at the same time: `ZIP / postal code` became `Postal code`, and the three-column row now reserves enough width for non-US address labels.
+
+Follow-up wallet demo guard:
+- Google Pay and PayPal are intentionally routed to storefront demo completion for now.
+- Selecting either wallet no longer opens HyperSwitch, Google Pay, or PayPal, so it cannot validate the shopper's real wallet cards.
+- On USD checkout, the button reads `Place demo order with Google Pay` or `Place demo order with PayPal` and lands on the normal order confirmation page with the matching sandbox payment method.
