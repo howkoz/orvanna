@@ -283,6 +283,14 @@ derivations in section 6.4). Therefore:
 
 ## 4. The four launch plans, with exact draft parameters
 
+> Registration note, 2026-08-16: a FIFTH plan, plan_code 'orvanna_builder', is
+> specified in its own document, `docs\ORVANNA-BUILDER-PLAN-SPEC.md` (plain path:
+> `C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\ORVANNA-BUILDER-PLAN-SPEC.md`),
+> and runs under this spec's engine contract (sections 1, 2, 9, 10, 11) with reason
+> codes 'builder_spine_level_pay', 'builder_override_gen1', 'builder_override_gen2',
+> 'builder_second_leg_bonus' and no placement strategy. This note registers it in the
+> plan list and changes nothing else in this specification.
+
 Common gates for all four (held fixed so comparisons are about SHAPE): qualification is
 SV >= 100.00, sources pay regardless of their own qualification, no compression, line
 rounding per section 1.3. Parameter values below are drafts; they live in `p_params`
