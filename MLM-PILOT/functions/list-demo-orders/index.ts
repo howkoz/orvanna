@@ -18,19 +18,10 @@
    'abandoned', so the list shows them honestly.
 
    ============================================================
-   EXTENDED FOR THE STAFF ORDER HISTORY. NOT DEPLOYED as of
-   2026-08-16: the live version is still the original 25-row
-   listing. See the DEPLOY BLOCKER note in refund-payment/index.ts.
-
-   NOTE FOR WHOEVER DEPLOYS THIS. The currently deployed bundle
-   carries a STALE copy of _shared/edge.ts, from before
-   checkRateLimit learned to borrow a caller's connection. Deploying
-   this file will also refresh that copy, which is wanted, but it
-   means the deploy is not a no-op for the shared code.
-
-   Design: DOCUMENTATION\11-REFUNDS.md
-   Plain path:
-   C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\11-REFUNDS.md
+   EXTENDED FOR THE STAFF ORDER HISTORY. LIVE 2026-08-16, version 6,
+   deployed from disk. This deploy also refreshed the bundle's copy of
+   _shared/edge.ts, which had been stale since before checkRateLimit
+   learned to borrow a caller's connection.
 
    WHY THIS FUNCTION RATHER THAN A NEW ONE. The staff console
    needs an order history and an order detail view. Both are

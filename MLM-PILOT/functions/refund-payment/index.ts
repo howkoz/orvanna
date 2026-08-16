@@ -1,15 +1,14 @@
 /* ============================================================
    refund-payment (Supabase Edge Function, Deno)
 
-   NOT DEPLOYED. Authorised on 2026-08-16 but NOT shipped; the
-   deploy was stopped deliberately. See the DEPLOY BLOCKER note at
-   the foot of this header.
+   LIVE. Deployed 2026-08-16 by Howard from the command line tool,
+   which reads from disk, so this file is what is running.
 
-   When it is deployed it must go out WITHOUT platform JSON Web
-   Token verification, because the staff token travels in
-   x-orvanna-session and the platform key would otherwise claim the
-   Authorization header. Its own signature check is what secures
-   it, exactly like payment-webhook.
+   Deployed with verify_jwt TRUE, matching every other function
+   except the webhook. That is fine and needed no workaround: the
+   staff token travels in x-orvanna-session, so the platform keeps
+   Authorization for the anonymous key and the two never collide.
+   That header split was designed for exactly this case.
 
    Design: DOCUMENTATION\11-REFUNDS.md
    Schema: db\migrations\022_refunds.sql plus 023 (guard fix)
@@ -151,44 +150,34 @@
    coordinator's call, not this file's.
 
    ------------------------------------------------------------
-   DEPLOY BLOCKER, 2026-08-16. WHY THIS IS NOT LIVE.
+   VERIFIED AGAINST THE LIVE ENDPOINT, 2026-08-16.
 
-   Migrations 022 and 023 ARE applied and verified. This function
-   is not, and that was a deliberate stop rather than a failure to
-   get to it.
+   Ten refusals were sent directly to this endpoint, not through the
+   screen, and every one refused. The six authorisation failures all
+   answer the caller with the same 'not_authorised' and record six
+   DIFFERENT reasons in app.demo_staff_actions, which is the design
+   working. Full table in section 16.0 of the design document.
 
-   The Supabase command line tool is installed (version 2.114.0)
-   and supabase/functions is a symlink to this folder, so it would
-   deploy straight from disk with no transcription at all. But it
-   has NO stored credential: there is no SUPABASE_ACCESS_TOKEN and
-   no logged-in session, and logging in is interactive.
+   The two that could never be tested before deploy, because they
+   need the database, both refused by name: the Orvanna_Admin member
+   portal login and a GW-000001 Conductor login. There are 1,002
+   accounts that can sign in and exactly one that may refund.
 
-   The only other route is the management tool, which takes file
-   CONTENTS inline. That means hand-copying this file plus
-   _shared/edge.ts, _shared/staff-auth.ts and _shared/refund-rules.ts
-   into the call, roughly 2,500 lines, and again for
-   list-demo-orders, and again to diff each one back. That is
-   precisely the silent bundle drift the coordinator warned about,
-   on the one code path in this project that moves money out of the
-   business, and it was judged not worth doing at the end of a long
-   session.
+   ONE OPEN DEFECT, an audit label rather than a hole. A request with
+   NO session header is logged as bad_signature, not missing_token,
+   because bearerFrom falls back to Authorization and on this
+   deployment that header always carries the anonymous key: a
+   well-formed token that simply is not ours. The refusal is correct
+   and nothing reaches an order. What is lost is the ability to tell
+   "nobody was signed in" from "somebody presented a forged token",
+   and the second is the one worth alerting on.
 
-   THE SYSTEM IS IN A SAFE, COHERENT STATE BECAUSE OF THIS. The
-   schema is ready and inert: no deployed code writes the new
-   states, reads the new tables, or can reach a refund. There is no
-   half-live refund path and no button pointing at a missing
-   endpoint, because the site was not published either.
+   THE FIX IS ONE LINE: drop the Authorization fallback in
+   _shared/staff-auth.ts bearerFrom. It is right for this function
+   precisely BECAUSE it is deployed with verify_jwt true, so that
+   header is always the platform's and never ours. Deliberately not
+   changed on the night of deploy.
 
-   TO FINISH IT, in this order:
-     1. supabase login   (interactive, Howard runs it once)
-        or set SUPABASE_ACCESS_TOKEN in the environment
-     2. supabase functions deploy refund-payment --no-verify-jwt
-        supabase functions deploy list-demo-orders
-        both from MLM-PILOT, which reads these files from disk
-     3. py deploy\build_dist.py, then commit and push both repos
-     4. run the ten direct-call refusals in section 16 of
-        DOCUMENTATION\11-REFUNDS.md against the live endpoint
-     5. one real test order, then refund it
    ============================================================ */
 
 import {

@@ -1,6 +1,5 @@
 /* ============================================================
-   refund-rules.ts  NOT DEPLOYED (see refund-payment/index.ts, the
-   DEPLOY BLOCKER note, 2026-08-16)
+   refund-rules.ts  LIVE 2026-08-16
 
    EVERY RULE ABOUT WHETHER AN ORDER MAY BE REFUNDED, IN ONE
    PURE MODULE.

@@ -2,23 +2,19 @@
 
 **Owner of this document:** the architect on the Orvanna build team.
 **Written:** 2026-08-15.
-**Status as of 2026-08-16: SCHEMA APPLIED, CODE NOT DEPLOYED. Read this before anything
-else.**
+**Status as of 2026-08-16: LIVE.**
 
 | Artefact | State |
 |---|---|
 | Migration 022 (refunds schema) | **APPLIED** to project `oiyibdczkokegaxkwulv` and verified |
 | Migration 023 (guard fix) | **APPLIED**, see the box below |
-| `refund-payment` Edge Function | **NOT deployed** |
-| `list-demo-orders` (extended) | **NOT deployed**, the live version is still the original |
-| `www\staff.html` order history and refund button | **NOT published** |
-| Any real refund | **None issued.** No refund exists, on any order |
+| `refund-payment` Edge Function | **LIVE**, version 2, `verify_jwt: true` |
+| `list-demo-orders` (extended) | **LIVE**, version 6 |
+| `www\staff.html` order history and refund button | **PUBLISHED** |
+| The ten direct-call refusals | **ALL TEN REFUSED**, section 16.0 |
 
-**So no refund can currently be performed by anybody**, and that is a coherent, safe state
-rather than a half-finished one: the schema is inert because no deployed code writes the new
-states, reads the new tables, or can reach a refund, and there is no published button
-pointing at a missing endpoint. Verified after applying: `list-demo-orders` still answers
-HTTP 200 with 25 orders, unchanged.
+Both functions were deployed by Howard from the command line tool, which reads straight from
+disk, so there is no bundle drift to chase.
 
 > **MIGRATION 022 SHIPPED A DEFECT AND VERIFICATION CAUGHT IT.** The transition guard allowed
 > `processing -> refunded` and `created -> refunded`. Migration 010's guard only ever tested
@@ -1007,7 +1003,63 @@ Recorded rather than fixed, and none blocks the refund path.
 
 ## 16. Verification
 
-### 16.1 What was actually executed, and what it proves
+### 16.0 THE TEN REFUSALS, RUN AGAINST THE LIVE ENDPOINT, 2026-08-16
+
+Both functions were deployed by Howard from the command line tool, which reads from disk, so
+there is no bundle drift to chase. `refund-payment` is live at version 2 with
+`verify_jwt: true`, **matching every other function except the webhook, and that is fine**:
+the staff token travels in `x-orvanna-session`, so the platform keeps `Authorization` for the
+anonymous key and the two never collide. That header split was designed for exactly this and
+needed no workaround.
+
+Ten refusals were sent **directly to the endpoint**, not through the screen, paced to respect
+the three-per-minute limit. Every one refused. HTTP status is what the caller saw;
+`outcome_code` is from `app.demo_staff_actions`.
+
+| # | Sent | HTTP | outcome_code |
+|---|---|---|---|
+| 1 | no session header | 401 `not_authorised` | `bad_signature` (see the note below) |
+| 2 | hand-written session token | 401 `not_authorised` | `bad_signature` |
+| 3 | expired staff token | 401 `not_authorised` | `expired` |
+| 4 | **`Orvanna_Admin` token** | 401 `not_authorised` | `wrong_role` |
+| 5 | **`GW-000001` member token** | 401 `not_authorised` | `wrong_role` |
+| 6 | valid signature, account absent | 401 `not_authorised` | `unknown_user` |
+| 7 | **order 26.6 hours old** | 409 `outside_refund_window` | `outside_refund_window` |
+| 8 | order still `processing` | 409 `not_refundable` | `not_refundable` |
+| 9 | order that does not exist | 404 `order_not_found` | `order_not_found` |
+| 10 | `confirm` omitted | 400 `not_confirmed` | `not_confirmed` |
+
+Rows 4 and 5 are the ones that could never be tested before, because they need the database:
+**1,002 accounts can sign in and exactly one may refund.** Both the member portal login and a
+Conductor login were refused by name. Row 7 is the 24 hour window firing on live data:
+*"Refunds are limited to orders placed in the last 24 hours. This one is 26.7 hours old, so it
+has to be handled another way."*
+
+**Two things this run incidentally proved.** The six 401s tell the caller the same thing and
+record six *different* reasons, which is the design working. And every call returned a real
+HTTP status rather than a network failure, which is the only proof available that the current
+`_shared/edge.ts` shipped: without its `x-orvanna-session` entry in
+`Access-Control-Allow-Headers`, the browser would have failed at preflight and never reached
+the function at all.
+
+> **ONE DISCREPANCY, AND IT IS AN AUDIT LABEL RATHER THAN A HOLE.** Row 1 sends no session
+> header and is logged as `bad_signature`, not `missing_token`. The cause: `bearerFrom` falls
+> back to `Authorization` when `x-orvanna-session` is absent, and on this deployment
+> `Authorization` always carries the anonymous key, which is a well-formed token that simply
+> is not ours. So it is read, fails the signature check, and is refused.
+>
+> **The refusal is correct and the request never reaches an order.** What is lost is
+> precision: "nobody was signed in" and "somebody presented a forged token" now look
+> identical in the audit log, and the second is the one worth alerting on. `missing_token` is
+> effectively unreachable from a browser.
+>
+> The fix is one line, dropping the `Authorization` fallback, which is right for this function
+> precisely because it is deployed with `verify_jwt: true` and that header is therefore always
+> the platform's. **It is not being made tonight**, because deploying it needs the command
+> line tool and this session has no credential for it, and because changing a money path to
+> improve a log label at the end of a long night is the wrong trade. Recorded as open.
+
+### 16.1 What was executed before deploy, and what it proved
 
 **The order rules were run and every refusal fired.** Because `_shared/refund-rules.ts`
 imports nothing and touches nothing, the decision itself can be executed without a server or

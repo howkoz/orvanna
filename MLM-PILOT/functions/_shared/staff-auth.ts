@@ -1,6 +1,5 @@
 /* ============================================================
-   staff-auth.ts  NOT DEPLOYED (see refund-payment/index.ts, the
-   DEPLOY BLOCKER note, 2026-08-16)
+   staff-auth.ts  LIVE 2026-08-16
 
    THE SINGLE PLACE "IS THIS A STAFF AGENT?" IS DECIDED.
 
