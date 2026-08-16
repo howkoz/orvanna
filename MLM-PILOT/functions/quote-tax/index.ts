@@ -114,6 +114,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const taxIdText = typeof body.tax_id === "string" ? body.tax_id.trim().slice(0, 40) : "";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
+    /* The guest's picked tax state (2026-08-16): a two-letter CODE,
+       never an address. The shared allow list in _shared/tax.ts is
+       the only place it becomes one; anything unknown falls back to
+       the house default without erroring, and the server ignores it
+       entirely whenever a member is attached. Sliced to two
+       characters because that is all a state code is. */
+    const rawGuestState =
+      typeof body.guest_state === "string" ? body.guest_state.trim().slice(0, 2) : "";
 
     /* Identical call to the one create-payment makes, on purpose:
        the same mirror, the same caps, the same ceiling. A quote that
@@ -125,7 +133,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
     const order = priced.order;
 
-    const { address } = await resolveTaxAddress(client, rawMemberCode);
+    const { address } = await resolveTaxAddress(client, rawMemberCode, rawGuestState);
 
     const taxableCents =
       order.subtotal_one_cents + order.subtotal_sub_cents + order.activation_fee_cents;

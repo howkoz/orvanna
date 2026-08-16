@@ -93,6 +93,53 @@ export const HOUSE_TAX_ADDRESS: TaxAddress = {
   country: "US",
 };
 
+/* ------------------------------------------------------------
+   THE GUEST STATE ALLOW LIST (added 2026-08-16).
+
+   Howard's ask: a guest should be able to pick a state and watch
+   the tax engine answer for THAT state, instead of every guest
+   order silently pricing from Illinois. The rule that the
+   destination comes from the server, never the browser, does not
+   bend for this: the browser sends only a two-letter CODE, and
+   this table is the only place a code becomes an address. Every
+   address is canned, synthetic at the street (nobody lives at
+   1 Demonstration Way), and real at the city, ZIP code, and
+   state, which is what Stripe Tax actually prices on.
+
+   Eight states, chosen for the demonstration they give:
+     IL  the house default, stated everywhere as the default
+     NY  the famous 8.875 percent New York City combined rate
+     CA, TX, FL  three large, familiar, different-rate states
+     OR  no state sales tax at all: the zero-with-a-reason demo
+     WA, CO  two more distinct regimes (WA high, CO low state rate)
+
+   An unknown or absent code falls back to the house address,
+   silently HERE (a mistyped code must never fail a quote or a
+   cart) and visibly on the page, which labels the default as the
+   default. Whether a chosen state actually returns a nonzero
+   figure is still Howard's Stripe dashboard registration for that
+   state; an unregistered state answers zero with the reason
+   not_collecting, and the page says which zero it is.
+   ------------------------------------------------------------ */
+export const GUEST_STATE_ADDRESSES: Record<string, TaxAddress> = {
+  IL: HOUSE_TAX_ADDRESS,
+  NY: { line1: "1 Demonstration Way", city: "New York", state: "NY", zip: "10007", country: "US" },
+  CA: { line1: "1 Demonstration Way", city: "Sacramento", state: "CA", zip: "95814", country: "US" },
+  TX: { line1: "1 Demonstration Way", city: "Austin", state: "TX", zip: "78701", country: "US" },
+  FL: { line1: "1 Demonstration Way", city: "Tallahassee", state: "FL", zip: "32301", country: "US" },
+  OR: { line1: "1 Demonstration Way", city: "Portland", state: "OR", zip: "97201", country: "US" },
+  WA: { line1: "1 Demonstration Way", city: "Seattle", state: "WA", zip: "98101", country: "US" },
+  CO: { line1: "1 Demonstration Way", city: "Denver", state: "CO", zip: "80202", country: "US" },
+};
+
+/* Map a guest's state code to its canned address. Trimming and
+   uppercasing here means the two callers cannot normalize
+   differently. Anything not on the list is the house default. */
+export function guestAddressFor(rawStateCode: string): TaxAddress {
+  const code = rawStateCode.trim().toUpperCase();
+  return GUEST_STATE_ADDRESSES[code] ?? HOUSE_TAX_ADDRESS;
+}
+
 /* A tax identifier is TEXT here and a verdict nowhere else. The
    old browser-supplied tax_exempt boolean let any caller zero
    their own tax, which was the one hole in an otherwise
@@ -104,15 +151,36 @@ export function looksLikeTaxId(taxIdText: string): boolean {
 /* Read the destination for a member code, server side.
 
    A miss is not an error: a mistyped code must never fail a cart,
-   so it falls back to the house address exactly as a guest does.
+   so it falls back to the guest path exactly as a guest does.
    Returns the member's row id too, because create-payment needs it
-   for attribution and would otherwise repeat this query. */
+   for attribution and would otherwise repeat this query.
+
+   THE GUEST STATE CODE (third argument, added 2026-08-16) applies
+   ONLY when no member row is attached. The precedence, in words:
+
+     member found, address on file   the member's stored address,
+                                     the state code is IGNORED
+     member found, no address        the house default, the state
+                                     code is STILL ignored: an
+                                     attached member's tax basis is
+                                     the member record, exactly as
+                                     before this parameter existed
+     no member (empty code or miss)  the guest's picked state from
+                                     the allow list, house default
+                                     for anything unknown
+
+   Ignoring the code whenever a member is attached is what keeps
+   signed-in members byte-for-byte unchanged, and it also means a
+   guest who credits a referring member gets that member's real
+   destination rather than their own pick, which is the same rule
+   the checkout has always applied. */
 export async function resolveTaxAddress(
   client: DbClient,
   rawMemberCode: string,
+  rawGuestState = "",
 ): Promise<{ memberId: number | null; address: TaxAddress }> {
   if (rawMemberCode === "") {
-    return { memberId: null, address: HOUSE_TAX_ADDRESS };
+    return { memberId: null, address: guestAddressFor(rawGuestState) };
   }
   const memberRow = await client.queryObject<{
     id: number;
@@ -128,7 +196,7 @@ export async function resolveTaxAddress(
     [rawMemberCode],
   );
   const m = memberRow.rows[0];
-  if (!m) return { memberId: null, address: HOUSE_TAX_ADDRESS };
+  if (!m) return { memberId: null, address: guestAddressFor(rawGuestState) };
   if (!m.demo_address_zip) {
     return { memberId: m.id, address: HOUSE_TAX_ADDRESS };
   }

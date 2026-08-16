@@ -329,6 +329,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
       body.channel === "staff_console" ? "staff_console" : "shop";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
+    /* The guest's picked tax state (2026-08-16): parsed IDENTICALLY
+       to quote-tax, on purpose, because the whole point of the
+       shared resolver is that the state a shopper was quoted
+       against is by construction the state they are charged
+       against. A two-letter CODE, never an address; the allow list
+       in _shared/tax.ts is the only place it becomes one, and it is
+       ignored entirely whenever a member is attached. */
+    const rawGuestState =
+      typeof body.guest_state === "string" ? body.guest_state.trim().slice(0, 2) : "";
     /* Optional. "shop.html" or "staff.html" only; anything else
        (including absent, or a full address someone tried to
        smuggle in) falls back to shop.html in buildReturnUrl. */
@@ -351,6 +360,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const { memberId, address: taxAddress } = await resolveTaxAddress(
       client,
       rawMemberCode,
+      rawGuestState,
     );
 
     /* ---- real tax, replacing the flat mirror estimate ---- */
