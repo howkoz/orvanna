@@ -6,7 +6,8 @@ Written by the two graders themselves: `mlm-verifier` (correctness) and `mlm-qa`
 (completeness). Neither of us built any of the product described here. That is the
 whole point of us.
 
-State of the record: **2026-08-15.**
+State of the record: **end of 2026-08-15, carried into the small hours of
+2026-08-16.** Section 0 is the two-minute version.
 
 Plain path to this file:
 `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\06-QA-AND-VERIFICATION.md`
@@ -33,6 +34,87 @@ Mail Order or Telephone Order (MOTO).
 *The picture first. Green is proven twice. Amber is proven once, or proven against
 something that has since changed. Red has never been proven at all. Full-size file:*
 `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\diagrams\qa-coverage.svg`
+
+---
+
+## 0. State of play, end of 2026-08-15
+
+**Read this if you have two minutes and nothing else.** Everything below it is
+the evidence for it.
+
+### What is LIVE and PROVEN
+
+- **Refunds.** `refund-payment` version 2 and `list-demo-orders` version 6 are
+  deployed, from disk, by Howard, using the command line tool. Ten direct-call
+  refusals were driven against the live endpoint and all ten refused. **One real
+  refund was executed and it worked**: order `ORV-2026-08-1JSPY4`, $109.75
+  including $9.75 tax, member `GW-000001`, Braintree succeeded, requested by
+  `Orvanna_Staff`. The money returned matched the money charged **to the cent**,
+  which settles the single most important untested thing in this project as it
+  stood yesterday.
+- **The tax drift measurement.** `app.v_demo_tax_drift` now reads 975 cents. It
+  is the first non-zero reading, it is exactly the tax on the one refunded order,
+  and it is the designed consequence of not reversing tax rather than a fault.
+- **The public data surface is unchanged.** Exactly seven views are readable by
+  the anonymous key, the same seven as before the refunds work.
+- **Everything shipped before 2026-08-15** as recorded in section 2, with the
+  standing warnings there about which gates are stale.
+
+### What is APPLIED to the database
+
+Migrations 001 to 018, plus 022 and 023. Migration 018 made `tax_source`
+mandatory and made `total_cents` provably the sum of its parts, and **no
+historical row was altered** doing it (verified: zero rows carry the backfill
+value, zero rows violate the sum, zero rows were touched in the applying minute).
+Migrations 022 and 023 are the refunds schema.
+
+### What is PROPOSED and NOT applied
+
+Migrations **019** (the shop to compensation bridge), **020** (the GW-000 house
+account) and **021** (calendar month containment). Verified absent from the live
+ledger. Until 019 lands, **no live sale has ever produced a single point of
+volume**, which is the largest unfinished thing in the whole project.
+
+### What is DECIDED but NOT built
+
+**Instant Payout.** Approved by Howard at **20 percent of the order price**,
+paid by the sponsor, **terminal at the sponsor with no roll-up**. Not one line of
+code or SQL exists for it. The public brochure labels it "approved, not built" on
+every mention, which is the honest handling and was checked.
+
+### What is NEW on the property
+
+Four new things shipped, across five files: the **Conductor Library** split into
+an index and a per-agent detail page, the **compensation brochure**, the **FAQ**,
+and the **Conductor explainer**. The vocabulary changed with them: a distributor
+is now a **Conductor**, the agents they run are an **Ensemble**, and the people
+they sponsor are a **Team**.
+
+### The three things to do first tomorrow
+
+1. **Fix the address the checkout shows.** A signed-in member sees a synthetic
+   Iowa address on the payment screen and is charged the California rate from
+   their stored address. The amount is right; the address shown at the moment of
+   consent is not the one that produced it. This is new finding **N-H1** and it
+   is the only HIGH raised today.
+2. **Grade the staff refund screen.** The refund *endpoint* is now the
+   best-evidenced code in the project. The *button* that reaches it has never had
+   a single checklist row run against it, and the staff console has still never
+   had a verifier gate of any kind.
+3. **Decide migration 019.** Everything about compensation from real sales is
+   waiting behind it, including whether Instant Payout can ever be more than a
+   brochure promise.
+
+### The one lesson worth carrying out of today
+
+**Widen a constraint, and re-read every trigger that was leaning on it being
+narrow.** Migration 022 widened a CHECK constraint to admit `refunded`. Migration
+010's trigger had been relying on that constraint to reject values it had never
+heard of, so widening it silently deleted the guarantee and
+`processing` to `refunded` briefly became legal. Caught by the migration's own
+verification block, before any refund existed, and closed by migration 023. A
+constraint and a trigger that together enforce one rule are one mechanism, and
+editing half a mechanism is how this class of defect is made.
 
 ---
 
@@ -123,8 +205,13 @@ document is a missing gate, not an implied pass.**
 | Office landing (retroactive gate on live code) | Rebuilt member portal home | not gated | **FAIL** (2 HIGH contrast, 5 MEDIUM, 4 LOW) | 2026-08-14 | **No. Failed, and shipped anyway by Howard's own explicit ruling that no rollback was warranted.** |
 | Full audit sweep, six areas | Everything, treated as unreviewed | **FAIL** (4 HIGH, 9 MEDIUM, 6 LOW) | **FAIL** (2 HIGH, 8 MEDIUM, 8 LOW) | 2026-08-15 | **No. Both gates failed.** |
 | Stripe Tax (quote-tax, record-tax, migrations 015 to 017) | Real destination-based tax on the live checkout | **no document exists** | **no document exists** | 2026-08-15 | **No gate of any kind has ever been run on this.** |
+| Refunds (migrations 018, 022, 023; `refund-payment`; `list-demo-orders` v6) | The refund engine and the one live refund | **PASS** (0 HIGH on the engine) | **CONDITIONAL PASS** (endpoint complete; the screen ungraded) | 2026-08-16 | **Partly. The endpoint closes. The staff screen has never been graded, and this gate raised one HIGH on the checkout.** |
+| Four new pages: Conductor Library index, per-agent detail, compensation brochure, FAQ, Conductor explainer | New public surface, new vocabulary | **no document exists** | **no document exists** | 2026-08-15 | **No gate of any kind has been run on any of them.** |
 
-### Two warnings about that table
+Full record for the refunds row:
+`C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\REFUNDS-VERDICT-2026-08-15.md`
+
+### Three warnings about that table
 
 **The Phase 6 "CLOSED, BOTH GATES PASS" line is stale, and the roadmap still
 states it as present-tense fact.** Both gates genuinely passed on 2026-08-14. Since
@@ -138,6 +225,16 @@ check from being made.
 alone.** No verifier verdict was ever written for any of them. The project's own
 rule says a phase closes only on both. Six phases do not meet it. This is stated
 plainly because it is not visible from the roadmap, which reports them as done.
+
+**The refunds gate is the first one in two days that ran on time, and it still
+only covers half the feature.** It was written against the deployed endpoint, the
+live ledger and the live data, not against a builder's report, and it found one
+HIGH defect while doing it. But it does not cover the staff screen at all: the
+history, the order detail and the refund button shipped ungraded, and the staff
+console has still never had a verifier gate of any kind. So the pattern of 2026
+-08-15 is improving rather than fixed. **Four new public pages also shipped with
+no gate of any kind**, which is the accumulation problem in section 1 recurring
+on a different surface.
 
 ---
 
@@ -229,7 +326,7 @@ gate verdicts were FAIL.
 |---|---|---|---|
 | V-H1 | HIGH | A total that moves while the payment is being created is dropped on the floor. The card form then shows the current total while the open payment carries the old one. | **FIXED, verified.** Commit `3f30d44`. |
 | V-H2 | HIGH | A hand-typed member code is silently discarded. A guest who types a sponsor's code gets an order credited to nobody. | **FIXED, verified.** An input listener now exists at `www\shop.html:1151`. |
-| V-H3 | HIGH | The session token is never verified, and the shipped source comment claims it is. Hand-writing a session object opens the staff console and the member portal. | **OPEN, verified still present.** The false comment is unchanged in `www\staff.html:294` and `site\index.html:66`. |
+| V-H3 | HIGH | The session token is never verified, and the shipped source comment claims it is. Hand-writing a session object opens the staff console and the member portal. | **MOVED, NOT CLOSED. Downgraded to MEDIUM.** See the box below; this is the most misunderstood item in the codebase. |
 | V-H4 | HIGH | The administrator and staff passwords went into version control in plaintext and were never rotated. | **PARTLY CLOSED, verified.** The plaintext is out of the current migration file; git history still carries it and **no rotation is recorded anywhere.** |
 | V-M1 | MEDIUM | Cart edits made while the checkout is open never reach the checkout. | **FIXED, verified.** `renderAll` now calls the summary re-render. |
 | V-M2 | MEDIUM | Automatic payment opening manufactures orphan orders and burns the daily rail limit. 66 percent of orders on 2026-08-15 were stuck at `created`. | **OPEN**, not re-verified. |
@@ -237,10 +334,46 @@ gate verdicts were FAIL.
 | V-M4 | MEDIUM | Specification drift in three places, none amended. | **OPEN**, not re-verified. |
 | V-M5 | MEDIUM | A third-party chat script runs on the payment page. Acceptable on a test rail; must never carry to a live one. | **OPEN by design ruling.** |
 | V-M6 | MEDIUM | Migration 013 is applied to production and absent from the repository. | **OPEN, verified, and now worse.** See section 4.5. |
-| V-M7 | MEDIUM | Howard's real first name appears 16 times in the public build, with verbatim internal quotes. | **OPEN, verified.** Still 11 occurrences in `deploy\dist\shop.html`, 4 in `team.html`, 2 in `index.html`, 1 in `staff.html`. |
+| V-M7 | MEDIUM | Howard's real first name appears 16 times in the public build, with verbatim internal quotes. | **MOSTLY FIXED, THEN RECURRED. Counted from the public repository's own history:** 19 occurrences at `06d0c03`, **5** after the copy fix at `da5ca7c`, back to **7** at `5e3cc0c`. Four of the seven are legitimate credits on `team.html` and `index.html` and should stay. **Three are internal comments in `deploy\dist\staff.html`, two of them verbatim dated quotes, and they were reintroduced by the very next feature commit.** See N-M4. |
 | V-M8 | MEDIUM | The rate limiter reads then increments in two statements, so concurrent requests can all pass. | **OPEN**, not re-verified. |
 | V-M9 | MEDIUM | The sign-in role allow-list omits `member`, so a page asking for `member` gets "any role is acceptable". | **OPEN**, not re-verified. |
 | V-L1 to V-L6 | LOW (6) | Daily limit uses session time zone not UTC; the 25-unit cap is unexplained to the shopper; a byte order mark in `catalog.js`; unrecorded reasoning for seven database advisor errors; no secret scan in the build; an orphan row if a reference write fails. | **OPEN.** The byte order mark was verified still present. |
+
+> ### V-H3 has MOVED. State this split precisely or it will be got wrong again.
+>
+> The original finding was that **nothing anywhere verified a session token**, and
+> that `www\staff.html` claimed a browser could not forge one. That claim was
+> false and has been removed.
+>
+> **It was replaced by a second claim that was ALSO false at the time it shipped:**
+> *"The real gate is the role check the server performs on every function call."*
+> When that sentence was written, no server-side role check existed anywhere in
+> the codebase. `demo-login` minted tokens that nothing ever verified.
+>
+> **It is true NOW, and only in one place.** `functions\_shared\staff-auth.ts`
+> verifies the token's signature against the key in `app.demo_auth_config`, checks
+> the expiry, then **re-reads the role from `app.demo_users`** and discards the
+> token's own role claim. Every function was read to establish where it runs:
+>
+> | Function | Is a token verified? |
+> |---|---|
+> | `refund-payment` | **Yes, on every call.** This is the control that moves money. |
+> | `list-demo-orders` | **Only on the order-detail path** (`?order_number=`). The default list has origin and rate limit only. |
+> | `create-payment`, `confirm-payment`, `demo-login`, `quote-tax`, `record-tax` | **No.** Origin allow-list and rate limit only. |
+> | `payment-webhook` | **No.** It has its own signature verification instead. |
+>
+> So the sentence now shipping on `www\staff.html:398` and `site\index.html:71`
+> is **true of the refund button, true of opening one order, false of every other
+> call the staff console makes, and false of the entire member portal**, which
+> calls nothing that verifies a token at all.
+>
+> The honest form of the sentence is: *the refund endpoint decides for itself who
+> you are; the rest of the property does not.* Origin and rate limit are rails,
+> not gates, and the difference is the whole point.
+>
+> Downgraded from HIGH to MEDIUM because the one control that can move money out
+> of the business is now genuinely gated, and because the residual exposure is
+> reading a demonstration page rather than performing an action.
 
 #### Quality assurance findings (completeness, contrast, every surface)
 
@@ -251,15 +384,15 @@ across every page and both themes. 9,690 passed.
 |---|---|---|---|
 | Q-H1 | HIGH | Shop primary buttons are unreadable while disabled: computed **1.70 to 1** against a 4.5 to 1 floor. Reproduced live on the checkout button and on the pay button during every payment open. | **FIXED, verified.** Commit `f7329f1` replaced the fade with a real disabled treatment. |
 | Q-H2 | HIGH | Portal light theme: the QUALIFIED and NOT QUALIFIED signal fails, five instances, 3.28 to 1 and 4.12 to 1. The single most important status in the member office. | **FIXED, verified.** The colour tokens were restated and re-measured at 6.72 to 1 and 5.53 to 1. |
-| Q-M1 | MEDIUM | The shop tells the shopper "any values continue, including empty fields" directly beneath a real payment button. False on a live rail. | **OPEN, verified still present** at `www\shop.html:306`. |
-| Q-M2 | MEDIUM | "Express options place the order in one step." All three express buttons are disabled and place nothing. | **OPEN, verified still present** at `www\shop.html:214`. |
-| Q-M3 | MEDIUM | The disabled express buttons look identical to the working one. No disabled rule exists for them at all. A shopper taps Apple Pay and gets silence. | **OPEN, verified.** No `.pay-btn:disabled` rule exists in the stylesheet. |
-| Q-M4 | MEDIUM | The staff console says "No bank approval is possible on this path" on a page that ships a full bank-approval overlay and contradicts itself two lines earlier. | **OPEN, verified still present** at `www\staff.html:149`. |
+| Q-M1 | MEDIUM | The shop tells the shopper "any values continue, including empty fields" directly beneath a real payment button. False on a live rail. | **FIXED, verified.** Zero occurrences of the phrase across `www\`, `site\` and `deploy\dist\`. |
+| Q-M2 | MEDIUM | "Express options place the order in one step." All three express buttons are disabled and place nothing. | **FIXED, verified.** Zero occurrences of the phrase anywhere in the shipped tree. |
+| Q-M3 | MEDIUM | The disabled express buttons look identical to the working one. No disabled rule exists for them at all. A shopper taps Apple Pay and gets silence. | **OPEN.** The sentence was removed, the visual treatment was not re-measured by this pass. Treat as unknown, not closed. |
+| Q-M4 | MEDIUM | The staff console says "No bank approval is possible on this path" on a page that ships a full bank-approval overlay and contradicts itself two lines earlier. | **FIXED, verified.** Zero occurrences of the phrase anywhere in the shipped tree. |
 | Q-M5 | MEDIUM | The finishing state was applied to the shop only. The roadmap claimed both. The staff console still shows the exact flash-back-to-the-card-form bug Howard reported. | **OPEN, verified.** Zero occurrences of the finishing function in `www\staff.html`. The roadmap claim has since been corrected in prose. |
 | Q-M6 | MEDIUM | A keyboard user cannot reach the bank's passcode field. The focus ring targets an element that cannot take focus. | **FIXED, verified.** Both pages now set the focus attribute before focusing. |
 | Q-M7 | MEDIUM | Staff primary buttons fail while disabled, 3.72 to 1 and 3.84 to 1, including one button that is permanently disabled. | **FIXED, verified.** The staff stylesheet now uses an opaque grey rather than a fade. |
 | Q-M8 | MEDIUM | The receipt says "Payments route through the Orvanna orchestration layer in a later phase." They route through it now. | **FIXED, verified.** The line is gone. |
-| Q-L1 to Q-L8 | LOW (8) | PV used before it is expanded; ZIP never expanded; an unknown product code silently renders a different product; an overclaimed "saved billing address"; field borders at 1.60 to 1; six touch targets under 24 pixels at phone width; a byte order mark; an unreachable stale status line. | **OPEN.** |
+| Q-L1 to Q-L8 | LOW (8) | PV used before it is expanded; ZIP never expanded; an unknown product code silently renders a different product; an overclaimed "saved billing address"; field borders at 1.60 to 1; six touch targets under 24 pixels at phone width; a byte order mark; an unreachable stale status line. | **OPEN.** The "saved billing address" item is **ESCALATED to HIGH and re-raised as N-M1's neighbour, finding N-H1**: the sentence is not merely overclaimed, the address on the screen is not the address the server taxes against, and that is now provable on a real order. |
 | Q-unproven | Could not verify | Whether the card form is visually present on arrival could not be confirmed: the browser pane never composited a frame. Recorded as unproven rather than passed. | **STILL UNPROVEN.** Needs one look in a visible browser. |
 
 #### Code quality findings
@@ -279,12 +412,12 @@ across every page and both themes. 9,690 passed.
 | # | Severity | Finding | Status |
 |---|---|---|---|
 | W-H1 | HIGH | "Payments route through the orchestration layer in a later phase", printed on every successful receipt. | **FIXED, verified.** |
-| W-H2 | HIGH | "Any values continue, including empty fields" on a real payment step. | **OPEN, verified.** Same as Q-M1. |
-| W-H3 | HIGH | "Express options place the order in one step." Both halves false. | **OPEN, verified.** Same as Q-M2. |
-| W-H4 | HIGH | "No bank approval is possible on this path" on the staff console. Operationally dangerous on a live call. | **OPEN, verified.** Same as Q-M4. |
-| W-H5 | HIGH | "Test mode: this is a simulated approval and no money moves." The approval is not simulated. It is a real 3DS challenge served by a sandbox issuer. | **OPEN, verified still present** at `www\shop.html:461`. |
-| W-H6 | HIGH | A 73-line HTML comment containing four invented executives with full biographies ships to production, underneath a page whose entire premise is that the team is real. | **OPEN, verified still present** in `www\index.html` and in the built output. |
-| W-H7 | HIGH | Nine comments quoting Howard verbatim and dating his bug reports ship to production, on files any visitor can fetch. | **OPEN, verified.** |
+| W-H2 | HIGH | "Any values continue, including empty fields" on a real payment step. | **FIXED, verified.** Same as Q-M1. |
+| W-H3 | HIGH | "Express options place the order in one step." Both halves false. | **FIXED, verified.** Same as Q-M2. |
+| W-H4 | HIGH | "No bank approval is possible on this path" on the staff console. Operationally dangerous on a live call. | **FIXED, verified.** Same as Q-M4. |
+| W-H5 | HIGH | "Test mode: this is a simulated approval and no money moves." The approval is not simulated. It is a real 3DS challenge served by a sandbox issuer. | **FIXED, verified.** Zero occurrences of the phrase anywhere in the shipped tree. |
+| W-H6 | HIGH | A 73-line HTML comment containing four invented executives with full biographies ships to production, underneath a page whose entire premise is that the team is real. | **FIXED, verified.** The block is gone from `www\index.html` and `deploy\dist\index.html`, replaced by a four-line note recording why, and archived at `docs\archive\2026-08-14-original-fictional-leadership-section.html`. The only "Chief Executive" strings left on the property are the name of a product the shop sells. |
+| W-H7 | HIGH | Nine comments quoting Howard verbatim and dating his bug reports ship to production, on files any visitor can fetch. | **PARTLY FIXED, THEN RECURRED. Downgraded to MEDIUM.** 14 occurrences removed at `da5ca7c`; **two verbatim dated quotes reintroduced at `5e3cc0c`**, at `deploy\dist\staff.html` lines 309 and 2377, plus a third naming at line 936. See N-M4. |
 | W-M1 to W-M11 | MEDIUM (11) | Footer and top notice contradict each other on the same page; a false default confirmation note; PV versus SV named differently on two live surfaces; portal money carries no currency mark; a perpetual-ownership promise for hosted software; "cancel anytime" with nothing that cancels; two absolute product guarantees; a two-day build claim that is now three; member codes still carry the pre-Orvanna prefix; the portal is titled for a member and gated for an administrator; one card-hint sentence has the bank and the shopper the wrong way round. | **OPEN**, not re-verified except the member-code prefix, which is still present. |
 | W-L1 to W-L11 | LOW (11) | Two em dash characters in placeholder markup (the only two on the property); a bare one-word "Declined."; a percent-style split between surfaces; slang about money on one page; a footer with two versions; inert footer links; PV before its expansion; a backdated announcement; two strong outcome claims; two disabled options handled two different ways; a hardcoded delivery promise. | **OPEN.** |
 
@@ -314,6 +447,31 @@ across every page and both themes. 9,690 passed.
 | Test-card document | 1 large | The most dangerous document in the project: undated, points at three dead card worlds, two rows actively inverted, and the four cards the checkout itself recommends appear nowhere in it. | **OPEN.** |
 | Items 1 to 34 | 34 | The deduplicated open-items list across every source. Tier 1 (owed before anything else ships) is four items: run both gates over the checkout, correct the roadmap's false statements, rebuild the test-card document, rotate the four burned keys. | **Tier 1 is entirely OPEN.** |
 
+#### Contrast findings closed since (measured, not eyeballed)
+
+| # | Finding | Status |
+|---|---|---|
+| Disabled button contrast on the shop | A stylesheet comment claimed **4.63 to 1**. Nobody had ever computed it. The real measurement was **3.75 to 1**, below the 4.5 to 1 floor. | **FIXED, verified.** The rule at `www\css\shop.css:593` now records both numbers honestly, and the replacement (`#0F172A` on `#7C8AA0`) computes to **5.10 to 1**. The lesson is in the comment itself: a contrast figure written by hand is a guess until something computes it. |
+
+### 4.1b The refunds gate of 2026-08-16, and the seven findings it raised
+
+Full record:
+`C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\REFUNDS-VERDICT-2026-08-15.md`
+
+Verifier verdict **PASS** on the engine. Quality assurance verdict **CONDITIONAL
+PASS**: the endpoint is complete and proven, the staff screen that fronts it has
+never been graded, and the gate found one HIGH on the checkout while looking.
+
+| # | Severity | Finding | Status |
+|---|---|---|---|
+| N-H1 | **HIGH** | **The checkout shows one address and taxes against another.** `www\shop.html:124` promises "Sign in to use your saved billing address". Lines 1006 to 1012 then fill the form with `SYNTHETIC_ADDRESS` (line 876: Jordan Avery, 4821 Meridian Loop, Cedar Falls, Iowa 50613) while `_shared\tax.ts` `resolveTaxAddress` sends the member's **real stored address** to the tax engine. Proven on `ORV-2026-08-1JSPY4`: member `GW-000001`'s stored address is Los Angeles, CA 90012, the order carries `tax_jurisdiction = 'CA, US'` and an effective rate of **9.750 percent**. Cedar Falls, Iowa is 7 percent. The shopper saw Iowa and was charged California. | **OPEN.** The amount is correct and the server priced it. What is wrong is that the address shown at the moment of consent is not the one that produced the amount, on a screen that promises it is. |
+| N-M1 | MEDIUM | **A refused staff action throws away an identity the server had already verified.** `refund-payment` writes every authorisation failure to the audit log as `actor: "anonymous"`, `actor_role: null`. Correct for a forged token; wrong for `wrong_role` and `unknown_user`, where the signature verified and the username is known. Audit rows 9 and 10 record that somebody with the wrong role tried to refund but not that one was `Orvanna_Admin` and the other Conductor `GW-000001`. Those are the two events worth alerting on. | **OPEN.** Larger than one line: `StaffAuthResult` carries no username on its failure branch. |
+| N-M2 | MEDIUM | **Migration 023 is in the live ledger with no file.** Its text was folded into `022_refunds.sql` instead. The final state is reproducible; the broken intermediate state is not. Fourth instance of changing applied SQL in place in this project. | **OPEN.** Milder than D-F1 and V-M6 because the state can be rebuilt. |
+| N-M3 | MEDIUM | **Migration 018's file states the opposite of the truth, in capitals.** It is still named `018_PROPOSED_tax_integrity_hardening.sql` and its header reads "STATUS: PROPOSED. NOT APPLIED TO PRODUCTION. NOT IN THE LIVE LEDGER." It is applied, in production, and in the ledger. | **OPEN.** |
+| N-M4 | MEDIUM | **The name-in-public-build defect recurred a third time.** 19 occurrences, down to 5 at the copy fix, back to 7 at the next feature commit. Two new verbatim dated quotes in `deploy\dist\staff.html`. | **OPEN.** A finding that returns every time a feature ships is a missing build step, not a defect. Recommendation: fail the build in `deploy\build_dist.py` on an author name inside a comment. |
+| N-L1 | LOW | **A missing session header logs as `bad_signature`, not `missing_token`**, because `bearerFrom` falls back to `Authorization`, which on this deployment always carries the anonymous key. The refusal is correct; the audit cannot tell "not signed in" from "somebody tried". | **OPEN, and deliberately so.** Recorded by the builder at `refund-payment\index.ts:166-179` and consciously not changed on the night of deploy: changing a money path to improve a log label at the end of a long session is the wrong trade. The fix is one line, dropping the fallback. |
+| N-L2 | LOW | `refund-payment`'s own header contradicts itself: lines 145 to 150 say it must be deployed **without** platform token verification, lines 175 to 179 say it **is** deployed with `verify_jwt: true`. The platform confirms the second. | **OPEN.** The first block is stale and should be deleted, not reconciled. |
+
 ### 4.2 Earlier phase-gate findings
 
 | Phase | Findings | Status |
@@ -327,18 +485,29 @@ across every page and both themes. 9,690 passed.
 
 ### 4.3 The honest summary of the ledger
 
-- Fixed and re-verified by this document: **11 findings**, including all four
-  highest-severity defects the two full audits raised about the checkout itself.
-- Still open at HIGH severity: **9** (listed in the summary at the end).
-- Still open at MEDIUM severity: roughly **45** across the six audits.
-- Still open at LOW severity: roughly **40**.
-- Never gated at all: the Stripe Tax feature, and four production migrations.
+Counts as of the end of 2026-08-15, after the day's fixes and this gate.
 
-Nothing in the open list can lose real money. The sandbox has no path to the real
-world, the anonymous database key remains sealed and live-probed, and the finalized
-commission months gained no new input. The severity ceiling on the entire open list
-is embarrassment and wasted time, not loss. That ceiling holds only while the rail
-stays a test rail.
+- **Fixed and re-verified: 20 findings.** Eleven were closed by the previous
+  version of this document. Nine more closed since: six false statements removed
+  from live payment screens (Q-M1, Q-M2, Q-M4, W-H2, W-H3, W-H4, W-H5), the
+  fictional executive roster (W-H6), and the disabled-button contrast, measured
+  from 3.75 to 5.10 against a comment that had claimed 4.63 without anyone ever
+  computing it.
+- **Still open at HIGH severity: 4.** One of them, N-H1, was raised today and is
+  the only HIGH on the current checkout. V-H3 was downgraded to MEDIUM and W-H7
+  to MEDIUM, both with reasons stated at their rows rather than quietly.
+- Still open at MEDIUM severity: roughly **48**, including five raised today.
+- Still open at LOW severity: roughly **40**.
+- **Never gated at all:** the Stripe Tax feature, four new public pages, the
+  staff refund screen, and five production migrations.
+
+**One thing genuinely changed today about that ceiling.** For the first time,
+this system **moved money out of the business**: a real refund of $109.75 through
+Braintree. The sandbox still has no path to real funds, so the ceiling holds. But
+the shape of the risk changed the moment an outward, irreversible transfer became
+possible from a browser button, and every future finding on the refund path
+should be read against that rather than against the pretend-payment era. The one
+control that guards it, `requireStaff`, was tested ten ways and held ten times.
 
 ### 4.4 What is genuinely right, and should not be lost in the list above
 
@@ -355,7 +524,24 @@ An honest ledger has to say this too, or it misleads in the other direction.
   as the last word.
 - A client can never influence an amount. The request carries no prices.
 - The database enforces immutability itself, not just in application code:
-  a finalized run rejects writes at the trigger level.
+  a finalized run rejects writes at the trigger level. **Re-proven by execution
+  on 2026-08-16**, along with five other guards: `processing` to `refunded`,
+  `created` to `refunded` and `refunded` to `succeeded` all refuse; `succeeded`
+  to `refunded` allows; the staff audit log refuses an update; and a second full
+  refund on an already refunded order is refused by the partial unique index.
+  Six of six. Driven live inside a self rolling-back block, with row counts
+  re-read afterwards to confirm nothing was committed.
+- **The refund row is written before the processor is called.** That single
+  ordering decision converts the worst possible failure, an untraceable double
+  refund, into an answerable question. It is the best decision in the refunds
+  work and it cost nothing.
+- **Migration 022's own verification block found migration 022's own defect**,
+  minutes after applying and before any refund existed. That is the strongest
+  single piece of evidence in this document that the verification habit pays for
+  itself.
+- **The tax gap was measured rather than hidden.** A view that reads $9.75 and
+  names the exact endpoint that would close it is a better outcome than a gap
+  nobody wrote down.
 - The anonymous key grants nothing on the application schema at all. Not a weak
   policy, no access.
 - The secret sweep of the public repository is clean. The only credential in its
@@ -380,6 +566,29 @@ single instance. It is now four instances, and it happened after the audit that 
 it. Combined with the rebuild recipe that already omits three migrations, **the
 database currently cannot be reconstructed from this repository.**
 
+**Corrected and updated 2026-08-16.** The ledger was read directly rather than
+inferred from commit messages, and the picture is better than the paragraph above
+but still wrong.
+
+| Migration | In the live ledger? | File in `db\migrations\`? |
+|---|---|---|
+| 001 to 007 | yes | yes |
+| 008, 009 | yes | **pointer files only**, the SQL lives in `db\comp\` |
+| 010 to 012 | yes | yes |
+| 013 | yes | **yes**, contrary to the paragraph above |
+| 014 to 017 | yes | **yes**, contrary to the paragraph above |
+| 018 (`tax_integrity_hardening`) | yes | yes, but **named PROPOSED and headed NOT APPLIED**. Finding N-M3 |
+| 019, 020, 021 | **no, correctly** | yes, and correctly marked proposed |
+| 022 (`refunds_022`) | yes | yes |
+| 023 (`refund_guard_fix_023`) | yes | **no file at all.** Folded into 022. Finding N-M2 |
+
+So migrations 013 and 015 to 017 **do now have files**; they were written into the
+repository after that paragraph was drafted, which is why it reads worse than the
+truth. **Two real gaps remain**: migration 023 has no file, and migrations 008
+and 009 are pointers rather than SQL. **The repository can now produce the correct
+final state.** It still cannot reproduce the history, and nobody has attempted a
+rebuild to prove even the first claim.
+
 ---
 
 ## 5. What is NOT tested
@@ -387,52 +596,91 @@ database currently cannot be reconstructed from this repository.**
 Named plainly. An untested area that is silently omitted is worse than one that is
 named, because a reader assumes coverage that does not exist.
 
-1. **The whole 2026-08-15 checkout rebuild shipped ungated.** Fifteen commits, 723
-   lines of code and SQL. A processor change, a 3DS mode change, a new payment
-   lifecycle, roughly a thousand new credential rows, a new client-side
-   authorization rule, and a shared-code change touching every server function
-   including the webhook. Verified by its builder only. The two audits that ran
-   later that day were retroactive, not gates.
-2. **The Stripe Tax feature has never been gated in any way.** Two new server
-   functions and three migrations, shipped after the audits closed. No verifier
-   verdict, no quality assurance checklist, no specification entry.
-3. **No card has ever been driven end to end on the current processor by a grader.**
-   The verifier's check for amount equality on a genuinely succeeded payment was
-   deferred on 2026-08-14 because that session could not drive the payment widget,
-   and it has not been run since, on any rail. It is the single most important
-   untested thing in the project.
-4. **Nothing visual has ever been seen.** Every gate ran with the browser window
-   hidden. Behaviour was proven by dispatching real events at real elements and
-   reading the resulting document state, and contrast was computed rather than
-   eyeballed, which is stronger than a screenshot for those questions. But no page
-   has ever been rendered and looked at by a grader. Layout collapse, overlap,
-   z-order in a real compositor, animation, and font rendering are all unproven.
-   One row of the 2026-08-15 quality assurance audit is explicitly recorded as
-   unproven for exactly this reason.
-5. **No real device and no second browser.** Phone width was emulated, never a
-   phone. Everything was driven in one engine.
-6. **Load and concurrency are untested.** The rate limiter's read-then-increment
-   race is a code-reading finding, not a measured one. Nobody has fired concurrent
-   requests to see whether the ceiling holds.
-7. **The database cannot be rebuilt from the repository, and nobody has tried.**
-   The rebuild recipe omits three migrations that exist; four more migrations do
-   not exist as files at all.
-8. **Rollback is untested.** No migration has been rolled back and re-applied. One
-   is known not to be re-runnable.
-9. **The blocked-popup path is untested and unhandled.** The bank approval now
-   appears in a popup inside the page. Nothing in the code handles the case where a
-   browser blocks it, and no test covers it. The research document dismisses this in
-   one line and it is now the primary path.
-10. **Assistive technology is untested.** Contrast is measured and keyboard focus
-    was proven by hand on one dialog. No screen reader has ever been run against any
-    page. The hidden accessible table on the office landing was found by reading
-    code, not by listening.
-11. **The staff console has never had a verifier gate at all.** It is a roughly
-    600-line copy of the shop's payment engine, it handles money, a live agent reads
-    it aloud to a caller, and no correctness grader has ever looked at it.
-12. **Nothing has been tested against the specification since the specification went
-    stale.** Thirteen recorded divergences means a passing test against that
-    document now proves less than it looks like it does.
+**Rewritten 2026-08-16.** Three items on this list got shorter, one disappeared,
+and four are new. The list is longer than it was, which is the honest result of a
+day that shipped more than it graded.
+
+### Closed since the last version of this list
+
+- **"No card has ever been driven end to end on the current processor by a
+  grader"** was the single most important untested thing in the project. **It is
+  now tested.** Order `ORV-2026-08-1JSPY4` was charged $109.75 and refunded
+  $109.75, and the amount equality check deferred on 2026-08-14 was recomputed
+  and holds to the cent. The deferred check is closed on the processor that is
+  actually connected.
+
+### Smaller than it was
+
+1. **The 2026-08-15 checkout rebuild shipped ungated**, and still has no gate of
+   its own. Two audits ran retroactively that day and a third ran on the refunds
+   work. Fifteen commits of money-path change are still certified by their builder
+   only, but the money path itself has now been exercised end to end once, which
+   is more than could be said before.
+2. **The database rebuild.** The claim "four migrations do not exist as files"
+   is no longer true. Migrations 013 and 015 to 017 now have files. **One
+   migration, 023, still has none**, and two more are pointers. So the repository
+   should now be able to produce the correct final state. **Nobody has tried**, so
+   that remains a belief rather than a fact.
+
+### Unchanged, and still true
+
+3. **Nothing visual has ever been seen.** Every gate has run with the browser
+   window hidden, including this one, which ran entirely against the database and
+   the deployed endpoints. Contrast is computed and behaviour is proven by
+   dispatching real events, both stronger than a screenshot for those questions.
+   But no page has been rendered and looked at by a grader. Layout collapse,
+   overlap, compositor z-order, animation and font rendering are all unproven.
+4. **No real device and no second browser.** Phone width was emulated, never a
+   phone. One engine throughout.
+5. **Load and concurrency are untested.** The rate limiter's read-then-increment
+   race is a code-reading finding, not a measured one.
+6. **Rollback is untested.** No migration has been rolled back and re-applied.
+   One is known not to be re-runnable, and migrations 022 and 023 join the list
+   untested.
+7. **The blocked-popup path is untested and unhandled** on the bank approval,
+   which is now the primary path.
+8. **Assistive technology is untested.** No screen reader has ever been run
+   against any page.
+9. **Nothing has been tested against the Phase 6 specification since it went
+   stale.** Thirteen recorded divergences, none amended.
+
+### New, and this is where the day's gap is
+
+10. **The staff refund screen has never been graded, at all.** Not one checklist
+    row has been run against `www\staff.html`'s order history, order detail or
+    refund button. **The endpoint behind it is now the best-evidenced code in the
+    project. The button a human presses to reach it is entirely unproven.** Worse:
+    the one successful refund's audit row carries `reason_code: 'other'`, which
+    both the screen and a direct call can produce, **so even the success does not
+    prove the button is wired.**
+11. **The staff console has still never had a verifier gate of any kind.** This
+    was already true and is now more serious: it is a roughly 600-line copy of the
+    shop's payment engine **plus a control that moves money out of the business**,
+    read aloud by an agent on a live call.
+12. **`already_refunded` has never been returned by the live endpoint.** The
+    design document's own step 7, clicking refund a second time, was not
+    performed: there is no audit row after the success. The **database backstop**
+    was proven instead (a second succeeded refund is refused by the partial unique
+    index), which is the stronger of the two controls. But the caller-facing
+    response is unproven, and so is the promise that a second click does not call
+    the processor.
+13. **Four new public pages shipped with no gate of any kind:** the Conductor
+    Library index, the per-agent detail page, the compensation brochure, the FAQ
+    and the Conductor explainer. No contrast sweep, no copy audit, no verifier
+    pass. They introduce a new vocabulary (Conductor, Ensemble, Team) to a
+    property whose older pages have not been swept for the old one.
+14. **The Stripe Tax feature has still never been gated**, and finding N-H1 shows
+    why that matters: the address the tax is computed from is not the address the
+    shopper is shown.
+15. **The clawback snapshot is untested in the only case that matters.** The one
+    refund captured a `comp_impact` snapshot that correctly reads
+    `bridge: not_applied`, because migration 019 is not applied and no live sale
+    has ever produced volume. Nobody has seen it capture a real bridged order,
+    because no such order can exist yet.
+16. **Instant Payout has nothing to test.** Approved at 20 percent, sponsor-paid,
+    terminal at the sponsor. Zero lines of code, zero SQL, no migration. The
+    public brochure labels it "approved, not built" on every mention, which was
+    checked and is correct.
 
 ---
 
@@ -513,24 +761,63 @@ fix described in the roadmap as "APPLIED TO BOTH SURFACES per the QA rule that s
 follows capability" had in fact been applied to one surface. The rule was quoted
 correctly and followed halfway. That half is still open today as finding Q-M5.
 
+### The second lesson of the day, from the refunds work
+
+**Widen a constraint, and re-read every trigger that was leaning on it being
+narrow.**
+
+Migration 010 made a successful payment terminal. Its trigger only ever tested
+where a row was coming *from*; for a status it had never heard of, it fell through
+and returned the row unchanged, relying on the CHECK constraint to reject the
+value. That was correct and safe for as long as the constraint stayed narrow.
+
+Migration 022 widened the constraint to admit `refunded` and
+`partially_refunded`, because a refund needs somewhere to go. Widening it
+**silently deleted the guarantee the trigger had been leaning on**, and
+`processing` to `refunded` and `created` to `refunded` became legal.
+
+Three properties of this failure are worth keeping, and they are different from
+the ones in the story above:
+
+1. **It was invisible in the diff.** Nothing in the trigger edit is wrong when
+   read on its own. The defect lives in the interaction between section 1 and
+   section 2 of the same file, which no line-by-line review would surface.
+2. **A constraint and a trigger that together enforce one rule are one
+   mechanism.** Editing half a mechanism is how this class of defect is made, and
+   the two halves being in different parts of the same file did not help.
+3. **It was caught before it could matter, by the migration's own verification
+   block.** No refund existed yet, and the Edge Function never attempts either
+   transition because the rule module requires a successful payment first. So it
+   was a missing **backstop**, not a live hole. That distinction is exactly what
+   the verification block existed to draw, and it drew it within minutes.
+
+This is the first time in the project's record that a defect was caught **by the
+process, before the work went any further, rather than retroactively by an
+audit.** It is worth noticing as much as the defect is.
+
 ---
 
 ## 7. Recommended next tests, ranked
 
 Ranked by what would actually reduce risk, not by how quick they are.
 
+Re-ranked 2026-08-16. Test 1 from the previous version is **done**, and what it
+proved has pushed two new items to the top.
+
 | # | Test | Why it is first | Effort |
 |---|---|---|---|
-| 1 | **Drive one card end to end on the live Braintree rail, in a visible browser, and check the amount to the cent against the stored order.** Use `4000 0000 0000 2503` with passcode `1234`. | This is the deferred verifier check from 2026-08-14, still deferred, on a processor that has since changed. It is the only test that proves the money path holds on the rail that is actually connected. It also settles the one row the last audit could not prove. | Half a day |
-| 2 | **A full verifier and quality assurance gate over the checkout as a whole**, both surfaces, against the live rail. | Fifteen commits of money-path work are certified by their builder only, and the project's most-read document claims otherwise. This is the two-gate rule's entire purpose. | One day, half each |
-| 3 | **Gate the Stripe Tax work.** Recompute tax independently for at least three destinations, one exempt case, and the receipt wording, and confirm the four undocumented migrations. | It shipped after the audits with no gate of any kind, it touches the amount charged, and it partly overtakes an open finding about where tax exemption is decided. | Half a day |
-| 4 | **A visible-browser visual and assistive-technology pass on all seven pages**, in both themes, at phone and desktop width. | No page has ever been rendered and looked at. Contrast is measured but layout, overlap, z-order and animation are entirely unproven, and one audit row is explicitly recorded as unproven for this reason. | Half a day |
-| 5 | **A verifier gate on the staff call console.** It has never had one. | Roughly 600 lines of copied payment engine, drifted three ways in a day, handling money, read aloud by an agent on a live call. The known open defect C-A3 lets it charge one amount and speak another. | Half a day |
-| 6 | **Rebuild the database from the repository into a scratch project and diff it against production.** | This is the single test that proves or disproves seven separate open findings at once, including four missing migrations and a rebuild recipe that omits three more. | Half a day |
-| 7 | **A concurrency test on the rate limiter and the daily ceiling.** Fire simultaneous requests and count what actually got through. | The race is a code-reading finding, not a measured one, and the daily ceiling is currently being consumed by mere browsing. | Two hours |
-| 8 | **A blocked-popup test on the bank approval path.** | It is now the primary path and nothing in the code handles the failure. | One hour |
-| 9 | **A copy sweep against the live rail rather than against the old one.** Every sentence on a payment screen, checked against what the code now does. | Five of the seven highest-severity copy findings are still shipping, on the highest-stakes screens the site has, and they are all leftovers from the pretend-payment era. | Two hours |
-| 10 | **Rebuild the test-card document from the code**, then re-run the card matrix against it. | It is the one document that produces a wrong action within thirty seconds, and the shop points at it as authoritative. | Two hours |
+| 1 | **Fix and then re-test the address shown at checkout.** Sign in as a member, read the address on screen, and compare it to `tax_jurisdiction` and the effective rate on the order that results. | This is finding N-H1, the only HIGH on the current checkout. A shopper is shown Cedar Falls, Iowa and charged the Los Angeles rate. The amount is right; the address that produced it is not the one displayed, at the moment of consent, on a screen that promises it is. | Two hours |
+| 2 | **A full quality assurance checklist and a verifier gate over the staff refund screen.** History paging, order detail, the disabled states, the confirmation step, the second click, and computed contrast on every new control. | The endpoint is proven ten ways. The button is proven zero ways, and the one success does not establish that the button is even wired. This is the widest gap in the project today. | Half a day |
+| 3 | **A verifier gate on the staff call console as a whole.** It has never had one. | Roughly 600 lines of copied payment engine, drifted three ways in a day, and it now carries a control that moves money out of the business. The known open defect C-A3 lets it charge one amount and speak another. | Half a day |
+| 4 | **Gate the four new public pages.** Contrast sweep in both themes, copy audit, and a vocabulary sweep for the Conductor, Ensemble and Team change across the whole property. | Five files of new public surface shipped with no gate of any kind, introducing a new vocabulary to a site whose older pages still carry the old one. | Half a day |
+| 5 | **Gate the Stripe Tax work.** Recompute tax independently for at least three destinations, one exempt case, and the receipt wording. | Still never gated, it touches the amount charged, and N-H1 shows the address feeding it is not the address the shopper sees. | Half a day |
+| 6 | **A full verifier and quality assurance gate over the checkout as a whole**, both surfaces, against the live rail. | Fifteen commits of money-path work are still certified by their builder only. | One day, half each |
+| 7 | **Prove `already_refunded` against the live endpoint**, and confirm the processor is not called a second time. | The database backstop is proven; the caller-facing response and the no-second-call promise are not. | One hour |
+| 8 | **A visible-browser visual and assistive-technology pass on all pages**, in both themes, at phone and desktop width. | No page has ever been rendered and looked at, by any gate, including this one. | Half a day |
+| 9 | **Rebuild the database from the repository into a scratch project and diff it against production.** | The gaps here are smaller than the last version of this document claimed, but the rebuild has still never been attempted, so "it should work" is a belief. | Half a day |
+| 10 | **A concurrency test on the rate limiter, the daily ceiling, and the refund row lock.** | All three races are code-reading findings, not measured ones. The refund one now guards an irreversible outward transfer. | Two hours |
+| 11 | **A blocked-popup test on the bank approval path.** | It is the primary path and nothing in the code handles the failure. | One hour |
+| 12 | **Rebuild the test-card document from the code**, then re-run the card matrix against it. | It is still the one document that produces a wrong action within thirty seconds, and the shop points at it as authoritative. | Two hours |
 
 ### One process change, worth more than any single test
 
@@ -554,6 +841,8 @@ C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\PHASE-5-VERDI
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\PHASE-6-VERDICT.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\DB-AUDIT-2026-08-15.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\FULL-AUDIT-2026-08-15.md
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\REFUNDS-VERDICT-2026-08-15.md
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\BRIDGE-DRY-RUN-VERDICT.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\qa\PHASE-1-QA.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\qa\PHASE-3-QA.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\qa\PHASE-4-QA.md
@@ -573,6 +862,21 @@ C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\TEST-CARDS.html
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\PHASE-6-SPEC.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\COMP-PLAN-SPEC.md
 C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\ROADMAP.md
+C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\11-REFUNDS.md
+C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\db\migrations\018_PROPOSED_tax_integrity_hardening.sql
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\db\migrations\022_refunds.sql
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\functions\refund-payment\index.ts
+C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\functions\_shared\staff-auth.ts
 ```
 
-Report only. Nothing in the product was changed to produce this document.
+**Live sources queried directly for the 2026-08-16 update**, rather than read from
+another document: the Supabase migration ledger, `app.demo_orders`,
+`app.demo_order_refunds`, `app.demo_staff_actions`, `app.v_demo_tax_drift`,
+`pg_constraint`, `pg_get_functiondef`, the anonymous role's privilege set, the
+deployed Edge Function versions and entrypoint paths, and the public repository's
+own commit history.
+
+Report only. Nothing in the product was changed to produce this document. The one
+write attempted, a six-part probe of the refund state machine, was rolled back and
+verified rolled back.

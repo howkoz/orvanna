@@ -12,10 +12,33 @@
 | `list-demo-orders` (extended) | **LIVE**, version 6 |
 | `www\staff.html` order history and refund button | **PUBLISHED** |
 | The ten direct-call refusals | **ALL TEN REFUSED**, section 16.0 |
-| The single test refund | **NOT DONE.** No refund exists; tax drift reads zero. Section 16.0b |
+| The single test refund | **DONE, AND IT WORKED.** Order `ORV-2026-08-1JSPY4`, $109.75 returned in full. Section 16.0b |
+| The staff order history and refund button | **PUBLISHED AND UNGRADED.** No quality assurance checklist row has been run against it |
 
 Both functions were deployed by Howard from the command line tool, which reads straight from
 disk, so there is no bundle drift to chase.
+
+> **THE SUCCESS PATH IS PROVEN, 2026-08-16.** A real refund executed end to end:
+> order `ORV-2026-08-1JSPY4`, member `GW-000001`, **$109.75 including $9.75 of tax**,
+> refund reference `orvrf_1854dcb719b1bd9be0767b97`, acquirer reference
+> `cmVmdW5kXzdlc2V5bmE1`, connector `braintree`, status `succeeded`, requested by
+> `Orvanna_Staff` from the verified token. The order is now `refunded`.
+>
+> **The amount was recomputed independently and matches to the cent.** $100.00 taxable at the
+> Los Angeles combined rate of 9.750 percent is $9.75; $100.00 plus $9.75 is $109.75;
+> `total_cents` and `amount_cents` are both 10,975. This closes the amount-equality check that
+> had been deferred since 2026-08-14 on every rail.
+>
+> **`app.v_demo_tax_drift` now reads 975 cents**, its first non-zero value, exactly the tax on
+> the one refunded order that carried a Stripe tax transaction, and exactly what section 7 of
+> migration 022 predicted. That is the measurement working, not a fault.
+>
+> **What this does NOT prove.** The audit row carries `reason_code: 'other'`, which both the
+> staff screen and a direct call can produce, so the refund button's wiring is still unproven.
+> `already_refunded` has never been returned by the live endpoint: step 7 below was not run.
+> The database backstop against a double refund WAS proven independently (a second succeeded
+> refund row is refused by the partial unique index). Full record:
+> `C:\Users\howar\Desktop\Desktop\ORVANNA\MLM-PILOT\docs\verification\REFUNDS-VERDICT-2026-08-15.md`
 
 > **MIGRATION 022 SHIPPED A DEFECT AND VERIFICATION CAUGHT IT.** The transition guard allowed
 > `processing -> refunded` and `created -> refunded`. Migration 010's guard only ever tested
@@ -29,17 +52,27 @@ disk, so there is no bundle drift to chase.
 > a live hole. **The general lesson: when you widen a CHECK constraint, re-read every trigger
 > that was relying on it to be narrow.**
 
-> **WHY THE CODE IS NOT DEPLOYED, and it was a deliberate stop.** The Supabase command line
-> tool is installed (2.114.0) and `supabase/functions` is a symlink to the real folder, so it
-> would deploy straight from disk with no transcription. But it holds **no credential**: no
-> `SUPABASE_ACCESS_TOKEN`, no logged-in session, and logging in is interactive. The only other
-> route takes file **contents inline**, which meant hand-copying roughly 2,500 lines for one
-> bundle and 1,900 for the other, plus the same again to diff them back. That is exactly the
-> silent bundle drift the deploy instructions warned about, on the one path in this project
-> that moves money out of the business. It was judged not worth doing at the end of a long
-> session, so the schema shipped and the code did not. **To finish: `supabase login` once,
-> then `supabase functions deploy refund-payment --no-verify-jwt` and
-> `supabase functions deploy list-demo-orders`, then section 16.2 of this document.**
+> **THE DEPLOY HAPPENED, AND THE DELIBERATE STOP WAS THE RIGHT CALL.** This block previously
+> explained why the code was NOT deployed: the Supabase command line tool held no credential,
+> and the only alternative route took file **contents inline**, meaning roughly 2,500 lines
+> hand-copied for one bundle and 1,900 for the other. That is exactly the silent bundle drift
+> the deploy instructions warn about, on the one path in this project that moves money out of
+> the business, and shipping the schema without the code was judged the safer end to a long
+> session.
+>
+> **Howard then ran `supabase login` and deployed both functions from the command line tool**,
+> which reads straight from disk. `refund-payment` is version 2, `list-demo-orders` is version
+> 6. The platform's own record confirms the route: both report an entrypoint path beginning
+> `file:///Users/howar/...`, whereas every function deployed the older way reports a
+> `file:///tmp/user_fn_...` path. All eight source files were then hashed on both sides of the
+> symbolic link and are byte identical. **There is no transcription step anywhere in this
+> deploy, which is the whole reason the stop was worth taking.**
+>
+> One correction to the old instruction above: it said to deploy with `--no-verify-jwt`. It was
+> deployed with `verify_jwt: true` instead, and that is **fine and arguably better**: the staff
+> token travels in `x-orvanna-session`, so the platform keeps `Authorization` for its own key
+> and the two never collide. The header split was designed for exactly this. The one cost is
+> the audit label described in section 16.0.
 
 **Scope, set by Howard on 2026-08-15, in five steps.**
 
@@ -1060,10 +1093,57 @@ the function at all.
 > line tool and this session has no credential for it, and because changing a money path to
 > improve a log label at the end of a long night is the wrong trade. Recorded as open.
 
-### 16.0b THE SINGLE TEST REFUND WAS NOT PERFORMED. STOPPED, NOT SKIPPED.
+### 16.0b THE SINGLE TEST REFUND: STOPPED FIRST, THEN DONE, AND IT WORKED
 
-**No refund has been issued, on any order.** `app.demo_order_refunds` is empty and
-`app.v_demo_tax_drift` reads zero, which is the honest figure and not a placeholder.
+**Resolved 2026-08-16.** This section is kept in two parts because the stop is worth
+reading. Part one is why the refund was NOT performed on the night of deploy, written at
+the time. Part two is what happened when it was.
+
+#### Part two, the outcome. Read this first.
+
+**The refund was performed and it succeeded.**
+
+| | |
+|---|---|
+| Order | `ORV-2026-08-1JSPY4` |
+| Member | `GW-000001`, entered as the referral code and resolved server side |
+| Charged | $100.00 subscription plus $9.75 tax (`stripe_tax`, `CA, US`) = **$109.75** |
+| Refunded | **$109.75**, `tax_cents_returned` 975 |
+| Refund reference | `orvrf_1854dcb719b1bd9be0767b97` (ours, and the processor's idempotency key) |
+| Acquirer reference | `cmVmdW5kXzdlc2V5bmE1` |
+| Connector | `braintree`, refund `status` `succeeded` |
+| Requested by | `Orvanna_Staff`, from the verified token, never a browser-asserted name |
+| Order state | `succeeded` to `refunded` |
+| `app.v_demo_tax_drift` | **975 cents**, first non-zero reading, exactly as section 7 predicted |
+
+**Independently recomputed.** $100.00 at the Los Angeles combined rate of 9.750 percent is
+$9.75. $100.00 plus $9.75 is $109.75. `total_cents` is 10,975 and `amount_cents` is 10,975.
+**The money returned equals the money charged, to the cent.** That closes the amount-equality
+check that had been deferred since 2026-08-14.
+
+**The clawback snapshot was captured and reads `bridge: not_applied`**, which is correct:
+migration 019 is not applied, so this order never produced volume and there is nothing to
+claw back. The mechanism ran; the case that matters has still never been exercised.
+
+**Four things this still does not prove**, stated because the table above reads like a clean
+sweep:
+
+1. **The refund button's wiring.** The audit row carries `reason_code: 'other'`, which both
+   the staff screen and a direct call produce. Nothing in the record says which was used.
+2. **`already_refunded` from the live endpoint.** Step 7 of section 16.2 was not run; there
+   is no audit row after the success. The **database backstop was proven separately**: a
+   second succeeded refund row on the same order is refused by
+   `demo_order_refunds_one_live_per_order_idx`. That is the stronger of the two controls, and
+   the weaker one is untested.
+3. **That the processor is not called twice** on a second click.
+4. **Anything about the staff screens themselves**, which have had no quality assurance pass
+   of any kind.
+
+#### Part one, the stop, written on the night of deploy and kept for the record
+
+**At the time this was written, no refund had been issued on any order.**
+`app.demo_order_refunds` was empty and `app.v_demo_tax_drift` read zero, which was the honest
+figure and not a placeholder.
 
 **Why.** Refunding requires a paid order of my own, and I could not get one to `succeeded`:
 
@@ -1090,16 +1170,21 @@ a green tick and a real refund of an order that was not mine, which is not what 
 **Both of my orders are `created` and will age to `abandoned`** by the existing sweep, which
 is the designed behaviour. Nothing was hand-edited to tidy them.
 
-**What is still unproven by this**, stated plainly: the success path. Everything up to the
-refusal is proven against the live endpoint; the write path (processor call, refund row,
-order moving to `refunded`, drift becoming non-zero) has been proven only in the rule layer
-and the database guard tests, never end to end.
+**What was still unproven at that point**, stated plainly at the time: the success path. The
+write path (processor call, refund row, order moving to `refunded`, drift becoming non-zero)
+had been proven only in the rule layer and the database guard tests, never end to end.
 
-**To finish it**, place an order through the shop in a browser where the approval screen can
-actually be clicked, let `record-tax` run so the order carries a `tax_transaction_id`, then
-refund from the staff screen and read `app.v_demo_tax_drift`. Recording tax first is what
+**The plan written then was**: place an order through the shop in a browser where the approval
+screen can actually be clicked, let `record-tax` run so the order carries a
+`tax_transaction_id`, then refund and read `app.v_demo_tax_drift`. Recording tax first is what
 makes the drift non-zero; refund before it runs and the order leaves the recorder queue with
 no transaction to reverse, which is the self-healing case in section 10.1.
+
+**That plan was followed and it worked exactly as written**, including the drift prediction.
+Part two above is the result. The refusal to refund somebody else's order, taken at the time
+as a matter of principle rather than convenience, cost one extra session and produced a better
+piece of evidence: an order created for the purpose, refunded in full, with a tax transaction
+behind it so the drift measurement had something to measure.
 
 ### 16.1 What was executed before deploy, and what it proved
 
@@ -1150,10 +1235,25 @@ graceful-degradation path working as intended. No console errors came from this 
 403 and 404 entries in the console are the Botpress chat embed and Google Fonts, and predate
 this work.
 
-### 16.2 What still has to be run, in order
+### 16.2 The run order, with what has actually been run marked
 
-**Steps 1 to 4 are Howard's to run.** Step 5 is the first thing that spends real sandbox
-money and should be done on an order created for the purpose.
+**Updated 2026-08-16 by the verification gate.** This was written as a to-do list. It is kept
+in its original wording, with each step marked, because the wording is the specification for
+anyone re-running it.
+
+| Step | State |
+|---|---|
+| 1. Apply migration 022 and run its section 9 checks | **DONE**, and it found the defect that became migration 023 |
+| 2. Deploy `refund-payment` and `_shared/staff-auth.ts` | **DONE** from the command line tool, from disk. Deployed with `verify_jwt: true` rather than `--no-verify-jwt`; see the deploy box at the top of this document for why that is fine |
+| 3. Re-run the rule tests against the deployed code | **DONE. 19 of 19**, re-run by the gate against the file that is deployed |
+| 4. Test the refusals by calling the endpoint directly | **DONE. Ten sent, ten refused**, section 16.0. One substitution: a `GW-000001` Conductor token was tested in place of "an order already refunded" |
+| 5. Confirm the audit log cannot be edited | **DONE.** An update against a live audit row was driven and refused |
+| 6. Create a fresh test order and refund it | **DONE.** `ORV-2026-08-1JSPY4`, section 16.0b. Amount matched to the cent, `connector_refund_id` present, drift now 975 cents |
+| 7. Click refund a second time; expect `already_refunded` | **NOT DONE.** The database backstop was proven instead. The caller-facing response and the no-second-processor-call promise are unproven |
+| 8. Check the history and detail screens against the deployed function | **NOT DONE. No quality assurance pass of any kind has been run on the staff refund screens.** This is the largest open item in the refunds work |
+
+**Steps 1 to 4 were Howard's to run.** Step 5 was the first thing that spends real sandbox
+money and was done on an order created for the purpose.
 
 1. **Apply migration 022** and run the ten verification queries in its section 9. They check
    the new states, the amended trigger in both directions, the one-live-refund index, the
