@@ -93,3 +93,4 @@ Verification:
 
 Follow-up:
 - The 3DS passcode frame now gets explicit top-center placement when it is revealed, with a layer above the sticky checkout summary and below the page's bank-approval instruction bar. This keeps the OTP screen from opening underneath the sticky price area.
+- The payment panel, live payment status, and card-form skeleton now rise above the sticky checkout summary while `payment-in-flight` is active. This covers the short finishing transition after OTP and before the thank-you page.
