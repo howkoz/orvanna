@@ -90,14 +90,15 @@
   var role = params.get('role') === 'staff' ? 'staff' : 'admin';
   var door = DOORS[role];
 
-  /* Only the two known doors are accepted as a destination, so the
-     address bar cannot turn this page into a redirector to anywhere
-     else. Anything unrecognized falls back to the role's own door. */
+  /* Only KNOWN destinations are accepted, so the address bar cannot
+     turn this page into a redirector to anywhere else. Anything
+     unrecognized falls back to the role's own door.
+     staff-operations.html added 2026-08-16 (the staff operations
+     area: billing console and commission dashboard); it uses the
+     same staff sign-in as staff.html. */
   var requested = params.get('next');
-  var destination =
-    (requested === DOORS.admin.next || requested === DOORS.staff.next)
-      ? requested
-      : door.next;
+  var KNOWN_NEXT = [DOORS.admin.next, DOORS.staff.next, 'staff-operations.html'];
+  var destination = KNOWN_NEXT.indexOf(requested) >= 0 ? requested : door.next;
 
   document.title = door.tab;
   document.getElementById('loginTitle').textContent = door.heading;
