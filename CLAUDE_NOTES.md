@@ -75,3 +75,18 @@ Deploy note:
 - Supabase CLI deploy for `quote-tax`, `create-payment`, and `confirm-payment` is still blocked locally by missing `SUPABASE_ACCESS_TOKEN`.
 - The static deploy still fixes the visible Illinois-default issue for states the current live functions already support, because the browser now sends `guest_state` from the billing State field.
 - Full ZIP-specific pricing needs the updated Edge Functions deployed.
+
+## 2026-08-16 Sticky Checkout Summary
+
+Howard reported that the order total scrolls out of view by the time the shopper reaches the payment area.
+
+What changed:
+- The checkout order summary is sticky on desktop, with a 96px top offset and its own vertical scroll if the summary content is taller than the viewport.
+- The checkout section overflow is visible so sticky positioning can work correctly.
+- Mobile keeps the summary in normal document flow and still shows it before the form, so it does not take over the small screen.
+- The stale tax-helper HTML comment was updated to match the current blank-address flow.
+
+Verification:
+- `node --check MLM-PILOT\www\js\payments.js` passed.
+- Inline JavaScript syntax check for `MLM-PILOT\www\shop.html` passed.
+- `py MLM-PILOT\deploy\build_dist.py` passed with bundle hash `0927252101bb6d0e`.
