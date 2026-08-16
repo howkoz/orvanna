@@ -309,3 +309,71 @@ request is live on both surfaces at computed contrast. Rows re-graded: 10, all
 PASS. From QA's half of the gate: **DEPLOY YES**, with the one condition already
 on record: the deploy includes the two changed Edge Function files and is
 byte-compared against the cloud.
+
+---
+
+# BRIDGE ROUND: the live shop-to-comp bridge, acceptance gate, 2026-08-16 (evening)
+
+Scope: commit c37a5c1 ("The bridge is live"), migrations 019, 020, 021 applied
+straight to production on Howard's explicit ruling. The verifier owns the
+independent money recomputation (running concurrently); this gate grades the
+member-facing surfaces, the staff console against a bridged order, and
+documentation truth. Method note: the Browser pane refuses direct navigation to
+the live https://orvanna.io origin, so the portal was graded by serving the
+repo's `site\` pages locally against the SAME live database, which is faithful
+for every question in scope because commit c37a5c1 touched ZERO page files (the
+data is the only variable under test); the live /portal/ was separately
+confirmed serving (HTTP 200). One new sandbox order was placed as the canary.
+
+## Bridge checklist
+
+| # | Check | Evidence | Verdict |
+|---|---|---|---|
+| BR-1 | Portal renders, picker works, finalized months UNCHANGED | Portal renders on live data behind the admin sign-in gate. Member picker: typeahead resolves and switches members. Spot-check against the INDEPENDENT pre-bridge references recorded in docs\qa\PHASE-45-QA.md (Supabase REST, 2026-08-14, period 2026-07-01): GW-000002 July SV 200.00 and statement 4,888.00, both identical today; GW-000014 July SV 50.00 and statement 0.00, both identical today, DESPITE GW-000014 carrying 600 of bridged August volume, so no leak into finalized display. Company tab: July run #12 payout 20,669.20, and the full finalized trend 11,906.00 / 13,434.00 / 14,636.00 / 16,507.20 / 17,749.20 / 20,669.20 exactly matches the ROADMAP finalized record. Consistent with the engineer's checksum proof; independently observed at the surface | PASS |
+| BR-2 | No GW-000 house account on any member-visible surface | Picker search for "GW-000" returns ordinary members only (no house row); regex sweep for the bare house code (GW-000 followed by a non-digit) across My Business, My Volume, My Rank, My Statement, and Company rendered text: ZERO hits; Company still reads "of 1,000 accounts" (house invisible, matching the migration 020 verification that public views still return 1,000 members and one root) | PASS |
+| BR-3 | August visibility honest | August is NOT shown anywhere: the period picker offers February through July 2026 only, so no surface displays bridged August volume and there is nothing to be dishonest about. Noted per the gate's instruction: absence is fine. When an August period first appears, its per-member figures must match the bridge record (GW-000003 900, GW-000014 600, GW-000001 300, GW-000002 200, plus anything bridged later) | PASS (noted) |
+| BR-4 | Staff console vs a bridged order | Looked up bridged order ORV-2026-08-0W7UWR (GW-000002, staff console channel): renders fully and correctly (succeeded, $106.50, 100 PV, tax FL US $6.50, processor reference), refund history honestly empty, refund button offered with eligibility left to the server per the recorded owner decision. Nothing contradicts the bridge. Observation, not a defect: refunding a BRIDGED order now invokes decision 4.3 (remove rows and rerun before publication); the screen says nothing about that, consistent with its enforce-nothing design, and the policy covers it | PASS |
+| BR-5a | Seven-decisions file exists and matches the rulings | docs\decisions\2026-08-16-bridge-seven-decisions.md: succeeded-only (4.4), creation month forever with refuse-and-report on published months plus the 021 trigger (4.5), packs one row with parent PV and never exploded (4.2, 4.6), refunds rerun-as-superseding-versioned-run after publication (4.3), one-time spread over ten months calendar-contained (4.1), unattributed volume to house GW-000 as bookkeeping never disbursement (4.7), each with Howard's quoted words where he supplied them, plus the straight-to-production ruling and the full apply/verify/idempotency/checksum outcome | PASS |
+| BR-5b | The ANSWERED banners in DOCUMENTATION\09 | Seven ANSWERED banners (two dated 2026-08-15, five new dated 2026-08-16), each naming the chosen option consistently with the decision record | PASS |
+| BR-5c | ROADMAP final next-step | "THE BRIDGE IS LIVE... 11 live orders bridged (2,000.00 Sales Volume, August 2026)... 1. END OF AUGUST, BY HAND: the first real commission run... 2. Then open the SUBSCRIPTION ENGINE". Matches reality and the decision record | PASS |
+| BR-5d | No unqualified stale claims | TWO FOUND, one HIGH one MEDIUM, both in DOCUMENTATION (live pages are clean; grep of www\ and site\ found no stale bridge claims). See defects BR-H1 and BR-M1 | FAIL |
+| BR-6 | Canary: fresh attributed payment lands succeeded | Staff order ORV-2026-08-1132GS for caller GW-000002, card 4242: confirmed server-side succeeded, $106.50, 100 PV, channel staff_console. On the record: this order is NOT yet bridged and will bridge on the next bridge run (end of August per the plan); the bridge was NOT run by QA | PASS |
+
+## Defects
+
+- **BR-H1 (HIGH, documentation truth).** DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md
+  line 5 still reads "**Status:** design plus a dry run. **Nothing in here has
+  been applied to production.**" and line 11 still says the bridge "does not
+  exist". Both claims are FALSE as of this round: migrations 019, 020, 021 are
+  applied to production and 11 orders are bridged, and this same round EDITED
+  this same file (the ANSWERED banners) while leaving its header denying the
+  whole thing. Per the charter, a false status claim in a document the round
+  touched is a HIGH defect. Two-line fix.
+- **BR-M1 (MEDIUM, documentation truth).** DOCUMENTATION\00-INDEX.md line 29
+  still describes doc 09 as "The one missing connection: why no real purchase
+  has ever paid a commission, the seven decisions Howard has to make, and a dry
+  run of what today's real sales would pay." The connection exists, the seven
+  decisions are made, and the dry run became a live commit. (The "never paid a
+  commission" clause alone is technically true until the end-of-August run, but
+  it stands unqualified inside a three-way-stale sentence.) One-line fix: real
+  sales now feed the engine; the first commission run over them lands at the end
+  of August.
+- **BR-L1 (LOW).** www\comp-plan.html line 644 says the program is "a working
+  prototype running on synthetic data". Since the bridge, August volume includes
+  real test purchases, so "synthetic data" is now only mostly true; the
+  sentence's real-money disclaimer ("No actual earnings... exist") remains
+  accurate. Worth a clause when the page is next touched.
+
+## Bridge round verdict
+
+**FAIL, on documentation truth alone; every system surface passes.** The bridge
+itself is clean at every surface this gate owns: finalized months render
+byte-identical to the pre-bridge references, the house account is invisible
+everywhere member-facing, August leaks nowhere, the staff console tells no lies
+about a bridged order, and a fresh attributed canary landed succeeded and is
+queued for the next bridge run. But the round's own edited documentation still
+denies the round happened (BR-H1), and my charter makes that a HIGH defect that
+blocks a PASS. Fix the doc 09 header and the index line (minutes of work), and
+on re-inspection of those two files alone this verdict flips to PASS; nothing
+else is owed from QA's half. The verifier's independent money recomputation is
+the other half of the gate and is not graded here.
