@@ -329,6 +329,26 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const taxExempt = looksLikeTaxId(taxIdText);
     const channel =
       body.channel === "staff_console" ? "staff_console" : "shop";
+    const requestedCurrency =
+      typeof body.currency === "string" ? body.currency.trim().toUpperCase().slice(0, 3) : "USD";
+    const requestedPaymentMethod =
+      typeof body.payment_method === "string" ? body.payment_method.trim().toLowerCase().slice(0, 40) : "card";
+    if (requestedPaymentMethod !== "card") {
+      return errorResponse(
+        req,
+        409,
+        "payment_method_staged",
+        "Bank account checkout is staged for the Plaid/Open Banking sandbox, but this order table does not store non-USD settlement yet. Nothing was charged.",
+      );
+    }
+    if (requestedCurrency !== "USD") {
+      return errorResponse(
+        req,
+        409,
+        "currency_staged",
+        "This storefront can display that currency, but live payment settlement is still guarded to USD until the order records store currency. Nothing was charged.",
+      );
+    }
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
     /* Checkout billing address fields: parsed IDENTICALLY to quote-tax,

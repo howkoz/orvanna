@@ -120,3 +120,27 @@ Operational decision:
 - Leave customer-facing active routing on Braintree plus Authorize.net.
 - Do not add Stripe to active routing until its raw-card path is fixed, because it is enabled but still fails the actual Orvanna-style card flow.
 - Orvanna's `create-payment` code already leaves connector selection to HyperSwitch, so no frontend deploy is required for the current Braintree/Authorize.net routing split.
+
+## 2026-08-16 Plaid and Multi-Currency Staging
+
+Howard asked to integrate Plaid to the site, then noted that GBP/EUR multi-currency is the natural next step.
+
+What changed:
+- The shop now has a currency selector for USD, GBP, and EUR in the sticky order summary.
+- Catalog, cart, checkout summary, and confirmation display amounts through the selected display currency.
+- The checkout now shows a selectable Bank account payment method for the Plaid/Open Banking sandbox path.
+- Apple Pay, Google Pay, and PayPal remain disabled demonstration marks in live mode.
+- Bank account checkout is intentionally staged: selecting it shows an honest message instead of creating a HyperSwitch payment.
+- Non-USD card settlement is also guarded, because `app.demo_orders` stores cents but not currency yet.
+- `create-payment` now rejects non-card or non-USD attempts before pricing and before inserting an order row, so crafted requests cannot create misleading orders.
+
+Why:
+- HyperSwitch's Plaid Open Banking PIS support is currently GBP/EUR, while Orvanna's order records and live card flow are USD.
+- The next real maturity step is a schema migration for order currency, receipt/refund currency propagation, tax currency handling, and then a true Plaid/Open Banking payment create path.
+- Howard installed Avalara AvaTax inside Stripe sandbox. Good direction for EU/GB maturity, but the current custom checkout calls Stripe Tax directly from the Edge Function. The next tax decision is whether Stripe's third-party tax app path can power that calculation transparently after setup, or whether Orvanna should call AvaTax directly with Avalara credentials.
+
+Verification:
+- `node --check MLM-PILOT/www/js/payments.js` passed.
+- Inline JavaScript syntax check for `MLM-PILOT/www/shop.html` passed.
+- `py MLM-PILOT/deploy/build_dist.py` passed with bundle hash `ca321ad1f09ffde6`.
+- Browser check against `http://127.0.0.1:4177/shop.html` confirmed GBP display, Bank account selectable, and staged Plaid messaging with no payment create.
