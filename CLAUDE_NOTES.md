@@ -144,3 +144,8 @@ Verification:
 - Inline JavaScript syntax check for `MLM-PILOT/www/shop.html` passed.
 - `py MLM-PILOT/deploy/build_dist.py` passed with bundle hash `ca321ad1f09ffde6`.
 - Browser check against `http://127.0.0.1:4177/shop.html` confirmed GBP display, Bank account selectable, and staged Plaid messaging with no payment create.
+
+Follow-up correction:
+- USD now disables the Plaid/Bank account button instead of allowing a click that only explains failure afterward.
+- The payment method row now uses wordmark-style payment marks for Apple Pay, GPay, PayPal, Card, and Plaid instead of generic line icons.
+- Browser check confirmed USD disables Plaid with the ACH/bank-debit explanation, while GBP keeps Plaid selectable and still shows the staged settlement message without creating a payment.
