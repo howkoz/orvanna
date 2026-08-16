@@ -1,6 +1,10 @@
-# Subscription Engine Specification, version 1.1
+# Subscription Engine Specification, version 1.2
 
-As of 2026-08-16 (v1.1, same day: three errata the S1 gates forced. E1: the
+As of 2026-08-16 (v1.2, same day: THE RUN LIMIT added per Howard's ruling R9,
+"if i want to run 5 run only 5", section 9B, with the billing_runs columns,
+console field, and verification rows it implies; engine change lands as
+migration 028 by the standing rule, since 024 through 027 are applied.
+v1.1, same day: three errata the S1 gates forced. E1: the
 section 4.2 sketch formula corrected to `(n - 1) * frequency_months`, verifier
 ruling on D6, the builder was right. E2: the dunning-to-paused lane T10a added,
 resolving the 12.3 versus 5.2 contradiction the verifier flagged as M3, with
@@ -55,6 +59,7 @@ Plain path:
 | R6 | Recommended default requiring confirmation: multi-month frequencies spread their volume, calendar-contained. | Section 5.4, OQ1 |
 | R7 | (arrived while this spec was being written, folded in the same day) The engine runs automatically each day at a staff-configured time, if one is set; a staff Graphical User Interface (GUI) console controls the schedule, previews and executes runs, and manages subscriptions. | Section 9A |
 | R8 | (same-day, three follow-up messages) Five production failure modes Howard deals with today must each be defended against by name, with a mechanism and a verification row, in a living register. | Section 13A |
+| R9 | (same-day, v1.2) His words: "put a field that allows me to run a specific amount of subscriptions, if i want to run 5 run only 5, if i want to run 100 then run 100... i will never probably run more than 10 but i want it wired up in case." The run limit. | Section 9B |
 
 Sections 9A and 13A carry letters rather than renumbering the document,
 so the same-day amendment stays visible, per this role's charter rule that
@@ -341,6 +346,9 @@ create table app.billing_runs (
   status text not null check (status in ('running','final','superseded')),
   started_at timestamptz, finished_at timestamptz,
   subscriptions_due int, attempts_made int, succeeded int, declined int,
+  -- v1.2, ruling R9, the run limit (section 9B):
+  limit_requested int,                    -- null = no limit, run everything due
+  due_count int, processed_count int, remaining_count int,
   notes text
 );
 create unique index billing_runs_one_final_per_tick
@@ -610,6 +618,8 @@ One tick processes one date. Every step is deterministic given the inputs.
    still enforced (a retry whose window passed is `skipped_clipped`, never run
    late into a new month); plus checkpoint evaluations (C2), pause
    auto-resumes (T19), and auto-cancel evaluations (T22) due by today.
+   (v1.2, R9: when the tick carries a run limit N, the limit is applied to
+   lane (a) ONLY, after deterministic ordering, per section 9B.)
 4. **Promo hook, named `app.fn_apply_promotions`.** Interface, fixed now so S2
    and later promotions slot in without touching the pipeline: input is the
    run id plus the set of candidate charges (subscription_id, renewal_index,
@@ -705,7 +715,7 @@ options, minimum set:
 | Option | What it does |
 |---|---|
 | Schedule control | Enable or disable the daily run; set the time and timezone. Writes `app.billing_schedule` through an Edge Function. |
-| Run now, preview first | A mandatory DRY-RUN PREVIEW before any execution: what would bill today (count of subscriptions due, total dollars, breakdown by frequency and by new-versus-retry), creating nothing, exactly the quote-then-record pattern the tax engine already established. Then a separate confirm step executes the real run. The preview is the SAME gather-and-price read the real run performs, so preview and execution can never disagree. |
+| Run now, preview first | A mandatory DRY-RUN PREVIEW before any execution: what would bill today (count of subscriptions due, total dollars, breakdown by frequency and by new-versus-retry), creating nothing, exactly the quote-then-record pattern the tax engine already established. Then a separate confirm step executes the real run. The preview is the SAME gather-and-price read the real run performs, so preview and execution can never disagree. (v1.2, R9): beside RUN NOW sits the LIMIT FIELD: blank means run everything due; an integer N means run exactly N per section 9B. When N is set, the preview LISTS WHICH subscriptions the first N are (member code, product, amount, due date, in selection order) before the confirm step. |
 | Run history | Every billing run as a row: run id, tick date, when, gathered, succeeded, declined by classification (member-fault and system-fault reported separately), retries scheduled. Drill into one run down to its attempts and their reasons, the brief's E13 made real. |
 | Retry queue | Everything scheduled to retry, when, and under which decline class. |
 | Attention queue | The rows a human must see: orphaned attempts the reconciler flagged (FM2), cycle-audit gaps (FM4), internal_config failures (FM5), needs_human classifications (config and duplicate codes). |
@@ -732,6 +742,71 @@ pg_cron alarm firing real daily ticks, and not one console screen changes.
 Member-facing surfaces (dunning notices, the member's own card update page)
 remain Phase S3 as before. Cost of the call: S1 grows by one page and its Edge
 Functions; the schema was already carrying everything the console reads.
+
+## 9B. The run limit (R9, ruled 2026-08-16, v1.2)
+
+Howard's words, verbatim: "put a field that allows me to run a specific
+amount of subscriptions, if i want to run 5 run only 5, if i want to run 100
+then run 100... i will never probably run more than 10 but i want it wired
+up in case." Six rules make that field safe, deterministic, and auditable.
+
+1. **The tick accepts an optional limit.** `fn_billing_tick(p_date, p_limit)`
+   where `p_limit` null means run everything due (today's behavior,
+   unchanged); an integer N means process exactly N new cycle billings, or
+   all of them when fewer than N are due.
+2. **Selection is DETERMINISTIC.** The due set (pipeline step 3 lane a) is
+   ordered by OLDEST DUE DATE FIRST (`scheduled_date` ascending), then
+   member code ascending, and the first N are taken. Same data, same N, same
+   five subscriptions, every time: a limited run is repeatable, the preview
+   can show exactly who will bill, and the verifier can recompute the
+   selection independently. Oldest-first also means a limit can never
+   starve the longest-waiting subscription, which is the fairness property
+   batch queues lose when selection is arbitrary.
+3. **A limited run can strand nothing.** The remainder is simply not
+   processed this run, so it has no accounting row, so the existing
+   due-on-or-before gather (pipeline step 3, the FM4 catch-up rule) selects
+   it on the very next tick, oldest first. The limit needs no bookmark, no
+   cursor, and no new state: due-ness already derives from cycle
+   accounting, and anything unprocessed remains due by construction.
+4. **The run record carries the arithmetic.** `billing_runs` gains
+   `limit_requested` (null = unlimited), `due_count`, `processed_count`,
+   `remaining_count`, and run history renders the sentence "ran N of M due,
+   R remaining" on every limited run's row, so a partial run can never be
+   mistaken for a complete one.
+5. **The console field.** The RUN NOW control gains the limit field (blank =
+   all, integer N = exactly N), and the mandatory dry-run preview, when N is
+   set, lists WHICH subscriptions the first N are before the confirm step
+   (section 9A.2). The scheduled daily pg_cron run always runs unlimited;
+   the limit is a hand-run instrument.
+6. **Interaction with retries, stated: the limit bounds NEW cycle billings
+   only.** Already-scheduled retries due that day are processed regardless,
+   as are checkpoint evaluations, pause auto-resumes, auto-cancel sweeps,
+   and the reconciler. The argument, accepted from the coordinator and
+   endorsed: a retry is a promise already made, on a date derived from the
+   decline class and clipped by rule C1; deferring it behind a limit would
+   silently break the ladder arithmetic (a deferred retry can fall out of
+   its calendar-month window and vanish as skipped_clipped), turning a
+   cautious small run into a dunning distortion that punishes exactly the
+   members already in trouble. The limit is a throttle on NEW exposure, not
+   on commitments; the counts in rule 4 therefore count new cycle billings
+   only, and retries processed appear in the run report under their own
+   heading as they always have.
+
+**Worked example.** Tick date 2026-09-01, 23 subscriptions due, limit 5.
+Ordering: all 23 share due date 2026-09-01, so member code breaks the tie;
+the first five by code (say GW-000004, GW-000007, GW-000012, GW-000019,
+GW-000023) are processed. The run row reads limit_requested 5, due_count 23,
+processed_count 5, remaining_count 18: "ran 5 of 23 due, 18 remaining." The
+18 have no accounting rows, so the next tick (2026-09-02, any limit or
+none) gathers them under due-on-or-before, oldest due date 2026-09-01
+first, beginning with number 6 in the same ordering (GW-000031, the sixth
+code). Two retries scheduled for 2026-09-01 from August declines run in the
+same limited tick regardless of the limit, per rule 6.
+
+**Migration note, by the standing rule:** migrations 024 through 027 are
+applied, so the engine change for the run limit (the `fn_billing_tick`
+signature, the four `billing_runs` columns, and the ordered selection) lands
+as MIGRATION 028, owned by mlm-db-engineer.
 
 ## 10. The simulated clock, and how S1 proves a year in minutes
 
@@ -1093,6 +1168,12 @@ here with a mechanism and a verification row, the same day.
    and date (simulated), and after a deliberately skipped day the next tick
    gathers the missed work under the catch-up rule with zero losses and zero
    duplicates.
+10. R9 row (v1.2): the worked example of section 9B reproduced exactly: 23
+    due, limit 5, the same five selected on recomputation under the
+    ordering rule; the run row's four counts correct; the next tick
+    processes the remaining 18 beginning at number 6 with zero strandings
+    and zero duplicates (the FM1 key still holds across limited runs); and
+    a retry due on the limited tick's date executes despite the limit.
 
 **mlm-qa accept-tests (completeness gate):**
 
@@ -1119,6 +1200,11 @@ here with a mechanism and a verification row, the same day.
 7. Every console write lands in `app.demo_staff_actions` with the staff
    username; a crafted request without a staff session is refused server-side
    (the hiding-a-button-is-not-a-gate test).
+8. R9 row (v1.2): the console limit field drives a run of exactly 5 with 23
+   due; the preview lists the same five subscriptions the run then bills;
+   run history renders "ran 5 of 23 due, 18 remaining"; blank field runs
+   all; zero and negative inputs are refused with a plain message; the
+   scheduled daily run ignores the field and runs unlimited.
 
 ## 15. Open questions for Howard, each with a recommended default
 
