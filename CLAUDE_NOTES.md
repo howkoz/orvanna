@@ -46,3 +46,29 @@ Follow-up cleanup applied:
 
 Remaining suggested cleanup:
 1. Decide whether to commit or archive the current untracked proof and lab artifacts.
+
+## 2026-08-16 Checkout Tax Address Fix
+
+Howard reported that guest checkout defaulted tax to Illinois instead of using the State/ZIP fields in the billing form.
+
+What changed:
+- `MLM-PILOT\www\shop.html` no longer has a separate guest "Tax state" selector in the order summary.
+- Guest checkout now normalizes the visible billing State field and sends it as `guest_state`.
+  - Examples: `NY`, `New York`, and `new york` all normalize to `NY`.
+- Guest checkout also sends `guest_zip`, `guest_city`, and `guest_line1` for the ZIP-aware server path.
+- The address fields are now part of the payment amount signature, so editing State/ZIP forces a fresh quote and a fresh payment opening.
+- `MLM-PILOT\functions\quote-tax\index.ts` and `MLM-PILOT\functions\create-payment\index.ts` now parse the guest address fields identically.
+- `MLM-PILOT\functions\_shared\tax.ts` now has fallback synthetic addresses for every U.S. state and uses the typed ZIP when present.
+- `MLM-PILOT\functions\confirm-payment\index.ts` returns stored tax provenance on receipts.
+- `MLM-PILOT\www\js\payments.js` uses the receipt's own `tax_jurisdiction` before falling back to in-memory quote totals.
+
+Verification:
+- Inline JavaScript syntax check passed for `MLM-PILOT\www\shop.html`.
+- `node --check MLM-PILOT\www\js\payments.js` passed.
+- `py MLM-PILOT\deploy\build_dist.py` passed with bundle hash `326662642176d221`.
+- Public static bundle was pushed to `howkoz/orvanna.io` at commit `d9193b8`.
+
+Deploy note:
+- Supabase CLI deploy for `quote-tax`, `create-payment`, and `confirm-payment` is still blocked locally by missing `SUPABASE_ACCESS_TOKEN`.
+- The static deploy still fixes the visible Illinois-default issue for states the current live functions already support, because the browser now sends `guest_state` from the billing State field.
+- Full ZIP-specific pricing needs the updated Edge Functions deployed.

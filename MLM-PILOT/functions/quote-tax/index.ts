@@ -48,9 +48,10 @@
    up their mind and it must never eat the budget for actually
    paying (the same reasoning that gave confirm its own scope).
 
-   Nothing personal is accepted, stored, or logged: no names, no
-   addresses, no Tax ID values, no card data, no raw IPs. The
-   destination is read from the database, never from the request.
+   No names, Tax ID values, card data, or raw IPs are stored or
+   logged. Guest billing State/ZIP can be sent by the shop so the
+   sandbox tax quote follows the visible checkout fields; member
+   destinations are still read from the database.
    ============================================================ */
 
 import {
@@ -114,14 +115,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const taxIdText = typeof body.tax_id === "string" ? body.tax_id.trim().slice(0, 40) : "";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
-    /* The guest's picked tax state (2026-08-16): a two-letter CODE,
-       never an address. The shared allow list in _shared/tax.ts is
-       the only place it becomes one; anything unknown falls back to
-       the house default without erroring, and the server ignores it
-       entirely whenever a member is attached. Sliced to two
-       characters because that is all a state code is. */
+    /* Guest billing address fields. The State remains backward
+       compatible with the old guest_state field, while ZIP, city,
+       and line1 let the shared resolver price from the visible
+       checkout fields once this function version is deployed. */
     const rawGuestState =
       typeof body.guest_state === "string" ? body.guest_state.trim().slice(0, 2) : "";
+    const rawGuestZip =
+      typeof body.guest_zip === "string" ? body.guest_zip.trim().slice(0, 10) : "";
+    const rawGuestCity =
+      typeof body.guest_city === "string" ? body.guest_city.trim().slice(0, 80) : "";
+    const rawGuestLine1 =
+      typeof body.guest_line1 === "string" ? body.guest_line1.trim().slice(0, 80) : "";
 
     /* Identical call to the one create-payment makes, on purpose:
        the same mirror, the same caps, the same ceiling. A quote that
@@ -133,7 +138,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
     const order = priced.order;
 
-    const { address } = await resolveTaxAddress(client, rawMemberCode, rawGuestState);
+    const { address } = await resolveTaxAddress(
+      client,
+      rawMemberCode,
+      rawGuestState,
+      rawGuestZip,
+      rawGuestCity,
+      rawGuestLine1,
+    );
 
     const taxableCents =
       order.subtotal_one_cents + order.subtotal_sub_cents + order.activation_fee_cents;

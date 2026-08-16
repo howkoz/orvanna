@@ -26,11 +26,12 @@
    THE THREE RULES IT OBEYS, unchanged from when they were written
    inside create-payment:
 
-   1. THE DESTINATION COMES FROM THE DATABASE, NEVER THE BROWSER.
-      It is read from the signed-in member's row by
-      resolveTaxAddress below. A browser that can choose its own
-      destination can choose its own tax rate, which is the same
-      mistake as letting it choose its own price.
+   1. A MEMBER DESTINATION COMES FROM THE DATABASE, NEVER THE
+      BROWSER. It is read from the signed-in member's row by
+      resolveTaxAddress below. A guest destination may come from the
+      checkout billing State/ZIP fields because this is a sandbox
+      pilot and the visible address fields are the shopper control.
+      The signed-in member path remains database-authoritative.
 
    2. EXEMPTION IS STRIPE'S DECISION, NOT THE PAGE'S. The page
       sends the tax identifier TEXT, this file decides whether it
@@ -94,50 +95,104 @@ export const HOUSE_TAX_ADDRESS: TaxAddress = {
 };
 
 /* ------------------------------------------------------------
-   THE GUEST STATE ALLOW LIST (added 2026-08-16).
+   THE GUEST STATE FALLBACK TABLE (added 2026-08-16).
 
-   Howard's ask: a guest should be able to pick a state and watch
-   the tax engine answer for THAT state, instead of every guest
-   order silently pricing from Illinois. The rule that the
-   destination comes from the server, never the browser, does not
-   bend for this: the browser sends only a two-letter CODE, and
-   this table is the only place a code becomes an address. Every
-   address is canned, synthetic at the street (nobody lives at
-   1 Demonstration Way), and real at the city, ZIP code, and
-   state, which is what Stripe Tax actually prices on.
-
-   Eight states, chosen for the demonstration they give:
-     IL  the house default, stated everywhere as the default
-     NY  the famous 8.875 percent New York City combined rate
-     CA, TX, FL  three large, familiar, different-rate states
-     OR  no state sales tax at all: the zero-with-a-reason demo
-     WA, CO  two more distinct regimes (WA high, CO low state rate)
+   The checkout walk made the right shopper expectation clear:
+   the visible State/ZIP fields should drive guest tax. This table
+   gives every U.S. state a synthetic fallback city and ZIP, while
+   guestAddressFor below replaces those defaults with the typed ZIP,
+   city, and street when the checkout sends them.
 
    An unknown or absent code falls back to the house address,
    silently HERE (a mistyped code must never fail a quote or a
    cart) and visibly on the page, which labels the default as the
    default. Whether a chosen state actually returns a nonzero
-   figure is still Howard's Stripe dashboard registration for that
+   figure is still the Stripe dashboard registration for that
    state; an unregistered state answers zero with the reason
    not_collecting, and the page says which zero it is.
    ------------------------------------------------------------ */
 export const GUEST_STATE_ADDRESSES: Record<string, TaxAddress> = {
   IL: HOUSE_TAX_ADDRESS,
+  AL: { line1: "1 Demonstration Way", city: "Montgomery", state: "AL", zip: "36104", country: "US" },
+  AK: { line1: "1 Demonstration Way", city: "Juneau", state: "AK", zip: "99801", country: "US" },
+  AZ: { line1: "1 Demonstration Way", city: "Phoenix", state: "AZ", zip: "85004", country: "US" },
+  AR: { line1: "1 Demonstration Way", city: "Little Rock", state: "AR", zip: "72201", country: "US" },
   NY: { line1: "1 Demonstration Way", city: "New York", state: "NY", zip: "10007", country: "US" },
   CA: { line1: "1 Demonstration Way", city: "Sacramento", state: "CA", zip: "95814", country: "US" },
+  CT: { line1: "1 Demonstration Way", city: "Hartford", state: "CT", zip: "06103", country: "US" },
+  DE: { line1: "1 Demonstration Way", city: "Dover", state: "DE", zip: "19901", country: "US" },
+  DC: { line1: "1 Demonstration Way", city: "Washington", state: "DC", zip: "20001", country: "US" },
+  GA: { line1: "1 Demonstration Way", city: "Atlanta", state: "GA", zip: "30303", country: "US" },
+  HI: { line1: "1 Demonstration Way", city: "Honolulu", state: "HI", zip: "96813", country: "US" },
+  ID: { line1: "1 Demonstration Way", city: "Boise", state: "ID", zip: "83702", country: "US" },
+  IN: { line1: "1 Demonstration Way", city: "Indianapolis", state: "IN", zip: "46204", country: "US" },
+  IA: { line1: "1 Demonstration Way", city: "Des Moines", state: "IA", zip: "50309", country: "US" },
+  KS: { line1: "1 Demonstration Way", city: "Topeka", state: "KS", zip: "66603", country: "US" },
+  KY: { line1: "1 Demonstration Way", city: "Frankfort", state: "KY", zip: "40601", country: "US" },
+  LA: { line1: "1 Demonstration Way", city: "Baton Rouge", state: "LA", zip: "70802", country: "US" },
+  ME: { line1: "1 Demonstration Way", city: "Augusta", state: "ME", zip: "04330", country: "US" },
+  MD: { line1: "1 Demonstration Way", city: "Annapolis", state: "MD", zip: "21401", country: "US" },
+  MA: { line1: "1 Demonstration Way", city: "Boston", state: "MA", zip: "02108", country: "US" },
+  MI: { line1: "1 Demonstration Way", city: "Lansing", state: "MI", zip: "48933", country: "US" },
+  MN: { line1: "1 Demonstration Way", city: "Saint Paul", state: "MN", zip: "55101", country: "US" },
+  MS: { line1: "1 Demonstration Way", city: "Jackson", state: "MS", zip: "39201", country: "US" },
+  MO: { line1: "1 Demonstration Way", city: "Jefferson City", state: "MO", zip: "65101", country: "US" },
+  MT: { line1: "1 Demonstration Way", city: "Helena", state: "MT", zip: "59601", country: "US" },
+  NE: { line1: "1 Demonstration Way", city: "Lincoln", state: "NE", zip: "68508", country: "US" },
+  NV: { line1: "1 Demonstration Way", city: "Carson City", state: "NV", zip: "89701", country: "US" },
+  NH: { line1: "1 Demonstration Way", city: "Concord", state: "NH", zip: "03301", country: "US" },
+  NJ: { line1: "1 Demonstration Way", city: "Trenton", state: "NJ", zip: "08608", country: "US" },
+  NM: { line1: "1 Demonstration Way", city: "Santa Fe", state: "NM", zip: "87501", country: "US" },
+  NC: { line1: "1 Demonstration Way", city: "Raleigh", state: "NC", zip: "27601", country: "US" },
+  ND: { line1: "1 Demonstration Way", city: "Bismarck", state: "ND", zip: "58501", country: "US" },
+  OH: { line1: "1 Demonstration Way", city: "Columbus", state: "OH", zip: "43215", country: "US" },
+  OK: { line1: "1 Demonstration Way", city: "Oklahoma City", state: "OK", zip: "73102", country: "US" },
+  PA: { line1: "1 Demonstration Way", city: "Harrisburg", state: "PA", zip: "17101", country: "US" },
+  RI: { line1: "1 Demonstration Way", city: "Providence", state: "RI", zip: "02903", country: "US" },
+  SC: { line1: "1 Demonstration Way", city: "Columbia", state: "SC", zip: "29201", country: "US" },
+  SD: { line1: "1 Demonstration Way", city: "Pierre", state: "SD", zip: "57501", country: "US" },
+  TN: { line1: "1 Demonstration Way", city: "Nashville", state: "TN", zip: "37219", country: "US" },
   TX: { line1: "1 Demonstration Way", city: "Austin", state: "TX", zip: "78701", country: "US" },
+  UT: { line1: "1 Demonstration Way", city: "Salt Lake City", state: "UT", zip: "84111", country: "US" },
+  VT: { line1: "1 Demonstration Way", city: "Montpelier", state: "VT", zip: "05602", country: "US" },
+  VA: { line1: "1 Demonstration Way", city: "Richmond", state: "VA", zip: "23219", country: "US" },
   FL: { line1: "1 Demonstration Way", city: "Tallahassee", state: "FL", zip: "32301", country: "US" },
   OR: { line1: "1 Demonstration Way", city: "Portland", state: "OR", zip: "97201", country: "US" },
   WA: { line1: "1 Demonstration Way", city: "Seattle", state: "WA", zip: "98101", country: "US" },
+  WV: { line1: "1 Demonstration Way", city: "Charleston", state: "WV", zip: "25301", country: "US" },
+  WI: { line1: "1 Demonstration Way", city: "Madison", state: "WI", zip: "53703", country: "US" },
+  WY: { line1: "1 Demonstration Way", city: "Cheyenne", state: "WY", zip: "82001", country: "US" },
   CO: { line1: "1 Demonstration Way", city: "Denver", state: "CO", zip: "80202", country: "US" },
 };
 
-/* Map a guest's state code to its canned address. Trimming and
-   uppercasing here means the two callers cannot normalize
-   differently. Anything not on the list is the house default. */
-export function guestAddressFor(rawStateCode: string): TaxAddress {
+function cleanAddressText(raw: string): string {
+  return raw.trim().replace(/\s+/g, " ").slice(0, 80);
+}
+
+function cleanZip(raw: string): string {
+  const match = raw.trim().match(/\d{5}(?:-\d{4})?/);
+  return match ? match[0] : "";
+}
+
+/* Map a guest's entered billing address to the tax address. Trimming
+   and uppercasing here means the two callers cannot normalize
+   differently. Anything without a known state is the house default. */
+export function guestAddressFor(
+  rawStateCode: string,
+  rawZip = "",
+  rawCity = "",
+  rawLine1 = "",
+): TaxAddress {
   const code = rawStateCode.trim().toUpperCase();
-  return GUEST_STATE_ADDRESSES[code] ?? HOUSE_TAX_ADDRESS;
+  const base = GUEST_STATE_ADDRESSES[code];
+  if (!base) return HOUSE_TAX_ADDRESS;
+  return {
+    line1: cleanAddressText(rawLine1) || base.line1,
+    city: cleanAddressText(rawCity) || base.city,
+    state: base.state,
+    zip: cleanZip(rawZip) || base.zip,
+    country: "US",
+  };
 }
 
 /* A tax identifier is TEXT here and a verdict nowhere else. The
@@ -155,32 +210,37 @@ export function looksLikeTaxId(taxIdText: string): boolean {
    Returns the member's row id too, because create-payment needs it
    for attribution and would otherwise repeat this query.
 
-   THE GUEST STATE CODE (third argument, added 2026-08-16) applies
-   ONLY when no member row is attached. The precedence, in words:
+   THE GUEST ADDRESS FIELDS apply ONLY when no member row is
+   attached. The precedence, in words:
 
      member found, address on file   the member's stored address,
-                                     the state code is IGNORED
+                                     guest fields are IGNORED
      member found, no address        the house default, the state
-                                     code is STILL ignored: an
+                                     fields are STILL ignored: an
                                      attached member's tax basis is
                                      the member record, exactly as
-                                     before this parameter existed
-     no member (empty code or miss)  the guest's picked state from
-                                     the allow list, house default
-                                     for anything unknown
+                                     before these parameters existed
+     no member (empty code or miss)  the guest's billing State/ZIP,
+                                     house default for unknown State
 
-   Ignoring the code whenever a member is attached is what keeps
+   Ignoring the guest fields whenever a member is attached is what keeps
    signed-in members byte-for-byte unchanged, and it also means a
    guest who credits a referring member gets that member's real
-   destination rather than their own pick, which is the same rule
+   destination rather than their own typed address, which is the same rule
    the checkout has always applied. */
 export async function resolveTaxAddress(
   client: DbClient,
   rawMemberCode: string,
   rawGuestState = "",
+  rawGuestZip = "",
+  rawGuestCity = "",
+  rawGuestLine1 = "",
 ): Promise<{ memberId: number | null; address: TaxAddress }> {
   if (rawMemberCode === "") {
-    return { memberId: null, address: guestAddressFor(rawGuestState) };
+    return {
+      memberId: null,
+      address: guestAddressFor(rawGuestState, rawGuestZip, rawGuestCity, rawGuestLine1),
+    };
   }
   const memberRow = await client.queryObject<{
     id: number;
@@ -196,7 +256,12 @@ export async function resolveTaxAddress(
     [rawMemberCode],
   );
   const m = memberRow.rows[0];
-  if (!m) return { memberId: null, address: guestAddressFor(rawGuestState) };
+  if (!m) {
+    return {
+      memberId: null,
+      address: guestAddressFor(rawGuestState, rawGuestZip, rawGuestCity, rawGuestLine1),
+    };
+  }
   if (!m.demo_address_zip) {
     return { memberId: m.id, address: HOUSE_TAX_ADDRESS };
   }

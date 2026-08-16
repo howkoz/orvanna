@@ -64,6 +64,9 @@ interface DemoOrderRow {
   activation_fee_cents: number;
   tax_cents: number;
   tax_exempt: boolean;
+  tax_source: string | null;
+  tax_reason: string | null;
+  tax_jurisdiction: string | null;
   total_cents: number;
   pv_total: string | number;
   payment_reference: string | null;
@@ -112,6 +115,9 @@ function receiptOf(row: DemoOrderRow) {
     activation_fee_cents: row.activation_fee_cents,
     tax_cents: row.tax_cents,
     tax_exempt: row.tax_exempt,
+    tax_source: row.tax_source,
+    tax_reason: row.tax_reason,
+    tax_jurisdiction: row.tax_jurisdiction,
     total_cents: row.total_cents,
     pv_total: Number(row.pv_total),
     processor: {
@@ -178,6 +184,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
               referral_code_entered, items, activation,
               subtotal_one_cents, subtotal_sub_cents,
               activation_fee_cents, tax_cents, tax_exempt,
+              tax_source, tax_reason, tax_jurisdiction,
               total_cents, pv_total, payment_reference,
               payment_status, processor_summary
          from app.demo_orders
@@ -250,6 +257,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
               referral_code_entered, items, activation,
               subtotal_one_cents, subtotal_sub_cents,
               activation_fee_cents, tax_cents, tax_exempt,
+              tax_source, tax_reason, tax_jurisdiction,
               total_cents, pv_total, payment_reference,
               payment_status, processor_summary
          from app.demo_orders

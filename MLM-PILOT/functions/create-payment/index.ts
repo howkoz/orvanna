@@ -55,8 +55,10 @@
        https://<allowed origin>/<shop.html|staff.html>?orv=<order number>
 
    Secrets: only via Deno.env.get, names per spec section 3.
-   Nothing personal is accepted, stored, or logged: no names,
-   no addresses, no Tax ID values, no card data, no raw IPs.
+   No names, Tax ID values, card data, or raw IPs are stored or
+   logged. Guest billing State/ZIP can be sent by the shop so the
+   sandbox tax charge follows the visible checkout fields; member
+   destinations are still read from the database.
    ============================================================ */
 
 import {
@@ -329,15 +331,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
       body.channel === "staff_console" ? "staff_console" : "shop";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
-    /* The guest's picked tax state (2026-08-16): parsed IDENTICALLY
-       to quote-tax, on purpose, because the whole point of the
-       shared resolver is that the state a shopper was quoted
-       against is by construction the state they are charged
-       against. A two-letter CODE, never an address; the allow list
-       in _shared/tax.ts is the only place it becomes one, and it is
-       ignored entirely whenever a member is attached. */
+    /* Guest billing address fields: parsed IDENTICALLY to quote-tax,
+       on purpose, because the whole point of the shared resolver is
+       that the address a shopper was quoted against is by
+       construction the address they are charged against. */
     const rawGuestState =
       typeof body.guest_state === "string" ? body.guest_state.trim().slice(0, 2) : "";
+    const rawGuestZip =
+      typeof body.guest_zip === "string" ? body.guest_zip.trim().slice(0, 10) : "";
+    const rawGuestCity =
+      typeof body.guest_city === "string" ? body.guest_city.trim().slice(0, 80) : "";
+    const rawGuestLine1 =
+      typeof body.guest_line1 === "string" ? body.guest_line1.trim().slice(0, 80) : "";
     /* Optional. "shop.html" or "staff.html" only; anything else
        (including absent, or a full address someone tried to
        smuggle in) falls back to shop.html in buildReturnUrl. */
@@ -361,6 +366,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
       client,
       rawMemberCode,
       rawGuestState,
+      rawGuestZip,
+      rawGuestCity,
+      rawGuestLine1,
     );
 
     /* ---- real tax, replacing the flat mirror estimate ---- */
