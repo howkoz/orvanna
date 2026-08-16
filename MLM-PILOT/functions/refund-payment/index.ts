@@ -142,12 +142,13 @@
    this file. Processor error text is stored in a named field and
    never echoed wholesale.
 
-   DEPLOYMENT: like payment-webhook, this must be deployed WITHOUT
-   platform JavaScript Object Signing and Encryption (JSON Web
-   Token, JWT) verification, because the Authorization header
-   carries OUR staff token rather than the platform key. Its own
-   signature check is what secures it. Setting that flag is the
-   coordinator's call, not this file's.
+   DEPLOYMENT: this function is deployed WITH platform JavaScript
+   Object Signing and Encryption (JSON Web Token, JWT) verification
+   enabled. The platform uses Authorization for the anonymous key,
+   while our staff session rides x-orvanna-session and is verified
+   again by _shared/staff-auth.ts. payment-webhook is the exception:
+   it keeps platform verification off because webhooks authenticate
+   with their own signed payload.
 
    ------------------------------------------------------------
    VERIFIED AGAINST THE LIVE ENDPOINT, 2026-08-16.
@@ -507,10 +508,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
        where it helps an operator and does not help a prober. */
     const auth = await requireStaff(client, req, ["staff"]);
     if (!auth.ok) {
-      /* Finding N-M1, implemented 2026-08-16. NOT YET DEPLOYED:
-         deploy owes a byte-compare against the cloud copy plus both
-         gates per the standing rule; the repo is knowingly ahead of
-         the cloud here, on record.
+      /* Finding N-M1, implemented and deployed 2026-08-16, then
+         proven live in DOCUMENTATION\11-REFUNDS.md section 16.1.
 
          When the refusal happened AFTER the token's signature
          verified (expired, unknown_user, wrong_role), requireStaff

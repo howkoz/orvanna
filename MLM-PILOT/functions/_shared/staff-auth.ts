@@ -169,10 +169,8 @@ export type StaffAuthResult =
       | "unknown_user"
       | "wrong_role"
       | "not_configured";
-    /* Finding N-M1, implemented 2026-08-16. NOT YET DEPLOYED: deploy
-       owes a byte-compare against the cloud copy plus both gates per
-       the standing rule; the repo is knowingly ahead of the cloud
-       here, on record.
+    /* Finding N-M1, implemented and deployed 2026-08-16, then
+       proven live in DOCUMENTATION\11-REFUNDS.md section 16.1.
 
        The username the token's SIGNATURE verified, present only when
        the refusal happened after the signature check passed (expired,

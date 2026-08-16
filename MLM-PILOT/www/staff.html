@@ -10,10 +10,10 @@
 <link rel="stylesheet" href="css/staff.css?v=5.2">
 <style>
 /* ============================================================
-   Order history and order detail (2026-08-15, PROPOSED).
-   Scoped to this feature and kept here rather than in staff.css
-   because the whole refund feature is proposed and not deployed;
-   it moves into the stylesheet when the feature ships.
+   Order history, order detail, and refund controls.
+   Added 2026-08-15, shipped 2026-08-16. Scoped to this feature
+   and kept here rather than in staff.css so the live refund screen
+   can keep its review history close to the markup it styles.
    Colours are taken from the existing shipped tokens rather than
    invented, so this matches the rest of the console.
 
@@ -2058,10 +2058,9 @@
 
   /* ============================================================
      ORDER HISTORY, ORDER DETAIL, AND THE REFUND BUTTON
-     Added 2026-08-15. PROPOSED, NOT DEPLOYED.
-     (Superseded 2026-08-16, quality assurance finding L4: the
-     refund rail is LIVE and passed both gates on 2026-08-15; the
-     line above is kept as history, not status.)
+     Added 2026-08-15, live as of 2026-08-16. The refund rail
+     passed both gates on 2026-08-15; this screen was then graded
+     in the stabilization quality assurance pass.
      Design: DOCUMENTATION\11-REFUNDS.md
 
      THIS SCREEN ENFORCES NOTHING. Read that twice before changing

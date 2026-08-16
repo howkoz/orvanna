@@ -1357,10 +1357,8 @@ bytes `832db864...`, and list-demo-orders `index.ts` 15,514 bytes `280afc3d...`.
 
 That last row is N-M1 **proven live**: a wrong-role refusal whose audit line names
 the cryptographically verified username in the database spelling, where the old code
-discarded it as `anonymous`. The comment blocks inside the deployed files still read
-"NOT YET DEPLOYED" for N-M1; they were shipped verbatim on purpose, because editing
-them would have broken the byte-compare against the gated sources. They can be
-corrected in a follow-up commit and redeploy.
+discarded it as `anonymous`. Follow-up cleanup on 2026-08-16 corrected the stale
+source comments that still described the fix as not deployed.
 
 ---
 
