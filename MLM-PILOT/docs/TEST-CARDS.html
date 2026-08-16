@@ -42,10 +42,11 @@ grades are not the same thing: <strong>end-to-end verified</strong> means the fu
 was completed on the live rail; <strong>server-verified</strong> means the payment service
 itself was read directly and reported the claimed state (done 2026-08-16), but the journey
 was not finished; <strong>documented</strong> means the behaviour comes from Braintree's
-published table and has not yet been run here. No challenge has ever been COMPLETED end to
-end on this rail by anyone: automation cannot type inside the bank's frame, so the finished
-passcode ending is pending one human click-through and is not claimed anywhere on this
-page.</div>
+published table and has not yet been run here. The challenge journey IS completed end to
+end on this rail: the owner ran 4000 0000 0000 2503 through the whole passcode flow in a
+real browser on 2026-08-16 (order ORV-2026-08-0XWV5X, confirmed succeeded server-side), so
+that card's ending is proven. The finished ending remains unproven only for
+4111 1111 1111 1111.</div>
 
 <div class="note"><strong>Acronym key.</strong>
 <strong>3DS</strong> is 3-D Secure, the card-network check that asks the card's issuing bank
@@ -63,12 +64,15 @@ any 3 digit value, for example 123. Cardholder name can be anything.</div>
 <table>
   <tr><th>Card number</th><th>Brand</th><th>What happens</th></tr>
   <tr><td class="num">4000 0000 0000 2503</td><td>Visa</td>
-      <td><strong>The primary recommended challenge card.</strong> Braintree's documented
-          3DS challenge card: the bank approval screen appears, and the passcode the sandbox
-          shows on its own screen is 1234. Server-verified 2026-08-16: the payment parks at
-          requires_customer_action with a next_action on the live rail. The completed
-          passcode ending, "then the payment succeeds", is documented by Braintree and
-          pending one human click-through here; it is not yet claimed.</td></tr>
+      <td><strong>The primary recommended challenge card. END-TO-END VERIFIED
+          2026-08-16.</strong> Braintree's documented 3DS challenge card: the bank approval
+          screen appears, the passcode the sandbox shows on its own screen is 1234, and the
+          payment then succeeds. The whole chain, challenge to passcode to approval to ORDER
+          PLACED, was completed by the owner in a real browser on the live site: order
+          ORV-2026-08-0XWV5X, confirmed server-side as succeeded, $110.25 total including
+          $10.25 tax, 2026-08-16 12:12:31 UTC. (That run used the pre-stabilization live
+          build; the rail is the same.) Also server-verified earlier the same day: the
+          payment parks at requires_customer_action with a next_action.</td></tr>
   <tr><td class="num">4111 1111 1111 1111</td><td>Visa</td>
       <td><strong>Also triggers a real 3DS challenge on this rail.</strong> Server-verified
           2026-08-16: parks at requires_customer_action with a next_action, so the earlier
@@ -100,8 +104,10 @@ card. Keep success demos under 2000.00 dollars.</div>
 4000 0000 0000 2503 and on 4111 1111 1111 1111 is served by Braintree's own 3DS in the
 sandbox. It is a genuine challenge flow: server-side reads on 2026-08-16 proved BOTH cards
 park the payment at requires_customer_action with a next_action while the shopper is in
-front of the screen, and the payment can complete only after the approval. What no run has
-recorded yet is a challenge finishing: one human click-through settles that.</div>
+front of the screen, and the payment can complete only after the approval. The finish is
+proven too, on 2503: the owner completed the challenge in a real browser the same day
+(order ORV-2026-08-0XWV5X, succeeded). The pending-human-click-through caveat now applies
+only to 4111's ending.</div>
 
 <h2 class="bad">What no longer applies</h2>
 <p><strong>4000 0000 0000 0002</strong> was the decline card on the RETIRED simulator rail

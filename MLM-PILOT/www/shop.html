@@ -1823,30 +1823,38 @@
        - 2026-08-16: server-side probes against the live rail proved
          BOTH 4111 and 2503 park at requires_customer_action with a
          next_action attached, so those two claims about 4111 were
-         wrong and are withdrawn. What NOBODY has on record yet is
-         either card COMPLETING its challenge: automation cannot type
-         inside the bank's iframe, so the finished passcode ending is
-         pending one human click-through and is not claimed anywhere.
+         wrong and are withdrawn.
+       - 2026-08-16, later the same day: the owner completed the 2503
+         challenge personally in a real browser on the live site, the
+         full chain, challenge to passcode 1234 to approval to ORDER
+         PLACED: order ORV-2026-08-0XWV5X, confirmed server-side as
+         succeeded ($110.25 including $10.25 tax, 12:12:31 UTC; run
+         on the pre-stabilization live build, same rail). So 2503 is
+         END-TO-END VERIFIED, ending included. The pending-human-
+         click-through caveat now applies ONLY to 4111's ending.
 
        The one story, told identically by this hint, staff.html's
        hint, and docs/TEST-CARDS.html:
          4000 0000 0000 2503  the primary recommended challenge card
                               (Braintree's documented 3-D Secure
                               challenge card; the sandbox passcode on
-                              its own screen is 1234)
+                              its own screen is 1234; end-to-end
+                              verified 2026-08-16, order
+                              ORV-2026-08-0XWV5X)
          4000 0000 0000 2370  approval screen, authentication fails
                               (Braintree's documented table)
          4000 0000 0000 2701  no screen at all, approves
                               (frictionless, Braintree's documented
                               table)
          4111 1111 1111 1111  also raises a challenge on this rail
-                              (server-verified 2026-08-16)
+                              (server-verified 2026-08-16; its ending
+                              is the one still unproven)
          4000 1111 1111 1115  approval screen, then the card declines
        Expiry month 01, year = current + 3. Full matrix:
        docs/TEST-CARDS.html. See also ROADMAP.md. */
     livePayNote.textContent =
       'Test mode, expiry 01/29, any three digit security code. ' +
-      '4000 0000 0000 2503 opens the approval screen from your bank; the passcode it shows you is 1234. ' +
+      '4000 0000 0000 2503 opens the approval screen from your bank; enter the passcode 1234 it shows you and the payment approves. ' +
       '4000 0000 0000 2370 opens it, and the approval fails. ' +
       '4000 0000 0000 2701 approves with no passcode at all. ' +
       'Nothing is ever charged.';

@@ -1716,14 +1716,17 @@
            (verifier finding M1, quality assurance finding H3): 4000
            0000 0000 2503 is the primary recommended challenge card
            (Braintree's documented 3-D Secure challenge card, sandbox
-           passcode 1234); 4111 1111 1111 1111 also raises a challenge
-           on this rail (server-verified 2026-08-16). Neither card has
-           a recorded COMPLETED challenge yet, so the hint claims the
-           screen, not the ending. Same story as shop.html's hint and
+           passcode 1234), END-TO-END VERIFIED 2026-08-16: the owner
+           completed the full challenge chain in a real browser on the
+           live site, order ORV-2026-08-0XWV5X, confirmed succeeded
+           server-side (run on the pre-stabilization live build, same
+           rail). 4111 1111 1111 1111 also raises a challenge on this
+           rail (server-verified 2026-08-16) and its ending is the one
+           still unproven. Same story as shop.html's hint and
            docs/TEST-CARDS.html. */
         staffStatus('Key the card into the secure form while the caller reads it; repeat back the last four only. ' +
           'If their bank asks for an approval you cannot complete it for them and you must not ask for any code. ' +
-          'Test mode, expiry 01/29: 4000 0000 0000 2503 raises the approval screen (its sandbox passcode is 1234), ' +
+          'Test mode, expiry 01/29: 4000 0000 0000 2503 raises the approval screen (its sandbox passcode is 1234) and then approves, ' +
           '4000 0000 0000 2701 approves with no approval screen.');
         /* THE BUTTON QUOTES THE SERVER, NEVER THIS PAGE.
            This line used to read fmtMoney(orderMath().total). That was
