@@ -156,3 +156,11 @@ Follow-up wallet enablement:
 - The HyperSwitch payment widget now includes `walletReturnUrl`, which wallet redirects need in order to return to Orvanna cleanly.
 - Apple Pay remains disabled in the Orvanna UI until the Braintree Apple Pay domain setup is complete.
 - Plaid/Open Banking remains staged behind GBP/EUR readiness and is still disabled for USD.
+
+Follow-up Stripe Tax currency staging:
+- Howard confirmed the intended European currency code is `EUR`, not `EU`.
+- CHF was added to the shopper currency selector beside USD, GBP, and EUR.
+- `quote-tax` now reads the selected currency and asks Stripe Tax in USD, GBP, EUR, or CHF.
+- The tax answer is converted back into Orvanna's existing USD-base cents contract before the browser paints totals, because the order table still does not store settlement currency.
+- `create-payment` remains explicitly USD for now, so payment settlement cannot silently mix a non-USD tax quote with USD order records.
+- Non-USD currency choices seed demo tax addresses: GBP uses GB/London, EUR uses IE/Dublin, and CHF uses CH/Zurich.

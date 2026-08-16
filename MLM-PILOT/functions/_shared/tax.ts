@@ -62,6 +62,21 @@ import type { DbClient } from "./edge.ts";
 
 const STRIPE_TAX_URL = "https://api.stripe.com/v1/tax/calculations";
 
+/* Display-currency tax staging.
+
+   Orvanna still stores order money as USD cents and create-payment is
+   deliberately guarded to USD. For quote-tax, though, we can ask
+   Stripe Tax in the selected display currency and convert the answer
+   back into the USD-base cents contract the browser already expects.
+   That keeps the page honest while the database currency migration is
+   not done yet. */
+const TAX_CURRENCY_RATES: Record<string, number> = {
+  USD: 1,
+  GBP: 0.79,
+  EUR: 0.92,
+  CHF: 0.88,
+};
+
 export interface TaxAddress {
   line1: string;
   city: string;
@@ -76,6 +91,21 @@ export interface TaxOutcome {
   calculation_id: string | null;
   reason: string | null;
   jurisdiction: string | null;
+  calculation_currency: string;
+  calculation_tax_cents: number;
+}
+
+function normalizeTaxCurrency(rawCurrency: string): string {
+  const currency = rawCurrency.trim().toUpperCase().slice(0, 3);
+  return TAX_CURRENCY_RATES[currency] ? currency : "USD";
+}
+
+function displayMinorFromUsdCents(usdCents: number, currency: string): number {
+  return Math.round(usdCents * TAX_CURRENCY_RATES[currency]);
+}
+
+function usdCentsFromDisplayMinor(displayCents: number, currency: string): number {
+  return Math.round(displayCents / TAX_CURRENCY_RATES[currency]);
 }
 
 /* THE HOUSE DESTINATION. Used for a guest, and for a member code
@@ -113,6 +143,9 @@ export const HOUSE_TAX_ADDRESS: TaxAddress = {
    ------------------------------------------------------------ */
 export const GUEST_STATE_ADDRESSES: Record<string, TaxAddress> = {
   IL: HOUSE_TAX_ADDRESS,
+  GB: { line1: "10 Downing Street", city: "London", state: "", zip: "SW1A 2AA", country: "GB" },
+  IE: { line1: "1 College Green", city: "Dublin", state: "", zip: "D02 X285", country: "IE" },
+  CH: { line1: "Bahnhofstrasse 1", city: "Zurich", state: "", zip: "8001", country: "CH" },
   AL: { line1: "1 Demonstration Way", city: "Montgomery", state: "AL", zip: "36104", country: "US" },
   AK: { line1: "1 Demonstration Way", city: "Juneau", state: "AK", zip: "99801", country: "US" },
   AZ: { line1: "1 Demonstration Way", city: "Phoenix", state: "AZ", zip: "85004", country: "US" },
@@ -169,14 +202,19 @@ function cleanAddressText(raw: string): string {
   return raw.trim().replace(/\s+/g, " ").slice(0, 80);
 }
 
-function cleanZip(raw: string): string {
-  const match = raw.trim().match(/\d{5}(?:-\d{4})?/);
-  return match ? match[0] : "";
+function cleanPostal(raw: string, country: string): string {
+  const compact = raw.trim().replace(/\s+/g, " ");
+  if (country === "US") {
+    const match = compact.match(/\d{5}(?:-\d{4})?/);
+    return match ? match[0] : "";
+  }
+  return compact.replace(/[^A-Za-z0-9 -]/g, "").slice(0, 12);
 }
 
 function checkoutAddressSupplied(rawStateCode: string, rawZip: string): boolean {
   const code = rawStateCode.trim().toUpperCase();
-  return GUEST_STATE_ADDRESSES[code] !== undefined && cleanZip(rawZip) !== "";
+  const base = GUEST_STATE_ADDRESSES[code];
+  return base !== undefined && cleanPostal(rawZip, base.country) !== "";
 }
 
 /* Map a guest's entered billing address to the tax address. Trimming
@@ -195,8 +233,8 @@ export function guestAddressFor(
     line1: cleanAddressText(rawLine1) || base.line1,
     city: cleanAddressText(rawCity) || base.city,
     state: base.state,
-    zip: cleanZip(rawZip) || base.zip,
-    country: "US",
+    zip: cleanPostal(rawZip, base.country) || base.zip,
+    country: base.country,
   };
 }
 
@@ -288,7 +326,9 @@ export async function calculateTax(
   address: TaxAddress,
   taxIdText: string,
   flatFallbackCents: number,
+  requestedCurrency = "USD",
 ): Promise<TaxOutcome> {
+  const calculationCurrency = normalizeTaxCurrency(requestedCurrency);
   const key = Deno.env.get("STRIPE_SECRET_KEY");
   if (!key) {
     return {
@@ -297,6 +337,8 @@ export async function calculateTax(
       calculation_id: null,
       reason: "stripe_not_configured",
       jurisdiction: null,
+      calculation_currency: calculationCurrency,
+      calculation_tax_cents: displayMinorFromUsdCents(flatFallbackCents, calculationCurrency),
     };
   }
 
@@ -310,6 +352,8 @@ export async function calculateTax(
       calculation_id: null,
       reason: "nothing_taxable",
       jurisdiction: null,
+      calculation_currency: calculationCurrency,
+      calculation_tax_cents: 0,
     };
   }
 
@@ -317,8 +361,8 @@ export async function calculateTax(
      the same category (software as a service), so splitting per item
      would produce identical treatment and only add rounding seams. */
   const form = new URLSearchParams();
-  form.set("currency", "usd");
-  form.set("line_items[0][amount]", String(taxableCents));
+  form.set("currency", calculationCurrency.toLowerCase());
+  form.set("line_items[0][amount]", String(displayMinorFromUsdCents(taxableCents, calculationCurrency)));
   form.set("line_items[0][reference]", "orvanna-order");
   form.set("line_items[0][tax_behavior]", "exclusive");
   form.set("customer_details[address][line1]", address.line1);
@@ -351,6 +395,8 @@ export async function calculateTax(
         calculation_id: null,
         reason: `stripe_http_${resp.status}`,
         jurisdiction: null,
+        calculation_currency: calculationCurrency,
+        calculation_tax_cents: displayMinorFromUsdCents(flatFallbackCents, calculationCurrency),
       };
     }
     const calc = (await resp.json()) as {
@@ -363,12 +409,15 @@ export async function calculateTax(
     };
     const first = calc.tax_breakdown?.[0];
     const j = first?.tax_rate_details;
+    const calculationTaxCents = calc.tax_amount_exclusive ?? 0;
     return {
-      tax_cents: calc.tax_amount_exclusive ?? 0,
+      tax_cents: usdCentsFromDisplayMinor(calculationTaxCents, calculationCurrency),
       source: "stripe_tax",
       calculation_id: calc.id ?? null,
       reason: first?.taxability_reason ?? "no_breakdown",
       jurisdiction: j ? [j.state, j.country].filter(Boolean).join(", ") : null,
+      calculation_currency: calculationCurrency,
+      calculation_tax_cents: calculationTaxCents,
     };
   } catch {
     console.error("tax: Stripe Tax unreachable");
@@ -378,6 +427,8 @@ export async function calculateTax(
       calculation_id: null,
       reason: "stripe_unreachable",
       jurisdiction: null,
+      calculation_currency: calculationCurrency,
+      calculation_tax_cents: displayMinorFromUsdCents(flatFallbackCents, calculationCurrency),
     };
   }
 }

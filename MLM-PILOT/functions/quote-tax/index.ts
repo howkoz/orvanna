@@ -112,6 +112,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
     }
 
     const activation = typeof body.activation === "string" ? body.activation : "";
+    const requestedCurrency =
+      typeof body.currency === "string" ? body.currency.trim().toUpperCase().slice(0, 3) : "USD";
     const taxIdText = typeof body.tax_id === "string" ? body.tax_id.trim().slice(0, 40) : "";
     const rawMemberCode =
       typeof body.member_code === "string" ? body.member_code.trim().slice(0, 40) : "";
@@ -154,6 +156,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       address,
       taxIdText,
       order.tax_cents, /* the mirror's flat figure, used only if Stripe cannot answer */
+      requestedCurrency,
     );
 
     /* Recomputed from parts rather than adjusted, so a quoted total
@@ -168,6 +171,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
         tax_source: taxOutcome.source,
         tax_reason: taxOutcome.reason,
         tax_jurisdiction: taxOutcome.jurisdiction,
+        tax_calculation_currency: taxOutcome.calculation_currency,
+        tax_calculation_cents: taxOutcome.calculation_tax_cents,
       },
     });
   } catch (err) {

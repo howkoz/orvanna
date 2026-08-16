@@ -399,6 +399,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       taxAddress,
       taxIdText,
       order.tax_cents, /* the mirror's flat figure, used only if Stripe cannot answer */
+      "USD",
     );
     /* The mirror priced the cart so the caps and the ceiling were enforced on a
        real number; the engine's figure now replaces its tax line. Recomputed
