@@ -544,7 +544,7 @@ artificially."** Sandbagging is structurally absent: there is no carryover to ba
 (Law A) and no placement tree to park volume in; volume books to the account that
 bought it, monthly, and pay is on the second-STRONGEST leg as the month actually
 landed. The splitting attack is worked in section 11 and loses: fixed downline volume
-V across k equal legs pays 0.0250 x V at k = 2, 0.0192 x V at k = 3, 0.0156 x V at
+V across k equal legs pays 0.0100 x V at k = 2, 0.0077 x V at k = 3, 0.0063 x V at
 k = 4; the optimum is two real balanced legs, which is not a leak, it is the design
 goal wearing its own name. (Re-anchored v1.2 to the rates of record:) funding an
 artificial second leg costs $100.00 a month of real subscription to return at most
@@ -611,8 +611,8 @@ source-level number on every surface, because members are what riot, not sources
 Seeded March at the rates of record: **35 of the 207 paid members, 17 percent, carry
 at least one shaved line**; the worst-shaved member loses 324.14, and the worst RATIO
 is 21 percent of that member's gross claims. The exhibit that states the problem in
-one row, GW-000044's bonus line: rate 0.020, basis 120.00, paid 0.18 against a
-rate-times-basis of 2.40, a 93 percent haircut that depends on OTHER people's claims
+one row, GW-000044's bonus line: rate 0.020, basis 120.00, member-visible paid 0.17
+(the floor-on-prorated rule of section 7) against a rate-times-basis of 2.40, a 93 percent haircut that depends on OTHER people's claims
 on shared sources, per source, at scale 6, and is not recomputable from anything the
 member can see. Therefore, AS NORMATIVE SPEC TEXT: **any member-facing statement of
 this plan MUST print, on every prorated line, the CLAIMED amount, the PAID amount,
