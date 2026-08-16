@@ -1,4 +1,4 @@
-# Comp Plan Lab Specification, version 1.2
+# Comp Plan Lab Specification, version 1.3
 
 As of 2026-08-16. Written by mlm-architect on Howard's green light of the same day, his
 words: "start running different comp plan runs... binary, unilevel and so on and then we
@@ -27,6 +27,19 @@ the builder, the verifier, and the live run); the extra-root placement rule is R
 in section 3.2; the interface's fifth defaulted parameter is ratified in section 1.1;
 and the census-scale cap behavior is documented in section 4.2. Sections 6.1, 6.2, the
 strategy A half of 6.3, and 6.4 are numerically unchanged.
+
+**Amendment 2026-08-16, v1.3 (Phase L2 landed, commit a26ca0d).** Two architect items
+out of the L2 build (`docs\verification\LAB-L2-PROOF-RUN-2026-08-16.md`; the verifier's
+L2 verdict was not yet committed when this amendment was written, and per the
+coordinator the build's interpretations are assumed to hold unless that verdict says
+otherwise). One: the CALIBRATION RESIDUE is ruled in section 4.2: the v1.2 rates stand
+and the residue is DISPLAYED, never hidden; the rejected iterate-to-cap-aware-parity
+option is recorded with the builder's math. Two: the two stairstep areas the builder
+implemented from interpreted prose are now stated in exact words in section 4.4 (the
+override walk model with its boundary counter, and the differential line columns with
+the scoped exception to the section 1.2 rounding invariant), and the builder's staged
+hand examples are appended as sections 6.5 and 6.6, discharging the L2 deliverable
+"hand example for each appended to this spec".
 
 The lab is a WHAT-IF machine. It takes the same members, the same tree, and the same
 month of volume that the real engine reads, runs them through alternative compensation
@@ -104,7 +117,7 @@ Three outputs per run, written only to the `lab` schema (section 2):
 | source_member_id | Nullable: null for aggregate-basis pay (binary pay-leg, stairstep differential), set for per-source pay (unilevel, matrix, overrides). |
 | level | Nullable: tree distance for level pay, null for aggregate pay. |
 | basis | The amount the rate was applied to (source CV, pay-leg CV, group CV differential basis). |
-| rate, amount | amount = round half up (rate x basis, 2), rounded AT THE LINE, exactly the real engine's rule. |
+| rate, amount | amount = round half up (rate x basis, 2), rounded AT THE LINE, exactly the real engine's rule. (Scoped in v1.3: this identity holds for every reason code EXCEPT 'stairstep_differential', which is arithmetically incapable of it; its exact column semantics and the recomputation path are defined in section 4.4.) |
 | reason | Not null, machine-readable: 'unilevel_level_pay', 'binary_pay_leg', 'matrix_level_pay', 'stairstep_differential', 'stairstep_override_gen1', 'stairstep_override_gen2'. Every dollar must be explainable by its own row. |
 
 **Company totals** on the lab run row: total_sv, total_cv, total_payout, members_paid
@@ -337,6 +350,36 @@ live parameter at census scale, not decoration; dashboard breakage figures for b
 must include capped remainders, and any rate change re-tests where the cap starts
 binding.
 
+**The calibration residue ruled (v1.3, 2026-08-16).** The L2 build ran the ruled rates
+on seeded March and proved they do NOT land size parity: binary pays 16.4522 percent of
+CV under 'bfs_spill' at 0.105 and 17.4898 percent under 'volume_balanced' at 0.110,
+against the baseline's 14.6085, a residue of 1.8 to 2.9 points. The cause is proven to
+the cent in the L2 proof run: the calibration rule is LINEAR (the rate scales every
+line proportionally) but the percents it divided were CAPPED totals and the cap is
+non-linear; at 0.20 the cap withheld 5,600.00, at 0.105 only 1,347.20, so payout
+shrinks slower than the rate (verification: run 28's uncapped total 16,476.60 equals
+0.525 times the uncapped 0.20 total 31,384.00, exactly).
+
+RULED: **ACCEPT THE RESIDUE AND DISPLAY IT. The v1.2 rates 0.105 and 0.110 stand
+unchanged.** Display rule, binding on the dashboard: every binary card, cell, and
+cross-plan comparison shows that run's ACTUAL percent of CV beside the baseline's
+percent, always, so the size difference is visible information rather than a hidden
+assumption; the phrase "size held equal" must not appear on any lab surface, and the
+caption reads "size approximately held; residue shown". Reasoning: the cap's binding
+SET depends on the rate (which legs cap changes as the rate moves), so cap-aware
+parity is a fixed-point chase, and worse, it was anchored on March alone: a rate
+solved to the cent for March (the builder's estimate, one whale line capped,
+payout(r) = 120,280 x r + 2,500.00, r of about 0.0909, nearest 0.005 = 0.090) buys
+parity for exactly one month and would still leave residue in February, April through
+July, and August. Size-parity to the cent across months with one rate never existed to
+be had; and tuning the rate against capped totals would launder the cap, which is a
+SHAPE feature of binary (it truncates top earners and shows up in the concentration
+metrics), into a size dial. Coarse calibration plus honest display keeps the shape
+story clean. The rejected option (iterate to cap-aware per-strategy rates, near 0.090
+for 'bfs_spill') is recorded here so the choice is auditable; it remains available
+later if Howard ever wants single-month parity for a specific exhibit, as a new run
+with its rate in plan_params, never a respec.
+
 ### 4.3 Plan 'matrix_3x7' (draft)
 
 | Parameter | Draft value | Meaning |
@@ -361,13 +404,47 @@ member's whole sponsor subtree EXCLUDING breakaway groups.
 |---|---|
 | Brackets (on GV, inclusive lower bounds) | 0 to 999.99: 5 percent; 1,000.00 to 4,999.99: 10 percent; 5,000.00 to 14,999.99: 15 percent; 15,000.00 and up: 20 percent |
 | Breakaway threshold | A member whose own GV >= 15,000.00 is a BREAKAWAY; their whole group leaves every upline member's GV that month. Monthly-pure, like ranks. |
-| Generation override | 4 percent of a generation 1 breakaway group's total CV; 2 percent for generation 2 (a breakaway found under a breakaway). Paid to the first QUALIFIED member found walking the sponsor chain upward from the breakaway; generation counting restarts at each breakaway boundary. |
-| Differential pay | Earner receives rate(own GV) x (own CV + non-breakaway group CV) minus the sum over each direct child group of rate(child GV) x (that child group's CV including the child's own). Reason 'stairstep_differential', one line per earner, basis = the signed net basis. |
+| Generation override | 4 percent of a breakaway group's total CV at generation 1, 2 percent at generation 2, assigned by the BOUNDARY-COUNTER WALK stated exactly below (v1.3). |
+| Differential pay | One line per earner, reason 'stairstep_differential', with the exact column semantics stated below (v1.3), superseding v1.1's undefined "basis = the signed net basis". |
 | Earner gate | qualified (SV >= 100.00); an unqualified member's differential is breakage (their downline's brackets still subtract normally). |
 
 Negative differentials cannot occur: a parent's GV includes every non-breakaway child
 group, so parent GV >= child GV, brackets are monotone in GV, and breakaway removes
 exactly the groups that would out-bracket the parent.
+
+**The two models in exact words (v1.3, 2026-08-16).** The L2 build implemented both of
+the following from interpreted prose, fixture-pinned them, and flagged them; they are
+now spec text, so they stop being interpretation.
+
+**Model one, the override walk (boundary counter).** For EACH breakaway member B,
+independently: walk the sponsor chain upward from B toward the root, carrying a
+boundary counter that starts at 0 and increments each time the walk passes another
+breakaway member. The first QUALIFIED member encountered while the counter is 0
+receives the generation 1 override, 0.04 x (B's group CV); the first qualified member
+encountered while the counter is 1 receives the generation 2 override, 0.02 x (B's
+group CV); the walk stops when the counter reaches 2, or at the root. Consequences
+that are now normative: a generation 2 payment for B exists exactly when another
+breakaway sits between B and its generation 2 recipient, which is the precise meaning
+of v1.1's parenthetical "a breakaway found under a breakaway"; an unqualified member
+is passed over without incrementing the counter (only breakaways are boundaries); and
+one member may collect different generations from different breakaways in the same
+month (in the section 6.6 chain, S3 takes generation 1 on S4's group AND generation 2
+on S6's group). Override lines are per-source (source = the breakaway member), so
+amount = round(rate x basis, 2) holds for both override reason codes.
+
+**Model two, the differential line columns.** A differential is a difference of
+bracket products, so no single rate-times-basis product can reproduce it whenever any
+child group's bracket differs from the earner's. The columns of a
+'stairstep_differential' line are therefore defined as: rate = the EARNER's bracket
+rate; basis = the earner's own CV plus their non-breakaway group CV; amount = the
+once-rounded differential, round(rate x basis minus the sum over each direct child
+group of (that child group's bracket rate x that group's CV, own CV included), 2).
+The identity amount = round(rate x basis, 2) does NOT hold for this one reason code
+(section 1.2 carries the scoped exception), and the recomputation path is normative:
+plan_metrics carries gv, bracket, breakaway flag, and group_cv for every member, and
+the verifier must be able to rebuild every differential amount from plan_metrics
+alone. This supersedes v1.1's "basis = the signed net basis", which named a column it
+never defined.
 
 **Targeting hand math.** Worst-case ceiling = top bracket 20 percent of CV plus a full
 two-generation override chain 4 + 2 = 26 percent of CV, only when stacked breakaways
@@ -528,6 +605,65 @@ a shallow tree, which is why the calibration rule of section 4.2 runs on the see
 right leg carried less volume at that step) and pays M1 104.00, M2 24.00, M3 40.00,
 company 168.00: an A-to-B spread of 16.00 with M2 and M3 trading places, which is the
 sensitivity of section 3.4 made concrete.
+
+### 6.5 Matrix worked examples (added v1.3, 2026-08-16, from the L2 build's staged derivation in `db\lab\108_proof_matrix_fixtures.sql`, recomputed by hand by the architect before adoption)
+
+Parameters per section 4.3: width 3, depth 7, rates 5/5/4/4/3/2/2 percent of source CV
+by placement level, qualified-earner gate, flat depth.
+
+**Mini tree.** Placement under BOTH strategies is identical to the sponsor tree: M1's
+three frontline members fill M1's three slots and M5 lands in M2's first slot, so no
+placement step ever needs spillover or a non-trivial weigh-in; spread 0.00, and here
+it is PROVABLE, unlike the corrected binary claim of 6.3. Lines: M1 on M2 at level 1 =
+0.05 x 120.00 = 6.00, on M3 = 4.00, on M4 = 4.00, on M5 at level 2 = 0.05 x 40.00 =
+2.00; M2 on M5 at level 1 = 2.00. Company = 18.00 (M1 16.00, M2 2.00) = 3.75 percent
+of CV 480.00. Against unilevel's 34.00 on the same tree, the whole story is the front
+line: matrix's flat 5 percent versus unilevel's 10 percent.
+
+**Ten-member tree.** Placement again equals the sponsor tree under both strategies (no
+member has more than three frontline members); spread 0.00. Lines: M1 level 1 on M2
+6.00, M3 4.00, M4 4.00; level 2 on M5 2.00, M6 6.00, M7 60.00, M8 4.00; level 3 at 4
+percent on M9 9.60, M10 1.60; M1 total 97.20. M2 on M5 2.00, M6 6.00, M9 (level 2)
+12.00 = 20.00. M3 on M7 60.00, M8 4.00, M10 (level 2) 2.00 = 66.00. M8 on M10 2.00.
+M5 is unqualified: its level 1 claim on M9 (12.00) is breakage. Company = 185.20 =
+8.5741 percent of CV 2,160.00 (unilevel 264.00, binary A at the draft rate 184.00).
+Flat depth 7 changes nothing here because the tree is only three levels deep; the
+losses versus unilevel are pure rate shape.
+
+### 6.6 Stairstep worked examples (added v1.3, 2026-08-16, from `db\lab\109_proof_stairstep_fixtures.sql`, recomputed by hand by the architect before adoption)
+
+Parameters per section 4.4: brackets 5/10/15/20 percent at GV 0 / 1,000 / 5,000 /
+15,000, breakaway at 15,000, overrides 4 and 2 percent.
+
+**Mini tree.** GVs: M1 600.00, M2 200.00, M3 100.00, M4 100.00, M5 50.00. Everybody
+sits in the 5 percent bracket, so every differential collapses: M1 = 0.05 x 480.00
+minus (0.05 x 160.00 + 0.05 x 80.00 + 0.05 x 80.00) = 24.00 minus 16.00 = 8.00; M2 =
+0.05 x 160.00 minus 0.05 x 40.00 = 6.00; M3 = 4.00; M4 = 4.00; M5 is unqualified, its
+2.00 is breakage. Company = 22.00 = 4.5833 percent of CV 480.00, no breakaways, no
+overrides. On a shallow low-volume tree stairstep is the stingiest of the four plans
+(unilevel 34.00, binary A 24.00, stairstep 22.00, matrix 18.00): everyone is stuck in
+the bottom bracket and differentials cancel to 5 percent of own CV.
+
+**The breakaway chain (fixture PROOF-STAIR, built to exercise every stairstep reason
+code including generation 2).** Sponsor chain S1 -> S2 -> S3 -> S4 -> S5 -> S6, plus
+S7 under S2. SV: S1 200, S2 100, S3 500, S4 10,000, S5 5,000, S6 15,000, S7 50.
+Bottom-up: S6 GV 15,000.00, BREAKAWAY, bracket 20. S5 GV 5,000.00 (S6's group left),
+bracket 15. S4 GV 10,000 + 5,000 = 15,000.00, BREAKAWAY, bracket 20. S3 GV 500.00
+(S4's group left), bracket 5. S7 GV 50.00, unqualified. S2 GV 650.00, S1 GV 850.00,
+both bracket 5. Differentials: S6 = 0.20 x 12,000.00 = 2,400.00; S5 = 0.15 x 4,000.00
+= 600.00; S4 = 0.20 x 12,000.00 minus 0.15 x 4,000.00 = 1,800.00; S3 = 0.05 x 400.00
+= 20.00; S2 = 0.05 x 520.00 minus (0.05 x 400.00 + 0.05 x 40.00) = 4.00; S1 = 0.05 x
+680.00 minus 0.05 x 520.00 = 8.00; S7's 2.00 is breakage; no negative differential
+anywhere, the monotonicity assertion holding on a fixture built to stress it.
+Overrides by the section 4.4 walk: S6's group CV 12,000.00 pays generation 1 to S5
+(first qualified, zero boundaries) = 480.00, then the walk passes breakaway S4
+(counter to 1) and S3 takes generation 2 = 240.00; S4's group CV 12,000.00 pays
+generation 1 to S3 = 480.00, and no breakaway sits above S4, so its generation 2 does
+not exist, which is the walk model's defining clause in action. S3 thus collects a
+generation 1 AND a generation 2 in one month, from different breakaways. Totals: S1
+8.00, S2 4.00, S3 740.00, S4 1,800.00, S5 1,080.00, S6 2,400.00, S7 0.00. Company =
+6,032.00 = 24.4409 percent of CV 24,680.00, six members paid, under the 26 percent
+stacked-breakaway ceiling of section 4.4.
 
 ---
 
