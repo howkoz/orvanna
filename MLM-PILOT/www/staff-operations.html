@@ -505,7 +505,7 @@
         ? ('Last changed by ' + s.updated_by + ' at ' + fmtWhen(s.updated_at) + '.')
         : 'Never changed; shipped disabled.';
     }).catch(function () {
-      byId('billingNotes').appendChild(el('div', 'ops-bad', 'Could not reach the billing console service.'));
+      byId('billingNotes').appendChild(el('div', 'ops-bad', 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'));
     });
   }
 
@@ -529,7 +529,7 @@
         ? ('Daily run enabled at ' + String(s.run_at_time).slice(0, 5) + ' ' + s.timezone + '.')
         : 'Daily run disabled; the engine runs manually only.');
       renderHonestyNotes(byId('billingNotes'), result.data);
-    }).catch(function () { schedStatus.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { schedStatus.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   });
 
   /* ---------- run now: preview, then the S2-pending execute ---------- */
@@ -639,7 +639,7 @@
         var wrap = el('div', 'ops-table-wrap'); wrap.appendChild(t);
         previewBody.appendChild(wrap);
       }
-    }).catch(function () { previewStatus.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { previewStatus.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   });
 
   /* EXECUTE: live as of migrations 028 and 029. Two clicks arm and
@@ -699,7 +699,7 @@
       loadOverview();
     }).catch(function () {
       previewStatus.textContent = '';
-      body.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service.'));
+      body.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'));
     });
   });
 
@@ -749,7 +749,7 @@
       t.appendChild(tb);
       var wrap = el('div', 'ops-table-wrap'); wrap.appendChild(t);
       body.appendChild(wrap);
-    }).catch(function () { status.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { status.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   }
 
   /* ---------- run history + drill ---------- */
@@ -788,7 +788,7 @@
         tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRunDetail(r.id); } });
         tbody.appendChild(tr);
       });
-    }).catch(function () { status.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { status.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   }
 
   /* Migration 028's run-record arithmetic, real field names
@@ -858,7 +858,7 @@
         drawer.appendChild(el('p', 'ops-status-line', 'No attempts on this run.'));
       }
       body.appendChild(drawer);
-    }).catch(function () { clearNode(body); body.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service.')); });
+    }).catch(function () { clearNode(body); body.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.')); });
   }
 
   /* ---------- retry queue ---------- */
@@ -883,7 +883,7 @@
         cell(tr, fmtMoney(r.amount), 'ops-num');
         tbody.appendChild(tr);
       });
-    }).catch(function () { status.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { status.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   }
 
   /* ---------- attention queue ---------- */
@@ -905,7 +905,7 @@
         cell(tr, r.detail);
         tbody.appendChild(tr);
       });
-    }).catch(function () { status.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { status.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   }
 
   /* ---------- subscription management ---------- */
@@ -952,7 +952,7 @@
         drawer.appendChild(wrap);
         subEvents.appendChild(drawer);
       }
-    }).catch(function () { subStatus.textContent = 'Could not reach the billing console service.'; });
+    }).catch(function () { subStatus.textContent = 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'; });
   }
 
   function renderSubCard(s) {
@@ -1021,7 +1021,7 @@
           if (currentMemberCode) { lookupSubs(); }
         }).catch(function () {
           clearNode(out);
-          out.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service.'));
+          out.appendChild(el('div', 'ops-bad', 'Could not reach the billing console service. Refresh and try again; if it persists, the console functions are not deployed yet, which the deploy round cures.'));
         });
       });
       return strip;
