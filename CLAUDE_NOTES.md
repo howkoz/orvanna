@@ -56,6 +56,7 @@ What changed:
 - Guest checkout now normalizes the visible billing State field and sends it as `guest_state`.
   - Examples: `NY`, `New York`, and `new york` all normalize to `NY`.
 - Follow-up: the billing State field is now a dropdown with all 50 states plus District of Columbia, so guest state selection is explicit instead of free text.
+- Follow-up: the account step no longer shows an Illinois tax estimate before login or guest State/ZIP entry. Tax is pending with a blank tax amount until either a member login supplies the stored address or a guest supplies State and ZIP.
 - Guest checkout also sends `guest_zip`, `guest_city`, and `guest_line1` for the ZIP-aware server path.
 - The address fields are now part of the payment amount signature, so editing State/ZIP forces a fresh quote and a fresh payment opening.
 - `MLM-PILOT\functions\quote-tax\index.ts` and `MLM-PILOT\functions\create-payment\index.ts` now parse the guest address fields identically.
