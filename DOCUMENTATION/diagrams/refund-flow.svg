@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 980" width="1180" height="980" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4B5563"/>
+    </marker>
+    <marker id="arwRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="980" fill="#FFFFFF"/>
+
+  <text x="30" y="38" font-size="20" font-weight="600" fill="#111827">D. The refund flow: full refunds only, and everything it touches</text>
+  <text x="30" y="60" font-size="13" fill="#4B5563">The button is the easy part. The column on the right is the real work. Proposed 2026-08-15, not applied and not deployed.</text>
+
+  <!-- ============ LEFT COLUMN: the flow ============ -->
+
+  <!-- 1. the ask -->
+  <rect x="30" y="84" width="650" height="72" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="46" y="108" font-size="13.5" font-weight="600" fill="#111827">1. A staff agent names ONE order in the staff console</text>
+  <text x="46" y="130" font-size="12.5" fill="#374151">There is no amount box anywhere on the screen. Full refunds only, by instruction,</text>
+  <text x="46" y="148" font-size="12.5" fill="#374151">so the only question the agent answers is which order and why.</text>
+
+  <line x1="355" y1="156" x2="355" y2="186" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 2. rails -->
+  <rect x="30" y="190" width="650" height="126" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
+  <text x="46" y="214" font-size="13.5" font-weight="600" fill="#111827">2. Three rails, in this order, before anything is decided</text>
+  <text x="46" y="236" font-size="12.5" fill="#374151">Origin allow list. Same as every other function.</text>
+  <text x="46" y="256" font-size="12.5" fill="#374151">Rate limit, in its own "refund" bucket: 3 a minute, so refunds can never eat checkout's budget.</text>
+  <text x="46" y="278" font-size="12.5" font-weight="600" fill="#B91C1C">AUTHORISATION: the signed staff token, actually verified against the key in the database.</text>
+  <text x="46" y="298" font-size="12.5" fill="#374151">This rail had to be BUILT. Nothing in this project has ever verified a session token before.</text>
+
+  <line x1="355" y1="316" x2="355" y2="346" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 3. phase one -->
+  <rect x="30" y="350" width="650" height="150" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
+  <text x="46" y="374" font-size="13.5" font-weight="600" fill="#111827">3. PHASE ONE: decide, then write the intent. One transaction, order row LOCKED.</text>
+  <text x="46" y="396" font-size="12.5" fill="#374151">Was it really paid? Has it been refunded before? Is one already in flight?</text>
+  <text x="46" y="416" font-size="12.5" fill="#374151">The amount is read from the ORDER ROW, never from the request. No caller can influence it.</text>
+  <text x="46" y="438" font-size="12.5" fill="#374151">Write the refund row as "requested", capture the clawback snapshot, and COMMIT.</text>
+  <text x="46" y="464" font-size="12.5" font-weight="600" fill="#92400E">The record exists BEFORE any money moves. That ordering is the whole design:</text>
+  <text x="46" y="484" font-size="12.5" font-weight="600" fill="#92400E">a timeout then leaves a question we can ask, instead of a refund we would repeat.</text>
+
+  <line x1="355" y1="500" x2="355" y2="530" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 4. phase two -->
+  <rect x="30" y="534" width="650" height="122" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.6"/>
+  <text x="46" y="558" font-size="13.5" font-weight="600" fill="#111827">4. PHASE TWO: POST /refunds to HyperSwitch, which calls Braintree</text>
+  <text x="46" y="580" font-size="12.5" fill="#374151">payment_id, refund_id (ours, and HyperSwitch's own idempotency key), amount, reason.</text>
+  <text x="46" y="600" font-size="12.5" fill="#374151">amount = the full total_cents, which already contains the tax. The customer is made whole.</text>
+  <text x="46" y="622" font-size="12.5" font-weight="600" fill="#5B21B6">Braintree implements refund Execute and RSync in full, and partial amounts too.</text>
+  <text x="46" y="642" font-size="12.5" font-weight="600" fill="#5B21B6">There is NO per-connector refund gate. The 3DS trap does not repeat here.</text>
+
+  <line x1="130" y1="656" x2="130" y2="690" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="352" y1="656" x2="352" y2="690" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="577" y1="656" x2="577" y2="690" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- 5. outcomes. succeeded sits RIGHTMOST on purpose: it is the only one
+       with consequences, and it belongs next to the consequences column. -->
+  <rect x="30" y="694" width="200" height="118" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="44" y="716" font-size="12.5" font-weight="600" fill="#991B1B">failed</text>
+  <text x="44" y="738" font-size="12" fill="#374151">Order stays "succeeded".</text>
+  <text x="44" y="755" font-size="12" fill="#374151">Nothing left the business.</text>
+  <text x="44" y="777" font-size="12" fill="#374151">The slot is released, so a</text>
+  <text x="44" y="794" font-size="12" fill="#374151">genuine retry is possible.</text>
+
+  <rect x="252" y="694" width="200" height="118" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="1.6"/>
+  <text x="266" y="716" font-size="12.5" font-weight="600" fill="#92400E">pending / review</text>
+  <text x="266" y="738" font-size="12" fill="#374151">Order stays "succeeded":</text>
+  <text x="266" y="755" font-size="12" fill="#374151">nothing is back yet.</text>
+  <text x="266" y="777" font-size="12" fill="#374151">The next click settles it</text>
+  <text x="266" y="794" font-size="12" fill="#374151">with GET /refunds/{id}.</text>
+
+  <rect x="474" y="694" width="206" height="118" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="488" y="716" font-size="12.5" font-weight="600" fill="#065F46">succeeded</text>
+  <text x="488" y="738" font-size="12" fill="#374151">Order becomes "refunded",</text>
+  <text x="488" y="755" font-size="12" fill="#374151">which is terminal.</text>
+  <text x="488" y="777" font-size="12" fill="#374151">The customer has every cent</text>
+  <text x="488" y="794" font-size="12" fill="#374151">back, tax included.</text>
+
+  <!-- 6. what is recorded -->
+  <rect x="30" y="828" width="650" height="122" rx="10" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="46" y="852" font-size="13.5" font-weight="600" fill="#111827">5. What is left behind, every time, whether the refund worked or not</text>
+  <text x="46" y="874" font-size="12.5" fill="#374151">app.demo_order_refunds: amount, the tax inside it, who asked, when, why, the processor's</text>
+  <text x="46" y="892" font-size="12.5" fill="#374151">reference, and a snapshot of which commission runs had already published this volume.</text>
+  <text x="46" y="914" font-size="12.5" fill="#374151">app.demo_staff_actions: the audit line, including every attempt that was REFUSED, which is</text>
+  <text x="46" y="932" font-size="12.5" fill="#374151">the record you most want when something has gone wrong.</text>
+
+  <!-- ============ RIGHT COLUMN: knock-ons ============ -->
+
+  <text x="716" y="102" font-size="14" font-weight="600" fill="#111827">The knock-ons. This column is the real work.</text>
+
+  <!-- tax -->
+  <rect x="716" y="118" width="434" height="196" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="732" y="142" font-size="13" font-weight="600" fill="#991B1B">TAX: a known, measured gap. Not a silent one.</text>
+  <text x="732" y="164" font-size="12.5" fill="#374151">The customer gets the tax back. Stripe is not told.</text>
+  <text x="732" y="186" font-size="12.5" fill="#374151">By instruction, we do not reverse the Stripe Tax</text>
+  <text x="732" y="204" font-size="12.5" fill="#374151">transaction, so Stripe's reports will OVERSTATE tax</text>
+  <text x="732" y="222" font-size="12.5" fill="#374151">owed by exactly the tax on every refunded order.</text>
+  <text x="732" y="246" font-size="12.5" font-weight="600" fill="#991B1B">Measure it: select * from app.v_demo_tax_drift;</text>
+  <text x="732" y="268" font-size="12.5" fill="#374151">Fix it later with POST /v1/tax/transactions/</text>
+  <text x="732" y="286" font-size="12.5" fill="#374151">create_reversal, mode=full. The backlog view already</text>
+  <text x="732" y="304" font-size="12.5" fill="#374151">lists every transaction id that needs one.</text>
+
+  <!-- commissions -->
+  <rect x="716" y="326" width="434" height="216" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
+  <text x="732" y="350" font-size="13" font-weight="600" fill="#3730A3">COMMISSIONS: clawbacks are out of scope. Evidence is not.</text>
+  <text x="732" y="374" font-size="12.5" fill="#374151">The bridge counts only orders whose status is</text>
+  <text x="732" y="392" font-size="12.5" fill="#374151">"succeeded", so moving to "refunded" has two effects</text>
+  <text x="732" y="410" font-size="12.5" fill="#374151">that cost no code at all:</text>
+  <text x="732" y="434" font-size="12.5" font-weight="600" fill="#065F46">Refund BEFORE the bridge runs: no volume is ever</text>
+  <text x="732" y="452" font-size="12.5" font-weight="600" fill="#065F46">created. Nothing to claw back. Self-healing.</text>
+  <text x="732" y="476" font-size="12.5" font-weight="600" fill="#991B1B">Refund AFTER the bridge runs: the volume stands, and</text>
+  <text x="732" y="494" font-size="12.5" font-weight="600" fill="#991B1B">upline may already have been paid on it.</text>
+  <text x="732" y="518" font-size="12.5" fill="#374151">So we snapshot, at refund time, which runs were already</text>
+  <text x="732" y="536" font-size="12.5" fill="#374151">final. That answer cannot be re-derived a month later.</text>
+
+  <!-- instant payout -->
+  <rect x="716" y="554" width="434" height="160" rx="10" fill="#FFFBEB" stroke="#D97706" stroke-width="1.6"/>
+  <text x="732" y="578" font-size="13" font-weight="600" fill="#92400E">INSTANT PAYOUT: this gives it a trigger, not a recovery.</text>
+  <text x="732" y="602" font-size="12.5" fill="#374151">Approved 2026-08-15 at 20 percent of order price, paid</text>
+  <text x="732" y="620" font-size="12.5" fill="#374151">to the sponsor, terminal there. Its own document says</text>
+  <text x="732" y="638" font-size="12.5" fill="#374151">the recovery path is unanswered and unbuilt.</text>
+  <text x="732" y="662" font-size="12.5" font-weight="600" fill="#92400E">This design supplies the EVENT and the EVIDENCE.</text>
+  <text x="732" y="682" font-size="12.5" fill="#374151">It does not supply the money back: there is still no</text>
+  <text x="732" y="700" font-size="12.5" fill="#374151">negative balance and no clawback engine.</text>
+
+  <!-- guard rails -->
+  <rect x="716" y="726" width="434" height="224" rx="10" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.6"/>
+  <text x="732" y="750" font-size="13" font-weight="600" fill="#111827">GUARD RAILS: what an agent can never do</text>
+  <text x="732" y="774" font-size="12.5" fill="#374151">Choose an amount. Refund an order that never succeeded.</text>
+  <text x="732" y="792" font-size="12.5" fill="#374151">Refund the same order twice. Refund without an explicit</text>
+  <text x="732" y="810" font-size="12.5" fill="#374151">confirmation the SERVER checks. Undo a refund.</text>
+  <text x="732" y="834" font-size="12.5" fill="#374151">Act without a verified staff token. Act unlogged.</text>
+  <text x="732" y="858" font-size="12.5" font-weight="600" fill="#111827">Shaped for partial refunds, deliberately not built:</text>
+  <text x="732" y="880" font-size="12.5" fill="#374151">refunds are their own table, many rows per order are</text>
+  <text x="732" y="898" font-size="12.5" fill="#374151">already legal, amount is a real column, and the</text>
+  <text x="732" y="916" font-size="12.5" fill="#374151">"partially_refunded" state is already permitted by the</text>
+  <text x="732" y="934" font-size="12.5" fill="#374151">trigger. Adding partial later touches no table.</text>
+
+  <!-- every outcome is recorded -->
+  <line x1="130" y1="812" x2="130" y2="824" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="352" y1="812" x2="352" y2="824" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+  <line x1="577" y1="812" x2="577" y2="824" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
+
+  <!-- only a SUCCEEDED refund reaches the knock-on column. Short hop across
+       the gutter, which is why succeeded was placed rightmost. -->
+  <line x1="680" y1="753" x2="712" y2="753" stroke="#DC2626" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arwRed)"/>
+  <text x="474" y="836" font-size="11.5" font-style="italic" fill="#991B1B">only a succeeded refund creates the knock-ons to the right</text>
+</svg>

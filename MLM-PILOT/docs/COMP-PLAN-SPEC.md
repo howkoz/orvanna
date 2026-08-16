@@ -8,6 +8,13 @@ the agent product and the 100 PV gate). The worked example is unchanged by v1.3 
 only high-rank holders were already qualified). mlm-comp-engineer must reproduce
 section 7 exactly; mlm-verifier recomputes it independently.
 
+**Amendment 2026-08-15: section 5A, Instant Payout.** Terms APPROVED by Howard at **20
+percent of the order price**, with a rule he supplied that it **does not roll up to the
+upline**. **It is not built and it pays nothing.** Chargeback recovery is the one open
+question and it is the gate on building it. Nothing in sections 1 through 5 or 6 through 8
+is changed by this amendment, because Instant Payout consumes no volume and writes no level
+pay. The engine, the worked example in section 7 and all six finalized runs are untouched.
+
 Acronym key: Multi-Level Marketing (MLM), Personal Volume (PV), Sales Volume (SV),
 Commissionable Volume (CV), Team Volume (TV), Software as a Service (SaaS),
 Quality Assurance (QA).
@@ -113,37 +120,127 @@ reduces to: qualified AND 2 active legs.)
   8.00 + 4.00 + 4.00 + 2.40 + 1.60 = 20.00, i.e. 20 percent of revenue before
   breakage.
 
-## 5A. Instant Payout (ADOPTED 2026-08-15 by Howard; NOT DESIGNED, NOT BUILT)
+## 5A. Instant Payout (TERMS APPROVED 2026-08-15 by Howard; NOT BUILT)
 
-**Amendment note: added 2026-08-15 on Howard's instruction, "log that in your notes as a
-rule of one of the commission rules". No surrounding rule is changed by this amendment.**
+**Amendment note 1, 2026-08-15.** Added on Howard's instruction, "log that in your notes as a
+rule of one of the commission rules". Adopted as a rule with no design and five open
+questions. No surrounding rule was changed.
 
-- **Rule.** An immediate payout on a first order, paid at the time of purchase rather than in
-  the end-of-month run. The mechanism's name is **Instant Payout** and that name is
-  normative: it is to be used in the plan, in the field, and in any table, column, or
-  function built for it.
-- **Status.** Adopted as a rule of this plan. There is no design and no code. It must not be
-  described to anyone as available.
+**Amendment note 2, 2026-08-15, later the same day.** Howard's words: **"20 on instant payout
+and it does not roll up to the upline"**. This amendment records the **approved rate of 20
+percent of the order price**, closes open questions 1, 2, 3 and 5, and adds a **new rule he
+supplied, the no-roll-up rule**, as 5A.3 below. **Open question 4, chargeback recovery,
+remains open and is now the sole gate on building this.** No surrounding rule is changed by
+this amendment: sections 1 through 5 and 6 through 8 are untouched, because Instant Payout
+consumes no volume and writes no level pay.
+
+### 5A.1 The rule
+
+- **Name.** The mechanism is called **Instant Payout**, and the name is normative: it is to be
+  used in the plan, in the field, and in any table, column, or function built for it.
+- **What it is.** An immediate payout on a first order, paid at the moment the payment
+  succeeds rather than in the end-of-month run.
+- **Status.** **Terms approved. Not built.** There is no migration, no engine change, no
+  column and no function. It pays nothing and it must not be described to anyone as available.
+  An approved-but-unbuilt mechanism is the one people begin describing as though it works.
 - **Rationale on the record.** Immediate payout on a first order is the strongest known lever
   for a new distributor to begin selling, because the gap between effort and reward is what
   kills early momentum.
-- **Open questions carried with the rule.** Adoption does not answer any of these, and the
-  rule may not be built until all five have answers:
-  1. Definition of "first": first order ever by the member, first order by somebody they
-     personally sponsored, or first order within a window after enrolment.
-  2. Payout basis: full order value, first monthly slice only, or price rather than
-     Commissionable Volume.
-  3. Placement: a real-time path alongside the monthly batch, or the batch reconciling
-     against payouts already made.
-  4. Chargeback recovery. **No clawback path exists anywhere in this system**, and
-     `payment_status` has no refunded state, so an Instant Payout that should not have been
-     paid cannot currently be recovered. The chargeback window runs months.
-  5. Whether a cap applies, and whether the payer's own qualification gate applies.
-- **Known collision with section 6.3 and with the spreading rule.** Every other payout in
-  this plan resolves once, at month end, inside a self-contained calendar month. An immediate
-  payout does not. Separately, a one-time purchase's volume is recognised across ten months
-  (Howard, 2026-08-15), so paying Instant Payout on the full one-time price would pay at once
-  on volume the plan deliberately declined to recognise at once.
+
+### 5A.2 The approved terms
+
+| # | Term | The rule |
+|---|---|---|
+| 1 | Who is paid | The **sponsor**, meaning the member who personally enrolled the buyer. Never the buyer. This mechanism pays for selling, not for buying. |
+| 2 | Trigger | The **first order ever** placed by a member the sponsor personally enrolled, placed **within 30 days of that member's enrolment date**. One Instant Payout per sponsored member, ever. |
+| 3 | Basis | The **order price**, excluding tax and any activation fee. **Not Commissionable Volume**, which closes open question 2 and dissolves the spreading collision in 5A.4. |
+| 4 | **Rate** | **20 percent of that price.** Approved by Howard, 2026-08-15. |
+| 5 | Cap per event | The basis is capped at **250.00**, so no single Instant Payout exceeds **50.00**. |
+| 6 | Cap per sponsor | At most **3** Instant Payouts to one sponsor in one calendar month. |
+| 7 | Eligibility of the payee | The sponsor must already have at least one **completed purchase** of their own. **No monthly qualification gate applies**, because a qualified month cannot be known at the instant a payment succeeds. This closes open question 5. |
+| 8 | When it is paid | At the moment `payment_status` reaches `succeeded`, which is the only status backed by a fresh retrieve from the processor and an exact amount match. |
+| 9 | Placement | A real-time payment, reconciled by the monthly batch rather than computed by it. One ledger. This closes open question 3. |
+| 10 | Against level pay | **In addition** to level 1 pay, never instead of it. No ordinary commission line is suppressed and **nothing in section 5 changes**. |
+| 11 | Against volume | It consumes **no volume**. Sales Volume, Commissionable Volume, Team Volume, every rank, and the ten-month spreading rule are untouched by it. |
+| 12 | Recovery | Recovered from the member's next monthly commission run. **See 5A.5: this does not exist and is the gate on the whole mechanism.** |
+| 13 | Ledger | Written to `app.commission_lines` with `payout_type = 'instant_payout'`, and a recovery with `payout_type = 'instant_payout_clawback'`, so the two kinds of money never merge silently in any existing report. |
+
+### 5A.3 The no-roll-up rule (added by Howard, 2026-08-15)
+
+**RULE: an Instant Payout is TERMINAL AT THE SPONSOR. It pays the sponsor and nobody above
+them.**
+
+Howard's words: "it does not roll up to the upline". This is stated as a rule rather than left
+as a consequence of term 3, because a future implementer who changed the basis, or who wrote
+an Instant Payout as an order row so that it would show on a report, would break it without
+intending to.
+
+Four prohibitions, each of which is a way this could go wrong in code:
+
+1. **No commission lines above the sponsor.** One qualifying event produces exactly **one**
+   line, to **one** earner. It never produces a level 2, 3, 4 or 5 line for the sponsor's own
+   upline.
+2. **No volume anywhere.** The amount is never written into `app.orders` or
+   `app.order_lines`, and never enters Sales Volume, Commissionable Volume or Team Volume for
+   anybody, including the sponsor who received it.
+3. **No effect on rank or qualification.** Receiving an Instant Payout does not help the
+   sponsor reach the 100.00 qualification threshold, does not count toward any Team Volume
+   threshold, and does not make any leg active.
+4. **Paid depth does not apply.** Every other payment in this plan is gated by the earner's
+   paid depth. An Instant Payout has no level, so there is nothing for paid depth to gate. An
+   Executive and a plain Member receive an identical Instant Payout on an identical first
+   order.
+
+**Why the rule earns its place beyond being Howard's instruction.** Instant Payout pays out of
+money still inside the chargeback window. A payment that rolled up would spread that exposure
+across five people, and a recovery would then have to reach five balances. Terminal at the
+sponsor means one payee, one amount, one source order, and one balance line to reverse, which
+is what makes the recovery path in 5A.5 tractable at all.
+
+### 5A.4 The collision with section 6.3 and with the spreading rule, now resolved
+
+Every other payout in this plan resolves once, at month end, inside a self-contained calendar
+month. An immediate payout does not, which is resolved by term 9: a real-time payment
+reconciled by the batch, not computed by it.
+
+Separately, a one-time purchase's volume is recognised across ten months (Howard, 2026-08-15),
+so paying Instant Payout on the full one-time price out of **volume** would pay at once on
+volume the plan deliberately declined to recognise at once. **Term 3 dissolves this.** The
+basis is the order price, a quantity the receipt already carries and the processor already
+confirmed, so no deferred volume is consumed and the ten-month schedule is untouched.
+
+### 5A.5 The one open question, which is the gate
+
+**Open question 4, chargeback recovery, is still open, and the mechanism may not be built
+until it is answered and the answer is implemented.**
+
+Today: `app.demo_orders.payment_status` permits only `created`, `processing`, `succeeded`,
+`failed`, `abandoned`, with **no refunded and no charged-back state**; a trigger refuses to
+move a row out of a terminal state and `succeeded` is terminal; `app.orders.status = 'refunded'`
+has never been written by any code path; there is no member balance and no concept of a
+negative one. **No clawback path exists anywhere in this system.** The chargeback window runs
+for months, so Instant Payout pays out of money that can still be taken back.
+
+Four pieces have to exist first, in this order:
+
+1. A `charged_back` and `refunded` payment status, plus a trigger amendment permitting exactly
+   the transitions `succeeded -> charged_back` and `succeeded -> refunded` and no others.
+2. A member balance that may go negative, one line per event, each carrying the source order
+   so a payout and its reversal can always be matched.
+3. Settlement inside `app.fn_run_commission`: payable equals commission total minus any
+   outstanding negative balance, floored at zero, with the remainder carried forward. The
+   commission lines themselves must not change, because they are frozen by trigger once a run
+   is final. **A statement says what was earned; a balance says what was paid. They must stay
+   separate.**
+4. A block on further Instant Payouts to a member carrying an unsettled negative balance.
+
+**Full costing and the option sets behind every term above:**
+`DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`. Plain path:
+`C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`
+Measured on the six finalized runs, March to July 2026: 234 qualifying events, 5,050.00 of
+Instant Payout, 0.72 percent of revenue, taking the whole plan from 11.86 to **12.59 percent
+of revenue against the 20 percent ceiling**. The no-roll-up rule moved no figure, because the
+cost model was already terminal at the sponsor.
 
 ## 6. Edge cases, decided
 
@@ -254,3 +351,10 @@ either; both are breakage by design.
    Qualification (SV >= 100) is required to HOLD any rank above Member. Delivered as
    v1.3 (engine migration 009), all six months rerun and refinalized; the v1.2 runs
    remain as frozen superseded history.
+7. **(section 5A, Instant Payout) PARTLY DECIDED by Howard 2026-08-15: "20 on instant
+   payout and it does not roll up to the upline."** The rate, the definition of "first",
+   the basis, the caps, the eligibility test and the placement are all now settled in
+   section 5A.2, and the no-roll-up rule is 5A.3. **Still open, and the sole gate on
+   building it: how an Instant Payout is recovered after a chargeback.** No clawback path
+   exists anywhere in this system. See 5A.5 for the four pieces that have to be built
+   first. Until then Instant Payout is an approved rule that pays nobody.

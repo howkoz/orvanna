@@ -2,8 +2,22 @@
 
 **Owner of this document:** the compensation engineer on the Orvanna build team.
 **Written:** 2026-08-15.
-**Status: OPTIONS WITH A RECOMMENDATION. Nothing here is decided and nothing has been
-applied. Every query behind every number was read-only against production.**
+**Status: THE RECOMMENDED PACKAGE IN SECTION 9 IS APPROVED BY HOWARD, 2026-08-15, AT 20
+PERCENT, WITH ONE RULE HE ADDED. IT IS STILL NOT BUILT. Every query behind every number
+was read-only against production. No migration, no engine change, and no code of any kind
+has been written for this mechanism.**
+
+> **APPROVAL, 2026-08-15.** Howard's words: **"20 on instant payout and it does not roll up
+> to the upline"**.
+>
+> Two things landed in that sentence. The first confirms the recommended rate of **20 percent
+> of the order price**. The second is a **new rule Howard added**, now term 14 in section 9.1
+> and section 6.4 below: **an Instant Payout is terminal at the sponsor.** It pays the
+> sponsor and nobody above them.
+>
+> **The chargeback recovery path remains unanswered and unbuilt.** Approving a rate does not
+> build a way to get the money back. Section 7 still stands as written, and term 12 is still
+> the gate on the whole mechanism.
 
 This document exists for one reason. Howard wants a compensation plan brochure that
 includes Instant Payout. A brochure has to state a specific promise, and Instant Payout
@@ -426,6 +440,57 @@ new recruit's first order becomes the one order on which the sponsor's ordinary 
 silently disappears. That is a hard thing to explain in a brochure and an easy thing to
 resent.
 
+### 6.4 The no-rollup rule, added by Howard on 2026-08-15
+
+> **RULE, APPROVED: an Instant Payout is TERMINAL AT THE SPONSOR. It pays the sponsor and
+> nobody above them. It generates no level pay, no depth pay, and no volume of any kind that
+> could reach anyone further up the tree. Rank does not extend it, because there is no depth
+> for rank to reach through.**
+
+Howard's words: "it does not roll up to the upline".
+
+**This was already true of the recommended terms, and it is now stated rather than implied.**
+The recommended basis is the order price rather than Commissionable Volume, so an Instant
+Payout consumes no volume, and every upward payment in Orvanna is computed from volume. The
+no-rollup behaviour therefore fell out of the design as a consequence. **A consequence is not
+a rule.** A future implementer who changed the basis, or who wrote an Instant Payout as an
+order row so that it would appear on a report, would break it without ever intending to. Now
+it cannot be broken by accident, because breaking it means contradicting a written rule
+rather than overlooking a side effect.
+
+**What the rule forbids, stated so an implementer cannot misread it.** Four things, and all
+four are ways this could go wrong in code rather than hypotheticals invented for symmetry:
+
+1. **No commission lines above the sponsor.** An Instant Payout writes exactly one line, to
+   one earner, for one event. It never produces a level 2, 3, 4 or 5 line for the sponsor's
+   own upline.
+2. **No volume anywhere.** The Instant Payout amount is never written into `app.orders` or
+   `app.order_lines`, and never enters Sales Volume, Commissionable Volume or Team Volume for
+   anybody, including the sponsor who received it.
+3. **No effect on rank or qualification.** Receiving an Instant Payout does not help the
+   sponsor reach the 100.00 qualification threshold, does not count toward any Team Volume
+   threshold, and does not make any leg active.
+4. **Paid depth is irrelevant to it.** Every other payment in the plan is gated by the
+   earner's paid depth. Instant Payout has no level, so there is nothing for paid depth to
+   gate. An Executive and a plain Member receive an identical Instant Payout on an identical
+   first order.
+
+**Why this is the right rule and not merely Howard's preference.** Instant Payout pays out of
+money that is still inside the chargeback window (section 7). A payment that rolls up spreads
+that exposure across five people instead of one, and a clawback then has to reach five
+balances rather than one. **Terminal at the sponsor means one payee, one amount, one
+`demo_order_id`, and one balance line to reverse.** It is the single design choice that makes
+the recovery path in section 7.6 tractable rather than a distributed-settlement problem.
+
+**What the rule forecloses, measured.** Nothing was lost by adopting it, because nothing was
+ever costed with rollup in it. But it is worth knowing the size of the door it closes. Had an
+Instant Payout rolled up the plan's ordinary ladder above the sponsor, the four levels above
+level one would add 5 + 5 + 3 + 2 = 15 percentage points on the same capped basis of
+25,250.00, which is **3,787.50** over the five months. The total would have been 8,837.50
+instead of 5,050.00, and the combined plan cost **13.13 percent of revenue instead of 12.59
+percent**. That figure is an upper bound on a shape nobody proposed, quoted only so the rule
+has a size attached to it.
+
 ---
 
 ## 7. Question five: the chargeback problem, which has no answer today
@@ -593,10 +658,13 @@ the bonus, which is a fair price for making the mechanism defensible.
 
 ---
 
-## 9. THE RECOMMENDED PACKAGE, on one page
+## 9. THE APPROVED PACKAGE, on one page
 
-This is a single coherent set of terms. Howard can approve it, or amend any line of it, in one
-pass.
+**APPROVED BY HOWARD, 2026-08-15, at 20 percent, with term 14 added by him. NOT BUILT.**
+
+This is a single coherent set of terms. It is now the policy of record for Instant Payout, and
+it is still not implemented anywhere: no migration, no engine change, no column, no function.
+Term 12 remains the gate on switching it on.
 
 ### 9.1 The terms
 
@@ -615,11 +683,29 @@ pass.
 | 11 | **Against volume** | It consumes **no volume**. Sales Volume, Commissionable Volume, Team Volume, ranks and the ten-month spreading rule are all completely untouched. |
 | 12 | **Recovery** | If the order is refunded or charged back, the amount is recovered from the member's balance and settled against their next monthly commission run. **This must be built before the first Instant Payout is paid.** |
 | 13 | **Ledger** | Written to `app.commission_lines` with `payout_type = 'instant_payout'`, so it never merges silently with level pay in any existing report. |
+| **14** | **NO ROLL-UP**, added by Howard, 2026-08-15 | **An Instant Payout is TERMINAL AT THE SPONSOR. It pays the sponsor and nobody above them.** No level pay, no depth pay, and no volume of any kind that could reach anyone further up the tree. One event produces exactly one commission line, to exactly one earner. Rank is irrelevant to it, because it has no level for paid depth to gate. Full rule in section 6.4. |
 
 ### 9.2 The modelled cost of exactly those terms
 
 Computed in one read-only SQL query applying terms 3, 5, 6, 7 and 8 simultaneously to the real
 first-order events of March through July 2026. Not derived by scaling any earlier figure.
+
+> **Does term 14, the no-rollup rule, change any figure in this table? Checked, and no.**
+> Two things could have moved and neither did.
+>
+> **The Instant Payout column.** The query that produced it emits one amount per qualifying
+> event, `0.20 x least(order price, 250.00)`, attributed to that event's single sponsor. There
+> is no level expansion in it and there never was: no ancestor walk, no level map, no rate
+> ladder. The model was already terminal at the sponsor, so making it a rule confirms the
+> figure rather than altering it. **5,050.00 stands.**
+>
+> **The existing plan payout column.** Those are the actual finalized runs, computed from
+> volume. Term 11 means Instant Payout writes no volume, so nothing an Instant Payout does can
+> reach `app.fn_run_commission`. **82,995.60 stands, unchanged, on all five months.**
+>
+> The combined figure of **12.59 percent of revenue is therefore unchanged by the approval**,
+> and so is every per-month figure in the table below. Section 6.4 quotes what rollup would
+> have cost had it been allowed, purely to give the rule a size.
 
 | Month | Qualifying events | Capped basis | Instant Payout at 20 percent | Existing plan payout | Revenue | Combined as share of revenue |
 |---|---|---|---|---|---|---|
@@ -658,8 +744,15 @@ once Instant Payout exists.
 
 **It cannot be switched on until the recovery path exists.** Term 12 is not a nice-to-have. It
 is the gate on the whole feature, and section 7.6 lists the four pieces that have to be built.
+**Approving the rate on 2026-08-15 did not build any of them.** The chargeback question is
+still open, and Instant Payout is still an approved rule that pays nobody, because no software
+computes it.
 
-### 9.5 If Howard wants a cheaper version, change exactly one line
+### 9.5 The cheaper variants, kept as a record of what was considered and not taken
+
+Howard approved 20 percent in addition to level pay. These were the two levers available if he
+had wanted the mechanism cheaper, and both are recorded here so a future reader can see they
+were priced rather than ignored.
 
 | Change | New cost | New combined share of revenue | Still fits? |
 |---|---|---|---|
