@@ -510,3 +510,74 @@ should have caught this now exists permanently in the charter
 The site-builder is moving the state control to the tax row in the summary;
 when that commit lands, the placement re-grades against this row, including
 the label-wording half (unpicked must read as a changeable default).
+
+---
+
+# DISCOVERABILITY DELTA PLUS THE OUTAGE-WINDOW COMMITS, 2026-08-16 (afternoon)
+
+Scope grew mid-delta: an account spend-limit outage interrupted QA at the start
+of the c66608a re-grade, and during the outage a separate session working with
+Howard landed TEN ungated commits on main (0367407 through 14b6cc7, documented
+in CLAUDE_NOTES.md) that SUPERSEDED c66608a's placement: the billing
+State/region dropdown is now the tax control, tax is HELD until the address is
+known, a currency selector (USD, GBP, EUR, CHF) joined the summary, a staged
+page-owned Plaid sandbox panel arrived, Braintree wallet methods were enabled,
+and the summary went sticky with layering fixes. Everything below is graded on
+HEAD, the artifact that would actually ship. Method as always: local serve
+against live functions, every request captured, every paint of the money
+surfaces logged, contrast computed.
+
+Deploy-gate note, on the record: those ten commits reached main with no gate.
+They have NOT reached the live property; this delta is the QA half of their
+gate (the verifier read the server halves concurrently), which restores the
+standing rule before any deploy.
+
+## Scope A: the discoverability rows (graded on HEAD)
+
+| # | Check | Evidence | Verdict |
+|---|---|---|---|
+| A-1 | Permanent row: price-affecting input visible at or before the price's first display | HEAD fixes Howard's catch by WITHHOLDING the figure rather than moving the picker: at checkout step 1 the tax row reads "Tax after account and billing address" with NO amount and NO jurisdiction, and the total shown ($100.00) is the pre-tax figure whose controls (cart quantity, activation, currency) are all visible in the summary. As guest, the row reads "Tax enter State/region and postal code" until BOTH visible fields are filled; only then does a figure appear ("Tax calculated CA, US", $8.75 exact for 94105). No price is ever asserted while the input that moves it is off screen | PASS |
+| A-2 | Companion wording: unfilled default reads as changeable, never settled fact | The pending labels are instructions pointing at visible controls, not facts; no jurisdiction is named before the shopper supplies one. (c66608a's "Illinois, the default, change below" wording was superseded by this stronger shape: no default figure is shown at all) | PASS |
+| A-3 | Sign-in refusals hand the shopper a path, through to a mounted card form | All three refusal paths live-driven: wrong password ("That username and password do not match a demonstration account."), unknown code (same), and the staff credential, which gets its own honest sentence ("That is a staff or administrator account. Use a member code here, or continue as a guest."). Every one shows the inline "Continue as guest instead" button; clicking it landed in guest mode, and after State plus ZIP the payment opened (fresh order ORV-2026-08-1KL28V, TX $108.00) with the provider widget MOUNTED (iframe and all three SDK elements present). The dead end Howard hit ("the card input is not opening") is gone | PASS |
+| A-4 | Referral-code decoration suppression | Moot by architecture on HEAD: the client-side state decoration no longer exists; only server truth is painted as "calculated". Live probe: guest with TX in the billing field plus referring code GW-000002 typed was priced by the server from the REFERRED member's stored Florida address and the row honestly said "Tax calculated FL, US" ($6.50). LOW note L-D1: in that referral case the guest hint still says tax comes "from the State/ZIP entered above", which is briefly untrue; one clause would fix it | PASS |
+| A-5 | Lockstep regression flip | CA to NY after the payment opened: order rotated (ORV-2026-08-1KIMGJ to ORV-2026-08-1KJ7M4), NY answered 888 exactly, and the paint log recorded ZERO divergent paints (button never carried a figure different from the displayed total) | PASS |
+
+## Scope B: the outage-window commits
+
+| # | Check | Evidence | Verdict |
+|---|---|---|---|
+| B-1 | Plaid panel demo framing honest | The full wizard was walked end to end (institution, sign-in with any test credentials plus consent box, account choice, authorize) and fired ZERO network calls at every step, verified per step: no real Plaid Link, no bank, no payment anywhere. Panel is labeled "PLAID SANDBOX", status "Sandbox preview", shows the summary's exact total (GBP 82.95) and country GB. DEFECT M-O1 on the ENDING: authorizing renders a full "ORDER PLACED" receipt with a page-minted order number in the REAL order namespace (ORV-2026-08-0Z6SG7) that no server knows (the staff console would answer "no order with that number exists"), carrying one honest sentence ("This preview placed a demo order and did not create a real Open Banking payment or charge real money") directly followed by one FALSE sentence ("This payment ran through the Orvanna orchestration layer in test mode"), which is boilerplate from the real receipt path; nothing ran through anything, zero calls | PASS with M-O1 |
+| B-2 | Currency staging can never reach a USD charge mismatch | Every guard CLAUDE_NOTES claims was verified live: switching to GBP fired ZERO server calls (the client block on non-USD live quotes holds, so the old deployed function cannot overwrite the local estimate); the row is labeled "estimate, for GB SW1A 2AA", never "calculated"; the open USD payment was DISCARDED on the switch (mount gone, chip gone); the pay button relabels "Card checkout is USD only" and clicking it fires nothing and explains honestly ("live card settlement is still guarded to USD until the order records store currency. Nothing was charged"). LOW L-O2: the currency choice persists in localStorage across visits and the page accepts a US state under GBP, painting a mixed "estimate, for California" in GBP; display-only incoherence, every money guard still held | PASS with L-O2 |
+| B-3 | Wallet methods work or are honestly framed | Google Pay (and PayPal, same allow list) selected under USD: a REAL create-payment opened (ORV-2026-08-1KSKEC, CA $108.75) and the secure widget mounted; the wallet path is real wiring, not a mock, and the on-page notes say exactly what runs where. Apple Pay: disabled with the honest reason (Braintree domain setup pending). USD bank tile: disabled with the honest ACH explanation, matching the notes' follow-up correction. The wallet sheets themselves cannot render in this pane; their click-through is the standing Howard item for any wallet demo | PASS |
+| B-4 | Sticky summary layering | Live with a real challenge parked (2503): body.payment-in-flight class applied, finishing status area computes z-index 25 and the sticky summary z-index 1 (commit 0367407's exact contract), challenge chrome at the clamped maximum and last in body. The pixel probe was void this round (the pane reported a zero-height viewport at that moment); the computed stack is decisive and the chrome mechanism itself carries the main gate's earlier elementFromPoint proof | PASS |
+| B-5 | Standing rows: contrast, hygiene, owner name | Hygiene: zero em or en dashes and zero owner-name hits in shop.html, shop.css, payments.js at HEAD. Contrast sweep of the reworked checkout: DEFECT M-O3, the PayPal tile's wordmark spans render PayPal's light-background brand navy on the dark tile, computing 1.04 to 1 ("Pay") and 3.71 to 1 ("Pal"): the mark is the tile's only label and its first half is invisible (the logotype exemption keeps this out of HIGH; the dark-background variant of the mark is the fix). LOW L-O4: the ~50 option elements of the new State/region and currency selects compute mid-grey 109,109,109, below 4.5 against either plausible popup background; the closed select text itself passes at 15.94. Nothing else below the floor | PASS with M-O3, L-O4 |
+
+## Defects (this delta)
+
+- **M-O1 (MEDIUM).** The Plaid sandbox ending fabricates a receipt in the real
+  order namespace and keeps one false boilerplate sentence. Two one-line fixes:
+  give demo-only orders a visibly different number shape (not ORV-), and drop or
+  condition the "ran through the Orvanna orchestration layer" line on the Plaid
+  path. The honest sentence already present should be the only story.
+- **M-O3 (MEDIUM).** PayPal wordmark tile: brand navy on the dark tile computes
+  1.04 to 1; use the wordmark's dark-background variant.
+- **L-D1 (LOW).** Guest hint wording is untrue while a referring member code is
+  typed (server prices the referred member's stored address).
+- **L-O2 (LOW).** Persisted currency accepts a US state under GBP and paints a
+  mixed estimate; money guards hold throughout.
+- **L-O4 (LOW).** Select option color below the floor on either plausible
+  popup background.
+
+## Delta verdict
+
+**PASS with two MEDIUM and three LOW defects; zero HIGH. Deploy YES from QA's
+half**, on these terms: the ten outage commits are hereby gated on the QA side
+(the verifier's concurrent server-half read completes the pair per the standing
+rule); the current HEAD is safe to deploy as-is because every money guard held
+under adversarial driving (non-USD cannot quote live, cannot open a payment,
+and cannot leave a stale payment behind; Plaid fires no network call at any
+step). M-O1 and M-O3 are queued fixes, both one-liners, neither blocking by the
+severity ladder; fixing M-O1 before the next deploy is RECOMMENDED because a
+fabricated ORV- number on a receipt is the kind of thing Howard's next live
+walk will catch. Howard's permanent discoverability row is graded and holds on
+HEAD's stronger fix: no price is asserted before its controls are on screen.
