@@ -377,3 +377,33 @@ blocks a PASS. Fix the doc 09 header and the index line (minutes of work), and
 on re-inspection of those two files alone this verdict flips to PASS; nothing
 else is owed from QA's half. The verifier's independent money recomputation is
 the other half of the gate and is not graded here.
+
+## Re-inspection, 2026-08-16 (later the same evening): VERDICT FLIPPED TO PASS
+
+Commit 332eb80 fixed exactly the two files on the stated path, and only those:
+
+- **BR-H1 CLOSED.** DOCUMENTATION\09-LINKING-SHOP-TO-COMP.md now opens
+  "**Status, corrected 2026-08-16:** **THE BRIDGE IS LIVE.**" with the decision
+  record cited, migrations 019 to 021 named as applied, the bridged figures (11
+  orders, 2,000.00 Sales Volume, 20 retained), the verifier verdict cited, and
+  the original "design plus a dry run" line preserved as dated history rather
+  than deleted. The body's old framing is now explicitly past-tense ("When this
+  document was written... the bridge between them did not exist. As of
+  2026-08-16 that gap is closed: real sales now feed the commission engine.").
+  Documentation-truth check on the new claims themselves: the cited
+  docs\verification\BRIDGE-LIVE-VERDICT-2026-08-16.md exists and reads "GATE:
+  PASS... Zero findings at any severity", so no new claim exceeds its evidence.
+- **BR-M1 CLOSED.** DOCUMENTATION\00-INDEX.md row 09 now reads "The connection
+  that now exists... **LIVE as of 2026-08-16**: all seven of Howard's policy
+  decisions ruled, migrations 019 to 021 applied, 11 real orders bridged into
+  August, verifier gate PASS with zero findings. The first commission run over
+  real volume happens at the end of August." Accurate on every clause.
+- Hygiene on the two edited files: zero em or en dashes, acronyms carried by
+  doc 09's existing key.
+- **BR-L1 stands OPEN as LOW** by the coordinator's deliberate call (touching a
+  live page reopens the deploy-gate cycle for one word); queued for the next
+  content round. Non-blocking, on the record.
+
+**BRIDGE ROUND FINAL VERDICT: PASS.** With the verifier's independent
+recomputation already returned as GATE: PASS with zero findings, both halves of
+the two-gate rule now pass on the live bridge.
