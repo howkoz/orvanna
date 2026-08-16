@@ -90,3 +90,6 @@ Verification:
 - `node --check MLM-PILOT\www\js\payments.js` passed.
 - Inline JavaScript syntax check for `MLM-PILOT\www\shop.html` passed.
 - `py MLM-PILOT\deploy\build_dist.py` passed with bundle hash `0927252101bb6d0e`.
+
+Follow-up:
+- The 3DS passcode frame now gets explicit top-center placement when it is revealed, with a layer above the sticky checkout summary and below the page's bank-approval instruction bar. This keeps the OTP screen from opening underneath the sticky price area.
