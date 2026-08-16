@@ -155,9 +155,28 @@
     var statusEl = byId(opts.statusId);
     var payButton = byId(opts.buttonId);
 
+    /* FAILURE MESSAGES READ AS FAILURES (owner request, 2026-08-16).
+       When the status line carries a failure ending it gets this
+       class, which both pages' stylesheets paint in the design
+       system's light red; any other status paint removes it, so a
+       new attempt, a success, or neutral narration clears the red on
+       its own. The engine decides by IDENTITY, not by guessing at
+       wording: it remembers the exact string the six-ending builder
+       last produced (every outcomeMessage output is a failure story),
+       plus the one failure string the engine itself mints
+       (copy.loaderFailed, which the pages print verbatim from the
+       loader rejection). Page-composed catch messages are the pages'
+       own strings and are out of this file's reach; graded separately
+       if the delta gate wants them red too. */
+    var STATUS_FAILURE_CLASS = 'pay-status-failure';
+    var lastFailureMessage = null;
+
     function status(message) {
       statusEl.hidden = !message;
       statusEl.textContent = message || '';
+      var isFailure = !!message &&
+        (message === lastFailureMessage || message === copy.loaderFailed);
+      statusEl.classList.toggle(STATUS_FAILURE_CLASS, isFailure);
     }
 
     /* ---------- Edge Function transport ---------- */
@@ -877,7 +896,16 @@
        Every string comes from the page's copy table. The engine
        decides WHICH story; the page decides the words.
        ============================================================ */
+    /* Public face: remembers the exact failure string it hands out,
+       so the status painter above can recognise it on arrival and
+       dress it as a failure (see STATUS_FAILURE_CLASS). */
     function outcomeMessage(receipt) {
+      var message = buildOutcomeMessage(receipt);
+      lastFailureMessage = message;
+      return message;
+    }
+
+    function buildOutcomeMessage(receipt) {
       var bankMsg = (receipt.processor && receipt.processor.error_message) || '';
       var bankSaid = bankMsg ? copy.bankSaidPrefix + bankMsg + '.' : '';
       /* SESSION STATE APPLIES ONLY TO THE SESSION'S OWN PAYMENT.
