@@ -208,3 +208,11 @@ Follow-up wallet demo guard:
 - Google Pay and PayPal are intentionally routed to storefront demo completion for now.
 - Selecting either wallet no longer opens HyperSwitch, Google Pay, or PayPal, so it cannot validate the shopper's real wallet cards.
 - On USD checkout, the button reads `Place demo order with Google Pay` or `Place demo order with PayPal` and lands on the normal order confirmation page with the matching sandbox payment method.
+
+Follow-up wallet approval previews:
+- Howard wanted the wallet flow to keep the shopper approval moment instead of bypassing straight to confirmation.
+- Google Pay now opens a storefront-owned sandbox wallet sheet with a visible test Mastercard ending 4445, the not-charged message, the checkout total, and a Pay button.
+- PayPal now opens its own storefront-owned PayPal sandbox approval sheet with a sandbox buyer funding source and a PayPal approval button.
+- Approving either sheet then places the same demo order and lands on the normal confirmation page. No real Google Pay, PayPal, card, or bank account is touched.
+- Card remains the only live HyperSwitch payment form on the storefront. Wallets no longer wake up the card form in the background.
+- `staff-operations.html` also had a tracked bad `../site/index.html` link that blocked the deploy build; it now points to `index.html`.

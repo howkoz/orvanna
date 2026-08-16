@@ -301,7 +301,7 @@
             <div class="checkout-panel glass" id="paymentPanel">
               <span class="accent-bar" aria-hidden="true"></span>
               <h2 class="checkout-panel-title"><span class="step-num">4</span>Payment</h2>
-              <p class="step-intro">Credit card, Google Pay, and PayPal are live for USD sandbox checkout. Plaid/Open Banking is staged for bank account testing when the currency rail is ready.</p>
+              <p class="step-intro">Credit card is live for USD sandbox checkout. Google Pay and PayPal use sandbox approval previews, then place a demo order after the shopper approves. Plaid/Open Banking is staged for bank account testing when the currency rail is ready.</p>
 
               <div class="pay-row" role="group" aria-label="Payment method">
                 <button class="pay-btn pay-applepay" type="button" data-pay="applepay" aria-pressed="false">
@@ -325,7 +325,7 @@
                   <span class="sr-only">Bank account through Plaid</span>
                 </button>
               </div>
-              <p class="pay-note">Card, Google Pay, and PayPal run through the HyperSwitch sandbox. Plaid is staged for bank account testing after the currency and ACH/Open Banking rails are ready.</p>
+              <p class="pay-note">Card runs through the HyperSwitch sandbox. Google Pay and PayPal show approval previews before the demo order completes. Plaid is staged for bank account testing after the currency and ACH/Open Banking rails are ready.</p>
 
               <form id="checkoutForm" novalidate>
                 <div id="cardFields">
@@ -555,6 +555,32 @@
     <p class="cc-line" id="ccTitle"><b>Your bank is asking you to approve this payment.</b> This is a real bank approval step running in test mode. The card is a test card, so nothing is ever charged.</p>
     <p class="cc-line cc-order">Order <span id="ccOrderNum">&mdash;</span>, not yet charged</p>
     <button class="btn btn-ghost btn-sm" type="button" id="ccCancel">Cancel and go back</button>
+  </div>
+</div>
+
+<!-- ============ WALLET SANDBOX PANEL ============
+     Google Pay and PayPal are processor-backed concepts in the
+     sandbox, but the connector path is not stable enough yet to
+     drive the real wallet sheets without processor errors. This
+     page-owned panel preserves the shopper approval step: choose the
+     visible sandbox funding source, approve, then the demo order
+     completes. -->
+<div class="wallet-panel" id="walletPanel" role="dialog" aria-modal="true" aria-labelledby="walletTitle" hidden>
+  <div class="wallet-sheet" id="walletSheet">
+    <div class="wallet-head">
+      <div class="wallet-brand" id="walletBrand"></div>
+      <button class="wallet-close" type="button" id="walletClose" aria-label="Close wallet preview">x</button>
+    </div>
+    <h2 id="walletTitle">Complete wallet checkout</h2>
+    <p class="wallet-sandbox-note" id="walletSandboxNote">This sandbox approval does not charge a real card.</p>
+    <div class="wallet-merchant-row">
+      <span id="walletMerchant">Pay Orvanna Sandbox</span>
+      <strong id="walletAmount">$0.00</strong>
+    </div>
+    <div class="wallet-funding" id="walletFunding" role="button" tabindex="0" aria-pressed="true"></div>
+    <button class="wallet-pay-btn" type="button" id="walletApprove">Pay</button>
+    <button class="wallet-secondary" type="button" id="walletCancel">Cancel</button>
+    <p class="wallet-secure" id="walletSecure">Your payment details are encrypted. This is a sandbox preview.</p>
   </div>
 </div>
 
@@ -1544,6 +1570,18 @@
   var plaidSigninError = document.getElementById('plaidSigninError');
   var plaidBalancePrimary = document.getElementById('plaidBalancePrimary');
   var plaidBalanceSecondary = document.getElementById('plaidBalanceSecondary');
+  var walletPanel = document.getElementById('walletPanel');
+  var walletSheet = document.getElementById('walletSheet');
+  var walletBrand = document.getElementById('walletBrand');
+  var walletTitle = document.getElementById('walletTitle');
+  var walletSandboxNote = document.getElementById('walletSandboxNote');
+  var walletMerchant = document.getElementById('walletMerchant');
+  var walletAmount = document.getElementById('walletAmount');
+  var walletFunding = document.getElementById('walletFunding');
+  var walletApprove = document.getElementById('walletApprove');
+  var walletCancel = document.getElementById('walletCancel');
+  var walletClose = document.getElementById('walletClose');
+  var walletSecure = document.getElementById('walletSecure');
 
   function canOpenLiveCardPayment() {
     return payMethod === 'card' && selectedCurrency() === 'USD';
@@ -1580,7 +1618,7 @@
     }
     if (demoWalletPayment()) {
       return selectedCurrency() === 'USD'
-        ? 'Place demo order with ' + PAY_LABELS[payMethod]
+        ? (payMethod === 'googlepay' ? 'Continue with Google Pay' : 'Continue to PayPal')
         : PAY_LABELS[payMethod] + ' demo checkout is USD only';
     }
     if (payMethod === 'bank') return 'Bank checkout staged';
@@ -1590,7 +1628,7 @@
   function stagedPaymentMessage() {
     if (demoWalletPayment()) {
       return selectedCurrency() === 'USD'
-        ? PAY_LABELS[payMethod] + ' is in storefront demo mode for now. Press the order button to place a demo order without opening a wallet window or validating a wallet card.'
+        ? PAY_LABELS[payMethod] + ' opens a sandbox approval preview. Choose the visible test funding source, then approve. Nothing real is charged.'
         : PAY_LABELS[payMethod] + ' demo checkout is guarded to USD for now. Nothing was charged.';
     }
     if (payMethod === 'bank') {
@@ -1612,6 +1650,69 @@
   function selectedPlaidBankName() {
     var bank = document.querySelector('.plaid-bank.is-selected');
     return bank ? bank.getAttribute('data-bank-name') : 'Sandbox Bank';
+  }
+
+  function displayedCheckoutTotalText() {
+    var renderedTotal = document.getElementById('checkoutTotal');
+    return renderedTotal && renderedTotal.textContent.trim()
+      ? renderedTotal.textContent.trim()
+      : fmtMoney(orderMath().total);
+  }
+
+  function walletFundingHtml(method) {
+    if (method === 'paypal') {
+      return '<span class="wallet-radio" aria-hidden="true"></span>' +
+        '<span class="wallet-funding-main"><strong>PayPal Sandbox Buyer</strong>' +
+        '<small>buyer@orvanna.example, PayPal Balance</small></span>' +
+        '<span class="wallet-chevron" aria-hidden="true">&rsaquo;</span>';
+    }
+    return '<span class="wallet-card-art" aria-hidden="true"><span></span><span></span></span>' +
+      '<span class="wallet-funding-main"><strong>Test Debit: Mastercard</strong>' +
+      '<small>Mastercard ending 4445</small></span>' +
+      '<span class="wallet-chevron" aria-hidden="true">&rsaquo;</span>';
+  }
+
+  function openWalletPanel() {
+    if (!walletPanel || !demoWalletPayment()) return false;
+    if (selectedCurrency() !== 'USD') {
+      revealStagedPaymentMessage(true);
+      return true;
+    }
+    var isPayPal = payMethod === 'paypal';
+    walletSheet.className = 'wallet-sheet ' + (isPayPal ? 'wallet-paypal-sheet' : 'wallet-google-sheet');
+    walletBrand.innerHTML = isPayPal
+      ? '<span class="wallet-paypal-logo"><span>Pay</span><span>Pal</span></span>'
+      : '<span class="wallet-google-logo"><span>G</span><span>Pay</span></span>';
+    walletTitle.textContent = isPayPal ? 'PayPal sandbox checkout' : 'Google Pay sandbox checkout';
+    walletSandboxNote.textContent = isPayPal
+      ? 'Approve this PayPal sandbox checkout. Nothing real is charged.'
+      : 'Your test card will not be charged because this is a sandbox preview.';
+    walletMerchant.textContent = isPayPal ? 'Pay with PayPal to Orvanna Sandbox' : 'Pay Orvanna Sandbox';
+    walletAmount.textContent = displayedCheckoutTotalText();
+    walletFunding.innerHTML = walletFundingHtml(payMethod);
+    walletApprove.textContent = isPayPal ? 'Pay with PayPal sandbox' : 'Pay';
+    walletSecure.textContent = isPayPal
+      ? 'PayPal sandbox approval only. The storefront completes a demo order after this step.'
+      : 'Your payment details are encrypted. This is a sandbox preview.';
+    walletPanel.hidden = false;
+    window.setTimeout(function () { walletApprove.focus({ preventScroll: true }); }, 0);
+    return true;
+  }
+
+  function closeWalletPanel() {
+    if (!walletPanel) return;
+    walletPanel.hidden = true;
+    var selectedButton = document.querySelector('[data-pay="' + payMethod + '"]');
+    if (selectedButton) selectedButton.focus();
+  }
+
+  function approveWalletPanel() {
+    var method = payMethod;
+    closeWalletPanel();
+    demoPlaceOrder({
+      paymentLabel: PAY_LABELS[method] + ' sandbox',
+      demoNote: PAY_LABELS[method] + ' sandbox approval complete. The shopper approved the visible sandbox wallet step, and no real card, PayPal account, or bank account was charged.'
+    });
   }
 
   function plaidSetStep(step) {
@@ -1702,8 +1803,15 @@
         : PAY_LABELS[method] + ' opens inside the secure HyperSwitch payment form. No card details are typed on this page.';
     }
     if (threeDsNotice) threeDsNotice.hidden = method === 'bank';
-    if ((method === 'bank' || demoWalletPayment()) && LIVE_PAYMENTS) {
+    if (method === 'bank' && LIVE_PAYMENTS) {
       revealStagedPaymentMessage(false);
+    } else if (demoWalletPayment() && LIVE_PAYMENTS) {
+      if (liveState && liveState.clientSecret) {
+        liveResetPayment('');
+      } else if (livePayArea) {
+        livePayArea.hidden = true;
+        liveStatus('');
+      }
     } else if (LIVE_PAYMENTS && livePayArea && !liveState.clientSecret) {
       livePayArea.hidden = true;
       liveStatus('');
@@ -1712,7 +1820,7 @@
     if (LIVE_PAYMENTS && liveState && liveState.clientSecret && !canOpenLivePayment()) {
       liveResetPayment('');
     }
-    if (method !== 'bank' && LIVE_PAYMENTS && typeof liveEnsureCheckout === 'function') liveEnsureCheckout();
+    if (method === 'card' && LIVE_PAYMENTS && typeof liveEnsureCheckout === 'function') liveEnsureCheckout();
   }
 
   payButtons.forEach(function (b) {
@@ -1720,6 +1828,26 @@
       setPayMethod(b.getAttribute('data-pay'));
     });
   });
+
+  if (walletApprove) walletApprove.addEventListener('click', approveWalletPanel);
+  if (walletCancel) walletCancel.addEventListener('click', closeWalletPanel);
+  if (walletClose) walletClose.addEventListener('click', closeWalletPanel);
+  if (walletFunding) {
+    walletFunding.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        walletFunding.classList.toggle('is-selected', true);
+      }
+    });
+  }
+  if (walletPanel) {
+    walletPanel.addEventListener('click', function (e) {
+      if (e.target === walletPanel) closeWalletPanel();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !walletPanel.hidden) closeWalletPanel();
+    });
+  }
 
   if (plaidClose) plaidClose.addEventListener('click', closePlaidPanel);
   if (plaidPanel) {
@@ -2550,10 +2678,7 @@
     }
     if (Object.keys(cart).length === 0) { showView('catalog'); return; }
     if (demoWalletPayment() && selectedCurrency() === 'USD') {
-      demoPlaceOrder({
-        paymentLabel: PAY_LABELS[payMethod] + ' sandbox',
-        demoNote: PAY_LABELS[payMethod] + ' demo checkout complete. This storefront preview placed a demo order without opening a wallet window, validating a wallet card, or charging real money.'
-      });
+      openWalletPanel();
       return;
     }
     if (revealStagedPaymentMessage(true)) return;
