@@ -407,3 +407,54 @@ Commit 332eb80 fixed exactly the two files on the stated path, and only those:
 **BRIDGE ROUND FINAL VERDICT: PASS.** With the verifier's independent
 recomputation already returned as GATE: PASS with zero findings, both halves of
 the two-gate rule now pass on the live bridge.
+
+---
+
+# STATE PICKER DELTA: guest tax state picker, page mechanics, 2026-08-16 (midday)
+
+Scope: commit 651ac49 ("Guest tax gets a state picker"), PAGE half only; the
+verifier reads the server halves concurrently. NOT DEPLOYED: the live functions
+still ignore guest_state, so every pick prices as Illinois on today's rail; this
+gate grades the page mechanics now and marks the rate-truth rows pending the
+function deploy. Method as before: `www\` served locally against the live
+functions, fetch payloads captured per request, every paint of the three money
+surfaces (tax row, total, pay button) logged with one timestamp by a mutation
+observer so divergence between them is measurable, not eyeballed.
+
+## State picker checklist
+
+| # | Check | Evidence | Verdict |
+|---|---|---|---|
+| SP-1 | Howard's row, verbatim: "the tax should display correct before the user submits the payment" | Fresh guest checkout: the tax line rendered a real calculated figure ($10.25, "Tax calculated IL, US") before any card entry existed; before the first payment opened the button read "Continue to card details" and carried NO figure. Same-paint coherence: on the California flip, one paint at one timestamp moved tax row ($5.00), label ("estimate, for California"), total ($105.00), AND button ("Pay $105.00 now, test mode") together; the builder's syncPayButtonToDisplayedTotal is observably doing its job. Divergence hunt: a five-flip storm (NY, TX at +150 ms mid-debounce, NY at +300 ms, WA at +900 ms mid-quote, NY at +1200 ms) produced 10 paints and ZERO divergent paints (a paint where the button carries a figure not equal to the displayed total); the debounce collapsed the churn to three quotes total (IL, CA, NY; the TX and WA flips never wasted a call) and the staleness check let only the final state's answer paint. The pane offers no network throttling, so the mid-quote flip is the race that was testable; it held | PASS |
+| SP-2 | Signature rotation on state change | State change after a payment opened discarded and reopened it every time: CA flip retired the IL order for fresh ORV-2026-08-17PT69; the flip storm produced exactly one further order, ORV-2026-08-17QKI3 (debounce, not one per flip). After each server answer the button label exactly matched the displayed total; DURING rotation the button correctly dropped to the no-figure "Continue to card details" rather than showing a stale amount | PASS |
+| SP-3 | Signed-in behavior | Member sign-in (GW-000002): picker hidden, guest note down, member disclosure up, and the create-payment request carried guest_state EMPTY (captured: gs="" versus the guest's gs="NY"), so the hidden picker can never churn a member's signature; totals repriced from the member's stored address ("Tax calculated FL, US"). Sign-out to guest: picker back, guest copy back, member note down | PASS |
+| SP-4 | Copy: three guest disclosures | All three name the picked state and the Illinois default, verified rendering: the account status ("Tax is calculated for the state you pick in the billing step, and it defaults to Illinois"), the address-panel guest note ("tax is calculated for the state you pick below, using a demonstration address in that state"), and the picker hint (which defers to the tax line as the truth: "the tax line above the total says which figure you are looking at"). Zero stale typed-address claims in the rendered page. ONE pre-deploy note, not a page defect: the picker hint's "the tax engine prices this order for that state" is true only once the functions deploy; until then the tax line's honest "calculated IL, US" breadcrumb is what keeps the surface truthful. Consequence recorded as the deploy condition below | PASS |
+| SP-5 | Accessibility | Label "Tax state" wired via for=; select keyboard-focusable; #guestTaxState present in the engine's inertSelectors (the inert mechanism itself was live-proven in the main gate); computed text contrast 15.94 to 1 | PASS |
+| SP-6 | Regression canary | Full guest 4242 checkout to ORDER PLACED: ORV-2026-08-17RXVM, $100.00 + $10.25 = $110.25 exact, record-tax 200 fired, and the receipt honestly names the jurisdiction that actually priced it ("Tax 10.25 PERCENT, IL, US") even though New York was picked, which is the correct pre-deploy truth-telling | PASS |
+
+## Post-deploy rows, PENDING (re-run after the function deploy)
+
+Updated per the coordinator mid-gate: Howard has enabled ALL 50 state
+registrations in the Stripe Tax dashboard. Therefore, post-deploy:
+
+- PD-1: per-state rates actually differ on the live rail (New York about 8.875
+  percent with the New York City demonstration address, California 9.75, and
+  Texas, Florida, Washington, Colorado all nonzero), and the quoted figure, the
+  charged figure, and the receipt agree per state.
+- PD-2: the ONLY zero reachable from the picker is Oregon, zero because no
+  state sales tax exists there, with its reason carried; the wording for that
+  zero gets graded against what Stripe ACTUALLY returns for a no-sales-tax
+  state (the "not collected, unregistered" wording path should now be
+  unreachable from the picker). ANY zero on a non-Oregon pick post-deploy is a
+  DEFECT (registration lag or a wrong canned address), not expected behavior.
+- PD-3: SP-1 and SP-2 sanity re-run with genuinely differing amounts, so the
+  button flip is exercised by real money movement, not only by the estimate
+  phase.
+
+## State picker delta verdict
+
+**PASS on the page mechanics; DEPLOY YES from QA's half, with one condition:**
+the page and the functions must ship TOGETHER. The functions alone are harmless;
+the page alone would let the picker promise per-state pricing the live rail does
+not perform (SP-4's note). After that deploy, the three PD rows above re-run as
+a short delta before this feature is called done.
