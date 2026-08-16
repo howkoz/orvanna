@@ -228,3 +228,11 @@ Follow-up billing copy trim:
 - Removed the explanatory helper text below the billing State/Country selector.
 - Removed the guest billing tax explanation under member code and the extra tax-helper box in the order summary.
 - The field labels and dropdown contents now carry the state/country behavior without training copy on the checkout screen.
+
+Follow-up member portal backoffice redesign:
+- Howard called out that `/portal/index.html` felt boring, tab-heavy, and not like a real MLM member backoffice.
+- The portal was rebuilt into a left-rail backoffice shell with Orvanna wordmark treatment, section navigation, utility links, and a sticky workspace command bar for member and period selection.
+- The old top tab strip remains wired through the same JavaScript behavior, but it now presents as side navigation on desktop and a contained horizontal rail on mobile.
+- Portal panels, stat cards, wire feed, tables, and chart surfaces were tightened so the page reads more like an operating dashboard than a demo report page.
+- `applyTheme` now tolerates the removed logo image element, and tab changes maintain `aria-current` for the redesigned navigation state.
+- Browser visual verification covered desktop and mobile, with horizontal overflow fixed before build.
