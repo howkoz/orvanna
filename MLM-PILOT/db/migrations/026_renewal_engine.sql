@@ -3,6 +3,12 @@
 -- Project: MLM Pilot (Orvanna persona, personal project)
 -- Date:    2026-08-16
 -- Author:  mlm-db-engineer
+--
+-- APPLIED TO THE CLOUD PROJECT 2026-08-16 (gated: verifier re-gate 13f273e
+-- CLOUD APPLY YES, quality assurance delta 8bf59df, on commit 8f31a76). The
+-- in-place-edit window on this file is CLOSED FOREVER as of that apply: any
+-- future change, however small, is a NEW numbered migration file.
+--
 -- Design:  MLM-PILOT\docs\SUBSCRIPTION-ENGINE-SPEC.md sections 4 (dates),
 --          5 (state machine), 8 (the ladder), 9 (the pipeline), 9A (the
 --          scheduler), 10 (the simulated clock and processor), 12 (edge
