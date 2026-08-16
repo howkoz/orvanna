@@ -2,13 +2,22 @@
 
 **Owner of this document:** the compensation engineer on the Orvanna build team.
 **Written:** 2026-08-15.
-**Status:** design plus a dry run. **Nothing in here has been applied to production.**
+**Status, corrected 2026-08-16:** **THE BRIDGE IS LIVE.** All seven section 4 decisions
+were ruled by Howard (see `MLM-PILOT\docs\decisions\2026-08-16-bridge-seven-decisions.md`),
+migrations 019, 020, and 021 were applied to production on 2026-08-16, and the first
+commit run bridged 11 real orders carrying 2,000.00 Sales Volume into August 2026, with
+20 unattributed orders retained on the house ledger. Verifier gate PASS with zero
+findings (`MLM-PILOT\docs\verification\BRIDGE-LIVE-VERDICT-2026-08-16.md`). The original
+status line read "design plus a dry run; nothing in here has been applied to production",
+which was true when written and is preserved here as history. The first commission run
+over real bridged volume happens at the end of August, by hand, with its own gate.
 
 This document exists because of finding 11 in `03-COMPENSATION-PLAN.md`, section 11.2:
-the live shop writes to `app.demo_orders`, and migration 010 says in its own header that
-that table "feeds nothing". Every commission Orvanna has ever calculated came from seeded
-data. No real purchase has ever produced a cent. Both halves of the system work. The
-bridge between them does not exist.
+the live shop writes to `app.demo_orders`, and migration 010 said in its own header that
+that table "feeds nothing". When this document was written, every commission Orvanna had
+ever calculated came from seeded data, no real purchase had ever produced a cent, both
+halves of the system worked, and the bridge between them did not exist. As of 2026-08-16
+that gap is closed: real sales now feed the commission engine.
 
 Howard's instruction, verbatim: "I thought that about the shop and comp plan i want you to
 link it and becasue that is probably the most important piece."
