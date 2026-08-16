@@ -12,6 +12,7 @@
 | `list-demo-orders` (extended) | **LIVE**, version 6 |
 | `www\staff.html` order history and refund button | **PUBLISHED** |
 | The ten direct-call refusals | **ALL TEN REFUSED**, section 16.0 |
+| The single test refund | **NOT DONE.** No refund exists; tax drift reads zero. Section 16.0b |
 
 Both functions were deployed by Howard from the command line tool, which reads straight from
 disk, so there is no bundle drift to chase.
@@ -1058,6 +1059,47 @@ the function at all.
 > the platform's. **It is not being made tonight**, because deploying it needs the command
 > line tool and this session has no credential for it, and because changing a money path to
 > improve a log label at the end of a long night is the wrong trade. Recorded as open.
+
+### 16.0b THE SINGLE TEST REFUND WAS NOT PERFORMED. STOPPED, NOT SKIPPED.
+
+**No refund has been issued, on any order.** `app.demo_order_refunds` is empty and
+`app.v_demo_tax_drift` reads zero, which is the honest figure and not a placeholder.
+
+**Why.** Refunding requires a paid order of my own, and I could not get one to `succeeded`:
+
+1. **The 3DS challenge path is unreachable from here.** A fresh order
+   (`ORV-2026-08-05RFVR`, $55.13) was created and confirmed with the Braintree test card
+   `4111 1111 1111 1111`. HyperSwitch answered `requires_customer_action` with a
+   `redirect_inside_popup`, and the bank approval screen is a cross-origin iframe inside
+   another cross-origin page. The browser pane in this session cannot composite frames, so
+   screenshots and clicks are unavailable, and there is no way to press the approval button.
+   That is an environment limit, not a fault in the rail: it is the same challenge a real
+   shopper completes on their own device.
+2. **The frictionless card authenticates but does not settle.** A second order
+   (`ORV-2026-08-05V99X`, $55.13) used `4000 1005 1111 2003`, which section B4 of
+   `docs/3DS-RESEARCH.md` documents as frictionless success for our exact external-3DS
+   configuration. It cleared authentication with no challenge and then sat at `processing` at
+   Braintree for over three minutes. The plausible reading is that a 3DSecure.io
+   authentication PAN is not a card Braintree's sandbox will authorise, so the two legs do
+   not line up. **Unconfirmed**, and worth one deliberate test.
+
+**I did not refund somebody else's order.** There is a succeeded order from earlier testing
+inside the 24 hour window that would have refunded cleanly. Refunding it would have produced
+a green tick and a real refund of an order that was not mine, which is not what was asked.
+
+**Both of my orders are `created` and will age to `abandoned`** by the existing sweep, which
+is the designed behaviour. Nothing was hand-edited to tidy them.
+
+**What is still unproven by this**, stated plainly: the success path. Everything up to the
+refusal is proven against the live endpoint; the write path (processor call, refund row,
+order moving to `refunded`, drift becoming non-zero) has been proven only in the rule layer
+and the database guard tests, never end to end.
+
+**To finish it**, place an order through the shop in a browser where the approval screen can
+actually be clicked, let `record-tax` run so the order carries a `tax_transaction_id`, then
+refund from the staff screen and read `app.v_demo_tax_drift`. Recording tax first is what
+makes the drift non-zero; refund before it runs and the order leaves the recorder queue with
+no transaction to reverse, which is the self-healing case in section 10.1.
 
 ### 16.1 What was executed before deploy, and what it proved
 
