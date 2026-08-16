@@ -94,3 +94,29 @@ Verification:
 Follow-up:
 - The 3DS passcode frame now gets explicit top-center placement when it is revealed, with a layer above the sticky checkout summary and below the page's bank-approval instruction bar. This keeps the OTP screen from opening underneath the sticky price area.
 - The payment panel, live payment status, and card-form skeleton now rise above the sticky checkout summary while `payment-in-flight` is active. This covers the short finishing transition after OTP and before the thank-you page.
+
+## 2026-08-16 HyperSwitch Multi-Processor Routing Check
+
+Howard re-enabled the Stripe, Braintree, and Authorize.net sandbox connectors and asked whether Orvanna can route traffic around instead of disabling extra processors.
+
+What was verified:
+- The Orvanna HyperSwitch profile is `pro_BA39ULYq4Vj0salGS0YA`.
+- Payment processor connector state from the HyperSwitch sandbox API:
+  - `braintree_default`, `mca_eE4v07QwkYUSyF55vrUC`, active and enabled.
+  - `authorizedotnet_default`, `mca_3FSgAbQMH1lTeJYxKUqI`, active and enabled.
+  - `stripe_default`, `mca_l0vwOt0SoWLPXRYjDwTF`, active and enabled.
+- Active routing config is `routing_loBp0KbnCzD0IADxwWbY`, named `Volume Based Routing-2026-08-16`.
+- Active routing is a 50/50 volume split between Braintree and Authorize.net. Stripe is enabled but not in the active split.
+
+Probe results:
+- Targeted Braintree sandbox authorization with `connector=["braintree"]` succeeded.
+- Targeted Authorize.net sandbox authorization with `connector=["authorizedotnet"]` succeeded.
+- Targeted Stripe sandbox authorization with `connector=["stripe"]` failed with Stripe's raw-card-data restriction. This is the same issue discovered earlier: Orvanna's HyperSwitch SDK flow uses raw card data through HyperSwitch, and this Stripe test account still needs Stripe raw-card API access or a tokenized Stripe-specific path before it should receive storefront traffic.
+- Eight untargeted sandbox authorizations, with no connector specified, all succeeded through active routing:
+  - 5 routed to Braintree.
+  - 3 routed to Authorize.net.
+
+Operational decision:
+- Leave customer-facing active routing on Braintree plus Authorize.net.
+- Do not add Stripe to active routing until its raw-card path is fixed, because it is enabled but still fails the actual Orvanna-style card flow.
+- Orvanna's `create-payment` code already leaves connector selection to HyperSwitch, so no frontend deploy is required for the current Braintree/Authorize.net routing split.
