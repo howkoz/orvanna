@@ -78,8 +78,16 @@ export function corsHeaders(req: Request): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": origin as string,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    /* x-orvanna-session added 2026-08-15 for the staff refund work.
+       WITHOUT IT THE BROWSER NEVER SENDS THE HEADER AT ALL: a custom
+       request header makes the request non-simple, so the browser
+       preflights, and a header missing from this list fails that
+       preflight before the function is ever reached. The symptom is
+       a network-level failure rather than a 401, which reads like
+       "the service is down" instead of "you are not signed in", so
+       it is worth knowing why this entry is here. */
     "Access-Control-Allow-Headers":
-      "authorization, apikey, x-client-info, content-type",
+      "authorization, apikey, x-client-info, content-type, x-orvanna-session",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };

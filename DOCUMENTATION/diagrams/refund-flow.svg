@@ -17,30 +17,32 @@
 
   <!-- 1. the ask -->
   <rect x="30" y="84" width="650" height="72" rx="10" fill="#EEF2FF" stroke="#6366F1" stroke-width="1.6"/>
-  <text x="46" y="108" font-size="13.5" font-weight="600" fill="#111827">1. A staff agent names ONE order in the staff console</text>
-  <text x="46" y="130" font-size="12.5" fill="#374151">There is no amount box anywhere on the screen. Full refunds only, by instruction,</text>
-  <text x="46" y="148" font-size="12.5" fill="#374151">so the only question the agent answers is which order and why.</text>
+  <text x="46" y="106" font-size="13.5" font-weight="600" fill="#111827">1. Order history, then the order, then Refund. Confirm restates number and amount.</text>
+  <text x="46" y="127" font-size="12.5" fill="#374151">History shows ALL orders, unfiltered by time. No amount box: full refunds only.</text>
+  <text x="46" y="145" font-size="12.5" fill="#374151">The screen enforces nothing; it shows whatever the server answers.</text>
 
   <line x1="355" y1="156" x2="355" y2="186" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
 
   <!-- 2. rails -->
   <rect x="30" y="190" width="650" height="126" rx="10" fill="#ECFEFF" stroke="#0891B2" stroke-width="1.6"/>
-  <text x="46" y="214" font-size="13.5" font-weight="600" fill="#111827">2. Three rails, in this order, before anything is decided</text>
-  <text x="46" y="236" font-size="12.5" fill="#374151">Origin allow list. Same as every other function.</text>
-  <text x="46" y="256" font-size="12.5" fill="#374151">Rate limit, in its own "refund" bucket: 3 a minute, so refunds can never eat checkout's budget.</text>
-  <text x="46" y="278" font-size="12.5" font-weight="600" fill="#B91C1C">AUTHORISATION: the signed staff token, actually verified against the key in the database.</text>
-  <text x="46" y="298" font-size="12.5" fill="#374151">This rail had to be BUILT. Nothing in this project has ever verified a session token before.</text>
+  <text x="46" y="210" font-size="13.5" font-weight="600" fill="#111827">2. Two rails, then the GATE. Only the third one is authorisation.</text>
+  <text x="46" y="230" font-size="12.5" fill="#374151">Rail: origin allow list. Only says the call came from our site, and the shop passes</text>
+  <text x="46" y="246" font-size="12.5" fill="#374151">it too. Cross-site protection, NOT identity.</text>
+  <text x="46" y="262" font-size="12.5" fill="#374151">Rail: rate limit, own "refund" bucket, 3 a minute. Tighter than any other function.</text>
+  <text x="46" y="284" font-size="12.5" font-weight="600" fill="#B91C1C">GATE: verify the signature, then RE-READ THE ROLE FROM app.demo_users. STAFF ONLY.</text>
+  <text x="46" y="302" font-size="12.5" font-weight="600" fill="#B91C1C">"admin" is the member portal login and is REFUSED. Hiding the button gates nothing.</text>
 
   <line x1="355" y1="316" x2="355" y2="346" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
 
   <!-- 3. phase one -->
   <rect x="30" y="350" width="650" height="150" rx="10" fill="#FEF3C7" stroke="#D97706" stroke-width="1.6"/>
-  <text x="46" y="374" font-size="13.5" font-weight="600" fill="#111827">3. PHASE ONE: decide, then write the intent. One transaction, order row LOCKED.</text>
-  <text x="46" y="396" font-size="12.5" fill="#374151">Was it really paid? Has it been refunded before? Is one already in flight?</text>
-  <text x="46" y="416" font-size="12.5" fill="#374151">The amount is read from the ORDER ROW, never from the request. No caller can influence it.</text>
-  <text x="46" y="438" font-size="12.5" fill="#374151">Write the refund row as "requested", capture the clawback snapshot, and COMMIT.</text>
-  <text x="46" y="464" font-size="12.5" font-weight="600" fill="#92400E">The record exists BEFORE any money moves. That ordering is the whole design:</text>
-  <text x="46" y="484" font-size="12.5" font-weight="600" fill="#92400E">a timeout then leaves a question we can ask, instead of a refund we would repeat.</text>
+  <text x="46" y="372" font-size="13.5" font-weight="600" fill="#111827">3. PHASE ONE: decide, then write the intent. One transaction, order row LOCKED.</text>
+  <text x="46" y="393" font-size="12.5" font-weight="600" fill="#92400E">Four rules, all server side: really paid? not already refunded? none in flight?</text>
+  <text x="46" y="410" font-size="12.5" font-weight="600" fill="#92400E">placed within 24 hours? The screen checks NONE of these and is not meant to.</text>
+  <text x="46" y="430" font-size="12.5" fill="#374151">The amount is read from the ORDER ROW, never from the request. No caller can influence it.</text>
+  <text x="46" y="450" font-size="12.5" fill="#374151">Write the refund row as "requested", capture the clawback snapshot, and COMMIT.</text>
+  <text x="46" y="472" font-size="12.5" fill="#374151">The record exists BEFORE any money moves: a timeout then leaves a question we can</text>
+  <text x="46" y="489" font-size="12.5" fill="#374151">ask, instead of a refund we would repeat.</text>
 
   <line x1="355" y1="500" x2="355" y2="530" stroke="#4B5563" stroke-width="1.6" marker-end="url(#arw)"/>
 
@@ -89,7 +91,8 @@
 
   <!-- ============ RIGHT COLUMN: knock-ons ============ -->
 
-  <text x="716" y="102" font-size="14" font-weight="600" fill="#111827">The knock-ons. This column is the real work.</text>
+  <text x="716" y="98" font-size="14" font-weight="600" fill="#111827">The knock-ons. This column is the real work.</text>
+  <text x="716" y="114" font-size="11.5" font-style="italic" fill="#991B1B">Reached only by a SUCCEEDED refund (red arrow below).</text>
 
   <!-- tax -->
   <rect x="716" y="118" width="434" height="196" rx="10" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.6"/>
@@ -129,7 +132,7 @@
   <!-- guard rails -->
   <rect x="716" y="726" width="434" height="224" rx="10" fill="#F9FAFB" stroke="#9CA3AF" stroke-width="1.6"/>
   <text x="732" y="750" font-size="13" font-weight="600" fill="#111827">GUARD RAILS: what an agent can never do</text>
-  <text x="732" y="774" font-size="12.5" fill="#374151">Choose an amount. Refund an order that never succeeded.</text>
+  <text x="732" y="774" font-size="12.5" fill="#374151">Choose an amount. Refund an order over 24 hours old.</text>
   <text x="732" y="792" font-size="12.5" fill="#374151">Refund the same order twice. Refund without an explicit</text>
   <text x="732" y="810" font-size="12.5" fill="#374151">confirmation the SERVER checks. Undo a refund.</text>
   <text x="732" y="834" font-size="12.5" fill="#374151">Act without a verified staff token. Act unlogged.</text>
@@ -147,5 +150,4 @@
   <!-- only a SUCCEEDED refund reaches the knock-on column. Short hop across
        the gutter, which is why succeeded was placed rightmost. -->
   <line x1="680" y1="753" x2="712" y2="753" stroke="#DC2626" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arwRed)"/>
-  <text x="474" y="836" font-size="11.5" font-style="italic" fill="#991B1B">only a succeeded refund creates the knock-ons to the right</text>
 </svg>

@@ -1,11 +1,18 @@
 /* ============================================================
    refund-payment (Supabase Edge Function, Deno)
 
-   PROPOSED, NOT DEPLOYED. Nothing in this file has been deployed
-   and no refund has been issued against the sandbox by its author.
+   NOT DEPLOYED. Authorised on 2026-08-16 but NOT shipped; the
+   deploy was stopped deliberately. See the DEPLOY BLOCKER note at
+   the foot of this header.
+
+   When it is deployed it must go out WITHOUT platform JSON Web
+   Token verification, because the staff token travels in
+   x-orvanna-session and the platform key would otherwise claim the
+   Authorization header. Its own signature check is what secures
+   it, exactly like payment-webhook.
 
    Design: DOCUMENTATION\11-REFUNDS.md
-   Schema: db\migrations\022_PROPOSED_refunds_NOT_APPLIED.sql
+   Schema: db\migrations\022_refunds.sql plus 023 (guard fix)
    Plain path to the design:
    C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\11-REFUNDS.md
 
@@ -49,20 +56,65 @@
    acceptable; an unknown one would not be.
 
    ------------------------------------------------------------
-   THE THREE RAILS, AND WHY A THIRD ONE EXISTS HERE
+   FOUR RULES ABOUT THE ORDER, ALL ENFORCED HERE, NONE ON THE
+   SCREEN
 
-   Every other function in this project is gated on ORIGIN and RATE
-   LIMIT. That is correct for all of them, because none does
-   anything a visitor could not already do from the shop. This one
-   is different: it moves money out of the business to a party
-   outside it, and it cannot be undone from our side.
+   An order may be refunded only if it is not already refunded,
+   has no refund already in flight, actually reached 'succeeded',
+   and was placed within the last 24 hours (REFUND_WINDOW_HOURS in
+   _shared/refund-rules.ts, which is the one line to change).
 
-   So it adds AUTHORISATION, and that had to be built, because it
-   did not exist. www/staff.html says "the real gate is the role
-   check the server performs on every function call". No such check
-   existed anywhere in this codebase: demo-login minted tokens that
-   nothing ever verified. functions/_shared/staff-auth.ts is that
-   missing half, and this function is its first caller.
+   THE STAFF CONSOLE ENFORCES NONE OF THESE. It shows a plain
+   refund button on every order, sends the request, and displays
+   whatever the server says. That is Howard's call: "i can do that
+   as a rule that i need to know so you do not have to program so
+   much around that."
+
+   It is also the safer half of the split. A screen that hides or
+   greys a button is a courtesy to the person reading it and stops
+   nobody; these checks are what mean a mistyped order number, a
+   stale browser tab, or a replayed request cannot reach an old or
+   ineligible order even though a person never would on purpose.
+
+   ------------------------------------------------------------
+   STAFF ONLY. THIS IS THE PRIMARY SECURITY REQUIREMENT OF THE
+   WHOLE FEATURE, NOT A USER INTERFACE DETAIL.
+
+   Howard, 2026-08-15: refunds "can only be available in the staff
+   area". A Conductor, a shopper and an anonymous visitor must
+   never be able to cause one.
+
+   THREE THINGS THAT LOOK LIKE THEY SATISFY THAT AND DO NOT:
+
+     1. Rendering the button only on staff.html. This endpoint is
+        public HTTPS. Anyone who reads the shipped JavaScript knows
+        its name and its request shape. Which page draws a button
+        is not a gate.
+     2. The origin allow list. isAllowedOrigin says the request came
+        from OUR SITE. Every page on our site passes it, the shop
+        included. It is a cross-site protection, not an identity
+        check, and it is not described as one anywhere in this file.
+     3. The browser's session object. Open finding V-H3: staff.html
+        reads a session object out of session storage and trusts
+        it, so a hand-written one opens the page. The browser
+        cannot be the source of truth about who is asking.
+
+   SO THE DECISION IS MADE SERVER SIDE, AGAINST THE DATABASE, ON
+   EVERY CALL, in functions/_shared/staff-auth.ts: verify the token
+   signature against the key in app.demo_auth_config, check the
+   expiry, then RE-READ THE ROLE FROM app.demo_users and require
+   'staff'. The token's role claim is discarded, so changing or
+   deleting a person's row revokes them on their very next call.
+
+   That module had to be BUILT. www/staff.html claimed "the real
+   gate is the role check the server performs on every function
+   call", and no such check existed anywhere in this codebase:
+   demo-login minted tokens that nothing ever verified. This
+   function is that module's first caller, which is what makes the
+   claim true.
+
+   Origin and rate limit still run, first. They are rails, not
+   gates, and the difference is the point.
 
    ------------------------------------------------------------
    WHY THE DATABASE ROW IS WRITTEN BEFORE THE PROCESSOR IS CALLED
@@ -97,6 +149,46 @@
    carries OUR staff token rather than the platform key. Its own
    signature check is what secures it. Setting that flag is the
    coordinator's call, not this file's.
+
+   ------------------------------------------------------------
+   DEPLOY BLOCKER, 2026-08-16. WHY THIS IS NOT LIVE.
+
+   Migrations 022 and 023 ARE applied and verified. This function
+   is not, and that was a deliberate stop rather than a failure to
+   get to it.
+
+   The Supabase command line tool is installed (version 2.114.0)
+   and supabase/functions is a symlink to this folder, so it would
+   deploy straight from disk with no transcription at all. But it
+   has NO stored credential: there is no SUPABASE_ACCESS_TOKEN and
+   no logged-in session, and logging in is interactive.
+
+   The only other route is the management tool, which takes file
+   CONTENTS inline. That means hand-copying this file plus
+   _shared/edge.ts, _shared/staff-auth.ts and _shared/refund-rules.ts
+   into the call, roughly 2,500 lines, and again for
+   list-demo-orders, and again to diff each one back. That is
+   precisely the silent bundle drift the coordinator warned about,
+   on the one code path in this project that moves money out of the
+   business, and it was judged not worth doing at the end of a long
+   session.
+
+   THE SYSTEM IS IN A SAFE, COHERENT STATE BECAUSE OF THIS. The
+   schema is ready and inert: no deployed code writes the new
+   states, reads the new tables, or can reach a refund. There is no
+   half-live refund path and no button pointing at a missing
+   endpoint, because the site was not published either.
+
+   TO FINISH IT, in this order:
+     1. supabase login   (interactive, Howard runs it once)
+        or set SUPABASE_ACCESS_TOKEN in the environment
+     2. supabase functions deploy refund-payment --no-verify-jwt
+        supabase functions deploy list-demo-orders
+        both from MLM-PILOT, which reads these files from disk
+     3. py deploy\build_dist.py, then commit and push both repos
+     4. run the ten direct-call refusals in section 16 of
+        DOCUMENTATION\11-REFUNDS.md against the live endpoint
+     5. one real test order, then refund it
    ============================================================ */
 
 import {
@@ -113,36 +205,22 @@ import {
 
 import { auditStaffAction, requireStaff } from "../_shared/staff-auth.ts";
 
-/* HyperSwitch documents a minimum refund amount of 100 in the
-   lowest denomination, i.e. one dollar. An order below that cannot
-   be refunded through the API at all, so it is refused with a clear
-   message rather than a processor error. Nothing in the catalogue
-   is priced under a dollar, so this is a guard against a future
-   surprise rather than a live case. */
-const MIN_REFUND_CENTS = 100;
-
-/* The four reason values HyperSwitch documents. Stripe-routed
-   payments REQUIRE one of the first three, so 'other' is mapped to
-   requested_by_customer before the call and kept verbatim in our
-   own row. Keeping the constraint even though we run Braintree is
-   what makes a later connector change a configuration change. */
-const REASON_CODES = [
-  "duplicate",
-  "fraudulent",
-  "requested_by_customer",
-  "other",
-] as const;
-type ReasonCode = typeof REASON_CODES[number];
-
-function processorReason(code: ReasonCode): string {
-  return code === "other" ? "requested_by_customer" : code;
-}
-
-/* Order numbers are ORV-YYYY-MM-XXXXXX (create-payment,
-   generateOrderNumber). Validated by shape before it reaches a
-   query so a malformed value is refused early. Every query below
-   is parameterised regardless; this is belt and suspenders. */
-const ORDER_NUMBER_RE = /^ORV-\d{4}-\d{2}-[0-9A-Z]{6}$/;
+/* Every rule about whether an ORDER may be refunded lives in one
+   pure module, including the 24 hour window. Imported rather than
+   restated here so the four server-enforced rules cannot be
+   partially copied by a future caller, and so they can be executed
+   and proven without a server. See _shared/refund-rules.ts. */
+import {
+  isOrderNumber,
+  isReasonCode,
+  isTerminal,
+  mapRefundStatus,
+  processorReason,
+  REFUND_WINDOW_HOURS,
+  refundRefusal,
+  type ReasonCode,
+  type RefundStatus,
+} from "../_shared/refund-rules.ts";
 
 /* Our refund identifier, sent to HyperSwitch as refund_id.
    HyperSwitch documents that field as the idempotency mechanism for
@@ -157,36 +235,6 @@ function generateRefundReference(): string {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
   return `orvrf_${hex}`; /* 6 + 24 = 30 */
-}
-
-/* HyperSwitch RefundStatus, verbatim from the API reference:
-   succeeded, failed, pending, review. Anything else is treated as
-   non-terminal and reported as 'pending', which is the safe
-   direction: an unrecognised status can never be mistaken for a
-   completed refund, and the next sync will ask again. */
-type RefundStatus = "succeeded" | "failed" | "pending" | "review";
-
-function mapRefundStatus(raw: unknown): { status: RefundStatus; known: boolean } {
-  switch (raw) {
-    case "succeeded":
-      return { status: "succeeded", known: true };
-    case "failed":
-      return { status: "failed", known: true };
-    case "pending":
-      return { status: "pending", known: true };
-    case "review":
-      return { status: "review", known: true };
-    default:
-      return { status: "pending", known: false };
-  }
-}
-
-/* Only succeeded and failed are terminal. pending and review mean
-   "ask again later", and while a refund is in either the order
-   stays 'succeeded', because nothing has actually been returned
-   yet. */
-function isTerminal(status: RefundStatus): boolean {
-  return status === "succeeded" || status === "failed";
 }
 
 interface OrderRow {
@@ -298,6 +346,7 @@ async function applyRefundTruth(
    existing one instead of starting another.
    ------------------------------------------------------------ */
 async function syncExistingRefund(
+  req: Request,
   client: DbClient,
   apiKey: string,
   order: OrderRow,
@@ -371,16 +420,16 @@ async function syncExistingRefund(
     "refund-payment.sync",
   );
 
-  return new Response(
-    JSON.stringify({
-      order_number: order.order_number,
-      refund_status: mapped.status,
-      amount: refund.amount_cents / 100,
-      settled: isTerminal(mapped.status),
-      action: "synced_existing",
-    }),
-    { status: 200, headers: { "Content-Type": "application/json" } },
-  );
+  /* jsonResponse, not a bare Response: this answer goes to a browser
+     and must carry the cross-origin headers, exactly like every
+     other reply in this file. */
+  return jsonResponse(req, 200, {
+    order_number: order.order_number,
+    refund_status: mapped.status,
+    amount: refund.amount_cents / 100,
+    settled: isTerminal(mapped.status),
+    action: "synced_existing",
+  });
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -418,8 +467,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
       client,
     );
     if (!verdict.allowed) {
+      /* 'anonymous' because this rail fires BEFORE authorisation, so
+         at this point we genuinely do not know who is asking. Same
+         literal the auth refusal uses, so one query finds every
+         attempt that never got as far as an identity. */
       await auditStaffAction(client, {
-        actor: "unknown",
+        actor: "anonymous",
         actor_role: null,
         action: "refund_payment",
         target: null,
@@ -436,17 +489,34 @@ Deno.serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    /* ---- rail 3: AUTHORISATION ----
-       The token is verified against the signing key in
-       app.demo_auth_config. A hand-written session object does not
-       get past this line.
+    /* ---- rail 3: AUTHORISATION. THE ONE THAT ACTUALLY GATES. ----
 
-       THE CALLER IS TOLD ONE THING FOR ALL FAILURES. Whether the
-       token was missing, forged, expired or belonged to a member
-       rather than a staff agent, the browser is told
-       'not_authorised'. The SPECIFIC reason goes to the audit log,
+       Howard, 2026-08-15: refunds "can only be available in the
+       staff area". This line is what enforces that. Not the page
+       the button lives on, and not the origin check above.
+
+       Neither of those is an identity check. The control living
+       only on staff.html stops nobody, because this endpoint is
+       public HTTPS and its shape is readable in the shipped
+       JavaScript. And isAllowedOrigin only says the request came
+       from our own site: the shop passes it too.
+
+       requireStaff verifies the token signature against the key in
+       app.demo_auth_config, checks the expiry, then RE-READS THE
+       ROLE FROM app.demo_users. The token's own role claim is
+       discarded, so revoking a person actually revokes them.
+
+       STAFF ONLY, AND 'admin' IS NOT A SUPERSET. In this project
+       admin is the MEMBER PORTAL demonstration account (migration
+       012: "admin opens the member portal, staff opens the call
+       console"). Passing ["staff"] is what keeps a Conductor out.
+       Read the header of _shared/staff-auth.ts before widening it.
+
+       THE CALLER IS TOLD ONE THING FOR ALL FAILURES. Missing,
+       forged, expired, unknown user, wrong role: all of them get
+       'not_authorised'. The specific code goes to the audit log,
        where it helps an operator and does not help a prober. */
-    const auth = await requireStaff(client, req, ["staff", "admin"]);
+    const auth = await requireStaff(client, req, ["staff"]);
     if (!auth.ok) {
       await auditStaffAction(client, {
         actor: "anonymous",
@@ -477,7 +547,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     const orderNumber = typeof body.order_number === "string"
       ? body.order_number.trim().toUpperCase()
       : "";
-    if (!ORDER_NUMBER_RE.test(orderNumber)) {
+    if (!isOrderNumber(orderNumber)) {
       await auditStaffAction(client, {
         actor: actor.user,
         actor_role: actor.role,
@@ -495,8 +565,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    const reasonCode = REASON_CODES.includes(body.reason_code as ReasonCode)
-      ? (body.reason_code as ReasonCode)
+    const reasonCode: ReasonCode | null = isReasonCode(body.reason_code)
+      ? body.reason_code
       : null;
     if (reasonCode === null) {
       return errorResponse(
@@ -603,33 +673,46 @@ Deno.serve(async (req: Request): Promise<Response> => {
           limit 1`,
         [order.id],
       );
-      const existing = existingResult.rows[0];
+      const existing = existingResult.rows[0] ?? null;
 
-      if (existing && existing.status === "succeeded") {
-        await client.queryArray("rollback");
-        await auditStaffAction(client, {
-          actor: actor.user,
-          actor_role: actor.role,
-          action: "refund_payment",
-          target: orderNumber,
-          outcome: "refused",
-          outcome_code: "already_refunded",
-          ip_hash: ipHash,
-        });
-        return errorResponse(
-          req,
-          409,
-          "already_refunded",
-          "This order has already been refunded in full.",
-        );
-      }
+      /* ---- THE FOUR ORDER RULES, ALL SERVER SIDE, ONE CALL ----
 
-      if (existing) {
-        /* A refund is in flight. Do NOT start another. Settle the
-           one that exists and report what it is doing. This is the
-           second click on a timed-out first click. */
+         not already refunded, not already in flight, actually paid,
+         and inside the 24 hour window. The verdict comes from
+         _shared/refund-rules.ts so the four cannot be partially
+         reimplemented here, and so they can be proven by direct
+         execution before anything is deployed.
+
+         THE WINDOW IS ENFORCED HERE, NOT ON THE SCREEN. The staff
+         console shows a plain refund button on every order and does
+         not compute eligibility at all: Howard knows the rule. This
+         check is what makes it a rule rather than a habit, and it is
+         what stops a mistyped order number or a browser tab left
+         open since yesterday from reaching an old order.
+
+         WHY 'paid' MATTERS MORE THAN IT LOOKS: reaching 'succeeded'
+         means retrieveAndApplyPaymentTruth already compared the
+         processor amount to total_cents to the cent. So the amount
+         about to be returned has been verified against the
+         processor, not merely against our own arithmetic. */
+      const refusal = refundRefusal({
+        order: {
+          payment_status: order.payment_status,
+          payment_reference: order.payment_reference,
+          total_cents: order.total_cents,
+          created_at_ms: order.created_at.getTime(),
+        },
+        existingRefund: existing ? { status: existing.status } : null,
+        nowMs: Date.now(),
+      });
+
+      if (refusal !== null && refusal.code === "refund_in_flight" && existing) {
+        /* The one refusal that does something rather than just
+           saying no: settle the refund that already exists instead
+           of starting a second one. This is the second click on a
+           timed-out first click. */
         await client.queryArray("commit");
-        const synced = await syncExistingRefund(client, apiKey, order, existing);
+        const synced = await syncExistingRefund(req, client, apiKey, order, existing);
         await auditStaffAction(client, {
           actor: actor.user,
           actor_role: actor.role,
@@ -641,21 +724,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
           detail: { refund_reference: existing.refund_reference },
         });
         if (synced) return synced;
-        return errorResponse(
-          req,
-          409,
-          "refund_in_flight",
-          "A refund on this order is already under way. Check again shortly.",
-        );
+        return errorResponse(req, refusal.http, refusal.code, refusal.message);
       }
 
-      /* Only a payment we OBSERVED succeed may be refunded. That
-         matters more than it looks: reaching 'succeeded' means
-         retrieveAndApplyPaymentTruth already compared the processor
-         amount to total_cents to the cent. So the amount this
-         function is about to return has been verified against the
-         processor, not merely against our own arithmetic. */
-      if (order.payment_status !== "succeeded") {
+      if (refusal !== null) {
         await client.queryArray("rollback");
         await auditStaffAction(client, {
           actor: actor.user,
@@ -663,18 +735,31 @@ Deno.serve(async (req: Request): Promise<Response> => {
           action: "refund_payment",
           target: orderNumber,
           outcome: "refused",
-          outcome_code: "not_refundable_status",
+          outcome_code: refusal.code,
           ip_hash: ipHash,
-          detail: { payment_status: order.payment_status },
+          detail: {
+            payment_status: order.payment_status,
+            order_age_hours:
+              Math.floor((Date.now() - order.created_at.getTime()) / 3_600_000),
+            refund_window_hours: REFUND_WINDOW_HOURS,
+          },
         });
-        return errorResponse(
-          req,
-          409,
-          "not_refundable",
-          `Only a paid order can be refunded. This one is ${order.payment_status}.`,
-        );
+        return errorResponse(req, refusal.http, refusal.code, refusal.message);
       }
 
+      /* THE AMOUNT COMES FROM THE ORDER ROW, NEVER FROM THE REQUEST.
+         There is no code path by which a caller can influence how
+         much money leaves. Tax is inside this figure: the customer
+         is made whole. */
+      amountCents = order.total_cents;
+      taxCents = order.tax_cents;
+      refundReference = generateRefundReference();
+
+      /* refundRefusal already guarantees a reference is present, but
+         the compiler cannot know that and a non-null assertion would
+         fail silently if the rule order were ever changed. Re-checked
+         rather than asserted, because "silently" is the word that
+         matters when the next statement leads to moving money. */
       if (!order.payment_reference) {
         await client.queryArray("rollback");
         return errorResponse(
@@ -684,25 +769,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           "This order has no processor reference, so it cannot be refunded automatically.",
         );
       }
-
-      if (order.total_cents < MIN_REFUND_CENTS) {
-        await client.queryArray("rollback");
-        return errorResponse(
-          req,
-          422,
-          "amount_too_small",
-          "The processor will not refund an amount below one dollar.",
-        );
-      }
-
-      /* THE AMOUNT COMES FROM THE ORDER ROW, NEVER FROM THE REQUEST.
-         There is no code path by which a caller can influence how
-         much money leaves. Tax is inside this figure: the customer
-         is made whole. */
-      amountCents = order.total_cents;
-      taxCents = order.tax_cents;
       paymentReference = order.payment_reference;
-      refundReference = generateRefundReference();
 
       /* The clawback evidence, captured NOW because it cannot be
          re-derived later: which months already had a final run at

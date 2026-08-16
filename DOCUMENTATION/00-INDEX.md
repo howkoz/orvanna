@@ -28,6 +28,7 @@ something is unverified or not yet built, it says so plainly.
 | 08 | [The team and what we built](08-TEAM-AND-WHAT-WE-BUILT.md) | Who does what, the timeline of every phase, and the lessons that cost real time | Project historian |
 | 09 | [Linking the shop to the compensation plan](09-LINKING-SHOP-TO-COMP.md) | The one missing connection: why no real purchase has ever paid a commission, the seven decisions Howard has to make, and a dry run of what today's real sales would pay | Compensation engineer |
 | 10 | [Instant Payout terms](10-INSTANT-PAYOUT-TERMS.md) | The adopted fourth earning mechanism turned into concrete costed terms: what "first" means, what it pays on, what three rate levels cost against the 20 percent of revenue ceiling, how a chargeback is recovered, and a one-page recommended package | Compensation engineer |
+| 11 | [Refunds](11-REFUNDS.md) | How a staff agent returns a customer's money: why hiding the button is not a gate and what the real one is, whether Braintree can refund at all, and every knock-on the refund creates on tax, commissions and Instant Payout. **Proposed, not applied and not deployed.** | Architect |
 
 **Diagrams** live in `diagrams\`. Every one is a standalone Scalable Vector
 Graphics (SVG) file on a white background with fixed colours, so it drops

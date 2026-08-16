@@ -1,17 +1,41 @@
 -- =============================================================================
--- Migration 022: refunds. PROPOSED. NOT APPLIED.
+-- Migration 022: refunds. APPLIED 2026-08-16.
 -- Project: MLM Pilot (Orvanna persona, personal project)
--- Date:    2026-08-15
+-- Date:    2026-08-15, applied 2026-08-16
 -- Author:  mlm-architect
 -- Design:  DOCUMENTATION\11-REFUNDS.md
 --          Plain path:
 --          C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\11-REFUNDS.md
 --
--- STATUS: NOT APPLIED. Nothing in this file has been run against the live
---         project. Migrations 018 and 019 are likewise proposed and unapplied.
---         021 is the highest number on disk, so 022 is the next free one.
+-- STATUS: APPLIED on Howard's authorisation. Pre-flight was RE-MEASURED against
+--         live data immediately before applying rather than trusted from earlier
+--         in the session, and every number below is from that measurement:
 --
--- RUN ORDER: after 001..017 and 021. This file does NOT require 018 or 019.
+--           117 demo orders: 29 succeeded, 50 created, 26 abandoned, 8 failed,
+--                            4 processing
+--           6 orders carry a tax_transaction_id (the only ones that can ever
+--             contribute Stripe tax drift, per section 7)
+--           payment_status CHECK held exactly the five original values
+--           demo_orders_status_transition_guard present, 2 triggers on the table
+--           app.demo_order_refunds and app.demo_staff_actions both ABSENT
+--           app.orders.demo_order_id ABSENT, so migration 019 is NOT applied and
+--             fn_refund_comp_snapshot takes its 'not_applied' branch
+--
+--         TWO DRIFTS FOUND BY THAT RE-MEASUREMENT, both recorded rather than
+--         assumed away:
+--
+--         1. MIGRATION 018 IS NOW APPLIED (version 20260816000812, tax integrity
+--            hardening). This header previously said it was not. It adds no
+--            trigger to app.demo_orders, so it does not interact with the refund
+--            update path; verified by listing the table's triggers.
+--         2. app.demo_users CARRIES THREE ROLES, NOT TWO. Migration 014 widened
+--            the constraint to (admin, staff, member) and added 1,000 member
+--            sign-in accounts (GW-000001 up). So 1,002 accounts can sign in and
+--            exactly ONE of them, Orvanna_Staff, may refund. The comment in
+--            functions/_shared/staff-auth.ts was corrected to match before
+--            deploying.
+--
+-- RUN ORDER: after 001..018 and 021. This file does NOT require 019.
 --            Section 5 detects at run time whether 019 has been applied and
 --            behaves correctly either way. Run as the service role or the
 --            database owner; Row Level Security blocks every other role.
@@ -170,6 +194,30 @@ begin
     if new.payment_status = 'created' then
         raise exception 'demo order % cannot return to created; created is the initial state only',
             old.order_number;
+    end if;
+
+    -- ADDED BY MIGRATION 023, AND THE REASON IS WORTH READING.
+    --
+    -- A refund state may be entered ONLY from a paid state. Without this rule
+    -- the guard below FALLS THROUGH for 'created' and 'processing', because
+    -- those branches only ever tested where a row was coming FROM and relied on
+    -- migration 010's CHECK constraint to reject any value it had never heard
+    -- of. Widening that constraint in section 1 to admit 'refunded' silently
+    -- removed the thing that was doing the work, and 'processing' -> 'refunded'
+    -- became legal.
+    --
+    -- Caught by the section 9 guard tests on 2026-08-16, AFTER 022 was applied
+    -- and BEFORE any refund existed. No data was affected: the Edge Function
+    -- never attempts this transition, because refund-rules.ts requires
+    -- 'succeeded' first. So this was a missing BACKSTOP rather than a live hole,
+    -- which is precisely the difference the tests were there to find.
+    --
+    -- The lesson, recorded because it generalises: when you widen a CHECK
+    -- constraint, re-read every trigger that was relying on it to be narrow.
+    if new.payment_status in ('refunded', 'partially_refunded')
+       and old.payment_status not in ('succeeded', 'partially_refunded') then
+        raise exception 'demo order % cannot go from % to %; only a paid order can be refunded',
+            old.order_number, old.payment_status, new.payment_status;
     end if;
 
     -- NEW (migration 022): the refund exits from a successful payment.
@@ -495,6 +543,28 @@ comment on table app.demo_staff_actions is
     'Audit log for staff console actions that move money or change money '
     'records. Records REFUSED attempts as well as allowed ones, which is the '
     'main reason it is separate from app.demo_order_refunds.';
+
+-- APPEND ONLY. An audit log that can be edited is not an audit log, and this
+-- one is the record of an irreversible outward money movement. In the style of
+-- migration 006's immutability hardening: the row may be written once and never
+-- changed or removed. Note the honest limit, stated rather than implied: the
+-- table owner can drop this trigger, so it defends against a mistaken or
+-- compromised FUNCTION, not against someone holding the database owner role.
+-- That is the same boundary every other trigger in this project sits behind.
+create or replace function app.demo_staff_actions_append_only()
+returns trigger
+language plpgsql
+as $$
+begin
+    raise exception 'app.demo_staff_actions is append only; rows cannot be % once written',
+        lower(tg_op);
+end;
+$$;
+
+create trigger demo_staff_actions_no_update
+    before update or delete on app.demo_staff_actions
+    for each row
+    execute function app.demo_staff_actions_append_only();
 
 create index if not exists demo_staff_actions_occurred_idx
     on app.demo_staff_actions (occurred_at desc);
@@ -853,4 +923,21 @@ $$;
 --   from information_schema.role_table_grants
 --  where grantee = 'anon' and table_schema = 'app'
 --  order by table_name;
+--
+-- -- 9.9 the audit log is append only. Both statements must RAISE.
+-- begin;
+--   insert into app.demo_staff_actions (actor, action, outcome)
+--   values ('verification', 'probe', 'refused');
+--   update app.demo_staff_actions set actor = 'someone else'
+--    where actor = 'verification';                 -- expect: exception
+--   delete from app.demo_staff_actions where actor = 'verification';
+--                                                  -- expect: exception
+-- rollback;
+--
+-- -- 9.10 the staff role gate is a DATABASE fact, not a token claim.
+-- --      Confirm the two demonstration accounts still carry the roles the
+-- --      refund function depends on. 'admin' must NOT be a staff account:
+-- --      it is the member portal login, and refund-payment refuses it.
+-- select username, role from app.demo_users order by role;
+--   -- expect: Orvanna_Admin = admin, Orvanna_Staff = staff
 -- =============================================================================
