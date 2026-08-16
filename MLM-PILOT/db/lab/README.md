@@ -40,6 +40,8 @@ be edited away.
 | `013_lab_run_freeze_fix.sql` | Freeze fix found by the probe itself: BEFORE UPDATE triggers see stored GENERATED columns of NEW as not yet computed, so 008's archive equality test had to exclude them (over-strict, never leaky; see header). |
 | `014_lab_scenario_replay.sql` | Phase L3: the mutation machinery. Effective-list flattening (root-first, seq order), replay of all five kinds with loud refusals (missing refs, root removal, cycles), the ratified remove_member roll-up, month scoping, synthetic identities per spec 9.4, `sv_override` as the one volume path, lock-time shape validation and the depth-3 stack cap. Read its five design decisions. |
 | `015_lab_watch_snapshots.sql` | Phase L3: `lab.watch_snapshots` (freeze-covered), the soft-cap warning, `fn_write_watch_snapshots` (six-bucket decomposition joined by member code, aggregate basis movements, the bucket-sum-equals-delta invariant enforced in code), `fn_run_plan` v2 with the named-baseline sixth parameter, and the mini-base fixture support (`fn_load_mini_base`, `fn_run_mini_fixture`). |
+| `016_lab_plan_orvanna_builder.sql` | PLAN FIVE, `'orvanna_builder'` (spec `docs\ORVANNA-BUILDER-PLAN-SPEC.md`): the unilevel spine verbatim (reason `builder_spine_level_pay`), Builder overrides gen1/gen2 by the boundary-counter walk with NO breakaway, the second-leg bonus with active-leg multipliers, and Law B's per-source waterfall (truncated factors at scale 6, floor-rounding on prorated lines, the cap invariant ASSERTED in code). Extends the plan_code and reason CHECKs and the dispatcher; `fn_basis_member_codes` learns the second-leg basis. |
+| `017_lab_watch_snapshots_v2.sql` | The snapshot writer learns plan five (shape, paid depth, contributing count) and the decomposition pairing key widens to (source_code, reason), required because plan five gives one earner a spine line AND an override line on the same source. No-op for all prior plans; see its header. |
 | `100_proof_isolation.sql` | L1 isolation proof: app inventory unchanged, zero grants, RLS on, no writes to app, `'final'` impossible, name wall holds, no deletes. |
 | `101_proof_identity.sql` | Creates the March 2026 census unilevel run and proves the identity scenario's derived set equals the census row for row. |
 | `102_proof_parity.sql` | Lab unilevel versus the REAL finalized March run: every line, both totals, member results with the one explained GW-000 census-drift row. |
@@ -55,6 +57,10 @@ be edited away.
 | `112_proof_scenario_s2.sql` | Spec 10.3 exactly: the four watched rows, M1 losing 4.00 (pure level shift) under unilevel and doubling 16.00 to 32.00 under binary A with basis movements gained [M2, M5] lost [M3]. |
 | `113_proof_stack_and_months.sql` | The stacked scenario S1X (unilevel 50.00, binary A 40.00; M1's watch row = +4.00 added minus 4.00 shifted = 0.00), month-scoped removal (July present, August gone), the depth-4 lock refusal, and the root-removal replay refusal. |
 | `114_proof_l3_sweep.sql` | Five recipes (unilevel, binary A/B at ruled rates, matrix A, stairstep) over S1, S2, and the stack; SEMANTIC code-keyed determinism over every same-recipe pair plus BYTE-ORDER determinism for the same-flow duplicates; the spec 10.2 component invariant over all snapshots; the isolation re-check with the subscriptions-build attribution note. |
+| `115_proof_p5_ten_member.sql` | Plan five's section 10 gate fixture: spine 264.00 line-identical to unilevel, override 56.00, bonuses 29.90 (multiplier 1.15) and 4.40 (floored, prorated), company 354.30 = 16.4028 percent of CV, and the M10 cap-binding row (8.00 + 1.60 + 0.40 = exactly 10.00, f3 0.200000). |
+| `116_proof_p5_decay.sql` | The Law A DECAY fixture: scenario 'DECAY' with a per-month set_volume, two runs; sponsor 17.60 month one, 8.00 month two, shrinkage exactly the 9.60 override, attributed in from_reach_lost by the watched-account machinery. |
+| `117_proof_p5_s1x_composition.sql` | Plan five over the L3 stacked scenario S1X with a watched snapshot: M1 +3.40 = +4.00 added, -4.00 level-shifted, +3.40 bonus aggregate, basis 80.00 to 160.00 gained [LAB-M4]; the composition proof. |
+| `118_p5_census_calibration.sql` | Seeded March: draft rates (21.9712 percent of CV), the section 9 one-shot calibration (factor 0.4075: 0.015 / 0.010 / 0.020), the calibrated determinism pair (18.9399 percent of CV, residue above the window RECORDED), pool pressure, and the six-recipe comparison with concentration. |
 
 Recorded proof output: `..\..\docs\verification\LAB-L1-PROOF-RUN-2026-08-16.md`,
 `..\..\docs\verification\LAB-L2-PROOF-RUN-2026-08-16.md`, and
@@ -113,13 +119,18 @@ appends a NEW run with identical output; runs are never edited or deleted
   references `app.members(id)` (spec-sanctioned). While lab rows exist, a
   TRUNCATE of `app.members` (fresh-rebuild script `db\comp\003`) refuses
   loudly until lab run data is cleared. That refusal is intentional.
-- **Scenario mutations are phase L3**: any scenario whose effective list
-  carries a mutation fails `lab.fn_derive_members` loudly. Only IDENTITY
-  (and the hand-built proof fixtures) run in L1.
-- **Fixture scenarios** `PROOF-MINI`, `PROOF-TEN`, and `PROOF-STAIR` are
-  locked rows whose derived sets are inserted by the proof scripts, not
-  replayed; they exist so the hand examples exercise the exact production
-  computation path.
+- **Scenario mutations replay since phase L3** (files 014 and 015): all five
+  kinds, stacked to depth 3, month-scoped. A mutation whose reference is
+  missing at its point in the replay fails the run LOUDLY; nothing is ever
+  silently skipped, and a failed replay rolls the whole run back.
+- **Fixture scenarios** (`PROOF-MINI`, `PROOF-TEN`, `PROOF-STAIR`, `DECAY`,
+  and the S-series) are locked rows run over HAND-LOADED base trees: the
+  proof scripts (or `fn_run_mini_fixture`) insert the base derived rows,
+  then the REAL replay applies the scenario's mutations, then the ordinary
+  snapshot and execute path runs. Since L3 the mutations themselves are
+  exercised by fixtures, not bypassed; only the census-derivation step is
+  hand-substituted, and proofs 101 and 102 cover that step on the real
+  census.
 - **Completed runs are frozen** (files 008 and 013): tampering with a
   completed run's row or any of its run-scoped child rows is refused by
   trigger; the only permitted change is complete to archived with every
