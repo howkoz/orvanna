@@ -1,4 +1,4 @@
-# Comp Plan Lab Specification, version 1.1
+# Comp Plan Lab Specification, version 1.2
 
 As of 2026-08-16. Written by mlm-architect on Howard's green light of the same day, his
 words: "start running different comp plan runs... binary, unilevel and so on and then we
@@ -15,6 +15,18 @@ WATCHED ACCOUNTS (section 10), and the LIVING REPORT (section 11). It also amend
 plan input (section 1.1: plans now read a DERIVED tree), adds new isolation walls
 (section 2.3), re-cuts the phasing (section 7), and appends open questions (section 8).
 Sections 3 through 6 are unchanged: every v1.0 number still stands.
+
+**Amendment 2026-08-16, v1.2 (L1 gate results).** The L1 build passed the verifier gate
+(`docs\verification\LAB-L1-VERDICT-2026-08-16.md`, PASS, zero findings against the
+build) and failed the QA gate on exactly one HIGH owed to this spec
+(`docs\qa\LAB-L1-QA-2026-08-16.md`). This amendment settles what both gates put on the
+architect: the CALIBRATED binary rates are RULED per strategy in section 4.2,
+superseding the draft 0.20; section 6.3's "strategies coincide, spread 0.00" claim is
+CORRECTED in place (it was wrong by this spec's own algorithm, caught independently by
+the builder, the verifier, and the live run); the extra-root placement rule is RATIFIED
+in section 3.2; the interface's fifth defaulted parameter is ratified in section 1.1;
+and the census-scale cap behavior is documented in section 4.2. Sections 6.1, 6.2, the
+strategy A half of 6.3, and 6.4 are numerically unchanged.
 
 The lab is a WHAT-IF machine. It takes the same members, the same tree, and the same
 month of volume that the real engine reads, runs them through alternative compensation
@@ -47,8 +59,14 @@ One call per (plan, month, parameter set). Declared entry point:
 
 ```
 lab.fn_run_plan(p_period date, p_plan_code text, p_params jsonb,
-                p_placement_strategy text) returns bigint  -- the lab run id
+                p_placement_strategy text,
+                p_scenario_code text default 'IDENTITY') returns bigint  -- run id
 ```
+
+(Amended v1.2, 2026-08-16, ratifying the build's fifth parameter, verifier LOW note 1:
+`p_scenario_code` defaults to 'IDENTITY', so every four-argument call behaves exactly
+as v1.1 declared, and scenario runs name their scenario explicitly. This is the
+signature of record.)
 
 The implementation may read, and only read:
 
@@ -200,7 +218,22 @@ Deterministic algorithm, processing members in ascending member id order (seed i
 ascend with enrollment; ties cannot occur on a primary key), root first, sponsor always
 processed before its members by construction:
 
-1. The root of the placement tree is the root of the sponsor tree.
+1. The root of the placement tree is the root of the sponsor tree. (Amended v1.2,
+   2026-08-16, ratifying the build's rule after verifier ruling 3c: the census carries
+   TWO rootless members, GW-000001 the seed root and GW-000 the house account of
+   migration 020, and v1.1's "the root", singular, was ambiguous. RULE: the LOWEST-ID
+   rootless member anchors the placement tree, and every other rootless member is
+   placed as if sponsored by it, through the ordinary steps below. This is
+   deterministic and preserves the one-connected-tree assumption every plan relies on.
+   Its money-effect is zero BY CONSTRUCTION, not by coincidence: migration 020's
+   guard triggers keep all house volume in `app.house_retained_volume` and out of
+   `app.orders`, and the lab's volume snapshot reads only `app.orders`, so GW-000
+   carries SV 0.00 into every leg it joins and can never earn or pay a cent. The
+   ratification is therefore permanent: the structure that makes the rule harmless is
+   the same structure decision 4.7 already made "never paid" mean. If that wall ever
+   moved, migration 020's own triggers would have to be dismantled first, which is a
+   Howard decision, not a drift. The rule applies identically to derived trees under
+   scenarios, section 9.)
 2. For each subsequent member m with sponsor s: if s has an open left slot, place m at
    s.left; else if s has an open right slot, place m at s.right.
 3. Otherwise SPILLOVER: scan s's placement subtree in BFS order (level by level, within
@@ -254,7 +287,7 @@ parity proof against the real engine is the L1 gate (section 7).
 
 | Parameter | Draft value | Meaning |
 |---|---|---|
-| pay_leg_rate | 0.20 (20 percent) | Rate applied to the pay leg CV. |
+| pay_leg_rate | RULED v1.2, 2026-08-16, superseding the draft 0.20: **0.105 under 'bfs_spill' and 0.110 under 'volume_balanced'**, per strategy (see "The calibration ruled" below). The FIXTURE examples of section 6 and the L1 fixture proof runs remain computed at the draft 0.20, correctly: every run records its rate in plan_params, and a hand example at 20 percent is easier arithmetic teaching the same shape. Census-scale comparison runs use the ruled rates. | Rate applied to the pay leg CV. |
 | pay_leg | weaker leg | Pay leg = the leg with the SMALLER total CV this month (ties: left leg is the pay leg). |
 | carryover | flush | Unmatched CV in the stronger leg is DISCARDED at month end. No carry ledger in lab v1; 'carry' with a per-leg ledger and a 3-month expiry is defined as an L2-plus option but not launched, because carryover makes months non-independent and the lab runs months independently. |
 | cap_per_member | 2,500.00 per month | A member's binary earnings line is capped after rounding; the capped remainder is recorded as breakage. |
@@ -276,6 +309,33 @@ realistic. The deterministic calibration rule, applied once at the L1 gate: run 
 pay_leg_rate* = 0.20 x (unilevel percent of CV / binary percent of CV), rounded to the
 nearest 0.005, recorded in the run parameters and in this spec by amendment the same
 day. Size is calibrated so the dashboard can talk about shape.
+
+**The calibration ruled (v1.2, 2026-08-16, closing QA HIGH-1).** The L1 build ran the
+rule on seeded March 2026 and the verifier independently recomputed every figure:
+unilevel 13,434.00 / 91,960.00 = 14.6085 percent of CV; binary at the draft 0.20 paid
+28.0383 percent of CV under 'bfs_spill' and 27.0074 percent under 'volume_balanced'.
+The rule as written produces a different rate per strategy (0.20 x 14.6085 / 28.0383 =
+0.1042, nearest 0.005 = 0.105; 0.20 x 14.6085 / 27.0074 = 0.1082, nearest 0.005 =
+0.110), and v1.1 never said which strategy anchors. RULED: **PER-STRATEGY RATES.
+pay_leg_rate = 0.105 under 'bfs_spill' and 0.110 under 'volume_balanced'.** Reasoning:
+the calibration exists so that size is held equal and every visible difference is
+shape (this section's own closing sentence), and the placement strategy is part of the
+run's recipe, not part of the plan's identity; anchoring one rate on strategy A would
+leave every strategy B total about one point of CV oversized, a residue of the
+derivation, and the dashboard would then show a size difference that is calibration
+noise, not placement information. The placement sensitivity that section 3.4 exists to
+show is not erased by equalizing totals: it lives in WHO gets paid (M2 and M3 trading
+places, per-member deltas, leg compositions), and those comparisons are cleaner, not
+weaker, when both strategies pay the same total. The rejected alternative (one rate
+anchored on A, B reported at the same rate carrying its own percent) is recorded here
+so the choice is auditable.
+
+**The cap binds on real data (v1.2, documenting verifier LOW note 3).** In the March
+2026 census run at the draft 0.20 rate, two binary lines hit the 2,500.00 per-member
+cap, and the capped remainders are breakage per this section. The cap is therefore a
+live parameter at census scale, not decoration; dashboard breakage figures for binary
+must include capped remainders, and any rate change re-tests where the cap starts
+binding.
 
 ### 4.3 Plan 'matrix_3x7' (draft)
 
@@ -405,10 +465,30 @@ Placement derivation, ascending id order M2, M3, M4, M5:
    choose: this is the spillover event the contrast below turns on.
 4. M5: sponsor M2, left taken (M4), right open, place at M2.right.
 
-Placement tree: M1(left: M2(left: M4, right: M5), right: M3). Strategy B
-('volume_balanced') coincides on this tree (every placement lands in an empty or forced
-slot before any weigh-in can differ), which the lab must report as spread 0.00 for this
-month; the ten-member month in 6.4 is where the strategies diverge.
+Placement tree: M1(left: M2(left: M4, right: M5), right: M3).
+
+**CORRECTION, v1.2, 2026-08-16 (verifier finding F1, MEDIUM, against this spec).** The
+v1.0 and v1.1 text of this paragraph claimed strategy B ('volume_balanced') coincides
+with strategy A on this tree, spread 0.00. That claim was WRONG by this spec's own
+section 3.3 algorithm, and it was caught three ways independently: the builder flagged
+it, the verifier hand-derived the true result, and live lab run 6 computed it. The
+original claim is preserved here as the error it was; the correct derivation follows.
+
+Strategy B on the mini tree, by the section 3.3 algorithm, ascending id order: M2 lands
+at M1.left (both legs empty, tie goes left). M3: M1's left leg already weighs SV 150.00
+(M2) against the right leg's 0, so descend right: M3 at M1.right. M4: sponsor M1, legs
+weigh 150.00 (left) against 100.00 (right), descend into the WEAKER right leg to M3,
+whose legs are both empty, tie left: M4 at M3.left, NOT spilled under M2 as in strategy
+A. M5: sponsor M2, both legs empty: M5 at M2.left.
+
+Placement tree B: M1(left: M2(left: M5), right: M3(left: M4)). Legs of M1: left
+{M2, M5} = 120.00 + 40.00 = 160.00, right {M3, M4} = 80.00 + 80.00 = 160.00, a TIE,
+and ties make the LEFT leg the pay leg (section 4.2): M1 alone earns
+round(0.20 x 160.00, 2) = 32.00. M2 and M3 each have an empty right leg: no lines.
+Company under B = 32.00, one member paid, spread A minus B = 24.00 minus 32.00 =
+**-8.00**, not 0.00. The mini tree is thus ALSO a sensitivity example, and a sharper
+one than 6.4: under A the payout is split two ways and totals 24.00; under B one
+balanced pair of legs pays one member 32.00 and everyone else nothing.
 
 Leg CVs and pay, rate 20 percent of the weaker leg, earner must be qualified:
 
@@ -483,7 +563,10 @@ member set equals the `app.members` snapshot row for row, and confirms schema is
 
 **L2: matrix plus stairstep-breakaway.**
 Deliverables: plans 'matrix_3x7' (both placement strategies at width 3) and
-'stairstep_breakaway'; hand example for each appended to this spec as an amendment.
+'stairstep_breakaway'; hand example for each appended to this spec as an amendment;
+plus (added v1.2, from QA finding MEDIUM-1) extend the registry discipline trigger so
+a run row freezes once its status is 'complete', mirroring the scenario freeze, closing
+the service-role UPDATE gap QA identified.
 Gates: verifier hand-recomputation of both plans on the mini tree plus one seeded month
 spot-check of every reason code; QA PASS.
 
