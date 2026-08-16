@@ -458,3 +458,30 @@ the page and the functions must ship TOGETHER. The functions alone are harmless;
 the page alone would let the picker promise per-state pricing the live rail does
 not perform (SP-4's note). After that deploy, the three PD rows above re-run as
 a short delta before this feature is called done.
+
+## Post-deploy rows, RUN, 2026-08-16 (afternoon, after the atomic deploy)
+
+Deploy graded: quote-tax v2 and create-payment v8 (byte-compared, per the
+deploy record in PICKER-VERDICT-2026-08-16.md, commit 8fb24da) plus the dist
+(commit b651cd9). The live origin serves the picker markup (verified: 16
+guestTaxState references in https://orvanna.io/shop.html, HTTP 200); the pane
+still refuses to render the live origin directly, so the rows were driven from
+the repo pages against the DEPLOYED functions, which is the same server truth.
+All figures below are the deployed functions' own responses, captured per
+request.
+
+| # | Check | Evidence | Verdict |
+|---|---|---|---|
+| PD-1 | Per-state rates genuinely differ; quote, charge, and receipt agree | On a $100.00 cart the deployed rail returned four distinct nonzero rates: Illinois 1025 cents (10.25 percent, the default), New York 888 (8.88 percent), California 875 (8.75 percent), Texas 800 (8.00 percent). The two figures the deploy engineer's server probes vouched for (NY 888 on 10000, IL fallback 1025) both reproduced exactly from the page. Each flip repainted label ("Tax calculated NY, US" and so on), row, total, and button together; 41 paints logged across the whole session, ZERO divergent (button never carried a figure different from the displayed total) | PASS |
+| PD-2 | The Oregon zero, graded against what Stripe actually returns | Captured verbatim from both deployed functions: tax_cents 0, tax_jurisdiction "OR, US", tax_source "stripe_tax", tax_reason "not_subject_to_tax" (exactly the deploy probe's string). The page painted "Tax none due OR, US", total $100.00, button "Pay $100.00 now, test mode". "None due" is the honest sentence for a no-sales-tax state, and the misleading alternative ("not collected", the unregistered wording) was not painted and is now unreachable from the picker. No non-Oregon pick returned zero | PASS |
+| PD-3 | Flip and rotation sanity with real money movement, charged on the live rail | The flips moved real amounts ($110.25 IL, $108.88 NY, $108.75 CA, $108.00 TX, $100.00 OR, back to $108.88 NY), each settled flip discarding and reopening the payment with a fresh order id and a button label matching the new displayed total. The loop was then closed with money: order ORV-2026-08-18MYJY, quoted 888/10888 for New York, CHARGED at the processor for exactly 10888 cents (succeeded), and receipted as "Tax 8.88 PERCENT, NY, US, $8.88, Order total $108.88" with record-tax fired. Quote equals charge equals receipt, to the cent, on a non-default state | PASS |
+
+## Final feature verdict: the guest tax state picker
+
+**PASS, feature complete.** Page mechanics passed pre-deploy (SP-1 to SP-6),
+the atomic deploy condition was honored (functions and dist together,
+byte-compared), and all three post-deploy rows now pass on the deployed rail
+with real charged money. Howard's acceptance sentence is met as stated: the tax
+displays correct, for the picked state, before the shopper submits the payment,
+and the figure quoted is the figure charged and the figure receipted. Nothing
+further is owed from QA's half on this feature.
