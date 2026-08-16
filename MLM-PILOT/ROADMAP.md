@@ -800,3 +800,26 @@ Next, in order:
 
 Earlier stabilization-plan items not yet closed remain tracked in
 docs\STABILIZATION-PLAN-2026-08-16.md.
+
+## Next small step (updated 2026-08-16 evening, supersedes the numbered list above)
+
+Howard green-lit two builds from his walk brainstorm and banked a third:
+
+1. SUBSCRIPTION ENGINE, spec in flight (docs\SUBSCRIPTION-ENGINE-SPEC.md). Howard's
+   rules captured 2026-08-16: frequencies monthly, bi-monthly, quarterly, semi-annual;
+   member picks the billing date, default 30 days after initial purchase; failed month
+   means no volume and not qualified; pause up to 2 months; auto-cancel after two unpaid
+   months; retries keyed to decline classification, never blind; AND a STAFF BILLING
+   CONSOLE (Graphical User Interface behind the staff sign-in): daily automatic run at a
+   staff-configured time, run-now with dry-run preview, run history, retry queue,
+   subscription management, seven-day forecast.
+2. COMP PLAN LAB, spec in flight (docs\COMP-LAB-SPEC.md): unilevel, binary, matrix,
+   stairstep-breakaway run as sandboxed what-if runs against the same members and orders,
+   compared on one dashboard. Lab runs can never touch finalized real runs.
+3. BANKED FOR LATER (Howard: "we will do 2 later but i think if we could do two this may
+   be amazing"): the THIN PAYMENT ROUTER, an Orvanna-owned orchestration layer over
+   processor-hosted card fields so raw card numbers never touch our code. Platform-side
+   campaign after the subscription engine.
+
+The end-of-August hand commission run (item 1 of the superseded list) still stands and
+comes first on the calendar.
