@@ -260,3 +260,52 @@ artifact being shipped. The single most important fix before deploy: make the
 challenge-card story tell ONE truth across TEST-CARDS.html and both pages' hints,
 proven by one completed challenge, because the payment flow is the product and
 that sheet is the demo script.
+
+---
+
+# DELTA: the fix round re-graded, 2026-08-16 (afternoon)
+
+Scope: commits d06468e ("Fix round: both gates' findings closed"), 7d57f43 ("The
+challenge ending is proven: 2503 end-to-end verified"), and 3f8eb2e ("Failure
+messages read as failures: red, at computed contrast"), graded against my eight
+FAILED rows, the regression canary, and the owner's new red-failure request. Same
+method as the main report: `www\` served locally, real Edge Functions, real
+sandbox rail, everything computed. New sandbox traffic this round: one canary
+order succeeded (ORV-2026-08-0YFX3K, $110.25), one amount-rule decline
+(ORV-2026-08-0YLZB5, $2,646.00, ProcessorDeclined), one same-day refund attempt
+on the canary order (refused unsettled, honest message), one challenge parked
+and abandoned for the leak repro, and three signature-rotation orders from the
+guest-to-member-to-guest swap test.
+
+## Delta checklist
+
+| # | Was | Re-check | Verdict |
+|---|---|---|---|
+| D-1 | HIGH 1: library links 1.84 to 1 | Computed independently in BOTH themes: dark, all 22 links exactly 9.57 to 1 (bold accent, underline); light (theme toggle, data-theme "light"), all 22 exactly 5.36 to 1. Hover (accent-soft wash composited over the panel): 8.22 to 1 dark, 4.80 to 1 light. Visited shares the same rule (`table a, table a:visited`), so no separate visited color exists to fail. Click-through: the Manager Agent link navigates to library-agent.html?sku=manager, which renders. The fix comment's own figures (9.57 / 5.36 / 8.21 / 4.81) match mine to rounding | PASS |
+| D-2 | HIGH 2: lookup inherits challenge flavor | Exact original reproduction: staff session, live payment parked at requires_customer_action (card 2503), chrome open for ORV-2026-08-0Y9U5Q, then lookup of UNRELATED declined order ORV-2026-08-0VW854. Wording now: "Declined. The bank said: ProcessorDeclined." No approval sentence, no challenge flavor. The guard is engine-level (outcomeMessage consults sawChallenge only when the receipt's order_number equals the session's own order), so no future caller can reintroduce the leak. Shop lookup Check-again: looked up the in-flight order ORV-2026-08-0VYUP5, the resume view rendered, and the Check again click fired a real confirm-payment for the adopted order (it was a dead control before the fix). Residual, LOW: the decline tail "The order lines are kept; the caller can read a different card number" still reads session-ish on a looked-up order | PASS |
+| D-3 | HIGH 3: two challenge-card truths | One truth now, in all three places, with per-claim evidence labels. TEST-CARDS.html: 2503 is the primary challenge card, END-TO-END VERIFIED with order ORV-2026-08-0XWV5X, which I independently confirmed server-side (succeeded, $110.25, shop channel); 4111 "also triggers a challenge, server-verified; its completed ending is likewise pending a human click-through"; 2370 and 2701 marked "Documented by Braintree; not yet run on this rail". No claim exceeds its evidence. shop.html and staff.html hints teach the same cards with the sandbox passcode (1234); the shop hint's history note even corrects its OWN earlier overclaim about 4111. Howard's-hands item 1 from the main report is closed by the owner's run | PASS |
+| D-4 | MEDIUM M1: guest tax honesty | Delivered in three places and live-verified: the guest status line ("...tax on a guest order is priced from the demonstration tax address in Illinois, not from the address fields below"), the addressTaxNoteGuest hint under the fields, and the tax row hint ("estimate, from the demonstration tax address, Illinois"). Swap both directions: guest note up as guest; sign-in (GW-000002) drops it and raises the member note; switching back reverses both. The amount signature caught every switch: three fresh orders (0YF31L guest, 0YFM4R member at Florida tax, 0YFX3K guest back at Illinois 10.25 percent), no stale figure ever painted | PASS |
+| D-5 | MEDIUM M2: payment-link copy | All three spots reworded: the rule now says "This sandbox cannot send a payment link yet, so stay on the line while they finish the approval on their own device"; the chip renders "not built yet" (verified in the live page); the panel line describes the path in the conditional and points at the keyed path. The old instructions survive only inside HTML comments documenting the fix | PASS |
+| D-6 | MEDIUM M3 (N-M1): refusal logging | Implemented repo-side: StaffAuthResult's failure arm now carries verified_user for post-signature refusals (expired, unknown_user, wrong_role), and refund-payment audits `auth.verified_user ?? "anonymous"`. Both files mark it NOT YET DEPLOYED with the gate obligation on record, the correct posture under the deploy-gate rule. The screen makes no claim that depends on it (the browser-facing refusal message is unchanged), so nothing user-visible overstates the cloud state | PASS (deploy owes byte-compare) |
+| D-7 | MEDIUM M4: same-day refund message | Reproduced live on the fresh canary order (succeeded minutes earlier, unsettled at Braintree): the refund attempt returned refund_status "failed", and the screen now says "The processor could not refund this payment because the payment has not settled on its side yet. Nothing was returned... Refunds work after the payment settles, usually overnight, so try this refund again later," with the decision-queue pointer, styled as a failure, and the Cancel button re-enabled (the box un-sticks). Server rules untouched | PASS |
+| D-8 | LOW batch | staff.html em and en dashes: now ZERO in the file (both placeholders replaced). Mobile nav links: computed 24 pixels tall at the mobile preset, no horizontal scroll. library-agent.html: the first PV use now reads "200 PERSONAL VOLUME (PV) A MONTH" in the price card, expansion at first use. The decline message now names the button that exists: "Press Continue to card details to try again with a different card", live-verified in the decline run | PASS |
+| D-9 | Regression canary: guest 4242 end to end | Full round on the fixed build: cart, guest, tax quoted before the card (Illinois 10.25 percent), order ORV-2026-08-0YFX3K opened, confirmed with 4242 on the rail, page resolved to ORDER PLACED with $100.00 + $10.25 = $110.25 exact, record-tax 200 fired. The passing rows keep passing | PASS |
+| D-10 | NEW (owner request): failure messages read as failures | Commit 3f8eb2e. Live on the shop: a real ProcessorDeclined ending rendered the status line in rgb(252, 165, 165) with class pay-status-failure at a COMPUTED 10.35 to 1 on its band; the neutral status before the failure carried no red class, and a success clears the line entirely (the class toggles off with the message). Staff console: the same rule (.place-hint.pay-status-failure) computes the same red at 10.35 to 1 inside the status element's own container, and the neutral status stays grey; the class is set by the same shared engine path the shop's live decline just exercised. Note, LOW: by design the red covers engine-minted failure strings (the six endings plus loaderFailed); page-composed catch messages (network-failure strings) stay grey | PASS |
+
+## Residuals carried forward (none blocking)
+
+- LOW: the lookup decline tail "The order lines are kept..." on looked-up orders.
+- LOW: page-composed network-error strings are not covered by the failure red.
+- OBLIGATION: functions/_shared/staff-auth.ts and functions/refund-payment/index.ts
+  are repo-ahead-of-cloud (N-M1); the deploy must carry them and byte-compare, per
+  the standing rule both files now cite themselves.
+
+## Delta verdict
+
+**PASS.** All three HIGH defects are fixed and re-proven by the original
+reproductions; all four MEDIUMs are closed (N-M1 correctly repo-side pending
+deploy); the LOW batch is done; the canary passes; and the owner's red-failure
+request is live on both surfaces at computed contrast. Rows re-graded: 10, all
+PASS. From QA's half of the gate: **DEPLOY YES**, with the one condition already
+on record: the deploy includes the two changed Edge Function files and is
+byte-compared against the cloud.
