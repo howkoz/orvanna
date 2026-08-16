@@ -150,3 +150,68 @@ discard-reopen behavior).
   shipped: that obligation opens at deploy time per the standing rule, along
   with the still-open N-M1-related compare noted in the delta verdict if not
   already discharged.
+
+---
+
+## Deploy record, 2026-08-16 (appended by the deploy engineer)
+
+This section is the deploy log for the server half this verdict authorized. It is
+appended by the database engineer agent, who executed the deploy; everything above
+this line is the verifier's and stands unedited.
+
+**Route.** Supabase management tool (the command line interface has no stored
+credential on this machine), functions first per the ordering note above, mirroring
+the platform's existing layout: entrypoint `functions/<name>/index.ts` with sibling
+`functions/_shared/` files. Sources: commit `651ac49`, which repository HEAD matched
+byte for byte at deploy time for all five files involved.
+
+**Versions.**
+
+| Function | Version before | Version after | Files in bundle |
+|---|---|---|---|
+| `quote-tax` | 1 | 2 | `index.ts`, `_shared/edge.ts`, `_shared/pricing.ts`, `_shared/tax.ts` |
+| `create-payment` | 7 | 8 | `index.ts`, `_shared/edge.ts`, `_shared/pricing.ts`, `_shared/tax.ts` |
+
+Both kept `verify_jwt: true`, their existing setting. Both prior bundles carried the
+pre-picker `tax.ts` (8,935 bytes) and a stale pre-connection-borrowing `edge.ts`
+(28,502 bytes); this deploy refreshed both, the same wanted side effect the
+2026-08-16 list-demo-orders redeploy had.
+
+**Byte-compare: PASS, all eight files (two bundles of four).** Every file was
+fetched back from the platform after deploy and its SHA-256 (Secure Hash Algorithm
+256) hash compared against the repository git blob (line-feed canonical form; the
+Windows working tree carries carriage-return line-feed endings from autocrlf):
+
+| File | Bytes | SHA-256 (first 16) | Verdict |
+|---|---|---|---|
+| `functions/quote-tax/index.ts` | 6,644 | `59894e5c489de97a` | MATCH |
+| `functions/create-payment/index.ts` | 23,957 | `5d34ff1b59f05eeb` | MATCH (equals the hash in this verdict's own table above) |
+| `functions/_shared/tax.ts` | 12,787 | `aada150c7dcdbf3f` | MATCH (equals this verdict's table) |
+| `functions/_shared/pricing.ts` | 8,545 | `9235559dfd0322b6` | MATCH |
+| `functions/_shared/edge.ts` | 29,051 | `832db86450095598` | MATCH (both bundles) |
+
+**Live probes, quote-tax, Origin `https://orvanna.io`, cart = one payment agent
+subscription (10,000 cents taxable), all HTTP 200:**
+
+| Probe | tax_cents | total_cents | tax_source | tax_reason | tax_jurisdiction |
+|---|---|---|---|---|---|
+| `guest_state: "NY"` | 888 | 10,888 | `stripe_tax` | `standard_rated` | `NY, US` |
+| `guest_state: "OR"` | 0 | 10,000 | `stripe_tax` | `not_subject_to_tax` | `OR, US` |
+| no `guest_state` | 1,025 | 11,025 | `stripe_tax` | `standard_rated` | `IL, US` |
+| `guest_state: "ZZ"` | 1,025 | 11,025 | `stripe_tax` | `standard_rated` | `IL, US` |
+
+Readings. New York answered 8.88 percent, the New York City combined rate as
+Stripe rounds it on this amount, nonzero as required now that all 50 states are
+registered. Oregon answered zero WITH its reason, and the exact Stripe
+taxability_reason string is `not_subject_to_tax` (not `not_collecting`): Oregon has
+no state sales tax, so this is the correct "none due" zero, and the quality
+assurance copy grade should key on that exact string. The no-state fallback landed
+on Illinois as contracted, now at a nonzero 10.25 percent because the mid-gate
+registration turned the old `not_collecting` zero into a real Springfield figure.
+The unknown code `ZZ` fell back to Illinois identically, with no error, which is
+the allow-list contract working.
+
+**Not probed here:** create-payment's `guest_state` end to end (it opens a real
+HyperSwitch payment; the shared resolver is byte-identical between the two
+functions, so the quoted state is by construction the charged state), and the
+browser half, which is QA's.
