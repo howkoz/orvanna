@@ -223,3 +223,8 @@ Follow-up billing location dropdown cleanup:
 - GBP rebuilds the select with only `United Kingdom`, EUR with only `Ireland`, and CHF with only `Switzerland`; the field label becomes `Country` and the postal field label becomes `Postal code`.
 - Switching back to USD clears the demo overseas address instead of leaving Dublin or London under a USD checkout.
 - Tax display copy now uses country names such as `Ireland` instead of forcing two-letter country codes into the customer-facing label.
+
+Follow-up billing copy trim:
+- Removed the explanatory helper text below the billing State/Country selector.
+- Removed the guest billing tax explanation under member code and the extra tax-helper box in the order summary.
+- The field labels and dropdown contents now carry the state/country behavior without training copy on the checkout screen.
