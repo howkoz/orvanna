@@ -232,6 +232,43 @@ authoring it is part of this job, not a follow-up.
 
 ---
 
+## 5A. Document pages, a registered class that carries no chrome
+
+Added 2026-08-17, when Howard asked for an illustrated compensation plan he could
+send someone as a link: "make it a link on the comp plan page where i can send the URL".
+
+A **document page** is a self-contained document that happens to be served from the
+site. It is not a section of the site, so it does not carry the canonical navigation,
+and no chrome lint applies to it. The first one is `plan-brochure.html`.
+
+**Why this class exists rather than an exception.** There were only two ways to ship
+such a page without it, and both were worse. Bolting the site navigation onto a
+document would make it stop being a document: the bar would print, it would fight the
+cover, and it would be meaningless to somebody who saved the file. Quietly widening
+the sign-in exclusion would hand the next person a loophole in the one mechanism that
+stops navigation drift. **Naming the class keeps "no chrome" a decision on the record
+instead of a hole.**
+
+**The rules for a document page:**
+
+1. **It must be registered** in `DOCUMENT_PAGES` in `deploy/build_dist.py`. An
+   unregistered page still fails `page_registry_lint`, exactly as before.
+2. **It must be genuinely self-contained**, and `document_page_lint` checks this rather
+   than trusting it: no `<link>`, `<script>`, `<img>`, `url()`, `@import`, `@font-face`
+   or external `<use>`. Everything inline, system fonts only.
+3. **Self-containment is the price of the exemption.** These pages exist to be sent as
+   a link, saved to a desktop, opened with no network, and printed. All three uses die
+   silently the moment the page references something outside itself, and a stylesheet
+   that resolves on the server and nowhere else would pass every other check in the
+   build.
+4. **It may carry a slim link back to the site**, so a reader who arrives cold can find
+   the company. That link must use the absolute address, because a relative one is dead
+   as soon as the file is saved. It must not reproduce the navigation.
+5. **It must print as a document**: any sticky element hidden entirely in print with no
+   reserved space.
+
+---
+
 ## 6. Out of scope, explicitly
 
 **The sign-in areas are not touched.** Howard excluded them by name:

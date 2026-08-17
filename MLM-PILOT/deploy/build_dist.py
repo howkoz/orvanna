@@ -369,6 +369,31 @@ NAV_LINT_EXCLUDED = {"login.html", "staff.html", "staff-operations.html"}
 # Pages this script itself writes, which have no site chrome by design.
 BUILD_GENERATED_PAGES = {"404.html"}
 
+# DOCUMENT PAGES. Self-contained documents that happen to be served from the
+# site. They deliberately carry no site chrome, because they are not sections
+# of the site: they are things a reader is sent a link to, saves to a desktop,
+# opens with no network, and prints.
+#
+# This class exists so that "no chrome" is a REGISTERED DECISION rather than a
+# hole. Without it the only way to ship such a page would be to bolt a
+# navigation onto a document, or to quietly widen the sign-in exclusion, which
+# would hand the next person a loophole. Contract section 6 names the class.
+#
+# The defining property is self-containment, and document_page_lint below
+# CHECKS it rather than trusting it. A document page that grew an external
+# stylesheet would still print and still serve, but would break silently the
+# moment somebody saved it and opened it offline, which is one of the three
+# uses it exists for.
+DOCUMENT_PAGES = {"plan-brochure.html"}
+
+# What a self-contained page may never reference. Anything here means the file
+# stops working the moment it leaves the server.
+EXTERNAL_REF_RE = re.compile(
+    r"""(<link\b[^>]*\bhref=|<script\b[^>]*\bsrc=|<img\b[^>]*\bsrc=|"""
+    r"""\burl\(\s*(?!['"]?\#)|@import\b|@font-face\b|<use\b[^>]*\bhref=)""",
+    re.I,
+)
+
 NAV_BLOCK_RE = re.compile(r'<nav class="nav-links"[^>]*>.*?</nav>', re.S)
 # The cart is an <a> on product.html and a <button> on shop.html; both are the
 # page's own existing markup, which the contract says to leave untouched.
@@ -396,24 +421,60 @@ def page_registry_lint() -> None:
     to replace. The build already knows what landed in dist; from here on it
     asserts that it recognises every one of them.
     """
-    known = set(CORPORATE_PAGES) | NAV_LINT_EXCLUDED | BUILD_GENERATED_PAGES
+    known = (set(CORPORATE_PAGES) | NAV_LINT_EXCLUDED
+             | BUILD_GENERATED_PAGES | DOCUMENT_PAGES)
     unknown = [n for n in root_pages() if n not in known]
     missing = [n for n in CORPORATE_PAGES if not (DIST / n).is_file()]
+    missing += [f"{n} (document page)" for n in DOCUMENT_PAGES
+                if not (DIST / n).is_file()]
     problems = []
     for n in unknown:
         problems.append(
             f"{n}: ships in the build but is registered nowhere. Add it to "
-            "CORPORATE_PAGES with the href its active item must carry, or to "
-            "NAV_LINT_EXCLUDED if it is a sign-in area with its own chrome.")
+            "CORPORATE_PAGES with the href its active item must carry, to "
+            "NAV_LINT_EXCLUDED if it is a sign-in area with its own chrome, or "
+            "to DOCUMENT_PAGES if it is a self-contained document that carries "
+            "no chrome on purpose.")
     for n in missing:
-        problems.append(f"{n}: registered as a corporate page but missing from the build")
+        problems.append(f"{n}: registered but missing from the build")
     if problems:
         for p in problems:
             print(f"  page registry: {p}")
         fail(f"{len(problems)} page(s) are not covered by the chrome lints")
     print(f"page registry: {len(root_pages())} root pages, all covered "
           f"({len(CORPORATE_PAGES)} linted, {len(NAV_LINT_EXCLUDED)} sign-in areas "
-          f"excluded, {len(BUILD_GENERATED_PAGES)} build generated)")
+          f"excluded, {len(DOCUMENT_PAGES)} document, "
+          f"{len(BUILD_GENERATED_PAGES)} build generated)")
+
+
+def document_page_lint() -> None:
+    """A document page must be genuinely self-contained.
+
+    These pages are exempt from every chrome lint, so the exemption has to buy
+    something checkable. Self-containment is that thing: the page is sent as a
+    link, saved to a desktop, opened with no network and printed, and all three
+    uses die quietly the moment it references anything outside itself. A
+    stylesheet that resolves on the server and nowhere else would pass every
+    other check in this build.
+    """
+    problems = []
+    for name in sorted(DOCUMENT_PAGES):
+        page = DIST / name
+        if not page.is_file():
+            continue
+        text = page.read_text(encoding="utf-8", errors="ignore")
+        for m in EXTERNAL_REF_RE.finditer(text):
+            line = text.count("\n", 0, m.start()) + 1
+            problems.append(
+                f"{name}:{line}: external reference {m.group(0).strip()!r}. A "
+                "document page must carry everything inline so it still works "
+                "saved to a desktop with no network.")
+    if problems:
+        for p in problems[:20]:
+            print(f"  document page: {p}")
+        fail(f"{len(problems)} external reference(s) in a self-contained document page")
+    print(f"document page lint: {len(DOCUMENT_PAGES)} document page(s) carry no "
+          "external references")
 
 
 def normalize_nav(block: str, allow_cart: bool) -> str:
@@ -708,6 +769,7 @@ def main() -> None:
     name_lint()
     secret_scan()
     page_registry_lint()
+    document_page_lint()
     nav_drift_lint()
     theme_boot_lint()
     chrome_sheet_link_lint()
