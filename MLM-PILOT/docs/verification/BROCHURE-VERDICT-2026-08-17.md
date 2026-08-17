@@ -583,3 +583,401 @@ Separate work item, not blocking this page:
 
 Re-gate scope after the fixes: the brochure only. The build machinery and the contract are
 sound as graded, and `comp-plan.html` needs no change beyond H-2 and the L-1 citation.
+
+---
+---
+
+# DELTA RE-GATE, 2026-08-17, commit `88cea04`
+
+**Graded by:** mlm-verifier (same agent, same adversarial posture)
+**Scope:** delta only, `afa6a3e` to `88cea04`. I did not re-grade the worked month or anything
+else I proved clean, per the coordinator's instruction. I re-graded what changed and
+everything my findings touched.
+
+## GATE: **PASS**
+## DEPLOY: **YES**
+
+Both HIGH findings are genuinely closed, and closed the harder way rather than the cheaper
+one. The version and date ruling is applied in full. The lint no longer admits any of the five
+references I walked past it last round.
+
+It is a PASS with an asterisk I want on the record: **the round's own lint fix contains a fix
+that does not work, plus six more holes.** Neither touches the shipped page, which I
+re-verified carries no external reference of any kind, so neither blocks the deploy. But this
+is the second consecutive round in which the document-page lint was declared to prove
+something it does not prove, and the shape of the pattern is why.
+
+### Artifacts graded, by hash
+
+| SHA-256 | Bytes | File |
+|---|---|---|
+| `537c8cfd76ebcee9dfda87760a378ced980991c7db160a2bdbb138b36a27de3e` | 198,465 | `MLM-PILOT/www/plan-brochure.html` |
+| `a349c211e6257654cb6c931c02da2da64583d0809756c01a1d207c69f560c402` | 240,764 | `MLM-PILOT/www/comp-plan.html` |
+| `457f0b6b9c8d670ac8a4fe8b765eb6e50269aa0588e824a7d042cf9b8b0e19bf` | 37,442 | `MLM-PILOT/deploy/build_dist.py` |
+| `8de0cfd0589b0079497f8e9ca26a5722c9dc343a6586c725f3c19af11c40e663` | 17,140 | `MLM-PILOT/docs/CORPORATE-CHROME-CONTRACT.md` (unchanged) |
+
+Working tree clean at `88cea04` after every probe.
+
+---
+
+## D1. HIGH-1, the ceiling: **CLOSED**
+
+Howard removed the exception from `comp-plan.html` rather than adding it to the brochure. I
+audited the removal three ways.
+
+**Count.** Instant Payout occurrences in `comp-plan.html`: 42 before, **31 after**. Eleven
+removed, matching the claim exactly. The brochure had zero before and has zero after.
+
+**No exception claim survives anywhere.** I read all seven surviving uses of "except" in
+`comp-plan.html` individually:
+
+| Surviving statement | Verdict |
+|---|---|
+| "the base for every percentage in this plan, without exception" | about Commissionable Volume, not the ceiling. True. |
+| "That ceiling has no exception. It holds on every order, at every rank, in every shape of organisation, and every mechanism that pays anybody today is settled inside it." | the new absolute claim. True, and note the precise qualifier "that pays anybody today". |
+| "how these terms sit against the plan's 20 percent ceiling, which has no exception" | the new open-gate framing. True. |
+| "Instant Payout is the exception to that **timing** by design: it pays on the day" | narrowed to timing. True. |
+| "Instant Payout is the one exception to that **basis**: its 20 percent sits on the order price itself" | narrowed to basis. True, and the arithmetic checks: 0.20 x 150.00 = 30.00 against 0.20 x 120.00 = 24.00. |
+| "The ceiling ... has no exception ... have never been reconciled with that promise" | the new note. True. |
+| "how the terms sit against this plan's 20 percent ceiling, which has no exception" | honest-gaps table. True. |
+
+I then searched for exception claims phrased **without** the word "except", which is where an
+audit like this usually fails: "sits on top", "additionally carry", "can exceed", "above the
+ceiling", "beyond 20", "more than 20 percent", "over 20 percent", "carve", "the monthly run
+never", "describes the monthly run", "raises the ceiling", and eight more. **Zero residual
+breach claims in either document.** The only two hits on "more than 20 percent" are the two
+correct absolute statements.
+
+**No true statement was removed by accident.** I read every removed line in the diff. All
+eleven removals are exception claims or the scoping language that supported them, and each was
+either deleted outright (the two figure captions, the two SVG descriptions, the "one carve-out"
+paragraph) or replaced with a true absolute statement ("the monthly run never crosses it"
+became "NO ORDER CROSSES IT"; "the ceiling on an order in the monthly commission run" became
+"the ceiling on an order"). The facts that had to survive did survive: Instant Payout is still
+described as approved, not built, computing nothing, paying nobody, in the honest-gaps table
+and in the new note. Nothing true was lost.
+
+**Follow-through is complete.** Three "one question is still open" statements became "two
+questions", plus "the condition on Instant Payout ever" became "one of the two conditions".
+Measured: "One question is still open" 2 before and 0 after, "Two questions are still open" 0
+before and 2 after.
+
+## D2. HIGH-2, the vocabulary: **CLOSED**
+
+| Term | Brochure before to after | comp-plan before to after |
+|---|---|---|
+| Conductor | 0 to **51** | 155 to 154 |
+| second-leg bonus | 30 to 30 | 0 to **18** |
+| second-team bonus | 0 to 0 | 18 to **0** |
+
+**I audited all 44 surviving occurrences of "Member" in the brochure individually, not by
+sample.** Every one is the rank name: the glossary entry, the paid-depth ladders ("Member 1,
+Builder 2, ..."), "rank above Member", the organisation-chart node labels ("M2, Member"), "a
+plain Member", and the rank table rows. **Zero use "member" to mean a person.** The glossary
+now carries the disambiguating line that makes this safe: "Every person this plan pays is a
+Conductor. Member: The name of the first rank."
+
+Both documents now use **leg** as the technical unit (133 and 78 occurrences) and **Team
+Volume** as the defined metric. The residual "team" in `comp-plan.html` is the plain English
+word in the ensemble-versus-team contrast, not a competing name for a leg.
+
+**The link note is now true.** "Same plan, same rules, same numbers" is gone. It now reads:
+"The rules and the numbers are the same. One difference worth knowing before you open it: this
+page keeps the plan that runs today separate from the two layers that are only modelled, and
+the companion presents the plan as one piece without drawing that line." That is the one
+difference that remains, stated plainly, and stating it is the right call.
+
+## D3. The version and date ruling: **APPLIED IN FULL**
+
+| | Before | After |
+|---|---|---|
+| "version 2.0" | 4 | **0** |
+| "Effective 1 September" | 3 | **0** |
+| "Supersedes version 1.3" | 1 | **0** |
+| "superseding version 1.3" | 1 | **0** |
+
+Section fifteen now says it in the document's own words: "This document carries no version
+number and no effective date. It states no start date and retires nothing." The footer repeats
+it. The supersession claim, which I flagged although it was not among the two items sent for
+ruling, is gone with the rest.
+
+Also fixed and confirmed: the contract citation in `build_dist.py`, section 6 to **section
+5A** (my L-1).
+
+## D4. The other changes this round, spot-checked
+
+Not in my scope, but they touch claims I graded, so I checked them.
+
+- **The print `tfoot` defect.** `tfoot { display: table-row-group; }` is present in the print
+  block. This was the one that would have been fatal: Chrome reprinting a table's totals on
+  every fragment of a split table, inside the section titled "A complete month, to the cent".
+  Fixed. Related to my L-3, where I flagged the printed length as the claim with a history of
+  drift and said I could not verify the print pipeline. Rendering Chrome's actual print output
+  is the right answer to that, and it found something real.
+- **Two false statements corrected.** "Level 1 pays twice what any other level pays" is gone;
+  it was false at levels 4 and 5, where 10 percent is more than three and five times the rate.
+  Figure 1's ceiling label now reads "20 percent of the $100.00" instead of "25% of CV",
+  matching the cover.
+- **My L-2, the phone-scroll count,** is now moot in the right direction: 13 measured last
+  round, **11 measured now**, with two more phone layouts added, one of them the organisation
+  chart that was showing a line running to nobody.
+- **My L-4, unlabelled bar segments in figure 16,** was not addressed. Still cosmetic, still
+  not worth a round.
+
+## D5. Craft claims re-measured on the changed file
+
+The brochure changed by 366 lines, so its geometry claims are new claims. Measured live in
+Chrome, not read from the commit message.
+
+| Claim | Measured | Result |
+|---|---|---|
+| Contrast floor, drawing labels | **6.30 to 1** (`#A62020` on `#FBE9E9`) | reproduces |
+| Contrast floor, composited page | **6.79 to 1** | reproduces |
+| Drawing labels | **495** across all variants | reproduces exactly |
+| Labels outside a viewBox, 375 and 1280 | **0** | reproduces |
+| Real text overlaps, 375 and 1280 | **0** | reproduces |
+| Page horizontal overflow, 375 and 1280 | **0** | reproduces |
+| Elements past the viewport outside a scroll frame | **0** | reproduces |
+| Scrolling frames at 375 | **11** of 14 visible | reproduces |
+| Sticky bar at 375 | one row, 43 pixels | reproduces |
+| Frames with a visible affordance | **14 of 14**, a 1 pixel `#C7CEDB` border | reproduces |
+| Figures and drawing SVGs | 18 and 24 (two new phone layouts) | consistent |
+
+The demonstration notice is now at 1.1 percent into the body, on the cover, as a stamp. It was
+previously reachable only in a no-print masthead, which meant nobody printing the document
+learned it was a demonstration until page 33 of 35. That was a real defect and it is fixed.
+
+---
+
+## D6. New findings
+
+### NEW-1 (MEDIUM). The precedence claim survived the ruling that removed its basis.
+
+The brochure still says, unchanged: "This document is the statement of the plan. **Where any
+other page or summary disagrees with it, this document governs.**"
+
+That sentence is inherited convention, and in this industry it is sound convention, because
+the booklet that governs is the dated, versioned instrument of record. Howard's ruling stripped
+the version, the date and the supersession claim from this document. The sentence that depended
+on them was left behind.
+
+It now reads oddly on its own terms and badly in combination:
+
+- The document declares three lines earlier that it carries no version number, no effective
+  date, states no start date, and retires nothing. A document with none of those governing over
+  one that has them is not a claim that survives a careful reader.
+- The new link note on `comp-plan.html` states in writing that the two documents differ in
+  scope, and that the brochure is the one that does **not** draw the line between what runs
+  today and what is only modelled. So the document claiming to govern is, by the sibling page's
+  own description, the less complete of the two on exactly one axis.
+
+This is the residue of my original H-1 rather than a new problem: last round "governs"
+aggravated the ceiling contradiction; now that the ceiling is reconciled, it aggravates the
+scope difference instead. It makes nothing on the page false, which is why it does not block.
+
+**Fix, one clause:** "Where any other page or summary disagrees with it **about the three
+layers it describes**, this document governs." Or delete the sentence, since a document that
+retires nothing has no obvious basis for governing anything.
+
+### NEW-2 (MEDIUM). The false-positive fix does not work.
+
+I reported that an internal `<use href="#id">` was wrongly blocked. The pattern was rewritten
+with `(?!\#)` guards and the comment states the intent correctly: "an internal
+`<use href="#id">` is a same-document reference and is exactly how an inline drawing reuses a
+shape, so it must be allowed."
+
+**Re-probed: it is still blocked.** So are `<image href="#x">` and `<link href="#y">`.
+
+Diagnosed to the character. The `url(` branch is written correctly, with the optional quote
+**inside** the lookahead:
+
+```
+\burl\(\s*(?!['"]?\#)
+```
+
+The two new branches put the optional quote **outside** it:
+
+```
+<(?:use|image)\b[^>]*\b(?:xlink:)?href\s*=\s*["']?(?!\#)
+```
+
+Because `["']?` is optional, the engine matches zero characters there and then tests `(?!\#)`
+against the quote character itself. A double quote is not a hash, so the lookahead passes and
+the branch matches. Confirmed directly against the compiled pattern:
+
+| Input | Should be | Actual |
+|---|---|---|
+| `<use href="#f0t"/>` | allowed | **BLOCKED** |
+| `<use href='#f0t'/>` | allowed | **BLOCKED** |
+| `<use href=#f0t/>` (unquoted) | allowed | allowed |
+| `<use xlink:href="#f0t"/>` | allowed | **BLOCKED** |
+| `<image href="#x"/>` | allowed | **BLOCKED** |
+| `<link rel="x" href="#y">` | allowed | **BLOCKED** |
+| `<use href="https://x/s.svg#i"/>` | blocked | blocked |
+| `url(#grad)` and `url("#grad")` | allowed | allowed |
+
+Only the unquoted form passes, and nobody writes SVG that way. So the document-page class still
+forbids the single most useful way to shrink an inline drawing, and it rejects it with a
+message saying "external reference", which is false and will send the next person hunting for a
+network reference that does not exist.
+
+**Fix:** move the optional quote inside the lookahead in both branches, matching the `url(`
+branch that is already right: `["']?(?!\#)` becomes `(?!["']?\#)`.
+
+### NEW-3 (MEDIUM). Six more ways past the lint, confirmed end to end.
+
+You asked me to find a sixth. I found six, each built and deployed with **exit 0**:
+
+| Probe | Result |
+|---|---|
+| CSS `background-image: image-set("https://cdn.example.com/a.png" 1x)` | **passed the build** |
+| SVG `<feImage href="https://cdn.example.com/i.png"/>` inside a `<filter>` | **passed the build** |
+| `<video poster="https://cdn.example.com/p.jpg">` | **passed the build** |
+| `<audio src="https://cdn.example.com/a.mp3">` | **passed the build** |
+| `<input type="image" src="https://cdn.example.com/b.png">` | **passed the build** |
+| `<body background="https://cdn.example.com/bg.png">` | **passed the build** |
+
+Sixteen candidates bypass the pattern by inspection, including `<video src>`, `<track src>`,
+SVG `<pattern href>`, `<textPath href>`, `<mpath href>`, `<form action>`,
+`<meta http-equiv="refresh">`, anchor `ping`, and `<link imagesrcset>` with no `href`.
+
+Two of these are worth naming specifically because they are the ones a person would actually
+write on this page. **CSS `image-set()`** is the modern sibling of `url()`, takes a bare quoted
+string with no `url(` token at all, and is exactly what a designer reaches for to serve a logo
+at two densities. **SVG `<feImage>`** is a genuine external image fetch inside a filter, in a
+document that is 24 inline drawings.
+
+**The finding is not the six tags. It is the shape.** Round one found five holes, the fix
+enumerated eleven forbidden constructs, and round two found six more with sixteen candidates
+outstanding. A blocklist of fetching elements will not converge, because HTML has dozens of
+fetching attributes and CSS keeps adding resource functions.
+
+**Recommended inversion, which does converge and which I verified.** Scan for any attribute
+whose value is an absolute URL, `https?://` or protocol-relative `//`, and fail unless it is on
+a short permitted list. I enumerated every absolute reference in the shipped brochure:
+
+```
+  2  href="https://orvanna.io/"          the site link, permitted by contract 5A rule 4
+ 22  xmlns="http://www.w3.org/2000/svg"  a namespace identifier, not a fetch
+```
+
+**Two exemptions, both closed and both already named in the contract.** That single rule would
+have caught all eleven of my bypasses across both rounds, including every one of the six above,
+and it needs no maintenance when the next fetching attribute is invented. Relative references
+stay covered by the cache-stamp assertion and the link checker, which is what caught my
+relative probes in round one before this lint ever ran. Keep the explicit `@import`,
+`@font-face`, `url(` and `<script>` rules alongside it, since those are the non-URL-shaped
+cases.
+
+### LOW
+
+**L-6. The note names the conflict without sizing it.** Section 10 prints "Total to you on that
+first order: 30.00 + 12.00 = **42.00**" on a $150.00 order, and prints 42.00 again inside a
+drawing. That is 28 percent, eight points above the ceiling the same page calls absolute. The
+note says the two "have never been reconciled" but never prints 28 percent or the gap.
+Everywhere else this document sizes its own bruises to two decimals: 34.5 percent for the worst
+proration ratio, 154 of 641, 90.2 percent for the top-five concentration, 0.526315 for a
+proration factor. A reader trained by twenty sections to expect the number meets the one place
+it is withheld, and it is the number a hostile consultant computes first. One clause fixes it.
+
+**L-7. The scroll affordance is a border, not a direction.** All 14 visible frames now carry a
+1 pixel `#C7CEDB` edge, up from `#DDE2EB` and from nothing on some. A border says "this is a
+frame"; it does not say "the drawing continues to the right". A fade at the right edge or a
+one-time hint would say the second thing. Cosmetic, and my ruling that the sideways scroll is
+acceptable stands and is stronger now at 11 frames than it was at 13.
+
+---
+
+## D7. Ruling requested: was the builder's note the right call, or should the page be silent?
+
+**The note is the right call. Silence would have been the worst option available, and it is not
+close.**
+
+1. **The contradiction is visible on the page whether or not it is named.** Section 10 prints
+   42.00 on a 150.00 order, twice, once inside a drawing. Section 4 states an absolute 20
+   percent ceiling. A numerate reader does that division in his head. This document says it is
+   written to survive a hostile read by a veteran compensation consultant, and that reader
+   divides 42 by 150 before he finishes the section. Silence would mean the page's own
+   arithmetic refutes the page's own central promise and nobody wrote it down. That is the
+   precise failure mode this project has shipped before and that both gates exist to stop.
+2. **The note is correctly scoped and every clause in it is verifiable.** It does not claim the
+   ceiling is breached today. It says the terms were approved separately, have never been
+   reconciled with the promise, nothing computes an Instant Payout, and nobody is paid one. All
+   four are true. It softens neither the ceiling nor the approval, which is the narrow path
+   between Howard's ruling and the standing record that the 2026-08-15 approval was not
+   revoked.
+3. **It reuses the document's own convention rather than inventing one.** Refund recovery was
+   already a named open gate on building the mechanism. The note makes the reconciliation the
+   second one, and the three "one question" to "two questions" edits make that structural
+   rather than decorative. A reader meets a familiar shape, not a new apology.
+4. **It was inside the builder's authority.** Howard ruled the ceiling absolute. Making the
+   page not-false given that ruling is implementation of the ruling, not a new decision. A
+   builder who applied the ruling and left the contradiction standing would have shipped a
+   document that fails on its own arithmetic, and would have been right to be failed for it.
+
+The one thing I would change is L-6: name the size, not just the conflict. "On the worked
+example above that is 42.00 on a 150.00 order, 28 percent, eight points above the ceiling."
+This document's credibility rests on the habit of printing the number that hurts, and this is
+the single place it declines to.
+
+---
+
+## D8. Severity confirmed, as asked, on the two carried forward
+
+Both were judged out of scope this round. Both are still absent: I re-measured.
+
+**M-1, the specification's binding proration frequency. MEDIUM. Does not block.** Zero
+occurrences of any frequency figure in the brochure. The specification makes the sentence
+normative and requires the realized numbers in any presentation, and version 1.2.2 exists
+because that exact figure was understated once already. The brochure carries the mechanism
+("the two bonus layers share what the ceiling leaves") and the strongest member protection (the
+claimed, paid and reason on every reduced line), and omits only the frequency, leaving a reader
+to guess "rare" where the measurement says roughly one member-month in four with any volume is
+reduced. **It does not block because nobody can be harmed by it today:** layers two and three
+pay nobody, no line has ever been shaved, and the corrected number is one click away on the
+linked page. **It must not survive another round.** The moment these layers are presented as
+real, the brochure becomes the surface that understates the exposure, and this project's
+specific failure history is documents describing behaviour the data did not have.
+
+**M-3, bundles and packs missing from "What carries volume". MEDIUM. Does not block, but it is
+the closer of the two.** Zero occurrences of bundle, pack, Ignition, Momentum, Constellation or
+Manager Agent in the brochure. Unlike M-1 this is about what pays **today**: bridge decision
+4.2 and migration 019 made the four products commissionable, and roughly half of real paid
+volume is bundles and packs. The section headed "What carries volume" lists the twelve agents
+and stops, then describes a $2,000.00 one-time purchase that none of the twelve products it
+just listed can be bought as. **That incoherence is detectable by a careful reader with no
+external knowledge**, which is what makes it worse than M-1 in kind even though it is the same
+severity. It does not block because it is an omission rather than a false statement, and
+because the page is a demonstration document that now says so on page 1. Fix is one table row.
+
+---
+
+## D9. Deploy
+
+**YES.** Ship `88cea04`.
+
+What made me fail `afa6a3e` is fixed and fixed properly: the ceiling is now one claim across
+both documents with no exception surviving anywhere in either, the vocabulary is one, the
+invented version and date are gone, and the arithmetic I recomputed last round is untouched by
+this delta. The page carries no external reference of any kind, which I re-verified directly
+rather than trusting the lint. A potentially fatal print defect that neither of us caught last
+round was found and fixed by looking at real printed output, which is the third time in three
+days that looking beat measuring.
+
+Same day, not gating:
+
+1. **NEW-1**, one clause on the precedence sentence, because Howard's ruling removed its basis
+   and left the sentence.
+2. **L-6**, one clause naming 28 percent in the note.
+
+Next work item, and it should not wait for a third round:
+
+3. **NEW-2**, the one-character fix in each of the two lookaheads, which is a fix believed done
+   and not done.
+4. **NEW-3**, invert the pattern to an absolute-URL scan with the two exemptions above, because
+   the blocklist has now failed twice and will fail again.
+
+Then, and I would not let these ride a third round:
+
+5. **M-3**, one table row for bundles and packs.
+6. **M-1**, one sentence carrying the proration frequency.

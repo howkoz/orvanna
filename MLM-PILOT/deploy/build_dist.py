@@ -389,27 +389,47 @@ DOCUMENT_PAGES = {"plan-brochure.html"}
 # What a self-contained page may never reference. Anything here means the file
 # stops working the moment it leaves the server.
 #
-# WIDENED 2026-08-17 after the verifier probed the first version and got five
-# external references PAST it with exit 0: an <iframe src>, an <img srcset>
-# (only `src` was covered), an <object data>, an SVG <image href>, and an
-# inline <script>. It also flagged a FALSE POSITIVE: an internal
-# <use href="#id"> is a same-document reference and is exactly how an inline
-# drawing reuses a shape, so it must be allowed.
+# REWRITTEN 2026-08-17, TWICE, and the second rewrite is the point.
 #
-# The rule the pattern encodes: fetching anything from outside this file is
-# forbidden; pointing at something inside it is fine. Hence the (?!#) guards.
-EXTERNAL_REF_RE = re.compile(
-    r"""(?:<link\b[^>]*\bhref\s*=\s*["']?(?!\#)"""
-    r"""|<script\b[^>]*\bsrc\s*="""
-    r"""|<img\b[^>]*\b(?:src|srcset)\s*="""
-    r"""|<iframe\b[^>]*\bsrc\s*="""
-    r"""|<object\b[^>]*\bdata\s*="""
-    r"""|<embed\b[^>]*\bsrc\s*="""
-    r"""|<source\b[^>]*\b(?:src|srcset)\s*="""
-    r"""|<(?:use|image)\b[^>]*\b(?:xlink:)?href\s*=\s*["']?(?!\#)"""
-    r"""|\burl\(\s*(?!['"]?\#)"""
-    r"""|@import\b"""
-    r"""|@font-face\b)""",
+# Round one was a blocklist of tags. The verifier probed it and got FIVE things
+# past with exit 0: <iframe src>, <img srcset> (only src was covered), <object
+# data>, an SVG <image href>, and an inline <script>. It also caught a false
+# positive: an internal <use href="#id"> is a same-document reference and is
+# how an inline drawing reuses a shape.
+#
+# Round two widened the blocklist. The verifier probed it again and got SIX
+# MORE past: CSS image-set(), <feImage href>, <video poster>, <audio src>,
+# <input type="image" src>, and <body background>, with sixteen further
+# candidates failing by inspection. It also proved the false-positive fix did
+# not work, diagnosed to the character: ["']? sat OUTSIDE the lookahead, so the
+# engine matched zero quote characters and then tested (?!#) against the quote
+# itself.
+#
+# THE REAL FINDING WAS THE SHAPE: a blocklist of tags cannot converge, because
+# the set of ways to fetch something is open-ended and grows with the platform.
+# So this is now an ALLOWLIST of what may appear in a URL-bearing attribute:
+#   - a same-document fragment (#...)      an inline drawing reusing a shape
+#   - a data: URI                          already inline, fetches nothing
+#   - mailto: and tel:                     not fetches
+#   - an absolute link on <a href>         a reader choosing to leave
+#   - xmlns                                a namespace name, never fetched
+# Everything else fails, whether or not anyone thought of it in advance.
+
+# Attributes that can cause a fetch. The allowlist is applied to their values.
+URL_ATTR_RE = re.compile(
+    r"""<(?P<tag>[a-zA-Z][\w:-]*)\b(?P<attrs>[^>]*)>""", re.S)
+URL_ATTR_PAIR_RE = re.compile(
+    r"""\b(?P<name>src|srcset|href|xlink:href|data|poster|background|action|"""
+    r"""formaction|cite|longdesc|manifest|profile|usemap|codebase|archive)"""
+    r"""\s*=\s*(?P<q>["'])(?P<val>.*?)(?P=q)""", re.S | re.I)
+
+# A value that fetches nothing from outside this file.
+SELF_CONTAINED_VALUE_RE = re.compile(
+    r"""^\s*(?:\#|data:|mailto:|tel:)""", re.I)
+
+# CSS that fetches. url(#...) is a same-document filter or gradient reference.
+CSS_FETCH_RE = re.compile(
+    r"""(?:\burl\(\s*(?!["']?\#|["']?data:)|\bimage-set\(|@import\b|@font-face\b)""",
     re.I,
 )
 
@@ -488,12 +508,26 @@ def document_page_lint() -> None:
         if not page.is_file():
             continue
         text = page.read_text(encoding="utf-8", errors="ignore")
-        for m in EXTERNAL_REF_RE.finditer(text):
+        for tag_m in URL_ATTR_RE.finditer(text):
+            tag = tag_m.group("tag").lower()
+            for a in URL_ATTR_PAIR_RE.finditer(tag_m.group("attrs")):
+                val = a.group("val").strip()
+                if SELF_CONTAINED_VALUE_RE.match(val):
+                    continue
+                # A reader choosing to leave is not the page fetching anything.
+                if tag == "a" and a.group("name").lower() == "href":
+                    continue
+                line = text.count("\n", 0, tag_m.start()) + 1
+                problems.append(
+                    f"{name}:{line}: <{tag} {a.group('name')}=\"{val[:60]}\"> "
+                    "fetches from outside the file. A document page must carry "
+                    "everything inline so it still works saved to a desktop "
+                    "with no network.")
+        for m in CSS_FETCH_RE.finditer(text):
             line = text.count("\n", 0, m.start()) + 1
             problems.append(
-                f"{name}:{line}: external reference {m.group(0).strip()!r}. A "
-                "document page must carry everything inline so it still works "
-                "saved to a desktop with no network.")
+                f"{name}:{line}: stylesheet fetches {m.group(0).strip()!r}. A "
+                "document page must carry everything inline.")
         for m in DOCUMENT_SCRIPT_RE.finditer(text):
             line = text.count("\n", 0, m.start()) + 1
             problems.append(
