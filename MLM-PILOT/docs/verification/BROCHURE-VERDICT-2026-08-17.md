@@ -981,3 +981,302 @@ Then, and I would not let these ride a third round:
 
 5. **M-3**, one table row for bundles and packs.
 6. **M-1**, one sentence carrying the proration frequency.
+
+---
+---
+
+# DELTA RE-GATE, 2026-08-17, commit `3f43094`
+
+**Graded by:** mlm-verifier
+**Scope:** delta only, `88cea04` to `3f43094`.
+
+## GATE: **PASS**
+## DEPLOY: **YES**
+
+Everything I raised is closed, including the one I passed and quality assurance failed. The
+proration figures re-derive against the specification. The 28-cents wording, which is the
+distinction this whole round exists to protect, is correct and is fenced three times.
+
+The lint is now the right shape. I still got six things past it, but for the first time they
+are all **one root cause with a known fix**, and none of them is a policy hole. That is
+progress rather than another round of the same thing, and it does not touch the shipped page.
+
+### Artifacts graded, by hash
+
+| SHA-256 | Bytes | File |
+|---|---|---|
+| `39727f88a5ca33ee68b624a3bdd37e13aac768521fcb5230152f806700481270` | 204,942 | `MLM-PILOT/www/plan-brochure.html` |
+| `f48fc9207b21d5b13250269dc86524302389213c3a6f52d96325284269d9830f` | 241,780 | `MLM-PILOT/www/comp-plan.html` |
+| `96912aac406048fc8b7bb2fe478d7e33f877b51abf5325c30ce559af00ba3ba9` | 39,482 | `MLM-PILOT/deploy/build_dist.py` |
+
+Build clean, `sha256 2b6557a878bd7c0b`. Working tree clean at `3f43094` after every probe.
+
+---
+
+## E1. NEW-1, the governance clause: **CLOSED**, and the pair is consistent in both directions
+
+I checked this in both directions, as asked, and specifically for the failure mode where one
+document asserts what the other denies.
+
+**The brochure now disclaims.** Three uses of "govern" survive in the file. One is "the rules
+that govern the ladder", unrelated. The other two are the negation:
+
+- Section fifteen: "This document explains the plan. **It does not govern any other page, it
+  settles no disagreement with one, and it retires nothing.** Where it differs from the
+  compensation plan page, that difference is not decided here."
+- Footer: "This document explains the three earning layers it describes. **It governs
+  nothing.** It carries no version number and no effective date."
+
+**`comp-plan.html` now claims, and can.** Two placements, header and glossary: "There is no
+separate printed plan booklet. This page, together with the version stamp in its footer, is
+the statement of the plan on this site, and where any other page or summary disagrees with it,
+this page is the one to check against."
+
+**Both directions check.**
+
+| Test | Result |
+|---|---|
+| Does the brochure claim authority anywhere? | No. "complete statement" 0, "statement of the plan" 0, "this document governs" 0. |
+| Does comp-plan's claim collide with anything the brochure asserts? | No. The brochure explicitly defers: "that difference is not decided here". |
+| Does either defer to a booklet that does not exist? | No. The brochure says "booklet" zero times. comp-plan says it four times, twice as the negation "There is no separate printed plan booklet", twice about the Builder extension having "no field name and no booklet", which is true and matches specification open question 7. |
+| Does the version stamp comp-plan points at actually exist? | **Yes.** Its footer reads "Orvanna compensation plan, version 1.3, effective month 2026-08." A claim that leans on a stamp, with the stamp present. |
+
+**Neither now claims something the other denies.** This is a better resolution than the one I
+proposed. I suggested narrowing the brochure's clause; removing it entirely and moving the
+claim to the document that has a version and a date is the cleaner answer, because authority
+now sits with the artifact that can carry it.
+
+**The return links.** Both new links from the brochure are absolute: two occurrences of
+`https://orvanna.io/comp-plan.html`, alongside the two existing `https://orvanna.io/`. That
+satisfies contract 5A rule 4. See NEW-5 below, because the lint would not have caught it.
+
+## E2. Re-derivation of the proration figures against specification 12A(e)
+
+The designer flagged that the wording was matched without re-deriving the numbers. Re-derived.
+
+**The brochure's sentence, verbatim:** "How often a bonus line is reduced. Measured across the
+modelled runs, 154 of the 641 Conductor-months that carried any volume were reduced on at
+least one layer: 24.0 percent, or roughly one in four. It is not rare. Your level pay is never
+among them."
+
+| Element | Specification 12A(e) v1.2.2 | My derivation | Result |
+|---|---|---|---|
+| Numerator | 154 bind on at least one layer | 154 | match |
+| Denominator | 641 sources carrying any volume | 641; and 641 + 360 zero-volume = 1,001 total, consistent | match |
+| Percentage | 24.0 percent | 154 / 641 = 0.2402496, **24.02 percent** | match |
+| "roughly one in four" | the specification's own amended phrase | 24.02 against 25.00 | match |
+| "that carried any volume" | the qualifier the whole v1.2.2 release exists to restore | **present** | match |
+| "reduced on at least one layer" | "prorate on at least one layer" | same claim | match |
+| "It is not rare" | the specification retired the word "rare" by name and substituted "routine and junior" | consistent | match |
+| "Your level pay is never among them" | "the spine is structurally untouchable, so no member's live-plan-equivalent pay is ever reduced" | consistent | match |
+
+**Internal consistency of the specification's own decomposition, checked because a matched
+sentence can still sit on broken figures.** 120 bind at layer 2, 83 at layer 3, 34 at layer 3
+only. So 83 minus 34 = 49 bind both, and 120 minus 49 = 71 bind layer 2 only. Distinct total =
+71 + 49 + 34 = **154**. The decomposition closes.
+
+**Related figures in the same paragraph, also re-derived:** 638.00 plus 305.68 = **943.68**
+prorated away; 943.68 / 17,417.12 = 0.05418, **5.4 percent** of the run. 35 / 207 = 0.16908,
+**17 percent** of paid members. 19.24 / 55.80 = 0.34480, **34.5 percent**, the honest worst
+ratio; 19.24 / 91.80 = 0.20959, the **21 percent** the specification says flatters. Every one
+reproduces.
+
+**The figures are correct. The wording is correct. The denominator qualifier is present.**
+Two notes, both LOW, in E5.
+
+## E3. The 28-cents counter-case: the wording is right, and it is fenced three times
+
+This is the one the round turns on, so I read both placements in full rather than checking for
+keywords.
+
+**Placement one, the Instant Payout section (this also closes L-6):** "The gap is worth
+printing rather than leaving for a reader to find. The worked example above pays 42.00 on a
+150.00 first order, which is 28 percent of the price against a 20 percent ceiling, **eight
+points over**. Nothing computes that today and nobody is paid it, and until the two are
+reconciled nobody will be."
+
+Arithmetic: 42.00 / 150.00 = 28.0 percent, and 28 minus 20 = 8 points. Correct. **L-6 closed**,
+and closed with the number I asked for rather than a gesture at it.
+
+**Placement two, the anti-gaming section, which is the one that had to be exactly right:**
+
+> "For commission generated BY the self-funded volume itself, no plan funded under a 20 percent
+> ceiling can return more than 20 cents on a self-funded dollar, so a self-funding attack of
+> that kind loses at least 80 percent, and this one loses 93. **What that bound does not
+> cover** ... **Nor does the bound cover the approved Instant Payout terms, and that is a fact
+> about the bound rather than about the ceiling.** The Instant Payout section works a
+> self-funded first order of 150.00 returning 42.00, which is 28 cents on the dollar, above the
+> 20 this bound implies. That is one of the two unreconciled questions gating the build, set
+> out in that section. **It is not an exception to the ceiling: the ceiling has none, and
+> Instant Payout pays nobody anything today.** The 20-cent figure is a bound on one channel. It
+> is not a law of the plan, and an earlier draft of this page stated it as one."
+
+**This is correct, and the distinction is made three separate times inside one passage:**
+
+1. "that is a fact about the bound rather than about the ceiling"
+2. "It is not an exception to the ceiling: the ceiling has none"
+3. "and Instant Payout pays nobody anything today"
+
+The 28 cents is never left unfenced. The sentence that states it is immediately followed by the
+sentence that denies the reading a hostile lifter would want. It also mirrors the
+specification's own self-correction ("an earlier draft of this page stated it as one"), which
+is the habit that makes this document credible.
+
+**Alignment with specification section 11 v1.2.2, clause by clause:** the 20-cent bound scoped
+to "commission generated BY the self-funded volume itself"; the bound not extending to
+self-funded volume bought to unlock pay on other people's volume, with the 100.00 qualification
+gate named as exactly that; the Instant Payout terms returning 42.00 on 150.00, 28 cents on the
+dollar; and "the 20-cent figure bounds one channel, stated as a universal law it is false". All
+four present, in the specification's own order. Supporting arithmetic also checks: 21.20 / 300
+= 7.07 cents and a 92.9 percent loss; 0.025 x 80.00 = 2.00 on 100.00, a 98 percent loss.
+
+**Ruling: the wording is sound.** I looked for the failure mode and it is not there.
+
+## E4. The rest, confirmed
+
+**M-3, bundles and packs: CLOSED and arithmetically correct.** The catalogue now carries
+"Bundles and packs, $200.00 to $800.00 a month, 200 to 800 PV. The Manager Agent bundle at
+$200.00 and 200 PV; the Ignition Pack at $200.00 and 200 PV; the Momentum Pack at $400.00 and
+400 PV; the Constellation Pack at $800.00 and 800 PV." All four match
+`DOCUMENTATION/03-COMPENSATION-PLAN.md` section 4.2. "A bundle or pack carries its own Personal
+Volume once, not the volume of the agents inside it" matches bridge decisions 4.2 and 4.6. The
+incoherence is closed: "A $2,000.00 one-time purchase, **which is what the Ignition Pack costs
+when it is bought once rather than monthly**, arrives as 200 PV a month for ten months."
+Checked: $200.00 x 10 = $2,000.00, and 2,000 PV / 10 = 200 PV a month. Correct.
+
+**L-7, the scroll affordance: CLOSED, and better than I asked for.** It is now a text label,
+"Scrolls sideways inside its frame", printed in the caption, plus a coloured scrollbar. I
+measured which figures show it against which figures actually scroll at 375:
+
+- figures scrolling: **10**
+- figures showing the label: **10**
+- **mismatches: 0**
+
+So no reader is told to scroll something that does not scroll, and none of the ten is left
+unmarked. The source comment also records that an inset shadow was tried first and measured at
+1.02 to 1 "because a scroll container paints its inset shadow under its content", which is the
+right way to lose an idea.
+
+**Craft re-measured on the changed file**, live in Chrome at 375: 512 drawing labels, worst
+drawing-label contrast **6.30 to 1**, worst composited page contrast **6.79 to 1**, zero labels
+outside a viewBox, zero real text overlaps, zero page horizontal overflow, zero elements past
+the viewport outside a scroll frame. All hold.
+
+## E5. Findings
+
+### NEW-4 (MEDIUM). Six ways past the allowlist. All of them are parser holes, not policy holes.
+
+You asked for a thirteenth. Here are six, each built and deployed with **exit 0**:
+
+| Probe | Result |
+|---|---|
+| `<img src=https://cdn.example.com/a.png alt=x>` (unquoted value) | **passed the build** |
+| `<img alt="width > height" src="https://cdn.example.com/a.png">` | **passed the build** |
+| `<meta http-equiv="refresh" content="0;url=https://cdn.example.com/">` | **passed the build** |
+| `<a href="#cover" ping="https://cdn.example.com/p">` | **passed the build** |
+| `<link rel="preload" as="image" imagesrcset="https://cdn.example.com/a.png 1x">` | **passed the build** |
+| relative `<a href="comp-plan.html">` | **passed the build** (see NEW-5) |
+
+Controls behaved correctly: a quoted external `<img src>` is caught, and the internal
+`<use href="#f0t"/>` **passes**, so NEW-2 is genuinely closed.
+
+**The important part is that the policy is now right and only the parsing is wrong.** The
+allowlist is the correct shape and I am not going to relitigate it. Two specific implementation
+defects produce four of the six:
+
+1. **`URL_ATTR_PAIR_RE` requires a quote:** `(?P<q>["'])(?P<val>.*?)(?P=q)`. An unquoted
+   attribute value is valid HTML5 and every browser fetches it, and the pair never matches, so
+   the value is never tested against the allowlist.
+2. **`URL_ATTR_RE` captures attributes with `[^>]*`.** A `>` inside an earlier quoted value
+   ends the capture, and every attribute after it falls outside the block the allowlist is
+   applied to. `alt="width > height"` is an ordinary caption in a document about arithmetic.
+
+The other two, `content` on a meta refresh and `ping` on an anchor, are the enumerated
+attribute list being finite again, in a smaller way than before.
+
+**Recommended fix, which I verified rather than assumed.** Stop parsing HTML with a regular
+expression and use `html.parser.HTMLParser` from the standard library, then apply the existing
+allowlist to every attribute value it yields. I ran both hole cases through it:
+
+```
+<img src=https://cdn.x/a.png alt=x>          -> img {'src': 'https://cdn.x/a.png', 'alt': 'x'}
+<img alt="width > height" src="https://...">  -> img {'alt': 'width > height', 'src': 'https://cdn.x/a.png'}
+```
+
+It resolves both correctly. Applying the allowlist to **every** attribute rather than an
+enumerated list also closes `content`, `ping`, `imagesrcset` and whatever the platform adds
+next, because a value that is not a fragment, a data URI, `mailto:`, `tel:` or an anchor's
+address is refused whether or not anyone anticipated the attribute. That is roughly fifteen
+lines and it makes the lint converge, which the last three rounds have not.
+
+**On the trend, in fairness:** round one found five holes and round two found six, both
+policy-shaped, meaning the rule itself was wrong. This round's six are all one root cause with
+a standard-library fix. The shape change worked; what is left is an implementation detail.
+
+### NEW-5 (MEDIUM). The `<a href>` exemption is total, so the defect fixed by hand this round would recur.
+
+The exemption is `if tag == "a" and name == "href": continue`, with no test on the value. So a
+**relative** anchor passes, and I confirmed it end to end: `<a href="comp-plan.html">` builds
+with exit 0.
+
+That is precisely the defect the coordinator fixed by hand in this commit, when the two new
+return links from the brochure were relative and had to be made absolute. Contract 5A rule 4 is
+explicit: "That link must use the absolute address, because a relative one is dead as soon as
+the file is saved." **The lint does not enforce the one rule in section 5A that this round
+already proved a human has to remember.** A relative anchor is not a fetch, which is why the
+exemption was written that way, but it breaks the saved-file use case exactly as an external
+stylesheet would, and that use case is the entire price of the chrome exemption.
+
+**Fix, one condition:** exempt an anchor's `href` only when the value is a same-document
+fragment or an absolute address, `https?://` or `mailto:` or `tel:`. Everything relative fails,
+with the message naming rule 4.
+
+### LOW
+
+**L-8. The brochure attributes a single month's measurement to plural runs.** It says "Measured
+across **the modelled runs**", but 154 of 641 is seeded March specifically, at the calibrated
+rates of record, per specification 12A(e). The figure is right; the attribution suggests an
+average across the six seeded months. One word: "across the modelled March run".
+
+**L-9. The member-level companion is absent from the brochure.** Specification 12A(e), extended
+v1.2 by red-team attack 4, makes it normative that "the MEMBER-level exposure rides beside the
+source-level number on **every surface**, because members are what riot, not sources", and that
+any presentation carries the 34.5 percent and the five zeroed members. The brochure carries the
+source-level number and none of the member-level set: 207, 34.5, 324.14 and "five Conductors"
+all appear zero times, against seven, two, one and one in `comp-plan.html`.
+
+I am rating this LOW rather than MEDIUM for two reasons that I checked rather than assumed.
+**First, the omission does not flatter the plan.** 35 of 207 paid Conductors is 17 percent,
+which is *lower* than the 24 percent the brochure does print, so the page shows the larger,
+less comfortable number and withholds the smaller one. **Second, the qualitative worst case is
+present**: "on a heavily covered order they can be reduced to nothing" is the readable form of
+the five members who lost 100 percent. What is missing is a denominator a member can locate
+themselves in, and it is one clause: "and 35 of the 207 Conductors paid that month carried at
+least one reduced line."
+
+---
+
+## E6. Deploy
+
+**YES.** Ship `3f43094`.
+
+Every finding from both previous rounds is closed, and the three that mattered most were closed
+harder than I asked. The governance pair is consistent in both directions and neither document
+asserts what the other denies. The proration figures re-derive from the specification, with the
+denominator qualifier that the whole v1.2.2 correction release exists to protect. The
+28-cents counter-case says the true thing about the self-funding bound and refuses the false
+thing about the ceiling, three times over, which is the distinction this round was called to
+protect.
+
+The two open items are build machinery. Neither affects the shipped artifact, which I verified
+directly carries no external reference of any kind, and neither blocks:
+
+1. **NEW-4**, replace the regex tag scan with `html.parser` and apply the allowlist to every
+   attribute. About fifteen lines, and it ends this series.
+2. **NEW-5**, condition the anchor exemption on the value being a fragment or absolute, so
+   contract 5A rule 4 stops depending on somebody remembering it.
+
+Two one-clause edits on the page whenever it is next touched, neither urgent:
+
+3. **L-8**, "the modelled runs" to the March run.
+4. **L-9**, add the 35 of 207 companion beside the 154 of 641.

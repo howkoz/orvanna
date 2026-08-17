@@ -803,3 +803,302 @@ Nothing else. Items D6 to D11 are LOW and I would ship over them.
   links to page B and B is the shorter read, B must name A and be able to return to it.
 - **A legend of coloured swatches needs a word.** Where one figure solves greyscale with
   ordering words, every sibling figure with the same legend must adopt them.
+
+---
+---
+
+# DELTA GATE 2: commit `3f43094`, 2026-08-17
+
+- **Commit graded:** `3f43094` ("Final round: the governance claim goes, and an affordance that actually renders"), which also carries `f35c7cf` ("The document-page lint stops being a blocklist and becomes an allowlist")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\` rebuilt by `py deploy\build_dist.py`, bundle sha256 `6d987e0b6be7adf9`, 39 files, 1510 KB, served over Hypertext Transfer Protocol (HTTP) from `deploy\dist`
+- **Grader:** mlm-qa. Read-only toward the product. Nothing was fixed.
+- **Date:** 2026-08-17
+- **Scope:** what changed, and everything my delta 1 findings touched. Per the coordinator I did not re-grade the printed total rows, the seven earlier closures or the pictures-only test except where a change could have disturbed them. Two changes could have, and I checked both: the only drawing altered is Figure 13's new phone layout, and the new caption line and edge bar add rendered ink, so I re-ran the contrast floor.
+
+## VERDICT: PASS
+
+## DEPLOY: YES
+
+The HIGH is closed in both documents and in both directions. All four MEDIUMs are
+closed. The affordance now renders, and it renders at the strength claimed: I sampled
+it from the rendered image rather than reading the stylesheet, and it measures **9.21 to
+1**, on the nail. The two deferred verifier items landed correctly, and I re-derived the
+proration figures against the specification myself rather than accepting the wording.
+Three LOW items remain and I would ship over all three.
+
+---
+
+## THE HIGH: closed, and closed both ways
+
+`plan-brochure.html`, printed page 34, under "HOW THE RULES CHANGE, AND WHEN":
+
+> This document explains the plan. It does not govern any other page, it settles no
+> disagreement with one, and it retires nothing. Where it differs from the compensation
+> plan page, that difference is not decided here.
+
+Printed page 35, the footer:
+
+> This document explains the three earning layers it describes. It governs nothing. It
+> carries no version number and no effective date.
+
+`comp-plan.html`, in two places, now claims the role instead of deferring to a document
+that did not exist:
+
+> There is no separate printed plan booklet, so this page, together with the version
+> stamp in its footer, is the statement of the plan on this site. If a number here
+> disagrees with a number anywhere else, this is the page to check it against.
+
+> Which document governs. There is no separate printed plan booklet. This page, together
+> with the version stamp in its footer, is the statement of the plan on this site.
+
+Verified:
+
+- **"governs" appears exactly once in 35 printed pages**, and that once is the negation.
+  I searched the extracted print text of all 35 pages.
+- **"booklet" no longer names a governing document.** The three remaining uses are the
+  two pre-existing "the Builder extension has no field name and no booklet" rows and the
+  new "There is no separate printed plan booklet" in both places. `plan-brochure.html`
+  uses the word zero times.
+- **The claim that no booklet is published is true.** There is an
+  `ORVANNA-COMP-PLAN-BOOKLET.html` under `docs\`, but it is not in the page registry and
+  I confirmed it is not in the built bundle, so it is not on the site.
+- **No contradiction in either direction.** One document governs and says so; one
+  explains and says it governs nothing. The brochure names the difference rather than
+  resolving it, which is the correct posture for the document that does not draw the
+  running-versus-modelled line.
+
+---
+
+## The four MEDIUMs
+
+### D2, the affordance: CLOSED, and the root cause diagnosis is correct
+
+The coordinator's account of the cause is right and matches what I measured last gate: an
+inset box shadow on a scroll container paints under its content, and every drawing lays
+an opaque ground across its whole viewBox, so the cue was covered by the thing it
+described. My 1.02 to 1 measurement was the symptom of exactly that.
+
+**I sampled the rendered pixels rather than reading the stylesheet.** Captured Figure 3's
+frame at 375 with mobile emulation on and scrollbars not suppressed, then read the median
+colour of each of the last sixteen pixel columns:
+
+| Column | Sampled colour |
+|---|---|
+| x = 335, 336 | rgb(255, 255, 255), the drawing's own white ground |
+| **x = 337 to 344** | **rgb(42, 62, 158), solid, eight columns wide** |
+| x = 345 to 350 | rgb(245, 247, 250), the page band outside the frame |
+
+Eight pixels exactly, painting **on top of** the opaque ground that used to hide it.
+Computing the ratio from those two sampled values:
+
+- Bar rgb(42, 62, 158) against the drawing's white ground: **9.21 to 1**
+- Bar against the page band beside it, rgb(245, 247, 250): **8.58 to 1**
+
+**The 9.21 to 1 claim is confirmed by pixel sampling**, and it is measured against the
+surface the bar actually sits on.
+
+The other cues, measured rather than read:
+
+| Claim | What I measured | Verdict |
+|---|---|---|
+| Cue scoped to scrolling frames only | At 375: 13 visible frames, **10 scrolling, 3 fitting**. All 10 scrolling frames carry borders (top, right, bottom, left) of (1, **8**, 1, 1) with right colour rgb(42, 62, 158). All 3 fitting frames carry (1, 1, 1, 1) and no indigo. **Zero frames that fit carry the cue** | Confirmed |
+| Caption line in each | `.scrollnote` computed `display: block` with a live `offsetParent` on all 10 scrolling frames and hidden on all 3 fitting frames. Text: "Scrolls sideways inside its frame", rendered upper case. Sampled from the image, ink rgb(42, 62, 158) on rgb(245, 247, 250): **8.58 to 1** | Confirmed |
+| Ten pixels of reserved scrollbar on all ten frames | **10.0 pixels exactly** on all ten, with classic scrollbars. With mobile emulation on, Chrome switches to overlay scrollbars and reserves **0**, as it does on a real phone | Confirmed as styled; see the note below |
+| Zero of 35 printed pages | Printed the document again: **0 occurrences** of the caption line in the extracted text of all 35 pages, and `.scrollnote { display: none }` under `@media print` | Confirmed |
+| Scrolling frames down from 13 to 10 | 10 at 375 and at 559; the wide layout returns at 560 | Confirmed |
+| Scoping is right | The cue is scoped by class, `.fig:not(.w340):not(.hasphone)`, not by measurement. The classes happen to be exactly correct: the 3 `.w340` figures are the 3 that fit and the 5 `.hasphone` figures are the 5 with phone layouts, and 18 minus 3 minus 5 is the 10 I measured scrolling | Correct, though it will need re-checking if a drawing is ever resized |
+
+**Looked at it.** Figure 3 at 375 now shows a solid indigo bar down the right edge of the
+frame and "SCROLLS SIDEWAYS INSIDE ITS FRAME" in indigo capitals directly above
+"FIGURE 3". It is unmistakable. This is a real fix, not a re-description of the old one.
+
+**The one note, and it does not change the verdict.** The reserved scrollbar is the one
+cue that still depends on the browser: 10 pixels with classic scrollbars, 0 on a phone
+using overlay scrollbars. That no longer matters, because the two cues that do the work,
+the eight pixel bar and the caption line, render on a phone and I measured both there.
+The claim would be exactly right if it read "ten pixels wherever the browser reserves a
+track".
+
+### D3, Figure 13 on a phone: CLOSED
+
+**Looked at it at 375.** A fifth phone layout, `viewBox 0 0 340 460`, is the only new
+drawing in this commit. Every rung's requirement is fully readable: "qualified, Team
+Volume 40,000.00+, 2+ legs each holding a Leader or above" through to "enrolled, nothing
+else required". The staircase indentation survives, the frame does not scroll, and
+correctly it carries no cue.
+
+### D4, "this version of the plan": CLOSED with one survivor
+
+The heading on printed page 34 is now **"WHAT THIS DOCUMENT DOES NOT COVER"**, and three
+of its four bullets read "the plan described here". Count is **8 down to 1**, not to zero.
+
+**The survivor, printed page 34, first bullet:** "Refunds and reversals. **This version**
+has no rule for reversing volume or reclaiming commission after a refund." It sits ten
+lines above "This document carries no version number and no effective date". LOW, listed
+below as D12, but the "down to 0" count in the hand-off is off by one and worth recording
+so the next sweep does not trust it.
+
+### D5, the return path: CLOSED
+
+Two links, both naming the destination and saying what is there rather than selling it:
+
+- Contents page: "There is a companion page, the Orvanna compensation plan page. It
+  covers the same plan and separates what is running today from what is only modelled.
+  This document does not draw that line, so read that page for it."
+- Footer: "The companion page, which separates what is running today from what is only
+  modelled, is the Orvanna compensation plan page."
+
+Both are descriptive and both are honest about the one difference. On paper the companion
+page is named but its address is not printed; only orvanna.io is. LOW, D13.
+
+### D8, the restored Instant Payout figure: CLOSED, and worded better than I asked
+
+Section ten's note now prints the gap: "The worked example above pays 42.00 on a 150.00
+first order, which is 28 percent of the price against a 20 percent ceiling, eight points
+over." I checked the arithmetic: 42.00 over 150.00 is 28.0 percent exactly, and 28 minus
+20 is eight points.
+
+The anti-gaming section carries it a second time and frames it correctly: "Nor does the
+bound cover the approved Instant Payout terms, and **that is a fact about the bound
+rather than about the ceiling** ... 28 cents on the dollar, above the 20 this bound
+implies ... **It is not an exception to the ceiling: the ceiling has none.**" That is the
+right sentence, and it is the one that keeps Howard's absolute ceiling intact while
+naming the number.
+
+---
+
+## The coordinator's own change: the absolute return links
+
+Tested as asked. `plan-brochure.html` contains **zero relative or root-relative `href` or
+`src` values**; every reference is either a same-document anchor, `https://orvanna.io/`,
+or `https://orvanna.io/comp-plan.html`. Copied the built file to a scratch folder and
+loaded it over `file://` with every host mapped to a dead address and a dead proxy:
+`performance.getEntriesByType('resource')` returned `[]`, 18 figures present, 20 sized
+Scalable Vector Graphics (SVG) drawings, full 45,610 pixel height, zero scripts, and all
+four links still absolute. **Nothing dies when the file is saved.**
+
+One asymmetry, LOW, D14: the two new comp-plan links carry no `target` and no `rel`,
+while the sticky bar carries `target="_blank" rel="noopener noreferrer"`. From a saved
+file, clicking a return link replaces the local document in the same tab.
+
+---
+
+## The two deferred verifier items, checked as new content
+
+### The proration sentence. I re-derived it rather than matching the wording.
+
+The designer flagged that it matched wording without re-deriving. I derived it against
+`docs\ORVANNA-BUILDER-PLAN-SPEC.md`.
+
+The brochure's new sentence: "Measured across the modelled runs, 154 of the 641
+Conductor-months that carried any volume were reduced on at least one layer: 24.0
+percent, or roughly one in four. It is not rare. Your level pay is never among them."
+
+| Element | Specification | Recomputed |
+|---|---|---|
+| 154 bind on at least one layer | Spec: "**154 bind on at least one layer**, of which 34 bind only at layer 3" | Matches |
+| 641 denominator | Spec: "the 1,001 denominator includes **360 sources with zero volume that can never bind**. Against the **641 sources that have any pool at all**" | 1,001 minus 360 is 641. Matches |
+| 24.0 percent | Spec: "**154 of 641 = 24.0 percent, roughly ONE IN FOUR**" | 154 / 641 = 0.240250, which is 24.0 percent. Correct |
+| The unit | Spec calls them sources or member-months; comp-plan defines the unit once as a source member-month and the brochure says Conductor-months | **Carried over in comp-plan's own unit, correctly.** The brochure never says orders |
+| comp-plan's sub-counts, 120 at the override layer, 83 at the bonus layer, 34 bonus-only | Spec: "120 is the count of sources whose LAYER 2 factor binds; 83 bind at layer 3 ... 34 bind only at layer 3" | Matches, and it is internally coherent: 120 + 83 minus 154 is 49 binding at both, 83 minus 49 is the 34 bonus-only |
+| comp-plan's "35 of the 207 paid Conductors carry at least one reduced line" | Spec: "**35 of the 207 paid members, 17 percent**" | Matches |
+| "Your level pay is never among them" | Spec: the spine "by construction is never prorated" | **True** |
+
+Both pages also record that an earlier draft printed "120 of 1,001", which is the
+self-correction the specification asks for. **The figures are right.**
+
+### Bundles and packs added to what carries volume. Verified against the catalogue.
+
+The brochure's new item: "Bundles and packs, $200.00 to $800.00 a month, 200 to 800 PV.
+The Manager Agent bundle at $200.00 and 200 PV; the Ignition Pack at $200.00 and 200 PV;
+the Momentum Pack at $400.00 and 400 PV; the Constellation Pack at $800.00 and 800 PV."
+
+Checked against `db\migrations\019_shop_to_comp_bridge.sql`:
+
+```
+('AGT-P-001', 'Ignition Pack',      'pack', 200.00, 200.00, null),
+('AGT-P-002', 'Momentum Pack',      'pack', 400.00, 400.00, null),
+('AGT-P-003', 'Constellation Pack', 'pack', 800.00, 800.00, null)
+```
+
+and the Manager Agent bundle at $200.00 per `faq.html`. **All four products exist, and
+every price and Personal Volume figure matches the seeded catalogue.** Each also obeys
+the brochure's own rule that Personal Volume equals the price in dollars.
+
+The incoherence is closed: the one-time example now reads "A $2,000.00 one-time purchase,
+which is what the Ignition Pack costs when it is bought once rather than monthly", and
+$200.00 a month over the ten-month recognition window is $2,000.00, recognised at 200
+Personal Volume a month. It reconciles.
+
+One inherited tension I record without grading, because it predates this commit and is
+disclosed on the page: `comp-plan.html`'s not-settled table still says "Version 1.3 of
+this plan recognises volume from the twelve individual agents only. Bundle, pack, and one
+time volume is not yet part of Sales Volume", while the brochure now lists bundles and
+packs under what carries volume. The brochure describes the plan whole and comp-plan
+draws the running line, which is exactly the difference both pages now disclose, so the
+two are consistent under their own stated division of labour.
+
+---
+
+## Regression checks on things a change could have disturbed
+
+| Check | Evidence | Result |
+|---|---|---|
+| Build clean after rebuild | 39 files, 1510 KB, sha256 `6d987e0b6be7adf9`; document page lint, name lint, secret scan, page registry, nav drift, theme boot, chrome sheet and currency mirror all pass | PASS |
+| 35 printed pages | Reprinted: **35 pages**, 612 by 792 points | PASS |
+| Printed total rows still appear once | Reprinted and searched all 35 pages: "Totals" twice, once per table, each under the last row it totals; "Layer one, fifteen lines" once. No duplicate footer | PASS, not disturbed |
+| Demonstration notice still on printed page 1 | Present, first tinted panel on the page | PASS |
+| Contrast floor, with the new bar and caption ink added | Recomputed over every SVG label: **6.30 to 1** at both 375 (383 runs) and 1280 (368 runs), zero below 4.5, zero below 6.30. New caption line sampled from the image at **8.58 to 1** | PASS, not disturbed |
+| Zero horizontal page overflow | 0 at 375, 559, 560, 768, 1024 and 1280 | PASS |
+| Pictures-only test | The only drawing changed is Figure 13's new phone layout, which I looked at and which is correct and complete. No existing drawing was altered, so the ruling from delta 1 stands | PASS, undisturbed |
+| Self-containment from `file://` with the network blocked | Zero resource entries, 18 figures, zero scripts | PASS |
+| "wide reach", "Instant Payout", "Howard", "Koziara", "Unicity", "version 2.0", "Supersedes" in the brochure | 0 each | PASS |
+| "second-team bonus" anywhere | 0 in both files | PASS |
+| No em or en dashes | 0 and 0 in both files | PASS |
+
+---
+
+## LOW defects remaining
+
+- **D12. One surviving "This version".** `plan-brochure.html`, printed page 34, the
+  refunds bullet under "WHAT THIS DOCUMENT DOES NOT COVER". Eight down to one, not to
+  zero. Change it to "The plan described here has no rule for reversing volume", matching
+  the three bullets beside it.
+- **D13. The companion page's address is not printed.** On paper the reader is told to
+  read "the Orvanna compensation plan page" but is given only orvanna.io, not
+  orvanna.io/comp-plan.html. One line in the footer would close it.
+- **D14. The two return links do not open a new tab**, while the sticky bar does. From a
+  saved file they replace the local document.
+- **D6, D7, D9, D10, D11 from delta 1 stand**, unchanged and unaddressed: the five colour
+  key still collapses in black and white (strokes 1.01 to 1.26 to 1, tints 1.004 to 1.044
+  to 1, computed); Figure 16's legend is still the one place the key is colour only; the
+  printed copy still has no page numbers; Figure 3 still opens on a cut word at 375; and
+  printed page 30 still ends in white space. I would ship over all of them.
+
+---
+
+## Deploy
+
+**YES.** Both documents are safe to publish as built at sha256 `6d987e0b6be7adf9`. The
+HIGH is closed in both directions, all four MEDIUMs are closed, the affordance renders at
+the strength claimed and I verified it by sampling pixels, the proration figures are
+right against the specification, and the bundles and packs are real products at the
+prices stated. What remains is eight LOW items, none of which misleads a reader.
+
+`plan-brochure.html` is now the strongest document on this property. The figure
+architecture is correct, the arithmetic reconciles to the cent, it prints to 35 clean
+pages, it survives being saved to a desktop with no network, and a reader who looks only
+at the drawings finishes with the plan and no wrong impression.
+
+## Standing checklist rows added by this gate
+
+- **Read every border side, not the top one.** My first probe of this affordance read
+  `borderTopWidth` and reported 1 pixel where the cue was an 8 pixel `border-right`. I
+  caught it and withdrew it before reporting, but the row is now permanent: when a cue is
+  described as an edge, measure the edge it names.
+- **An inset shadow on a scroll container is never a cue.** It paints under the content,
+  and any drawing with an opaque ground will hide it. Use a border, which paints above.
+- **A cue scoped by class is only as right as its classes.** When an affordance is
+  applied by `:not()` selectors rather than by measured overflow, re-check the mapping
+  every time a drawing is resized.
+- **A count claimed as "down to zero" gets counted.** This gate's was down to one.

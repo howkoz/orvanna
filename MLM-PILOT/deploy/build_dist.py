@@ -16,6 +16,7 @@ Run:  py deploy/build_dist.py
 """
 import hashlib
 import re
+from html.parser import HTMLParser
 import shutil
 import sys
 from pathlib import Path
@@ -415,17 +416,54 @@ DOCUMENT_PAGES = {"plan-brochure.html"}
 #   - xmlns                                a namespace name, never fetched
 # Everything else fails, whether or not anyone thought of it in advance.
 
-# Attributes that can cause a fetch. The allowlist is applied to their values.
-URL_ATTR_RE = re.compile(
-    r"""<(?P<tag>[a-zA-Z][\w:-]*)\b(?P<attrs>[^>]*)>""", re.S)
-URL_ATTR_PAIR_RE = re.compile(
-    r"""\b(?P<name>src|srcset|href|xlink:href|data|poster|background|action|"""
-    r"""formaction|cite|longdesc|manifest|profile|usemap|codebase|archive)"""
-    r"""\s*=\s*(?P<q>["'])(?P<val>.*?)(?P=q)""", re.S | re.I)
+# ROUND THREE, 2026-08-17. The allowlist POLICY was right; the PARSING was not.
+# The verifier probed the regex version and found six more ways past, and for
+# the first time they shared one root cause rather than being six new holes:
+#   <img src=https://...>            an UNQUOTED value, which the pair regex
+#                                    required quotes to see
+#   <img alt="width > height" src=…> a > inside an earlier quoted value, which
+#                                    terminated the tag regex early
+#   <meta http-equiv="refresh"       the address hides in `content`, which is
+#         content="0;url=…">         not a URL attribute by name
+#   <a ping="https://…">             same, in an attribute nobody listed
+#   <link imagesrcset="https://…">   same again
+#   <a href="comp-plan.html">        relative, and the anchor exemption was
+#                                    unconditional
+#
+# So the pattern matching is gone. A real HTML parser reads the tags, and the
+# allowlist is applied to EVERY attribute of every tag, which closes `content`,
+# `ping` and `imagesrcset` permanently rather than one name at a time.
+#
+# THE LAST ONE HAD THE MOST BITE and is worth stating plainly: the anchor
+# exemption let a RELATIVE link through, which is exactly the defect found by
+# hand on this page's two return links in this same round. Contract section 5A
+# rule 4 requires an absolute address precisely because a relative one dies the
+# moment the file is saved, and the lint written to enforce that rule did not
+# enforce it. An anchor may now leave for an absolute address; it may not point
+# at a neighbouring file that will not be there.
 
-# A value that fetches nothing from outside this file.
-SELF_CONTAINED_VALUE_RE = re.compile(
-    r"""^\s*(?:\#|data:|mailto:|tel:)""", re.I)
+# A value that fetches nothing from outside this file, whatever attribute it is in.
+SELF_CONTAINED_VALUE_RE = re.compile(r"""^\s*(?:\#|data:|mailto:|tel:)""", re.I)
+
+# An absolute address. Permitted only on an anchor: a reader choosing to leave
+# is not the page fetching anything.
+ABSOLUTE_URL_RE = re.compile(r"""^\s*https?://""", re.I)
+
+# Attributes whose value is a reference by definition, so ANY value that is not
+# self-contained fails, even one that does not look like a URL.
+URL_BEARING_ATTRS = {
+    "src", "srcset", "imagesrcset", "href", "xlink:href", "data", "poster",
+    "background", "action", "formaction", "cite", "longdesc", "manifest",
+    "profile", "usemap", "codebase", "archive", "ping", "content",
+}
+
+# Anything, in any attribute, that names somewhere else. Catches the address
+# hiding inside a meta refresh, and protocol-relative URLs.
+EMBEDDED_URL_RE = re.compile(r"""(?:[a-zA-Z][\w+.-]*://|(?<![:\w])//[\w.-]+\.)""")
+
+# `content` carries a URL only on a meta refresh; everywhere else it is prose,
+# so it is checked by EMBEDDED_URL_RE alone rather than as URL-bearing.
+CONTENT_IS_REFERENCE = ("refresh",)
 
 # CSS that fetches. url(#...) is a same-document filter or gradient reference.
 CSS_FETCH_RE = re.compile(
@@ -492,6 +530,66 @@ def page_registry_lint() -> None:
           f"{len(BUILD_GENERATED_PAGES)} build generated)")
 
 
+class _RefScanner(HTMLParser):
+    """Reads real HTML and applies the allowlist to every attribute.
+
+    Using a parser rather than a pattern is the whole point: the regex version
+    could not see an unquoted value and terminated a tag early on a `>` inside
+    an earlier quoted attribute. Both were found by probe, not by review.
+    """
+
+    def __init__(self, page_name: str):
+        super().__init__(convert_charrefs=True)
+        self.page = page_name
+        self.problems = []
+
+    def handle_starttag(self, tag, attrs):
+        line = self.getpos()[0]
+        attr_map = {(k or "").lower(): (v or "") for k, v in attrs}
+        for raw_name, raw_val in attrs:
+            aname = (raw_name or "").lower()
+            val = (raw_val or "").strip()
+            if not val or aname.startswith("xmlns"):
+                continue
+            if SELF_CONTAINED_VALUE_RE.match(val):
+                continue
+
+            # `content` is prose everywhere except on a meta refresh.
+            is_reference = aname in URL_BEARING_ATTRS
+            if aname == "content":
+                is_reference = any(
+                    k in attr_map.get("http-equiv", "").lower()
+                    for k in CONTENT_IS_REFERENCE)
+
+            embedded = EMBEDDED_URL_RE.search(val)
+            if not is_reference and not embedded:
+                continue
+
+            # A reader choosing to leave is not the page fetching anything,
+            # but the address must be absolute: a relative one dies the moment
+            # the file is saved. Contract 5A rule 4.
+            if tag == "a" and aname == "href":
+                if ABSOLUTE_URL_RE.match(val):
+                    continue
+                self.problems.append(
+                    f"{self.page}:{line}: <a href=\"{val[:60]}\"> is relative. "
+                    "A document page is saved and opened offline, where a "
+                    "relative link is dead. Use the absolute address.")
+                continue
+
+            self.problems.append(
+                f"{self.page}:{line}: <{tag} {aname}=\"{val[:60]}\"> reaches "
+                "outside the file. A document page must carry everything "
+                "inline so it still works saved to a desktop with no network.")
+
+
+def scan_document_refs(page_name: str, text: str) -> list:
+    scanner = _RefScanner(page_name)
+    scanner.feed(text)
+    scanner.close()
+    return scanner.problems
+
+
 def document_page_lint() -> None:
     """A document page must be genuinely self-contained.
 
@@ -508,21 +606,7 @@ def document_page_lint() -> None:
         if not page.is_file():
             continue
         text = page.read_text(encoding="utf-8", errors="ignore")
-        for tag_m in URL_ATTR_RE.finditer(text):
-            tag = tag_m.group("tag").lower()
-            for a in URL_ATTR_PAIR_RE.finditer(tag_m.group("attrs")):
-                val = a.group("val").strip()
-                if SELF_CONTAINED_VALUE_RE.match(val):
-                    continue
-                # A reader choosing to leave is not the page fetching anything.
-                if tag == "a" and a.group("name").lower() == "href":
-                    continue
-                line = text.count("\n", 0, tag_m.start()) + 1
-                problems.append(
-                    f"{name}:{line}: <{tag} {a.group('name')}=\"{val[:60]}\"> "
-                    "fetches from outside the file. A document page must carry "
-                    "everything inline so it still works saved to a desktop "
-                    "with no network.")
+        problems.extend(scan_document_refs(name, text))
         for m in CSS_FETCH_RE.finditer(text):
             line = text.count("\n", 0, m.start()) + 1
             problems.append(
