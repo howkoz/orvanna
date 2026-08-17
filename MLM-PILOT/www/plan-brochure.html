@@ -17,12 +17,10 @@
    Height utilities, if any are ever added, take a u- prefix
    and are used only on empty elements.
 
-   There are exactly two fixed heights in this file and neither
-   is on anything that can hold text:
-     .u-swatch                        16px, on empty spans
-     .figframe::-webkit-scrollbar      9px, on a scrollbar
+   There is exactly one fixed height in this file, .u-swatch at
+   16px, and it is applied only to empty spans in the colour key.
    A collapsed box that overlapped the next section is why this
-   rule exists, so any third one has to be justified here first.
+   rule exists, so any second one has to be justified here first.
    ============================================================ */
 
 :root {
@@ -301,6 +299,10 @@ tfoot td {
 /* A drawing laid out for a phone replaces the wide one below 560px, and
    the wide one always returns for paper. Neither ever sets a height. */
 .fig-narrow { display: none; }
+.scrollnote {
+  display: none; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ind); margin-bottom: var(--s1);
+}
 .fig-narrow svg { min-width: 0; max-width: none; }
 @media (max-width: 559px) {
   .fig-wide { display: none; }
@@ -309,15 +311,18 @@ tfoot td {
      say so without a word: the frame is drawn, the scrollbar is given a size
      and a colour so it stays visible instead of fading out, and the right edge
      is shaded so the drawing reads as continuing rather than as cut off. */
-  .figframe {
-    border: 1px solid var(--line); padding: 2px;
-    box-shadow: inset -16px 0 14px -13px rgba(16, 25, 43, 0.55);
+  .figframe { border: 1px solid var(--line); padding: 2px; }
+  /* Only the drawings that actually scroll are marked, and they are marked
+     twice: a solid bar down the edge the drawing continues past, which a
+     border paints above the drawing's own ground, and a line of words in the
+     caption. An inset shadow was tried first and rendered at 1.02 to 1,
+     because a scroll container paints its inset shadow under its content. */
+  .fig:not(.w340):not(.hasphone) .figframe {
+    border-right: 8px solid var(--ind);
     scrollbar-width: thin;
-    scrollbar-color: var(--muted) var(--band);
+    scrollbar-color: var(--ind) var(--band);
   }
-  .figframe::-webkit-scrollbar { height: 9px; }
-  .figframe::-webkit-scrollbar-track { background: var(--band); border-radius: 9px; }
-  .figframe::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 9px; }
+  .fig:not(.w340):not(.hasphone) .scrollnote { display: block; }
 }
 
 /* ---------------------------------------------- contents list */
@@ -442,6 +447,7 @@ tfoot td {
   /* Paper always gets the wide drawing, never the phone one. */
   .fig-wide { display: block; }
   .fig-narrow { display: none; }
+  .scrollnote { display: none; }
   a { color: #10192B; text-decoration: none; }
   .foot { padding: 14px 0 0; }
 }
@@ -508,6 +514,7 @@ tfoot td {
     <p class="kicker">Contents</p>
     <h2>What is in this document</h2>
     <p>Read it in order once. It gives you the words first, then the volume, then the single gate that decides whether anybody is paid at all, and only then the money. Each section opens with a drawing, and the words underneath the drawing say the same thing again, so nothing depends on your reading a picture correctly.</p>
+    <p>There is a companion page, <a href="https://orvanna.io/comp-plan.html">the Orvanna compensation plan page</a>. It covers the same plan and separates what is running today from what is only modelled. This document does not draw that line, so read that page for it.</p>
     <p class="small">Some of the drawings are wider than a phone screen. Those scroll sideways inside their own frame, and the page itself never does. On paper every drawing is fitted to the page.</p>
     <ol class="toc">
       <li><a href="#earn"><span class="tnum">1</span>How you earn, in one page</a></li>
@@ -547,7 +554,7 @@ tfoot td {
     <h2>How you earn, in one page</h2>
     <p class="lead">Orvanna sells artificial intelligence (AI) agents by subscription. Conductors subscribe to agents and introduce other people who do the same. The plan pays Conductors on the volume their organisation buys, through three layers that all draw from the same capped pot of money.</p>
 
-    <figure class="fig w880">
+    <figure class="fig w880 hasphone">
       <div class="figframe fig-wide">
       <svg viewBox="0 0 880 628" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f0t f0d">
         <title id="f0t">One order, followed all the way to every person it pays</title>
@@ -702,12 +709,12 @@ tfoot td {
         <text x="20" y="970" font-size="12.5" fill="#1F2937">paid of a 20.00 ceiling, with 5.20 never claimed.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 1</span><strong>What the drawing shows.</strong> One $100.00 order followed all the way to everybody it pays. The order carries 100 of Personal Volume, so 100.00 of Sales Volume, so 80.00 of Commissionable Volume, and its ceiling is 20.00. The buyer's sponsor, who holds Builder rank this month, is paid 8.00 of level pay at 10 percent and 1.60 of second-leg bonus at 2.0 percent, which is 9.60 in total. The person above that sponsor is paid 4.00 of level pay at 5 percent and 1.20 of Builder override at 1.5 percent, which is 5.20 in total. The buyer is paid nothing on their own order and nobody else is paid at all. Of the 20.00 ceiling, 14.80 is paid and 5.20 is never claimed by anybody. What it proves is the entire plan in one picture: several people are paid on one order, each for a different reason, and the sum of everything they receive is held below 20 percent of the price by the arithmetic that calculates it.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 1</span><strong>What the drawing shows.</strong> One $100.00 order followed all the way to everybody it pays. The order carries 100 of Personal Volume, so 100.00 of Sales Volume, so 80.00 of Commissionable Volume, and its ceiling is 20.00. The buyer's sponsor, who holds Builder rank this month, is paid 8.00 of level pay at 10 percent and 1.60 of second-leg bonus at 2.0 percent, which is 9.60 in total. The person above that sponsor is paid 4.00 of level pay at 5 percent and 1.20 of Builder override at 1.5 percent, which is 5.20 in total. The buyer is paid nothing on their own order and nobody else is paid at all. Of the 20.00 ceiling, 14.80 is paid and 5.20 is never claimed by anybody. What it proves is the entire plan in one picture: several people are paid on one order, each for a different reason, and the sum of everything they receive is held below 20 percent of the price by the arithmetic that calculates it.</figcaption>
     </figure>
 
     <p>That is the whole plan in one order. The rest of this document explains each of the four payments, why each person qualified for it, and what happens when the ceiling is reached.</p>
 
-    <figure class="fig w640">
+    <figure class="fig w640 hasphone">
       <div class="figframe fig-wide">
       <svg viewBox="0 0 640 404" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f1t f1d">
         <title id="f1t">The three earning layers and the ceiling they share</title>
@@ -784,7 +791,7 @@ tfoot td {
         <text x="36" y="512" font-size="11.5" fill="#1F2937">layer 1 left behind on that order.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 2</span><strong>What the drawing shows.</strong> A single order of $100.00 carries 80.00 of Commissionable Volume and can never pay more than 20.00 in total. Level pay draws on that 20.00 first and is always paid in full. The Builder override draws on what remains. The second-leg bonus draws on what is left after that. What it proves is that the three layers are not three separate budgets: they share one capped amount per order, so adding layers cannot raise what the order costs the company.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 2</span><strong>What the drawing shows.</strong> A single order of $100.00 carries 80.00 of Commissionable Volume and can never pay more than 20.00 in total. Level pay draws on that 20.00 first and is always paid in full. The Builder override draws on what remains. The second-leg bonus draws on what is left after that. What it proves is that the three layers are not three separate budgets: they share one capped amount per order, so adding layers cannot raise what the order costs the company.</figcaption>
     </figure>
 
     <h3>The plan in six sentences</h3>
@@ -851,7 +858,7 @@ tfoot td {
         <text x="388" y="248" font-size="12.5" fill="#4B5563">The person above YOU is your <tspan font-weight="700" fill="#10192B">SPONSOR</tspan>.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 3</span><strong>What the drawing shows.</strong> You sit at the top. A, B and C are your frontline, the people you personally enrolled, and they sit at level 1. D sits under A at level 2, and E sits under D at level 3. A, D and E together form one leg. Everybody below you at any depth is your downline. What it proves is that level, leg and frontline are three different things measured on the same chart: level counts distance downward, frontline counts only the row you enrolled yourself, and a leg is a whole branch treated as one unit.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 3</span><strong>What the drawing shows.</strong> You sit at the top. A, B and C are your frontline, the people you personally enrolled, and they sit at level 1. D sits under A at level 2, and E sits under D at level 3. A, D and E together form one leg. Everybody below you at any depth is your downline. What it proves is that level, leg and frontline are three different things measured on the same chart: level counts distance downward, frontline counts only the row you enrolled yourself, and a leg is a whole branch treated as one unit.</figcaption>
     </figure>
 
     <h3>The terms this plan uses</h3>
@@ -937,7 +944,7 @@ tfoot td {
         <text x="36" y="418" font-size="13.5" fill="#1F2937">20 percent of the $100.00 price</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 4</span><strong>What the drawing shows.</strong> A $100.00 domain agent carries 100 Personal Volume, because Personal Volume always equals the price in dollars. Everything booked to the account that month adds into Sales Volume. Commissionable Volume is 80 percent of Sales Volume, so 80.00 here, and that 80.00 is what every percentage in the plan is applied to. The order's ceiling is 20.00. What it proves is that a rate quoted in this plan is smaller in real money than it looks: 10 percent of Commissionable Volume is 8 percent of the price.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 4</span><strong>What the drawing shows.</strong> A $100.00 domain agent carries 100 Personal Volume, because Personal Volume always equals the price in dollars. Everything booked to the account that month adds into Sales Volume. Commissionable Volume is 80 percent of Sales Volume, so 80.00 here, and that 80.00 is what every percentage in the plan is applied to. The order's ceiling is 20.00. What it proves is that a rate quoted in this plan is smaller in real money than it looks: 10 percent of Commissionable Volume is 8 percent of the price.</figcaption>
     </figure>
 
     <h3>Why 80 percent and not 100</h3>
@@ -948,12 +955,13 @@ tfoot td {
     <ul>
       <li><strong>Domain agents, $100.00 a month, 100 PV.</strong> Payment Agent, Shipping Agent, Pricing Agent, Inventory Agent, Marketing Agent, Tax Agent.</li>
       <li><strong>Support agents, $50.00 a month, 50 PV.</strong> Software Engineer, Quality Assurance, Secretary, Chief Executive, Accounting, Customer Care.</li>
+      <li><strong>Bundles and packs, $200.00 to $800.00 a month, 200 to 800 PV.</strong> The Manager Agent bundle at $200.00 and 200 PV; the Ignition Pack at $200.00 and 200 PV; the Momentum Pack at $400.00 and 400 PV; the Constellation Pack at $800.00 and 800 PV. A bundle or pack carries its own Personal Volume once, not the volume of the agents inside it. Bought once instead of monthly, each costs ten times its monthly price and carries ten times its monthly Personal Volume.</li>
       <li><strong>Customer purchases.</strong> An order placed by a customer through a referring Conductor books to that Conductor's account, and its full Personal Volume counts in that Conductor's Sales Volume.</li>
     </ul>
     <p>A subscription grants its Personal Volume every month it is active. Cancel it and the volume stops from the cancellation month forward. Months already billed keep their volume.</p>
 
     <div class="note warn">
-      <p><strong>One-time purchases are recognised across ten months.</strong> Volume bought once, rather than as a monthly subscription, is recognised at one tenth a month for ten months. A $2,000.00 one-time purchase arrives as 200 PV a month for ten months, not 2,000 in a single month. This rule exists so that no single large purchase can lift somebody's volume or their team's volume into a rank for one month.</p>
+      <p><strong>One-time purchases are recognised across ten months.</strong> Volume bought once, rather than as a monthly subscription, is recognised at one tenth a month for ten months. A $2,000.00 one-time purchase, which is what the Ignition Pack costs when it is bought once rather than monthly, arrives as 200 PV a month for ten months, not 2,000 in a single month. This rule exists so that no single large purchase can lift somebody's volume or their team's volume into a rank for one month.</p>
     </div>
   </div>
 </section>
@@ -1014,7 +1022,7 @@ tfoot td {
         <text x="20" y="426" font-size="12.5" font-weight="700" fill="#10192B">Either way, your volume still pays your upline in full.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 5</span><strong>What the drawing shows.</strong> Three ordinary ways to reach 100.00 of Sales Volume feed one gate, and the gate asks a single question. Passing it lets you be paid on all three layers and makes your leg count as active for your sponsor. Failing it means no commission at all that month, no active leg, and no rank above Member. What it proves is that missing qualification costs the person who missed it and nobody else: their volume still pays everybody above them exactly as if they had qualified.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 5</span><strong>What the drawing shows.</strong> Three ordinary ways to reach 100.00 of Sales Volume feed one gate, and the gate asks a single question. Passing it lets you be paid on all three layers and makes your leg count as active for your sponsor. Failing it means no commission at all that month, no active leg, and no rank above Member. What it proves is that missing qualification costs the person who missed it and nobody else: their volume still pays everybody above them exactly as if they had qualified.</figcaption>
     </figure>
 
     <h3>The rules of the gate</h3>
@@ -1039,7 +1047,7 @@ tfoot td {
     <h2>The organisation every example uses</h2>
     <p class="lead">Every worked example from here to the end of this document uses the same ten person organisation, so you never have to learn a new cast. It is drawn once, here, with each person's volume on them.</p>
 
-    <figure class="fig w880">
+    <figure class="fig w880 hasphone">
       <div class="figframe fig-wide">
       <svg viewBox="0 0 880 456" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f5t f5d">
         <title id="f5t">The ten person organisation used by every example</title>
@@ -1177,7 +1185,7 @@ tfoot td {
         <text x="20" y="791" font-size="11.5" fill="#4B5563">Total Commissionable Volume 2,160.00.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 6</span><strong>What the drawing shows.</strong> Ten Conductors in one organisation. M1 is at the top and sponsors M2, M3 and M4. M2 sponsors M5 and M6. M3 sponsors M7 and M8. M5 sponsors M9, and M8 sponsors M10. M1 holds Leader and reaches three levels, M3 holds Builder and reaches two, and everybody else is a Member reaching one. M5 and M10 sold only 50.00 each, so they are not qualified. The whole group sold 2,700.00 of Sales Volume, which is 2,160.00 of Commissionable Volume. What it proves is nothing on its own: it is the fixed cast that every later example is computed on, so that any figure in this document can be traced back to one picture.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 6</span><strong>What the drawing shows.</strong> Ten Conductors in one organisation. M1 is at the top and sponsors M2, M3 and M4. M2 sponsors M5 and M6. M3 sponsors M7 and M8. M5 sponsors M9, and M8 sponsors M10. M1 holds Leader and reaches three levels, M3 holds Builder and reaches two, and everybody else is a Member reaching one. M5 and M10 sold only 50.00 each, so they are not qualified. The whole group sold 2,700.00 of Sales Volume, which is 2,160.00 of Commissionable Volume. What it proves is nothing on its own: it is the fixed cast that every later example is computed on, so that any figure in this document can be traced back to one picture.</figcaption>
     </figure>
 
     <div class="panel">
@@ -1237,7 +1245,7 @@ tfoot td {
         <text x="20" y="336" font-size="12.5" fill="#4B5563">Level 1 is worth as much as levels 2 and 3 combined.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 7</span><strong>What the drawing shows.</strong> The five level rates applied to one source with 80.00 of Commissionable Volume: level 1 pays 10 percent, which is 8.00; levels 2 and 3 pay 5 percent each, which is 4.00 each; level 4 pays 3 percent, which is 2.40; level 5 pays 2 percent, which is 1.60. The bars are drawn in proportion to the rates. What it proves is that level 1 is worth as much as levels 2 and 3 combined, and that the five rates add to exactly 25 percent of Commissionable Volume, which is the 20.00 ceiling and not a cent more.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 7</span><strong>What the drawing shows.</strong> The five level rates applied to one source with 80.00 of Commissionable Volume: level 1 pays 10 percent, which is 8.00; levels 2 and 3 pay 5 percent each, which is 4.00 each; level 4 pays 3 percent, which is 2.40; level 5 pays 2 percent, which is 1.60. The bars are drawn in proportion to the rates. What it proves is that level 1 is worth as much as levels 2 and 3 combined, and that the five rates add to exactly 25 percent of Commissionable Volume, which is the 20.00 ceiling and not a cent more.</figcaption>
     </figure>
 
     <h3>The rule</h3>
@@ -1266,7 +1274,7 @@ tfoot td {
 
     <h3>Depth: what your rank reaches</h3>
 
-    <figure class="fig w700">
+    <figure class="fig w700 hasphone">
       <div class="figframe fig-wide">
       <svg viewBox="0 0 700 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f7t f7d">
         <title id="f7t">Paid depth by rank</title>
@@ -1374,7 +1382,7 @@ tfoot td {
         <text x="20" y="345" font-size="11.5" fill="#4B5563">reach is paid to nobody.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 8</span><strong>What the drawing shows.</strong> Which levels each rank is paid on. A Member is paid on level 1 only. A Builder adds level 2, a Leader level 3, a Director level 4, and an Executive reaches all five. The rate on each level, 10, 5, 5, 3 and 2 percent, is identical for every rank. What it proves is that promotion in this plan buys reach and not rate: moving from Member to Builder does not add a cent to what you earn on your frontline, it opens a new row of people underneath them.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 8</span><strong>What the drawing shows.</strong> Which levels each rank is paid on. A Member is paid on level 1 only. A Builder adds level 2, a Leader level 3, a Director level 4, and an Executive reaches all five. The rate on each level, 10, 5, 5, 3 and 2 percent, is identical for every rank. What it proves is that promotion in this plan buys reach and not rate: moving from Member to Builder does not add a cent to what you earn on your frontline, it opens a new row of people underneath them.</figcaption>
     </figure>
 
     <h3>Worked, every step: depth</h3>
@@ -1391,7 +1399,7 @@ tfoot td {
     <p>Now change one thing and nothing else. You are a plain Member instead of a Builder, so your reach is one level. C is out of reach. You earn 120.00 + 8.00 = <strong>128.00</strong>, and the 2.00 is breakage: it is not pushed to the person above you, and it is not held for later.</p>
 
     <div class="note stop">
-      <p><strong>There is no compression in this version of the plan.</strong> If somebody in your line is unqualified, the people below them do not slide up into their place. An unqualified person is a wall in the organisation, not a hole. Whatever their level would have paid is paid to nobody.</p>
+      <p><strong>There is no compression in the plan this document describes.</strong> If somebody in your line is unqualified, the people below them do not slide up into their place. An unqualified person is a wall in the organisation, not a hole. Whatever their level would have paid is paid to nobody.</p>
     </div>
   </div>
 </section>
@@ -1467,7 +1475,7 @@ tfoot td {
         <text x="20" y="414" font-size="12.5" fill="#4B5563">Nadia is paid on her own group by level pay, exactly as before; the override is additional and sits above her.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 9</span><strong>What the drawing shows.</strong> An illustration with round figures. Nadia holds Builder rank and her group volume is 1,000.00. The walk starts at Nadia and moves upward. Owen is not qualified, so he is passed over: he is paid nothing and the counter stays at 0. Priya is qualified with the counter at 0, so she takes the first-generation override, 1.5 percent of 1,000.00, which is 15.00, and because Priya holds Builder the counter becomes 1. Quinn is qualified with the counter at 1, so Quinn takes the second-generation override, 1.0 percent of 1,000.00, which is 10.00, and because Quinn holds Builder the counter becomes 2 and the walk stops. Rosa is paid nothing on Nadia. What it proves is that the two generations are marked out by Builders and not by levels, and that an unqualified person neither earns nor blocks: the override passes over them to the next qualified person.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 9</span><strong>What the drawing shows.</strong> An illustration with round figures. Nadia holds Builder rank and her group volume is 1,000.00. The walk starts at Nadia and moves upward. Owen is not qualified, so he is passed over: he is paid nothing and the counter stays at 0. Priya is qualified with the counter at 0, so she takes the first-generation override, 1.5 percent of 1,000.00, which is 15.00, and because Priya holds Builder the counter becomes 1. Quinn is qualified with the counter at 1, so Quinn takes the second-generation override, 1.0 percent of 1,000.00, which is 10.00, and because Quinn holds Builder the counter becomes 2 and the walk stops. Rosa is paid nothing on Nadia. What it proves is that the two generations are marked out by Builders and not by levels, and that an unqualified person neither earns nor blocks: the override passes over them to the next qualified person.</figcaption>
     </figure>
 
     <h3>No breakaway: developing a Builder never costs you volume</h3>
@@ -1500,7 +1508,7 @@ tfoot td {
         <text x="20" y="296" font-size="12.5" fill="#4B5563">Groups nest: a Builder inside your group stays inside it, and inside your sponsor's group too.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 10</span><strong>What the drawing shows.</strong> The top bar is how the older breakaway style of plan behaves: when somebody below you is promoted, their group is taken out of yours and your volume falls. The lower bars are this plan: nothing is ever removed, your group keeps every Conductor at every depth, and the override on the new Builder's group is added on top. What it proves is that there is no rank anybody below you can reach that costs you a single unit of volume, so the plan never gives you a reason to hold somebody back.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 10</span><strong>What the drawing shows.</strong> The top bar is how the older breakaway style of plan behaves: when somebody below you is promoted, their group is taken out of yours and your volume falls. The lower bars are this plan: nothing is ever removed, your group keeps every Conductor at every depth, and the override on the new Builder's group is added on top. What it proves is that there is no rank anybody below you can reach that costs you a single unit of volume, so the plan never gives you a reason to hold somebody back.</figcaption>
     </figure>
 
     <h3>Worked, every step, in the ten person organisation</h3>
@@ -1576,7 +1584,7 @@ tfoot td {
         <text x="20" y="370" font-size="12.5" fill="#4B5563">An active leg is a real qualified person, so the steps cannot be reached by buying anything.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 11</span><strong>What the drawing shows.</strong> An illustration with round figures. On the left, a Conductor with a single leg of 1,000 volume has no second-strongest leg, so the bonus is nothing at all. On the right, the same total volume split into a leg of 600 and a leg of 400 has a second-strongest leg of 400, so with two active legs the bonus is 2.0 percent of 400, which is 8.00. The three boxes underneath show the rate stepping to 2.3 percent at three active legs and 2.5 percent at four or more. What it proves is that concentrating everything into one leg pays nothing extra by construction, and that the step in the rate is reached only by having more real qualified people, not by moving volume around.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 11</span><strong>What the drawing shows.</strong> An illustration with round figures. On the left, a Conductor with a single leg of 1,000 volume has no second-strongest leg, so the bonus is nothing at all. On the right, the same total volume split into a leg of 600 and a leg of 400 has a second-strongest leg of 400, so with two active legs the bonus is 2.0 percent of 400, which is 8.00. The three boxes underneath show the rate stepping to 2.3 percent at three active legs and 2.5 percent at four or more. What it proves is that concentrating everything into one leg pays nothing extra by construction, and that the step in the rate is reached only by having more real qualified people, not by moving volume around.</figcaption>
     </figure>
 
     <h3>Two details a careful reader will ask about</h3>
@@ -1631,7 +1639,7 @@ tfoot td {
         <text x="36" y="345" font-size="12.5" fill="#1F2937">Adding genuinely new people to a weaker leg is different: that raises the amount rather than dividing it.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 12</span><strong>What the drawing shows.</strong> The same 1,200 of downline volume arranged three ways, with the second-strongest leg shaded in each case because that is the leg the bonus is paid on. Two legs of 600 pay 2.0 percent of 600, which is 12.00. Three legs of 400 pay 2.3 percent of 400, which is 9.20. Four legs of 300 pay 2.5 percent of 300, which is 7.50. What it proves is that the step in the rate never catches up with the fall in the amount it is applied to, so there is no arrangement of existing volume worth chasing the step for, and no reason for anybody to buy anything at the end of a month to cross a threshold.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 12</span><strong>What the drawing shows.</strong> The same 1,200 of downline volume arranged three ways, with the second-strongest leg shaded in each case because that is the leg the bonus is paid on. Two legs of 600 pay 2.0 percent of 600, which is 12.00. Three legs of 400 pay 2.3 percent of 400, which is 9.20. Four legs of 300 pay 2.5 percent of 300, which is 7.50. What it proves is that the step in the rate never catches up with the fall in the amount it is applied to, so there is no arrangement of existing volume worth chasing the step for, and no reason for anybody to buy anything at the end of a month to cross a threshold.</figcaption>
     </figure>
 
     <div class="tframe">
@@ -1668,8 +1676,8 @@ tfoot td {
     <h2>The rank ladder</h2>
     <p class="lead">Five ranks. Each one is recomputed from scratch every month, and each one is defined by what your organisation did that month, not by what you bought.</p>
 
-    <figure class="fig w700">
-      <div class="figframe">
+    <figure class="fig w700 hasphone">
+      <div class="figframe fig-wide">
       <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f11t f11d">
         <title id="f11t">The rank ladder as a climb</title>
         <desc id="f11d">Member requires enrolment only and reaches one level. Builder requires a qualified month and two or more active legs and reaches two levels. Leader requires a qualified month, Team Volume of two thousand five hundred or more, and three or more active legs, and reaches three levels. Director requires a qualified month, Team Volume of ten thousand or more, and two or more legs each containing a Builder or above, and reaches four levels. Executive requires a qualified month, Team Volume of forty thousand or more, and two or more legs each containing a Leader or above, and reaches five levels.</desc>
@@ -1698,7 +1706,40 @@ tfoot td {
         <text x="20" y="404" font-size="12.5" fill="#4B5563">Builder rank is also what triggers the override in section seven for the people above you.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 13</span><strong>What the drawing shows.</strong> The five ranks as a climb, with the requirement for each one printed on its rung and the number of levels it reaches. Member needs only enrolment and reaches one level. Builder needs a qualified month and two or more active legs, and reaches two. Leader needs a qualified month, Team Volume of 2,500.00 or more and three or more active legs, and reaches three. Director needs a qualified month, Team Volume of 10,000.00 or more and two or more legs each containing a Builder or above, and reaches four. Executive needs a qualified month, Team Volume of 40,000.00 or more and two or more legs each containing a Leader or above, and reaches five. What it proves is that every rung above Member requires other people to be active, so no rank in this plan can be reached by spending money on yourself.</figcaption>
+      <div class="fig-narrow">
+      <svg viewBox="0 0 340 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="f11nt f11nd">
+        <title id="f11nt">The rank ladder as a climb</title>
+        <desc id="f11nd">Member requires enrolment only and reaches one level. Builder requires a qualified month and two or more active legs and reaches two levels. Leader requires a qualified month, Team Volume of two thousand five hundred or more, and three or more active legs, and reaches three levels. Director requires a qualified month, Team Volume of ten thousand or more, and two or more legs each containing a Builder or above, and reaches four levels. Executive requires a qualified month, Team Volume of forty thousand or more, and two or more legs each containing a Leader or above, and reaches five levels.</desc>
+        <rect x="0" y="0" width="340" height="460" fill="#FFFFFF"/>
+
+        <polygon points="14,360 28,360 28,300 42,300 42,240 56,240 56,162 70,162 70,84 84,84 84,360" fill="#F0F3F8"/>
+
+        <rect x="14" y="308" width="312" height="52" rx="7" fill="#F0F3F8" stroke="#10192B" stroke-width="2"/>
+        <text x="28" y="329" font-size="12.5" font-weight="700" fill="#10192B">MEMBER, reaches 1 level</text>
+        <text x="28" y="348" font-size="11.5" fill="#1F2937">enrolled, nothing else required</text>
+        <rect x="28" y="248" width="298" height="52" rx="7" fill="#E8ECF9" stroke="#2A3E9E" stroke-width="2.75"/>
+        <text x="42" y="269" font-size="12.5" font-weight="700" fill="#10192B">BUILDER, reaches 2 levels</text>
+        <text x="42" y="288" font-size="11.5" fill="#1F2937">qualified, 2 or more active legs</text>
+        <rect x="42" y="170" width="284" height="70" rx="7" fill="#F0F3F8" stroke="#10192B" stroke-width="2"/>
+        <text x="56" y="191" font-size="12.5" font-weight="700" fill="#10192B">LEADER, reaches 3 levels</text>
+        <text x="56" y="210" font-size="11.5" fill="#1F2937">qualified, Team Volume 2,500.00 or more,</text>
+        <text x="56" y="227" font-size="11.5" fill="#1F2937">3 or more active legs</text>
+        <rect x="56" y="92" width="270" height="70" rx="7" fill="#F0F3F8" stroke="#10192B" stroke-width="2"/>
+        <text x="70" y="113" font-size="12.5" font-weight="700" fill="#10192B">DIRECTOR, reaches 4 levels</text>
+        <text x="70" y="132" font-size="11.5" fill="#1F2937">qualified, Team Volume 10,000.00+,</text>
+        <text x="70" y="149" font-size="11.5" fill="#1F2937">2+ legs each holding a Builder or above</text>
+        <rect x="70" y="14" width="256" height="70" rx="7" fill="#F0F3F8" stroke="#10192B" stroke-width="2"/>
+        <text x="84" y="35" font-size="12.5" font-weight="700" fill="#10192B">EXECUTIVE, reaches 5 levels</text>
+        <text x="84" y="54" font-size="11.5" fill="#1F2937">qualified, Team Volume 40,000.00+,</text>
+        <text x="84" y="71" font-size="11.5" fill="#1F2937">2+ legs each holding a Leader or above</text>
+
+        <text x="20" y="388" font-size="11.5" fill="#4B5563">Every requirement on a rung must be met in the</text>
+        <text x="20" y="405" font-size="11.5" fill="#4B5563">same month, and you hold the highest rung you meet.</text>
+        <text x="20" y="427" font-size="11.5" fill="#4B5563">Builder rank is also what triggers the override in</text>
+        <text x="20" y="444" font-size="11.5" fill="#4B5563">section seven for the people above you.</text>
+      </svg>
+      </div>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 13</span><strong>What the drawing shows.</strong> The five ranks as a climb, with the requirement for each one printed on its rung and the number of levels it reaches. Member needs only enrolment and reaches one level. Builder needs a qualified month and two or more active legs, and reaches two. Leader needs a qualified month, Team Volume of 2,500.00 or more and three or more active legs, and reaches three. Director needs a qualified month, Team Volume of 10,000.00 or more and two or more legs each containing a Builder or above, and reaches four. Executive needs a qualified month, Team Volume of 40,000.00 or more and two or more legs each containing a Leader or above, and reaches five. What it proves is that every rung above Member requires other people to be active, so no rank in this plan can be reached by spending money on yourself.</figcaption>
     </figure>
 
     <h3>Every requirement, in full</h3>
@@ -1789,13 +1830,14 @@ tfoot td {
         <text x="34" y="424" font-size="12.5" font-weight="700" fill="#10192B">Nothing is left, so every override and bonus claim on that order is paid 0.00.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 14</span><strong>What the drawing shows.</strong> The upper bar is M8's month from the worked example: a $100.00 order, 80.00 of Commissionable Volume, a ceiling of 20.00. Level pay draws 12.00 of it, the Builder override draws 1.20, the second-leg bonus draws 1.60, and 5.20 is never claimed by anybody. Three layers and four separate payments fit inside one ceiling with room to spare. The lower bar is the opposite case: an order with five qualified people above it in reach gives the entire 20.00 to level pay, which leaves nothing, so every override and bonus claim on that order is paid zero. What it proves is that the ceiling is not a monitoring policy applied afterwards. It is the arithmetic the payments are calculated by, so no combination of ranks, depths or organisation shapes can push an order past 20 percent of its price.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 14</span><strong>What the drawing shows.</strong> The upper bar is M8's month from the worked example: a $100.00 order, 80.00 of Commissionable Volume, a ceiling of 20.00. Level pay draws 12.00 of it, the Builder override draws 1.20, the second-leg bonus draws 1.60, and 5.20 is never claimed by anybody. Three layers and four separate payments fit inside one ceiling with room to spare. The lower bar is the opposite case: an order with five qualified people above it in reach gives the entire 20.00 to level pay, which leaves nothing, so every override and bonus claim on that order is paid zero. What it proves is that the ceiling is not a monitoring policy applied afterwards. It is the arithmetic the payments are calculated by, so no combination of ranks, depths or organisation shapes can push an order past 20 percent of its price.</figcaption>
     </figure>
 
     <h3>What this means for you</h3>
     <div class="note good">
       <p><strong>Your level pay is never reduced.</strong> Level pay is senior to everything and always fits inside the ceiling, so no override and no bonus anywhere in the organisation can ever take a cent off it.</p>
       <p><strong>The two bonus layers share what the ceiling leaves.</strong> On an order where level pay has already taken most of the ceiling, override and bonus claims are reduced in proportion, and on a heavily covered order they can be reduced to nothing.</p>
+      <p><strong>How often a bonus line is reduced.</strong> Measured across the modelled runs, 154 of the 641 Conductor-months that carried any volume were reduced on at least one layer: 24.0 percent, or roughly one in four. It is not rare. Your level pay is never among them.</p>
       <p><strong>You will always be shown why.</strong> Where a bonus line has been reduced, your statement prints the amount claimed, the amount paid, and a plain reason: this order reached its 20 percent ceiling, and the bonus layers shared what remained. A reduced line is never shown as a bare number.</p>
     </div>
   </div>
@@ -1849,7 +1891,7 @@ tfoot td {
         <text x="34" y="334" font-size="12.5" font-weight="700" fill="#10192B">A's check falls by exactly 3.60, which is the override on B, to the cent.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 15</span><strong>What the drawing shows.</strong> Four people: A sponsors B, and B sponsors C and D. Each holds one $100.00 agent, so each has 80.00 of Commissionable Volume. In month one B has two active legs and therefore holds Builder rank, so A is paid 8.00 of level pay plus a 3.60 override on B's group volume of 240.00, and B is paid 16.00 of level pay plus a 1.60 bonus on the second-strongest leg. In month two C cancels. B is still qualified but now has one active leg, so B is not a Builder, and A's override disappears. A is paid 8.00 and B is paid 8.00. What it proves is that A's entire month-over-month loss is exactly the override, 3.60 and not a cent more or less. The plan puts a precise price on keeping the people below you active, and it puts that price in front of the person best placed to help.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 15</span><strong>What the drawing shows.</strong> Four people: A sponsors B, and B sponsors C and D. Each holds one $100.00 agent, so each has 80.00 of Commissionable Volume. In month one B has two active legs and therefore holds Builder rank, so A is paid 8.00 of level pay plus a 3.60 override on B's group volume of 240.00, and B is paid 16.00 of level pay plus a 1.60 bonus on the second-strongest leg. In month two C cancels. B is still qualified but now has one active leg, so B is not a Builder, and A's override disappears. A is paid 8.00 and B is paid 8.00. What it proves is that A's entire month-over-month loss is exactly the override, 3.60 and not a cent more or less. The plan puts a precise price on keeping the people below you active, and it puts that price in front of the person best placed to help.</figcaption>
     </figure>
 
     <h3>What is recalculated, and what that means</h3>
@@ -1857,7 +1899,7 @@ tfoot td {
       <li><strong>Ranks are recomputed every month</strong> from that month's volume and legs, so the set of Builders is recomputed every month, so the override boundaries and the people who receive overrides are recomputed every month.</li>
       <li><strong>Legs are re-ranked every month</strong>, so which leg is second-strongest, and the rate step that goes with the count of active legs, are recomputed every month.</li>
       <li><strong>There is no carryover.</strong> Volume that did not pay in one month does not roll into the next. There is nothing banked to be lost and nothing banked to be chased.</li>
-      <li><strong>There are no grace months</strong> in this version of the plan. A month that misses a requirement misses it.</li>
+      <li><strong>There are no grace months</strong> in the plan this document describes. A month that misses a requirement misses it.</li>
     </ul>
 
     <div class="note warn">
@@ -1924,7 +1966,7 @@ tfoot td {
         <text x="34" y="369" font-size="12.5" font-weight="700" fill="#10192B">Company pays 299.36 in total. Four of the ten Conductors are paid.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 16</span><strong>What the drawing shows.</strong> The four checks the month produces, drawn to scale and split by layer. M1 is paid 146.96, made of 114.00 of level pay, 21.00 of Builder override and 11.96 of second-leg bonus. M3 is paid 132.40, made of 130.00 of level pay and 2.40 of bonus. M2 is paid 16.00 and M8 is paid 4.00, both entirely level pay. The other six Conductors are paid nothing at all. The company pays 299.36 in total. What it proves is the honest shape of the plan: level pay is by far the largest part of every check, the two additional layers are meaningful but modest, and in a small organisation most Conductors are paid nothing, because most Conductors have nobody in reach below them.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 16</span><strong>What the drawing shows.</strong> The four checks the month produces, drawn to scale and split by layer. M1 is paid 146.96, made of 114.00 of level pay, 21.00 of Builder override and 11.96 of second-leg bonus. M3 is paid 132.40, made of 130.00 of level pay and 2.40 of bonus. M2 is paid 16.00 and M8 is paid 4.00, both entirely level pay. The other six Conductors are paid nothing at all. The company pays 299.36 in total. What it proves is the honest shape of the plan: level pay is by far the largest part of every check, the two additional layers are meaningful but modest, and in a small organisation most Conductors are paid nothing, because most Conductors have nobody in reach below them.</figcaption>
     </figure>
 
     <h3>Step one: volume and qualification</h3>
@@ -2093,7 +2135,7 @@ tfoot td {
         <text x="20" y="596" font-size="11.5" fill="#4B5563">Every line is a percentage of Commissionable Volume, rounded once on its own line. The total is the sum of the rounded lines.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 17</span><strong>What the drawing shows.</strong> M1's whole month as a statement, every line printed and the total reconciled on the drawing. Nine lines of level pay come to 114.00. One Builder override line, 1.5 percent of Builder M3's group volume of 1,400.00, comes to 21.00. One second-leg bonus line, 2.3 percent of the M2 leg's 520.00, comes to 11.96. The three add to 146.96. What it proves is that a Conductor's statement is readable line by line: every line names who the volume came from, what rate was applied and to what figure, and the total is simply the lines added up, with no adjustment applied afterwards that a Conductor cannot see.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 17</span><strong>What the drawing shows.</strong> M1's whole month as a statement, every line printed and the total reconciled on the drawing. Nine lines of level pay come to 114.00. One Builder override line, 1.5 percent of Builder M3's group volume of 1,400.00, comes to 21.00. One second-leg bonus line, 2.3 percent of the M2 leg's 520.00, comes to 11.96. The three add to 146.96. What it proves is that a Conductor's statement is readable line by line: every line names who the volume came from, what rate was applied and to what figure, and the total is simply the lines added up, with no adjustment applied afterwards that a Conductor cannot see.</figcaption>
     </figure>
 
     <p>The company paid <strong>299.36</strong> on <strong>2,160.00</strong> of Commissionable Volume, which is <strong>13.86 percent</strong> of Commissionable Volume, or <strong>11.09 percent</strong> of the 2,700.00 that came in the door. Four of the ten Conductors were paid. The structural ceiling on this month, 25 percent of 2,160.00, was 540.00, so the plan paid a little over half of what its own rates could describe.</p>
@@ -2155,7 +2197,7 @@ tfoot td {
         <text x="20" y="350" font-size="12.5" fill="#4B5563">Each of these is structural: it is absent from the arithmetic, not merely forbidden by a rule.</text>
       </svg>
       </div>
-      <figcaption><span class="fignum">Figure 18</span><strong>What the drawing shows.</strong> Six things the plan never pays for, each one crossed through. Nothing is paid for recruiting or enrolling. No rank can be bought, because every rank above Member requires other qualified people. Your own purchases qualify you and pay your upline but never pay you. There is no placement tree, so no position can be sold or awarded. Nothing is banked between months. And no order pays more than 20 percent of its price. What it proves is that each of these is structural rather than a policy: the arithmetic has no term for any of them, so there is nothing to enforce and nothing to make an exception to.</figcaption>
+      <figcaption><span class="scrollnote">Scrolls sideways inside its frame</span><span class="fignum">Figure 18</span><strong>What the drawing shows.</strong> Six things the plan never pays for, each one crossed through. Nothing is paid for recruiting or enrolling. No rank can be bought, because every rank above Member requires other qualified people. Your own purchases qualify you and pay your upline but never pay you. There is no placement tree, so no position can be sold or awarded. Nothing is banked between months. And no order pays more than 20 percent of its price. What it proves is that each of these is structural rather than a policy: the arithmetic has no term for any of them, so there is nothing to enforce and nothing to make an exception to.</figcaption>
     </figure>
 
     <h3>The same list, with the reason for each</h3>
@@ -2166,8 +2208,8 @@ tfoot td {
       <li><strong>No placement tree, no spillover and no purchased positions.</strong> Legs are the real sponsorship organisation, exactly as it happened. There is nowhere to place anybody strategically, no spillover to wait for, and no position that can be handed to somebody or sold.</li>
       <li><strong>No carryover and no banking.</strong> Volume that did not pay this month does not accumulate. That removes the end-of-month buying that plans with carryover produce, and it also means nobody is ever told that a balance they were promised has expired.</li>
       <li><strong>No payment above the ceiling.</strong> The 20 percent limit is applied inside the calculation, per order, before anything is paid. It is not a target that is reviewed later and corrected. That is what makes it safe to add layers to this plan without the cost of the plan drifting upward as the organisation grows.</li>
-      <li><strong>No compression, in this version.</strong> An unqualified person is a wall in the organisation rather than a hole: the people below them do not slide up into their place. This is stated here rather than buried, because it is the rule most likely to surprise somebody who has read other plans.</li>
-      <li><strong>No retail commission on customer sales, in this version.</strong> Customer volume books to the referring Conductor's account, counts toward their qualification and pays their upline. There is no separate retail margin paid on top of that.</li>
+      <li><strong>No compression.</strong> An unqualified person is a wall in the organisation rather than a hole: the people below them do not slide up into their place. This is stated here rather than buried, because it is the rule most likely to surprise somebody who has read other plans.</li>
+      <li><strong>No retail commission on customer sales.</strong> Customer volume books to the referring Conductor's account, counts toward their qualification and pays their upline. There is no separate retail margin paid on top of that.</li>
     </ul>
 
     <div class="note good">
@@ -2238,18 +2280,18 @@ tfoot td {
 
     <h3>How the rules change, and when</h3>
     <ul>
-      <li>This document is the statement of the plan. Where any other page or summary disagrees with it, this document governs.</li>
+      <li>This document explains the plan. It does not govern any other page, it settles no disagreement with one, and it retires nothing. Where it differs from the compensation plan page, that difference is not decided here.</li>
       <li>Rule changes take effect at the start of a stated calendar month and are never applied to a month that has already been calculated.</li>
       <li>Every month's calculation is versioned. A recalculation never edits a closed month: it produces a new numbered calculation, and the previous one is kept, so every statement can be traced to the exact calculation that produced it.</li>
       <li>All money in this plan is held to two decimal places. Rounding happens in exactly two places: once when Commissionable Volume is taken as 80 percent of Sales Volume, and once on each commission line. Totals are the sums of already rounded lines and are never rounded a second time.</li>
     </ul>
 
-    <h3>What this version of the plan does not cover</h3>
+    <h3>What this document does not cover</h3>
     <ul>
       <li><strong>Refunds and reversals.</strong> This version has no rule for reversing volume or reclaiming commission after a refund. A rule will be published before refunds are introduced.</li>
-      <li><strong>Compression.</strong> Not part of this version. An unqualified person is a wall in the organisation, as stated in sections six and thirteen.</li>
-      <li><strong>Grace months and rank retention.</strong> Not part of this version. Every rank is recomputed monthly with no retention and no highest-ever title.</li>
-      <li><strong>Disbursement.</strong> This plan calculates statements. It does not describe a method of payment, and no payment is made.</li>
+      <li><strong>Compression.</strong> Not part of the plan described here. An unqualified person is a wall in the organisation, as stated in sections six and thirteen.</li>
+      <li><strong>Grace months and rank retention.</strong> Not part of the plan described here. Every rank is recomputed monthly with no retention and no highest-ever title.</li>
+      <li><strong>Disbursement.</strong> The plan described here calculates statements. It does not describe a method of payment, and no payment is made.</li>
     </ul>
 
     <h3>Document details</h3>
@@ -2265,8 +2307,9 @@ tfoot td {
 
 <footer class="foot">
   <div class="wrap">
-    <p><strong>The Orvanna Compensation Plan, illustrated.</strong> This document is the complete statement of the three earning layers it describes. It carries no version number and no effective date.</p>
+    <p><strong>The Orvanna Compensation Plan, illustrated.</strong> This document explains the three earning layers it describes. It governs nothing. It carries no version number and no effective date.</p>
     <p>Orvanna is a demonstration company and no money is paid to anybody under this plan. No income is promised or implied. See section fifteen.</p>
+    <p>The companion page, which separates what is running today from what is only modelled, is <a href="https://orvanna.io/comp-plan.html">the Orvanna compensation plan page</a>.</p>
     <p>The demonstration site is at orvanna.io.</p>
   </div>
 </footer>

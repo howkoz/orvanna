@@ -381,3 +381,425 @@ Per my charter, rows that should have caught something get written down permanen
 - **Labels in a shared column inherit the heading above them.** Any stack of labels at one left edge must be read as heading-and-body, whatever the author intended.
 - **A demonstration marker must survive the print stylesheet.** Anything inside `no-print` does not exist on paper.
 - **A figure whose meaning is its overall shape must fit the narrowest supported width.** Sideways scrolling is acceptable for sequences and ledgers, never for silhouettes.
+
+---
+---
+
+# DELTA GATE: commit `88cea04`, 2026-08-17
+
+- **Commit graded:** `88cea04` ("Fix round: seven HIGH closed, three rulings applied, and a lint that five things walked past")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\` built by `py deploy\build_dist.py`, bundle sha256 `f161d60e2f42f944`, 39 files, 1503 KB, served over Hypertext Transfer Protocol (HTTP) from `deploy\dist`
+- **Grader:** mlm-qa, a fresh grader replacing the one whose session was lost. Read-only toward the product. Nothing was fixed.
+- **Date:** 2026-08-17
+
+## VERDICT: FAIL
+
+## DEPLOY: NO
+
+One HIGH remains. Every one of the seven HIGH defects this commit claimed to close
+**is closed, and I confirmed each by looking at the rendered result**, not by reading
+the source. Both wrong statements are corrected. The 20 percent ceiling is now
+consistent across both documents. But the supersession this commit removed from the
+cover stamps **survives in prose one page earlier in the same section**, and it points
+the opposite way to the two sentences on `comp-plan.html` that say a different document
+governs. That is the same defect class as the last gate's H1, and my charter grades a
+false claim in a touched document HIGH on its own.
+
+The fix is two sentences. Nothing else on this page needs to change.
+
+---
+
+## How this was graded
+
+The Browser pane again would not composite frames, exactly as last session. Rather than
+fall back to reading the Document Object Model (DOM), which my standing lesson says is
+not visual proof, I drove a real Chrome over the Chrome DevTools Protocol (CDP). I
+looked at:
+
+- all eighteen drawings at 1280, captured per figure;
+- all eighteen drawings at 375 with mobile emulation on, captured at the clipped frame
+  width so the capture is what a phone reader actually sees;
+- Chrome's own print output, rendered back to images at 110 dots per inch, all 35 pages
+  as a contact sheet and four pages full size;
+- four printed pages and two figures converted to greyscale, to test the document's own
+  promise that nothing depends on telling colours apart;
+- the page loaded from `file://` with every host blocked at the resolver and a dead
+  proxy, to test self-containment.
+
+Every number below that I state as measured, I measured in this session. Where a
+measurement of mine turned out to be wrong I say so and withdraw it.
+
+---
+
+## The seven closed HIGH defects, verified one by one
+
+| # | Claim | How I checked it | Result |
+|---|---|---|---|
+| 1 | Version, date, supersession stamps gone; section fifteen says so | Zero occurrences of "version 2.0", "1 September 2026", "Supersedes" in either file. Cover now carries the chips "Demonstration document" and "Read start to finish", **looked at, rendered**. Printed page 35: "This document carries no version number and no effective date. It states no start date and retires nothing." | **CLOSED**, but see HIGH D1 |
+| 2 | The false sameness claim rewritten; vocabulary unified | Note **rendered and read**: it now names the one difference, that comp-plan separates a running part one from a modelled part two while the companion presents the plan whole. "Conductor" 51 in the brochure, "second-leg bonus" 30; "second-team bonus" now 0 in both files. All 44 visible-text occurrences of "Member" in the brochure individually read: every one is the rank name | **CLOSED** |
+| 3 | Printed tables no longer repeat their total row | `tfoot { display: table-row-group }` present under `@media print`. **Verified on paper:** printed page 26 ends "Totals 2,700.00 / 2,160.00" directly under M10, the last row it totals. Printed page 27 carries "Layer one, fifteen lines 264.00" once, under the fifteenth line. Printed page 28 carries the ceiling table's "Totals" once. No total appears twice anywhere in 35 pages | **CLOSED** |
+| 4 | Demonstration notice on printed page 1 | **Looked at printed page 1.** The notice sits directly under the cover subtitle, in a tinted panel with a rule, above the contents: "Orvanna is a demonstration company. Its products, its Conductors and the organisations shown in this document are not real, and no money is paid to anybody under this plan." Legible in greyscale | **CLOSED** |
+| 5 | Qualification figure rebuilt with two labelled branches and arrowheads | **Looked at Figure 5** at 1280 and on paper in greyscale. Two stubs leave the gate, each labelled YES and NO in bold, each carrying an arrowhead, each landing on its own box. In black and white the branches are still unambiguous, because the labels carry the meaning and the colours no longer do | **CLOSED** |
+| 6 | Vocabulary figure definitions moved to their own panel | **Looked at Figure 3.** LEVEL 2 and LEVEL 3 now sit on short leader lines pointing at the D and E boxes. The downline and sponsor definitions sit in a separate bordered panel on the right. Nothing reads as heading-and-body any more | **CLOSED** |
+| 7 | Phone layouts for the two broken figures; scrolling frames 13 to 11 | **Looked at Figure 6 at 375:** an indented outline tree with M1 at the top, on screen, all ten Conductors present, nothing clipped. **Looked at Figure 8 at 375:** transposed to rank rows, all five ranks visible at once, the widening silhouette intact. Measured: 11 of the 14 visible frames scroll at 375, down from 13. Page overflow zero at 375, 768, 1024 and 1280 | **CLOSED**, but see MEDIUM D2 and D3 |
+
+### The two wrong statements
+
+- **"Level 1 pays twice what any other level pays"** is gone. Figure 7 now reads
+  "Level 1 is worth as much as levels 2 and 3 combined", which is true. **CLOSED.**
+- **Figure 1's ceiling label** now reads "Ceiling, 20% of the price 20.00", matching the
+  cover's 20 percent and Figure 4's "20 percent of the $100.00 price". Figure 7
+  reconciles the two bases on the drawing: "All five together: 25 percent of CV =
+  20.00 = 20 percent of the $100.00 price". **CLOSED.**
+
+### Earlier MEDIUM and LOW items also closed
+
+- **M5, unlabelled bar segments in Figure 16.** Both are now labelled on leader lines
+  above their segments, 11.96 and 2.40. Looked at. **CLOSED.**
+- **L1, the M5 and M6 box collision in Figure 6.** Gone; every sibling pair now has a
+  gap. Looked at. **CLOSED.**
+- **L2, inverted colour discipline between sections seven and eight.** Section
+  `layer2` now carries plain indigo panels and section `layer3` carries the teal
+  `note lit`. **CLOSED.**
+- **L5, wrong contract section in two source comments.** Both now cite section 5A.
+  **CLOSED.**
+- **L6, no address on paper.** The printed footer now reads "The demonstration site is
+  at orvanna.io." on page 35. **Partly closed**; still no page numbers.
+
+---
+
+## HIGH defect
+
+### D1. The supersession survived the edit. It is now a governance clause, and the two documents point at each other
+
+**Location:** `www/plan-brochure.html`, section fifteen, printed page 34, under the
+heading "HOW THE RULES CHANGE, AND WHEN". Also `www/comp-plan.html` lines 632 and 2836.
+
+The brochure says, as the first sentence of that subsection:
+
+> This document is the statement of the plan. Where any other page or summary disagrees
+> with it, this document governs.
+
+One printed page later, under "DOCUMENT DETAILS", the same section says:
+
+> This document carries no version number and no effective date. It states no start date
+> and retires nothing.
+
+A document that governs over every other page does, on every point of disagreement,
+retire the other page's reading. The two sentences are three inches apart on paper and
+they do not agree.
+
+It matters because **the two documents do disagree, and this commit says so in writing.**
+The new link note on `comp-plan.html`, which I read rendered, states the one remaining
+difference: comp-plan keeps the plan that runs today separate from the two layers that
+are only modelled, and the brochure presents the plan as one piece without drawing that
+line. Under the brochure's governance clause, the brochure's reading wins. That reinstates
+the Builder override and the second-leg bonus as governing rules over comp-plan's
+statement that they are "modelled and verified in a laboratory and are not part of the
+live plan" and that "No Conductor has been paid one cent by either layer". It is the
+substance of "Supersedes version 1.3" with the number taken out.
+
+And the site now points in a circle. `comp-plan.html` says, twice:
+
+> If a number here disagrees with a number anywhere else, the compensation plan booklet
+> is the document that governs.
+
+> Which document governs. The compensation plan booklet is the single statement of this
+> plan that Conductors are given. ... where any wording differs, the booklet and its
+> version stamp govern.
+
+There is no compensation plan booklet on this site. I searched: "booklet" appears five
+times, all in `comp-plan.html`, three of them as this governing document and two saying
+the Builder extension "has no field name and no booklet". `plan-brochure.html` uses the
+word zero times. If the booklet is meant to be the brochure, then "the booklet **and its
+version stamp** govern" became unsatisfiable the moment this commit removed the version
+stamp, and it is a false statement in a file this commit changed. If the booklet is meant
+to be something else, then comp-plan defers to a document that does not exist while the
+brochure claims the role for itself.
+
+**Why HIGH.** My charter grades a false claim in a touched document HIGH on its own,
+and `comp-plan.html` is a touched document. Beyond that, this is the surviving half of
+the defect the previous gate raised as H1 and this commit reports as closed. The stamps
+were removed; the prose that does the same work was not audited. Both gates have to run
+again on whatever ships, so it is worth doing once and completely.
+
+**What I would ship.** Delete "Where any other page or summary disagrees with it, this
+document governs" and keep "This document is the statement of the plan" only if the
+brochure also says which document draws the running-versus-modelled line. On
+`comp-plan.html`, replace both "the compensation plan booklet" sentences with a name
+that exists. Then re-print and re-read page 34.
+
+---
+
+## MEDIUM defects
+
+### D2. The phone scroll affordance is claimed as three cues; one renders, and it does not distinguish a scrolling frame from a fitting one
+
+**Location:** `www/plan-brochure.html`, the `@media (max-width: 559px)` block, `.figframe`.
+
+The source names three cues and says they work "without a word": the frame is drawn, the
+scrollbar is given a size and a colour so it stays visible, and the right edge is shaded
+so the drawing reads as continuing. Measured at 375 with mobile emulation:
+
+| Cue | What I measured | Verdict |
+|---|---|---|
+| 1 pixel border | Present on all 14 visible frames | Renders, but also on the 3 frames that do not scroll (Figures 4, 5 and 7), so it does not mean "there is more to the right" |
+| Right-edge shading | On an empty band inside Figure 4's frame, mean luminance falls from 254.9 to a minimum of 252.3 out of 255. That is a contrast of about **1.02 to 1** | Does not render as a visible cue |
+| Sized, coloured scrollbar | `offsetHeight - clientHeight - border` is **0 on every one of the 14 frames**. Chrome reserves no track and paints an overlay scrollbar, which is invisible until the reader has already scrolled. Real mobile Chrome and Safari behave the same way | Does not render until after the action it is meant to prompt |
+
+The `inset -16px 0 14px -13px` shadow places its darkening about 22 to 36 pixels in from
+the right edge, not at the edge, and at that offset it is a 1 percent luminance step. The
+commit's "all 14 remaining frames gained a visible affordance where there had been none"
+is materially overstated: what a phone reader gains is a hairline border.
+
+I note for the record that my first probe of this looked for a pseudo-element or a
+background image and found none. **That probe was wrong and I withdraw it**; the shading
+is a box shadow and it is declared. It simply does not render at a visible strength.
+
+### D3. Figure 13 still clips the rank thresholds on a phone
+
+**Location:** Figure 13, at 375 the frame scrolls 327 pixels.
+
+Only Figures 6 and 8 were given phone layouts. **Looked at Figure 13 at 375:** the
+visible column reads "EXECUTIVE, reaches 5 le", "qualified, Team Volume 40,0",
+"DIRECTOR, reaches 4 levels", "qualified, Team Volume 10,000.00+", "qualified, Team
+Volume 2,500.00 or more, 3". The three ranks whose requirements a reader most wants are
+the three whose requirements are cut. The staircase shape survives, which is why this is
+MEDIUM and not HIGH, and the caption restates every threshold in words. The previous gate
+called this borderline MEDIUM and it is unchanged.
+
+### D4. "This version of the plan" appears eight times in a document that says it has no version
+
+**Location:** `www/plan-brochure.html`, eight occurrences, including the section fifteen
+heading **"WHAT THIS VERSION OF THE PLAN DOES NOT COVER" on printed page 34**, one page
+before "This document carries no version number".
+
+Examples: "There is no compression in this version of the plan", "There are no grace
+months in this version of the plan", "This version has no rule for reversing volume",
+"Not part of this version". Ruling 1 removed the stamps and rewrote section fifteen's
+closing bullets, but the prose that depends on a version identity was not swept. The
+phrase now has no referent, and the reader this document is written for is exactly the
+reader who will ask which version.
+
+### D5. There is still no way back from the brochure, and the brochure never mentions the document it came from
+
+**Location:** `www/plan-brochure.html`. The whole file contains exactly two external
+links, both `https://orvanna.io/`. It contains the strings "modelled", "not operating",
+"laboratory", "companion" and "comp-plan" **zero times each**.
+
+So the one document that draws the running-versus-modelled line is unreachable from the
+one that does not, and the lighter document never tells the reader the heavier one
+exists. This was M4 last gate and it is unchanged. It is also what makes D1 bite: the
+brochure claims to govern over a page it never names.
+
+---
+
+## LOW defects
+
+- **D6. The five colour key on the contents page still collapses in black and white.**
+  I computed the greyscale separation of every pair, from the declared hex values, using
+  Web Content Accessibility Guidelines relative luminance. Strokes: green `#0B5D3B` vs
+  blue `#2A3E9E` **1.16 to 1**, teal `#0F5F6E` vs red `#A62020` **1.01 to 1**, amber
+  `#7A4A06` vs red **1.01 to 1**, the whole set spanning **1.01 to 1.26 to 1**. Tints:
+  **1.004 to 1.044 to 1**. On a monochrome printer the key is five identical grey squares
+  beside five different sentences. The document anticipates this in prose; the key itself
+  still does not degrade.
+- **D7. Figure 16 is the last place where the key is colour only.** In greyscale the
+  three legend swatches and the three segments of M1's bar are identical greys, and the
+  mapping survives only by left-to-right order. Figure 14 solved the identical problem
+  with wording, "drawn first / drawn next / drawn last", and Figure 16 did not adopt it.
+  Every amount is printed on the drawing, so the arithmetic is not at risk; only the
+  layer names are. **Looked at, in greyscale, both figures.**
+- **D8. A true, quantified Instant Payout statement was removed and its number now
+  appears nowhere.** The old anti-gaming note said that once Instant Payout is built the
+  worked example returns 42.00 on a self-funded first order of 150.00, "28 cents on the
+  dollar, above 20". The replacement sentence is true but qualitative. Section ten's new
+  note names the conflict without naming its size. "28 percent" and "28 cents" now appear
+  nowhere on the site. I would put the number back into section ten's note.
+- **D9. The printed copy has no page numbers.** 35 pages, no folio on any of them. The
+  site address now prints once, on page 35.
+- **D10. Figure 3 opens clipped on a phone.** At 375 the first thing visible is the top
+  box cut to "YO", the frontline label cut to "LEVEL 1, you", and the definitions panel
+  entirely off screen. Nothing is misfiled and nothing is wrong, but the vocabulary
+  figure's first impression on a phone is a cut word.
+- **D11. Printed page 30 ends with roughly 45 percent white space** because Figure 18
+  will not split, which is correct behaviour. It is the worst instance of a pattern that
+  costs perhaps three quarters of a page across the document. Cosmetic.
+
+---
+
+## RULING: the pictures-only reader
+
+### PASS.
+
+This is the bar the page was built to and it now clears it. I re-ran the test by looking
+at all eighteen drawings at 1280, then all eighteen at 375, then a sample in greyscale on
+paper, reading only the drawings and the text inside them.
+
+**Coverage** is complete, as it was last gate: the order to volume to Commissionable
+Volume to ceiling chain, the three layers and their rates, the vocabulary, the gate, the
+cast, the five level rates, what each rank reaches, the generation walk, no breakaway,
+the second leg and why splitting loses, the rank ladder, when the ceiling binds, the
+month over month loss, the four checks, one full statement, and the never-pays list.
+
+**All six wrong readings that failed this test last gate are closed:**
+
+| # | Last gate's wrong reading | State now |
+|---|---|---|
+| 1 | Figure 3 taught that level 2 means downline and level 3 means sponsor | Definitions in their own panel; LEVEL 2 and LEVEL 3 on leader lines to the boxes they name |
+| 2 | Figure 5 landed the failing branch on the "qualified" box | Two labelled branches with arrowheads, each on its own box; holds in greyscale |
+| 3 | Figure 7 said inside the drawing that level 1 pays twice any other level | Now "Level 1 is worth as much as levels 2 and 3 combined" |
+| 4 | Figure 1 labelled the ceiling 25 percent of CV against the cover's 20 percent | Now "Ceiling, 20% of the price 20.00"; Figure 7 reconciles both bases on the drawing |
+| 5 | On a phone Figure 6 showed an organisation with no top | Phone tree with M1 at the top and all ten present |
+| 6 | On a phone Figure 8 showed a plan with two ranks | Phone layout with all five ranks on screen |
+
+**No new wrong reading is available.** The nearest candidate is D7: in black and white,
+Figure 16's three layer names can only be assigned by order. That mis-assigns a label,
+not a fact, because every amount is printed on the drawing and the total reconciles
+either way. It does not overturn the ruling.
+
+The figure architecture is the strongest thing on this page and it is now correct.
+
+---
+
+## RULING: the ceiling across both documents
+
+### CONSISTENT, in both directions. No contradiction found.
+
+- The brochure states the ceiling as 20 percent of the price on the cover, in Figure 1,
+  in Figure 4, in Figure 7 (reconciling 25 percent of Commissionable Volume to 20 percent
+  of price), in Figure 14 and in Figure 18, where it prints "No order ever pays more than
+  20 percent of its price, whatever the organisation looks like."
+- `comp-plan.html` now states it absolutely in every place it appears: "That ceiling has
+  no exception. It holds on every order, at every rank, in every shape of organisation";
+  Law B reads "No order can ever pay out more than 20 percent of its price"; the layer
+  diagram reads "THE CEILING: 20 PERCENT OF THE PRICE. NO ORDER CROSSES IT." I read every
+  one of the 31 surviving "Instant Payout" occurrences and every "20 percent", "twenty
+  percent" and "exception" in the file.
+- The brochure contains "Instant Payout" zero times, so it makes no claim about it in
+  either direction.
+- Eleven exception statements were removed and I found **no true statement about Instant
+  Payout deleted except one**, D8, the 28 cents on the dollar figure. Every other removal
+  was a carve-out from the ceiling, which is exactly what the ruling required.
+
+### The builder's judgement call on the new comp-plan note: RIGHT CALL.
+
+The note reads: "How this sits against the 20 percent ceiling, which is one of the two
+reasons it is not built. The ceiling in section four is the plan's central promise and
+it has no exception: no order pays out more than 20 percent of its price. The terms above
+were approved separately and have never been reconciled with that promise, and until they
+are, nothing computes an Instant Payout and nobody is paid one."
+
+I rendered it in light theme and read it on screen. It is right for four reasons:
+
+1. **It does not edit approved terms to fit a document.** The rate, the basis and the
+   caps were approved on 2026-08-15. Quietly changing them so the arithmetic stopped
+   embarrassing the ceiling would have been the worse call by a distance.
+2. **It flags the conflict before the reader meets it.** The stop-note at the top of
+   section ten now names both open gates, and says the second is taken up at the end of
+   the section. The reader hits the 30.00 arithmetic already knowing it is unreconciled.
+3. **It converts an unresolved contradiction into a named build gate**, alongside refund
+   recovery, and the same wording is mirrored in the not-settled table.
+4. **Nothing is wrong today**, because Instant Payout computes nothing and pays nobody,
+   and the note says exactly that.
+
+The one improvement is D8: put the 28 percent back, so the reader learns the size of the
+gap and not only that a gap exists.
+
+---
+
+## Printed findings, stated plainly
+
+- **35 pages**, United States Letter, 612 by 792 points. Claim confirmed.
+- **The demonstration notice is on page 1**, prominent, above the contents, legible in
+  greyscale.
+- **No total row repeats.** Verified by reading pages 25 to 29 line by line and searching
+  all 35 pages for duplicate totals. The defect that would have done the most damage is
+  gone.
+- **Table headers repeat.** Pages 27 and 28 each open with their table's repeated header
+  row.
+- **No figure splits.** `.fig`, `.panel`, `.note` and `figcaption` all carry
+  `break-inside: avoid`. Confirmed on a contact sheet of all 35 pages and on four pages
+  at full size.
+- **Tables do split**, three of them, which is correct for tables longer than a page and
+  is what the print stylesheet intends. Rows never split. I record this because the
+  earlier checklist row was worded "no table split", which was the wrong test.
+- **The sticky bar is gone with no reserved space.** Page 1 begins at the normal margin.
+- **Readable in black and white.** Four pages converted to greyscale and read. Figures 5
+  and 8 in particular now carry their meaning without colour.
+
+## Phone results, stated plainly
+
+- Zero horizontal page overflow at 375, 768, 1024 and 1280.
+- 11 of 14 visible drawing frames scroll sideways at 375, down from 13. Two at 768. None
+  at 1024 or 1280.
+- Figures 1, 2, 6 and 8 have purpose-built phone layouts and each one is correct: I
+  looked at all four.
+- Figure 13 still clips its thresholds (D3). Figure 3 opens on a cut word (D10).
+- The affordance for the 11 scrolling frames is a hairline border and nothing else that
+  renders (D2).
+
+## Contrast, recomputed independently
+
+I recomputed rather than accepting the claim. Walking every `<text>` and `<tspan>` in
+every Scalable Vector Graphics (SVG) drawing, taking each label's fill, finding the
+topmost painted shape whose bounding box contains the label's centre, compositing that
+shape's fill and every alpha above it down through the DOM background stack to the page:
+
+| Width | Text runs measured | Floor | Below 4.5 to 1 | Below 6.3 to 1 |
+|---|---|---|---|---|
+| 375 | 378 | **6.30 to 1** | 0 | 0 |
+| 1280 | 368 | **6.30 to 1** | 0 | 0 |
+
+The floor is the "when they are promoted" label in Figure 10, red `#A62020` on the red
+tint `#FBE9E9`, at 6.30. The next four are grey `#4B5563` labels on the indigo and red
+tints at 6.40 to 6.45. Plain panel labels composite at **6.79**. **The 6.30 claim and
+the 6.79 composited claim are both confirmed by my own computation.** My run counts
+fewer text nodes than the commit's 495 because I skip `<text>` elements that only wrap
+`<tspan>` children, to avoid double counting.
+
+## Other checks
+
+| Check | Evidence | Result |
+|---|---|---|
+| Build clean, document page lint passes | "document page lint: 1 document page(s) carry no external references"; 39 files, 1503 KB, sha256 `f161d60e2f42f944` | PASS |
+| Self-containment from `file://` with the network blocked | Copied the built file to a scratch folder, launched Chrome with `MAP * 127.0.0.1:1` and a dead proxy, loaded over `file://`: `performance.getEntriesByType('resource')` returned `[]`, 18 figures, 20 sized SVGs, full 45,150 pixel height, cover styling intact | PASS |
+| Zero scripts | `document.querySelectorAll('script').length === 0` on the served page and the saved file | PASS |
+| Sticky bar opens a new tab and survives being saved to a desktop | Both links `https://orvanna.io/`, absolute, `target="_blank"`, `rel="noopener noreferrer"`, still correct when loaded from `file://` | PASS |
+| "wide reach", "Instant Payout", "Howard" absent from the brochure | 0, 0, 0. Also 0 for "Koziara" and "Unicity" | PASS |
+| The rules and the numbers really are the same | Rank thresholds, paid depth, level rates 10/5/5/3/2, override 1.5 and 1.0, bonus 2.0/2.3/2.5, gate at 100.00 Sales Volume and the 20 percent ceiling all cross-checked between the two files | PASS, the link note's claim is true |
+| Cold arrival: whose plan, what it is, how to reach the site | Cover names Orvanna International, states the business, states it is a demonstration; sticky bar reaches the site; printed footer gives orvanna.io | PASS on screen and on paper |
+| comp-plan renders after the edits | Zero horizontal overflow, 20 figures, the layer diagram closes cleanly where the exception line was removed, the new note renders correctly in light theme | PASS |
+
+---
+
+## Re-gate requirements
+
+Both gates must run again on the exact artifact that ships. For my gate to pass I need:
+
+1. **D1 resolved.** The governance sentence removed or reconciled, and `comp-plan.html`'s
+   two "compensation plan booklet" sentences pointed at a document that exists.
+2. **D4 resolved.** The eight "this version" phrases swept, starting with the section
+   fifteen heading on printed page 34.
+3. Section fifteen re-printed and re-read on paper after both.
+4. D2, D3 and D5 addressed or accepted with a reason on the record.
+
+Nothing else. Items D6 to D11 are LOW and I would ship over them.
+
+## Standing checklist rows added by this gate
+
+- **Removing a stamp does not remove a claim.** When a version, date or supersession is
+  taken off a cover, search the whole document for every sentence whose meaning depends
+  on the identity that was removed: "this version", "governs", "supersedes", "effective",
+  "the current". Read each one aloud against the new cover.
+- **Two documents on one site may not both claim precedence.** Whenever a page asserts
+  which document governs, find every other page that asserts the same thing and check
+  that the arrows point the same way and at a document that exists.
+- **A claimed affordance must be measured as rendered, not as declared.** A box shadow
+  in the stylesheet is not a cue until its luminance step is measured; a styled scrollbar
+  is not a cue until `offsetHeight - clientHeight` proves the browser reserved space for
+  it.
+- **A one-way link is a defect in the lighter document, not the heavier one.** If page A
+  links to page B and B is the shorter read, B must name A and be able to return to it.
+- **A legend of coloured swatches needs a word.** Where one figure solves greyscale with
+  ordering words, every sibling figure with the same legend must adopt them.
