@@ -1692,3 +1692,79 @@ print. The coordinator applied a remedy I under-tested.
   across `<text>` elements, so a phrase can be plainly visible on the page and absent from
   the file as a searchable string. Strip markup, or read the printed Portable Document
   Format (PDF) text, before claiming any wording is gone.
+
+---
+
+# Re-gate 3, 2026-08-17: commit `f16c2ed`
+
+- **Commit graded:** `f16c2ed` ("Close the widow the last remedy caused")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\plan-brochure.html`, bundle sha256 `bc422be1ab83f8e8`, printed through Chrome's own pipeline over the Chrome DevTools Protocol (CDP) at US Letter, with the `2b20e11` baseline printed alongside
+- **Scope:** the pagination ruleset and every page boundary. The document was not re-graded.
+
+## VERDICT: PASS
+
+## DEPLOY: YES
+
+## The five properties, every boundary, both builds
+
+| # | Property | Baseline `2b20e11` | **This commit `f16c2ed`** |
+|---|---|---|---|
+| 1 | Printed pages | 37 | **37** |
+| 2 | Kicker orphans | 2, on pages 6 and 35 | **0** |
+| 3 | Rules travelling with their kicker | 18 of 18 | **18 of 18** |
+| 4 | Widows | none | **none** |
+| 5 | Blocks that must stay whole and split | 0 | **0** |
+
+The page 8 to 9 boundary that failed last round: page 8 now ends on a complete paragraph and
+the whole section three opener, rule, kicker, heading and lead, sits together on page 9.
+No figure, table or panel touches a page edge anywhere in the document.
+
+28 of 37 printed pages are byte-identical to the baseline at 110 dots per inch. The 9 that
+moved (5 to 10 and 35 to 37) were audited on all five properties with zero findings.
+
+## Does this converge? Yes, and for a structural reason, not because the numbers came out clean
+
+The three rounds were not three separate defects. They were three seams in one chain, taken
+in order:
+
+| Round | What it protected | The seam it left open |
+|---|---|---|
+| `dccf12e` | the kicker's outer edge, `break-after` | the kicker's **inner** edge: its rule split away from its text |
+| `33db578` | the kicker's inner edge, `break-inside` | the **lead below it**: its last word split away |
+| `f16c2ed` | the lead, `break-inside` | **none left** |
+
+The section opener is now an unbreakable chain end to end: `.kicker` cannot break inside or
+after it, `h2` cannot break after it, and `.lead` cannot break inside it. There is no
+remaining sub-part to strand, and what follows a lead is always either a figure, a panel or
+a table, all of which already carry their own break rules, or an ordinary paragraph, which is
+supposed to break. That is why this round is different in kind from the two before it, and it
+is the reason I will say it converges rather than only that it passed.
+
+## Residual risk, named
+
+1. **Page 22 is the nearest thing left to a widow.** It opens with "people at the head of each
+   leg pays nothing.", one carried line measuring 207 points, about 40 percent of the measure.
+   It is a full clause and not a stranded word, and it is present unchanged in the baseline, so
+   it is pre-existing and out of this gate's scope. It sits just above my 200 point flag
+   threshold. If a zero-carryover document is ever wanted, that is the one line to look at, and
+   it needs its own print gate.
+2. **Ordinary body paragraphs are still unprotected, and Chrome is permissive here.** Measured
+   this round: setting `orphans: 2; widows: 2` changed nothing, so the effective floor is low.
+   No paragraph widows today. The guard is process, not more CSS: run the five-property audit
+   on any content change, which is now a standing row.
+3. **The pressure point for the next edit is pages 8 to 10.** Page 9 has 48 points of room left
+   below its last line, one of the three tightest in the document, and the opener above it is
+   now a single atomic block of roughly 120 points. Anything inserted before it will move that
+   block whole to page 10 rather than reflowing it. That is the correct behaviour and not a
+   defect, but it means the next content edit in sections one to three will repaginate visibly
+   and should be printed, not eyeballed. **Do not respond to that by adding another break rule.**
+   The chain is complete; a fourth declaration would start constraining things that are meant
+   to flow.
+
+## Closing note on the three rounds
+
+The original gate passed this document with one orphan reported. There were two. Each
+subsequent fix closed its target and opened one new break, and the only reason that was caught
+each time was printing the previous build alongside the new one and auditing every boundary
+rather than the boundary that was broken. That practice is now three standing rows above, and
+it is what should be repeated on the next content change rather than trusted to memory.
