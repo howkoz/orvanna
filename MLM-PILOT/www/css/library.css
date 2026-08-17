@@ -12,50 +12,61 @@
    library is the one part of the site with a light theme and
    corporate.css hard-codes a dark field.
 
-   THEMING, per the system rule "a colour is never defined only
-   inside a media query or a data-theme block":
-     1. Bare :root carries the COMPLETE light palette.
-     2. A guarded dark media query RESTATES only what changes, so
-        an explicit light choice still wins over a dark system.
-     3. :root[data-theme="dark"] restates the same tokens again,
-        so the in-page toggle wins in both directions.
+   THEMING, changed 2026-08-17 per docs/CORPORATE-CHROME-CONTRACT.md.
 
-   One deliberate exception, stated plainly: the navigation bar
-   and the footer keep the brand's dark field in BOTH themes.
-   Those tokens are declared once on bare :root and never
-   restated. The reason is the logo. assets/logo-header-dark.svg
+   These two pages used to follow the reader's operating system
+   by default, which made the library the one part of the site
+   that could open light while every other page opened dark. The
+   site now behaves as one site:
+     1. Bare :root carries the COMPLETE palette in its DARK form,
+        because dark is the default on every corporate page.
+     2. :root[data-theme="light"] RESTATES only what changes.
+     3. No operating-system preference query is involved. The
+        theme is a deliberate choice, made with the icon in the
+        navigation, or it is dark.
+   Noted rather than hidden: a reader whose machine is set to
+   light, and who never touches the icon, now sees dark here
+   where they used to see light. That is the point of one site
+   with one default.
+
+   One deliberate exception, unchanged and stated plainly: the
+   navigation bar and the footer keep the brand's dark field in
+   BOTH themes. Those tokens are declared once on bare :root and
+   never restated. The reason is the logo. assets/logo-header-dark.svg
    draws its wordmark in white, the brand rules forbid recolouring
    a logo variant by hand, and no light variant is deployed in
    www/assets. A permanently dark chrome around a theme-aware
-   reading surface is the honest way to hold that rule.
+   reading surface is the honest way to hold that rule, and
+   corporate.css now holds it the same way.
    ============================================================ */
 
 :root {
-  /* ---------- reading surface: the COMPLETE light palette ---------- */
-  --bg:            #FFFFFF;
-  --bg-2:          #F1F4FA;
-  --panel:         #FFFFFF;
-  --panel-2:       #F8FAFC;
-  --heading:       #0F172A;
-  --text:          #263244;
-  --muted:         #5B6472;   /* 6.0 to 1 on white */
-  --quiet:         #6B7280;
-  --line:          rgba(15, 23, 42, 0.13);
-  --line-lit:      rgba(79, 70, 229, 0.32);
-  --accent:        #0E7490;   /* the single lit accent, light form. 5.36 to 1 on white */
-  --accent-ink:    #FFFFFF;
-  --accent-soft:   rgba(14, 116, 144, 0.08);
-  --indigo-t:      #4338CA;   /* indigo as text on light. 7.4 to 1 on white */
-  --violet-t:      #6D28D9;
-  --icon:          #4F46E5;
-  --icon-lit:      #0E7490;
-  --panel-shadow:  0 4px 14px rgba(15, 23, 42, 0.10);
-  --panel-lift:    0 10px 26px rgba(15, 23, 42, 0.14);
-  --rule:          linear-gradient(90deg, rgba(14, 116, 144, 0.55), rgba(79, 70, 229, 0.28), transparent);
+  /* ---------- reading surface: the COMPLETE dark palette, the default ------- */
+  --bg:            #060B18;
+  --bg-2:          #0A1226;
+  --panel:         #101A31;
+  --panel-2:       #0C1424;
+  --heading:       #F1F5F9;
+  --text:          #C7D0DE;
+  --muted:         #94A3B8;
+  --quiet:         #7C8AA0;
+  --line:          rgba(129, 140, 248, 0.18);
+  --line-lit:      rgba(34, 211, 238, 0.38);
+  --accent:        #22D3EE;
+  --accent-ink:    #05121C;
+  --accent-soft:   rgba(34, 211, 238, 0.08);
+  --indigo-t:      #A5B4FC;
+  --violet-t:      #A78BFA;
+  --icon:          #818CF8;
+  --icon-lit:      #22D3EE;
+  --panel-shadow:  0 0 26px rgba(79, 70, 229, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --panel-lift:    0 0 38px rgba(34, 211, 238, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --rule:          linear-gradient(90deg, rgba(34, 211, 238, 0.45), rgba(129, 140, 248, 0.2), transparent);
 
   /* ---------- chrome: dark in both themes, declared once ---------- */
-  --chrome-bg:     rgba(6, 11, 24, 0.92);
+  --chrome-bg:     rgba(6, 11, 24, 0.94);
   --chrome-foot:   #050914;
+  --chrome-hi:     #FFFFFF;
   --chrome-head:   #F1F5F9;
   --chrome-text:   #C7D0DE;
   --chrome-muted:  #94A3B8;
@@ -66,52 +77,28 @@
   --maxw:          1100px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg:           #060B18;
-    --bg-2:         #0A1226;
-    --panel:        #101A31;
-    --panel-2:      #0C1424;
-    --heading:      #F1F5F9;
-    --text:         #C7D0DE;
-    --muted:        #94A3B8;
-    --quiet:        #7C8AA0;
-    --line:         rgba(129, 140, 248, 0.18);
-    --line-lit:     rgba(34, 211, 238, 0.38);
-    --accent:       #22D3EE;
-    --accent-ink:   #05121C;
-    --accent-soft:  rgba(34, 211, 238, 0.08);
-    --indigo-t:     #A5B4FC;
-    --violet-t:     #A78BFA;
-    --icon:         #818CF8;
-    --icon-lit:     #22D3EE;
-    --panel-shadow: 0 0 26px rgba(79, 70, 229, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --panel-lift:   0 0 38px rgba(34, 211, 238, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    --rule:         linear-gradient(90deg, rgba(34, 211, 238, 0.45), rgba(129, 140, 248, 0.2), transparent);
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg:           #060B18;
-  --bg-2:         #0A1226;
-  --panel:        #101A31;
-  --panel-2:      #0C1424;
-  --heading:      #F1F5F9;
-  --text:         #C7D0DE;
-  --muted:        #94A3B8;
-  --quiet:        #7C8AA0;
-  --line:         rgba(129, 140, 248, 0.18);
-  --line-lit:     rgba(34, 211, 238, 0.38);
-  --accent:       #22D3EE;
-  --accent-ink:   #05121C;
-  --accent-soft:  rgba(34, 211, 238, 0.08);
-  --indigo-t:     #A5B4FC;
-  --violet-t:     #A78BFA;
-  --icon:         #818CF8;
-  --icon-lit:     #22D3EE;
-  --panel-shadow: 0 0 26px rgba(79, 70, 229, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --panel-lift:   0 0 38px rgba(34, 211, 238, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --rule:         linear-gradient(90deg, rgba(34, 211, 238, 0.45), rgba(129, 140, 248, 0.2), transparent);
+/* The light theme: a deliberate choice, never a system default. */
+:root[data-theme="light"] {
+  --bg:           #FFFFFF;
+  --bg-2:         #F1F4FA;
+  --panel:        #FFFFFF;
+  --panel-2:      #F8FAFC;
+  --heading:      #0F172A;
+  --text:         #263244;   /* 12.63 to 1 on white */
+  --muted:        #5B6472;   /* 6.03 to 1 on white */
+  --quiet:        #6B7280;   /* 4.83 to 1 on white */
+  --line:         rgba(15, 23, 42, 0.13);
+  --line-lit:     rgba(79, 70, 229, 0.32);
+  --accent:       #0E7490;   /* the single lit accent, light form. 5.36 to 1 on white */
+  --accent-ink:   #FFFFFF;
+  --accent-soft:  rgba(14, 116, 144, 0.08);
+  --indigo-t:     #4338CA;   /* indigo as text on light. 7.40 to 1 on white */
+  --violet-t:     #6D28D9;
+  --icon:         #4F46E5;
+  --icon-lit:     #0E7490;
+  --panel-shadow: 0 4px 14px rgba(15, 23, 42, 0.10);
+  --panel-lift:   0 10px 26px rgba(15, 23, 42, 0.14);
+  --rule:         linear-gradient(90deg, rgba(14, 116, 144, 0.55), rgba(79, 70, 229, 0.28), transparent);
 }
 
 /* ============================================================
@@ -247,7 +234,7 @@ img, svg { max-width: 100%; display: block; }
   transition: color 0.15s ease;
 }
 
-a.nav-link:hover { color: #FFFFFF; }
+a.nav-link:hover { color: var(--chrome-hi); }
 
 a.nav-link::after {
   content: "";
@@ -265,7 +252,7 @@ a.nav-link::after {
 a.nav-link:hover::after,
 a.nav-link.is-active::after { transform: scaleX(1); }
 
-.nav-link.is-active { color: #FFFFFF; }
+.nav-link.is-active { color: var(--chrome-hi); }
 span.nav-link.is-active::after {
   content: "";
   position: absolute;
@@ -306,45 +293,68 @@ span.nav-link.is-active::after {
   text-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
 }
 
-/* ---------- theme control ---------- */
+/* ---------- the theme control ----------
+   Icon only, by instruction: a sun while the dark theme is on, a
+   moon while the light theme is on, and never the words Light or
+   Dark. It replaced the Theme / Auto / Light / Dark trio these two
+   pages used to carry, which was the loudest of the four different
+   theme controls the site had grown. The accessible name lives in
+   aria-label and js/site-chrome.js rewrites it on every change.
+   Forty by forty pixels is the minimum comfortable target on a
+   laptop trackpad. Identical to the rule in corporate.css, on
+   purpose: this control is chrome and chrome is shared. */
 
-.theme-set {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid var(--chrome-line);
-  border-radius: 999px;
-}
-
-.theme-legend {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--chrome-quiet);
-  padding: 0 8px 0 10px;
-}
-
-.theme-btn {
+.nav-theme {
   font: inherit;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--chrome-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--chrome-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--chrome-text);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-theme:hover {
+  color: var(--chrome-accent);
+  border-color: rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.nav-theme:focus-visible {
+  outline: 2px solid var(--chrome-accent);
+  outline-offset: 2px;
+}
+
+.nav-theme svg { width: 19px; height: 19px; }
+
+/* Exactly one icon is ever visible. */
+.nav-theme .icon-sun  { display: block; }
+.nav-theme .icon-moon { display: none; }
+:root[data-theme="light"] .nav-theme .icon-sun  { display: none; }
+:root[data-theme="light"] .nav-theme .icon-moon { display: block; }
+
+/* The Support control is a real button sitting among links, so
+   the browser's own widget styling has to be reset explicitly;
+   colour and size still come from .nav-link beside it. */
+.nav-support {
+  font-family: inherit;
   background: transparent;
   border: 0;
-  border-radius: 999px;
-  padding: 5px 11px 6px;
+  padding: 0 0 3px;
   cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease;
 }
-.theme-btn:hover { color: #FFFFFF; }
-.theme-btn[aria-pressed="true"] {
-  color: #05121C;
-  background: var(--chrome-accent);
-}
+
+/* The chat vendor's floating action button is suppressed here as
+   it is on the rest of the site: the panel opens from the Support
+   item in the navigation and from nowhere else. */
+.bpFab { display: none !important; }
 
 /* ============================================================
    TYPE, per the design system scale

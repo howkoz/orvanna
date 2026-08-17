@@ -85,7 +85,12 @@ def fail(msg: str) -> None:
 
 
 def copy_tree(src: Path, dst: Path) -> None:
-    shutil.copytree(src, dst, dirs_exist_ok=True)
+    # _partials/ holds source fragments (the canonical navigation block) that
+    # the drift lint below compares pages against. They are inputs to the
+    # build, not pages, so they must not ship: nav.html would otherwise land
+    # in dist/_partials/ and its relative links would trip the link check.
+    shutil.copytree(src, dst, dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns("_partials"))
 
 
 def rewrite(path: Path, old: str, new: str) -> None:
@@ -307,6 +312,126 @@ def secret_scan() -> None:
     print("secret scan: no secret-shaped strings in the build")
 
 
+# ---------------------------------------------------------------------------
+# NAVIGATION DRIFT LINT
+# ---------------------------------------------------------------------------
+# Added 2026-08-17, from docs/CORPORATE-CHROME-CONTRACT.md.
+#
+# WHY THIS EXISTS. Nine corporate pages each carried a hand-written top
+# navigation. Every one of them was pasted and then edited on its own, so they
+# drifted: the Library, Plan and Conductors links vanished from four pages,
+# four different theme controls grew, and the Support button did nothing on
+# four pages. The owner noticed by walking the site, which is the expensive way
+# to find it. Correcting the markup once fixes today; this lint is what keeps
+# it fixed, because the person editing a page is never the person remembering
+# the other eight.
+#
+# The canonical block lives in www/_partials/nav.html. Two differences are
+# permitted and only two:
+#   1. the active item, which carries is-active and aria-current="page";
+#   2. the cart, on shop.html and product.html only, which is a function of
+#      those pages rather than chrome.
+# Anything else fails the build.
+
+CORPORATE_PAGES = (
+    "index.html",
+    "shop.html",
+    "product.html",
+    "team.html",
+    "faq.html",
+    "comp-plan.html",
+    "conductor.html",
+    "library.html",
+    "library-agent.html",
+)
+
+# The sign-in areas were excluded by name by the owner. They keep their own
+# chrome, and no navigation lint applies to them. Listed here so the exclusion
+# is visible rather than implied by absence.
+NAV_LINT_EXCLUDED = ("login.html", "staff.html", "staff-operations.html")
+
+NAV_BLOCK_RE = re.compile(r'<nav class="nav-links"[^>]*>.*?</nav>', re.S)
+# The cart is an <a> on product.html and a <button> on shop.html; both are the
+# page's own existing markup, which the contract says to leave untouched.
+NAV_CART_RE = re.compile(r'<(a|button) class="nav-cart".*?</\1>', re.S)
+NAV_COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
+NAV_ACTIVE_CLASS_RE = re.compile(r'class="nav-link is-active"')
+NAV_ARIA_CURRENT_RE = re.compile(r'\s*aria-current="page"')
+# The active item, whole tag, for the aria-current pairing check below.
+NAV_ACTIVE_TAG_RE = re.compile(r'<a class="nav-link is-active"[^>]*>')
+WHITESPACE_RE = re.compile(r"\s+")
+
+
+def normalize_nav(block: str) -> str:
+    """Strip the two permitted differences, then flatten whitespace.
+
+    Comments are dropped: a note explaining why the cart sits where it sits is
+    not chrome drift. Whitespace is flattened because the canonical block is
+    stored at one indent and pasted into the pages at another; indentation is
+    not drift either. Everything else, including attribute order and link
+    text, is compared character for character.
+    """
+    block = NAV_COMMENT_RE.sub("", block)
+    block = NAV_CART_RE.sub("", block)
+    block = NAV_ACTIVE_CLASS_RE.sub('class="nav-link"', block)
+    block = NAV_ARIA_CURRENT_RE.sub("", block)
+    return WHITESPACE_RE.sub(" ", block).strip()
+
+
+def nav_drift_lint() -> None:
+    partial = ROOT / "www" / "_partials" / "nav.html"
+    if not partial.is_file():
+        fail(f"the canonical navigation partial is missing: {partial}")
+    canonical = NAV_BLOCK_RE.search(partial.read_text(encoding="utf-8"))
+    if not canonical:
+        fail(f"{partial} does not contain a <nav class=\"nav-links\"> block")
+    want = normalize_nav(canonical.group(0))
+
+    problems = []
+    for name in CORPORATE_PAGES:
+        page = DIST / name
+        if not page.is_file():
+            problems.append(f"{name}: corporate page missing from the build")
+            continue
+        found = NAV_BLOCK_RE.search(page.read_text(encoding="utf-8"))
+        if not found:
+            problems.append(f'{name}: no <nav class="nav-links"> block')
+            continue
+        block = found.group(0)
+
+        # Contract section 2, rule 1: the active item carries BOTH is-active
+        # and aria-current="page". The normalizer strips both, so without
+        # this check a page could lose the accessible half of the pair and
+        # still match. There is at most one active item on a page.
+        for tag in NAV_ACTIVE_TAG_RE.findall(block):
+            if 'aria-current="page"' not in tag:
+                problems.append(
+                    f"{name}: the active navigation item carries is-active but not "
+                    f'aria-current="page"\n      {tag}')
+
+        got = normalize_nav(block)
+        if got == want:
+            continue
+        # Report the first place the two diverge, so the message points at
+        # the edit rather than at a wall of markup.
+        cut = next((i for i, (a, b) in enumerate(zip(got, want)) if a != b),
+                   min(len(got), len(want)))
+        problems.append(
+            f"{name}: navigation differs from _partials/nav.html at character {cut}\n"
+            f"      page:      ...{got[max(0, cut - 40):cut + 60]}\n"
+            f"      canonical: ...{want[max(0, cut - 40):cut + 60]}")
+
+    if problems:
+        for p in problems:
+            print(f"  nav drift: {p}")
+        fail(f"{len(problems)} corporate page(s) diverge from the canonical "
+             "navigation in www/_partials/nav.html; only the active item and "
+             "the cart on shop.html and product.html may differ")
+    print(f"nav drift lint: {len(CORPORATE_PAGES)} corporate pages match "
+          f"_partials/nav.html (sign-in pages excluded: "
+          f"{', '.join(NAV_LINT_EXCLUDED)})")
+
+
 def currency_mirror_check() -> None:
     """Fail the build if the client and server currency rate tables drift.
 
@@ -384,6 +509,7 @@ def main() -> None:
     assert_version_stamps()
     name_lint()
     secret_scan()
+    nav_drift_lint()
     currency_mirror_check()
 
     files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)
