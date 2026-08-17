@@ -1,4 +1,51 @@
-# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.2
+# Orvanna Builder Plan Specification (lab plan five: 'orvanna_builder'), version 1.2.1
+
+**Correction release 2026-08-17, v1.2.1 (defects found while building the
+presentation, by tracing every published figure back to this document).** No
+mechanism, no parameter, no rate, no gate, and no measured result changes here.
+This release corrects five places where what the spec SAID did not match what the
+spec's own section 5 parameters, section 10 volume table, or the measurements
+say, and it hardens two presentation rules that were licensing a wrong sentence.
+Every correction moves in the direction of a SMALLER or more-qualified claim;
+none flatters the plan. Found by orvanna-writer while drafting
+`docs\COMP-PLAN-PAGE-CONTENT-2026-08-17.md` and
+`docs\ORVANNA-BUILDER-BRIEF-2026-08-17.md`, which already ship the corrected
+values.
+
+1. **Section 12A(d), a self-contradicting product breakdown.** The worked order
+   was described as "one $100.00 domain agent subscription (plus a $50.00 support
+   agent, CV 80.00 total)". That is SV 150.00 and CV 120.00, not CV 80.00, and it
+   contradicts the same sentence, the section 10 volume table, and the catalog.
+   M8 holds TWO $50.00 support agents, SV 100.00, CV 80.00. The commission
+   arithmetic that follows was correct and is unchanged.
+2. **Section 6, unlabelled draft-rate arithmetic.** The DECAY fixture's 9.60
+   override and 4.00 bonus are DRAFT-rate figures, and unlike section 10 and
+   12A(a) the section carried no label saying so. It now does, with the
+   rate-of-record equivalents printed beside them (3.60 and 1.60).
+3. **Section 13 presentation rule 2 was authorising a draft-rate number for a
+   slide**, by naming "the section 6 fixture's 9.60" as a presentation figure.
+   This was the same defect class the red team charged in attack 3, surviving
+   inside the very rules written to answer it. The rule now names 3.60, the
+   rate-of-record figure, and forbids the 9.60.
+4. **Section 13 presentation rule 1 said "seven computed months".** There are SIX
+   seeded months, February through July. The seventh is a partial bridged August
+   of eleven orders and two members paid, which the red team itself called
+   evidence of nothing. The rule now says six and excludes August by name.
+5. **Section 13 presentation rule 3's "7.9x to 92x" is not monotone in the band**
+   and invites a false sentence. The multiples are 7.9x, 92x and 81x in band
+   order, so the TOP band is 81x. "Up to 92 times at the top" is false. The rule
+   now says so and requires the three band multiples rather than the range's
+   endpoints.
+
+Two items from the red team's re-inspection residue list were checked and found
+ALREADY DISCHARGED in this file, recorded here so nobody re-opens them: the
+12A(b) leg-splitting sequence prints the rates of record (0.0100 / 0.0077 /
+0.0063 x V) and agrees with section 11, and the GW-000044 exhibit in 12A(e)
+prints **0.17**. On that last figure, the record is that the red team's attack 4
+printed 0.18 while its own same-day re-inspection corrected the value to 0.17
+against the engine trace of 0.177777 under section 7's floor-on-prorated rule.
+**0.17 is the value of record**; any surface quoting 0.18 is quoting a superseded
+number.
 
 **Amendment 2026-08-16, v1.2 (the red-team gate's price, paid).** The red-team review
 (`docs\verification\ORVANNA-BUILDER-RED-TEAM-2026-08-16.md`, commit 5170cc8) ruled NOT
@@ -195,7 +242,19 @@ and exactly priced, FOR THE ONE TO TWO BUILDER GENERATIONS NEAREST THE LAPSE, th
 people whose override the lapse erases. It is NOT universal, and above a pool-binding
 stack it inverts; section 6A names that honestly.
 
-**Two-month worked example (fixture DECAY, four members).** A sponsors B; B sponsors C
+**Two-month worked example (fixture DECAY, four members). DRAFT-RATE ARITHMETIC,
+labelled v1.2.1, 2026-08-17.** Every override and bonus figure below is computed at
+the DRAFT rates (gen1 0.04, gen2 0.02, second_leg 0.05), NOT the calibrated rates
+of record in section 5 (gen1 0.015, gen2 0.010, second_leg 0.020). The fixture is
+deliberately kept at its recorded rates, the discipline section 10 and 12A(a)
+already carry, because it is a section 13 GATE CONTRACT and every run records the
+rates it used; what it proves, that the sponsor's entire month-over-month loss
+equals the override to the cent, is rate-independent. AT THE RATES OF RECORD the
+same structure prices the same loss at 0.015 x 240.00 = **3.60**, not 9.60, and B's
+bonus at 0.020 x 80.00 = **1.60**, not 4.00. Any presentation of Law A quotes 3.60,
+per section 13 rule 2.
+
+A sponsors B; B sponsors C
 and D. Subscriptions: every member holds one domain agent ($100.00, 100 PV), so SV 100
 and CV 80.00 each; all qualified in month one.
 
@@ -574,8 +633,12 @@ would be a spec amendment, not a redesign.
 **(d) "This double-pays the same volume."** Every override plan in the industry pays
 multiple people on one order; the honest question is whether the SUM is bounded.
 Follow one order's dollar (re-anchored v1.2 to the rates of record, red-team
-confirmed): M8's month is one $100.00 domain agent subscription (plus a $50.00
-support agent, CV 80.00 total, pool 20.00). Layer 1: M3 earns 8.00 at level 1, M1
+confirmed; the PRODUCT BREAKDOWN corrected v1.2.1, 2026-08-17): M8's month is TWO
+$50.00 support agents (Software Engineer and Accounting, 50 PV each per the
+catalog), SV 100.00, CV 80.00, pool 20.00. (v1.2 printed "one $100.00 domain agent
+subscription plus a $50.00 support agent", which is SV 150.00 and CV 120.00 and
+contradicted both the CV 80.00 in its own sentence and section 10's volume table.
+The breakdown was wrong; the arithmetic below was and is right.) Layer 1: M3 earns 8.00 at level 1, M1
 earns 4.00 at level 2: 12.00. Layer 2: M8 sits in Builder M3's group, so M1's
 generation 1 override claims 0.015 x 80.00 = 1.20. Layer 3: M8 heads M3's
 second-strongest leg, so M3's bonus claims 0.020 x 80.00 = 1.60. Total: 12.00 + 1.20
@@ -664,24 +727,40 @@ slide deck.
 conversation about this plan; from red-team attacks 5, 6, and 7):**
 
 1. **The cost-drift chart is a standing exhibit.** Every presentation shows the
-   measured trajectory of percent of CV across the seven computed months (February
-   18.5594 rising to July 19.6812, about 0.22 points a month at this field maturity),
-   presented as what it is: real, intended, and bounded above at 25 percent of CV per
-   source by Law B. The drift is shown climbing toward a ceiling it cannot cross;
+   measured trajectory of percent of CV across the SIX SEEDED MONTHS, February
+   through July (18.5594, 18.9399, 19.1224, 19.4412, 19.5434, 19.6812: a rise of
+   1.1218 points over five month-steps, about 0.22 points a month at this field
+   maturity), presented as what it is: real, intended, and bounded above at 25
+   percent of CV per source by Law B. (Corrected v1.2.1, 2026-08-17: this rule said
+   "seven computed months", which counted the partial bridged August run. August is
+   eleven bridged orders and two members paid, the red team's own words are
+   "evidence of nothing", and it is EXCLUDED from the exhibit rather than plotted
+   as a seventh point.) The drift is shown climbing toward a ceiling it cannot cross;
    hiding it would hand a hostile reader the chart to draw themselves.
 2. **Law A is presented with the GW-000294 exhibit, not only the tidy fixture.** A
    real census member whose entire check is one 7.80 override sees it go to **0.00 in
    one month** because a Builder two hops down missed qualification once: a 100
    percent wipe on someone else's bad month, attributed entirely to from_reach_lost.
-   That is the no-grace reality, shown honestly beside the section 6 fixture's 9.60,
-   with the countermeasure stated (hold more than one Builder and more than one leg).
+   That is the no-grace reality, shown honestly beside the section 6 fixture, whose
+   retention price is quoted AT THE RATES OF RECORD as **3.60** (0.015 x the
+   fixture's group CV 240.00) and NEVER as the fixture's own draft-rate 9.60, with
+   the countermeasure stated (hold more than one Builder and more than one leg).
+   (Corrected v1.2.1, 2026-08-17: this rule previously named "the section 6
+   fixture's 9.60" and so authorised a draft-rate figure for a slide, which is the
+   defect class red-team attack 3 charged, surviving inside the rules written to
+   answer it. Section 6 now carries its draft-rate label too.)
    Open question 8 (the grace month) is re-decided by Howard WITH this exhibit and
    section 6A in hand.
 3. **The development premium is THE pull number; "wide reach" is never claimed.**
    The pitch leads with spec metric 2 as the red team computed it: within the same SV
    band, members who developed at least one Builder out-earn equal-volume members who
-   did not by **7.9x to 92x** (52.47 versus 6.66 at SV 100 to 149; 725.57 versus 7.90
-   at 150 to 299; 955.31 versus 11.77 at 300 plus), said in the same breath as the
+   did not by **7.9x, 92x, and 81x** in band order (52.47 versus 6.66 at SV 100 to
+   149; 725.57 versus 7.90 at 150 to 299; 955.31 versus 11.77 at 300 plus). **The
+   premium is NOT MONOTONE in the band, and the three band multiples are quoted, never
+   the range's endpoints alone** (added v1.2.1, 2026-08-17): the TOP band is 81x, so
+   the sentence "up to 92 times at the top" is FALSE and must never be said, and the
+   older shorthand "7.9x to 92x" is retired because it reads as a rising range and
+   invites exactly that sentence. Every quotation is said in the same breath as the
    participation counts (24 members hold that position; 44 earn any structure money;
    the top five capture 90.2 percent of the structure budget). The 22.9 percent
    structure-linked share is never shown without those companions. And the reach
