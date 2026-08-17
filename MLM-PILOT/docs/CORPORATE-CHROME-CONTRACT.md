@@ -117,10 +117,39 @@ on all nine corporate pages:
   follows the operating system by default; the library pages change to dark-default so the
   site behaves as one site. Note it in the verdict, do not treat it as a defect.)
 - **One storage key for the whole site: `orvanna-theme`**, values `dark` or `light`. It
-  replaces `orvannaLibraryTheme` and `orvanna-conductor-theme`. The consequence is the
-  point: a reader who picks light on the library still has light on the plan page.
+  replaces **four** keys: `orvannaLibraryTheme` (shared by the two library pages),
+  `orvanna-conductor-theme`, `orvanna-comp-plan-theme` and `orvanna-faq-theme`. The
+  consequence is the point: a reader who picks light on the library still has light on the
+  plan page. (The `713e3f8` commit message says five. It is wrong; the code and
+  `site-chrome.js`'s own comment say four, and four is correct.)
 - The choice applies before first paint (an inline snippet in `<head>`, not a deferred
-  script) so there is no flash of the wrong theme.
+  script) so there is no flash of the wrong theme. The canonical wording of that snippet is
+  `www/_partials/theme-boot.html` and `build_dist.py` lints every page against it.
+
+**What the light theme does NOT change, named here so nobody has to discover it.**
+
+Added 2026-08-17 after the quality assurance gate found that the round's own summary of
+deliberately-dark surfaces omitted the largest one. A reader who chooses light gets a light
+reading surface inside a permanently dark frame. That is a design decision, not an
+oversight, and this is the complete list:
+
+| Surface | Stays dark because | Recorded in |
+|---|---|---|
+| **The navigation bar** | It is the brand's fixed frame and it carries the dark lockup. It is shared by all nine pages, so a theme-aware bar would have to be right nine times. | `css/site-chrome.css` |
+| **The footer** | Same frame, same reason, and it sits under a light reading surface as a deliberate close. | `css/site-chrome.css` |
+| The starfield hero on `index.html` | A constellation drawn in indigo and cyan on night simply vanishes on white. This is the fallback section 5 names. | `css/corporate.css` |
+| The compensation plan's cover | A printed brochure's cover is a fixed object rather than a preference. | `comp-plan.html` |
+| The bank-approval bar, the wallet sheet and the brand tiles | Payment-brand surfaces carry their own fixed colour. | `css/shop.css` |
+
+The bar and the footer are the two that a reader will notice, so they lead the list. Every
+text pair inside all five was measured in both themes and every one clears the floor; the
+figures are in `docs/verification/CONTRAST-SWEEP-2026-08-17.md`.
+
+**A consequence worth stating.** Because the bar is translucent, a white page scrolling
+underneath it lightens it. At the 0.78 alpha this started at, the bar composited to about
+`#3D4143` over white and the Enroll placeholder measured **2.84 to 1**, a real failure that
+only exists in the light theme. The alpha is now 0.94, which composites to about `#151A26`
+and **4.98 to 1**, and is indistinguishable from the old value over the dark field.
 
 ---
 
@@ -141,6 +170,44 @@ permitted `is-active` / `aria-current` difference and the permitted cart additio
 **fails the build** on any other difference. The build already lints asset stamps, page
 names and secrets; this joins that family. A build that cannot drift is worth more than a
 navigation that is correct today.
+
+**Amendment, 2026-08-17: shared markup is not shared chrome.**
+
+The first pass did exactly what the two paragraphs above ask, and the bar still changed
+between pages. The markup was single-sourced and the behaviour was single-sourced, but the
+**presentation** was left in four places: `corporate.css`, `library.css`, and full inline
+copies inside `comp-plan.html` and `conductor.html`. Quality assurance measured it:
+
+| Page | Navigation font | Item gap | Header height |
+|---|---|---|---|
+| index, conductor, team, faq | 13.44 px | 26 px | 69 px |
+| library, library-agent | 13.44 px | 24 px | 69 px |
+| **comp-plan** | **12.80 px** | **20 px** | **65 px** |
+
+and at 390 pixels wide comp-plan packed the items left into a 181 pixel block starting at
+x=166 while the other eight centred a 335 pixel bar. Same items, different bar. That is
+Howard's original complaint, surviving on the Plan page.
+
+So the chrome now has **three** single sources, and a lint for each:
+
+| What | Single source | Lint in `build_dist.py` |
+|---|---|---|
+| Markup | `www/_partials/nav.html` | `nav_drift_lint` |
+| Pre-paint theme snippet | `www/_partials/theme-boot.html` | `theme_boot_lint` |
+| Presentation | `www/css/site-chrome.css` | `chrome_css_lint`, `chrome_sheet_link_lint` |
+| Behaviour | `www/js/site-chrome.js` | (loaded check, above) |
+
+`site-chrome.css` owns the navigation bar, the brand lockup inside it, the items, the
+Enroll pill, Sign In, the theme button, the Support button, the skip link and the footer.
+No other stylesheet and no inline `<style>` may declare those selectors at the head of a
+selector; a page-scoped ancestor is still allowed, because `.login-logo .brand-word` and
+`.foot .legal` cannot reach the chrome. **The cart is not chrome** and stays in `shop.css`.
+
+A fourth lint, `page_registry_lint`, asserts that every HTML page in the build is either
+registered as a corporate page or explicitly excluded as a sign-in area. Before it existed,
+a brand new page shipped with a mangled navigation and a passing build, which the verifier
+proved by probe. The registry also records which item each page marks active, so the lint
+requires the active marker rather than merely tolerating it.
 
 ---
 

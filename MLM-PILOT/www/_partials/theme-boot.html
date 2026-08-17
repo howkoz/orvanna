@@ -1,0 +1,14 @@
+<!-- Theme boot. Applies the stored choice before first paint, so no page ever
+     flashes the wrong palette. Dark is the default everywhere, so a visitor who
+     never touches the theme icon sees exactly what they saw before. One key for
+     the whole site: orvanna-theme. See docs/CORPORATE-CHROME-CONTRACT.md. -->
+<script>
+(function () {
+  var theme = 'dark';
+  try {
+    if (window.localStorage.getItem('orvanna-theme') === 'light') { theme = 'light'; }
+  } catch (err) { /* storage blocked: dark, the default, stands */ }
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.classList.add('js');
+})();
+</script>

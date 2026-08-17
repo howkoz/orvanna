@@ -313,66 +313,125 @@ def secret_scan() -> None:
 
 
 # ---------------------------------------------------------------------------
-# NAVIGATION DRIFT LINT
+# CHROME LINTS
 # ---------------------------------------------------------------------------
-# Added 2026-08-17, from docs/CORPORATE-CHROME-CONTRACT.md.
+# Added 2026-08-17, from docs/CORPORATE-CHROME-CONTRACT.md. Hardened the same
+# day after the verifier and the quality assurance gate both found holes.
 #
-# WHY THIS EXISTS. Nine corporate pages each carried a hand-written top
-# navigation. Every one of them was pasted and then edited on its own, so they
-# drifted: the Library, Plan and Conductors links vanished from four pages,
-# four different theme controls grew, and the Support button did nothing on
-# four pages. The owner noticed by walking the site, which is the expensive way
-# to find it. Correcting the markup once fixes today; this lint is what keeps
-# it fixed, because the person editing a page is never the person remembering
-# the other eight.
+# WHY THESE EXIST. Nine corporate pages each carried a hand-written top
+# navigation. Every one was pasted and then edited on its own, so they drifted:
+# the Library, Plan and Conductors links vanished from four pages, four
+# different theme controls grew, and the Support button did nothing on four
+# pages. The owner noticed by walking the site, which is the expensive way to
+# find it. Correcting it once fixes today; these lints are what keep it fixed,
+# because the person editing a page is never the person remembering the other
+# eight.
 #
-# The canonical block lives in www/_partials/nav.html. Two differences are
-# permitted and only two:
-#   1. the active item, which carries is-active and aria-current="page";
-#   2. the cart, on shop.html and product.html only, which is a function of
-#      those pages rather than chrome.
-# Anything else fails the build.
+# The chrome now has three single sources and a lint for each:
+#   www/_partials/nav.html         markup      -> nav_drift_lint
+#   www/_partials/theme-boot.html  pre-paint   -> theme_boot_lint
+#   www/css/site-chrome.css        presentation-> chrome_css_lint
+# and a fourth lint, page_registry_lint, asserts that no page can quietly opt
+# out of any of them.
 
-CORPORATE_PAGES = (
-    "index.html",
-    "shop.html",
-    "product.html",
-    "team.html",
-    "faq.html",
-    "comp-plan.html",
-    "conductor.html",
-    "library.html",
-    "library-agent.html",
-)
+# Every corporate page, mapped to the href its active navigation item must
+# carry. None means the page is not one of the navigation's own destinations
+# and correctly marks nothing active.
+#
+# This is a REGISTRY, not a convenience list. page_registry_lint below fails
+# the build if a page ships that is in neither this mapping nor the exclusion
+# set, which is what stops a brand new page from arriving unlinted. The
+# verifier proved that hole on 2026-08-17 by adding a pricing.html with a
+# mangled navigation: the build printed "9 corporate pages match" and exited 0.
+# Every page marks exactly one item active. Where the page is not itself one
+# of the nine destinations, it marks the section it belongs to, the way a
+# printed contents page marks the chapter rather than the leaf.
+CORPORATE_PAGES = {
+    "index.html":         "index.html",
+    "shop.html":          "shop.html",
+    "product.html":       "shop.html",     # a product page is inside the shop
+    "team.html":          "team.html",
+    "faq.html":           "index.html",    # the footer files the questions under Learn
+    "comp-plan.html":     "comp-plan.html",
+    "conductor.html":     "conductor.html",
+    "library.html":       "library.html",
+    "library-agent.html": "library.html",  # a detail page is inside the library
+}
 
-# The sign-in areas were excluded by name by the owner. They keep their own
-# chrome, and no navigation lint applies to them. Listed here so the exclusion
-# is visible rather than implied by absence.
-NAV_LINT_EXCLUDED = ("login.html", "staff.html", "staff-operations.html")
+# The cart is the ONLY permitted addition to the canonical navigation, and it
+# is permitted on these two pages only. Contract section 2, rule 3.
+CART_PAGES = {"shop.html", "product.html"}
+
+# The sign-in areas, excluded by name by the owner. They keep their own chrome
+# and no chrome lint applies to them.
+NAV_LINT_EXCLUDED = {"login.html", "staff.html", "staff-operations.html"}
+
+# Pages this script itself writes, which have no site chrome by design.
+BUILD_GENERATED_PAGES = {"404.html"}
 
 NAV_BLOCK_RE = re.compile(r'<nav class="nav-links"[^>]*>.*?</nav>', re.S)
 # The cart is an <a> on product.html and a <button> on shop.html; both are the
 # page's own existing markup, which the contract says to leave untouched.
 NAV_CART_RE = re.compile(r'<(a|button) class="nav-cart".*?</\1>', re.S)
+NAV_CART_PRESENT_RE = re.compile(r'class="nav-cart"')
 NAV_COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 NAV_ACTIVE_CLASS_RE = re.compile(r'class="nav-link is-active"')
 NAV_ARIA_CURRENT_RE = re.compile(r'\s*aria-current="page"')
-# The active item, whole tag, for the aria-current pairing check below.
-NAV_ACTIVE_TAG_RE = re.compile(r'<a class="nav-link is-active"[^>]*>')
+NAV_ACTIVE_TAG_RE = re.compile(r'<(?:a|span) class="nav-link is-active"[^>]*>')
+HREF_RE = re.compile(r'href="([^"]*)"')
 WHITESPACE_RE = re.compile(r"\s+")
 
 
-def normalize_nav(block: str) -> str:
-    """Strip the two permitted differences, then flatten whitespace.
+def root_pages() -> list:
+    """Every HTML page at the root of the build, in a stable order."""
+    return sorted(p.name for p in DIST.glob("*.html"))
+
+
+def page_registry_lint() -> None:
+    """No page may ship without being registered as linted or excluded.
+
+    Verifier finding L-2, proved by probe 2026-08-17: the chrome lints walked a
+    hardcoded list, so a new corporate page was unlinted until somebody
+    remembered to add it by hand. That is exactly the memory these lints exist
+    to replace. The build already knows what landed in dist; from here on it
+    asserts that it recognises every one of them.
+    """
+    known = set(CORPORATE_PAGES) | NAV_LINT_EXCLUDED | BUILD_GENERATED_PAGES
+    unknown = [n for n in root_pages() if n not in known]
+    missing = [n for n in CORPORATE_PAGES if not (DIST / n).is_file()]
+    problems = []
+    for n in unknown:
+        problems.append(
+            f"{n}: ships in the build but is registered nowhere. Add it to "
+            "CORPORATE_PAGES with the href its active item must carry, or to "
+            "NAV_LINT_EXCLUDED if it is a sign-in area with its own chrome.")
+    for n in missing:
+        problems.append(f"{n}: registered as a corporate page but missing from the build")
+    if problems:
+        for p in problems:
+            print(f"  page registry: {p}")
+        fail(f"{len(problems)} page(s) are not covered by the chrome lints")
+    print(f"page registry: {len(root_pages())} root pages, all covered "
+          f"({len(CORPORATE_PAGES)} linted, {len(NAV_LINT_EXCLUDED)} sign-in areas "
+          f"excluded, {len(BUILD_GENERATED_PAGES)} build generated)")
+
+
+def normalize_nav(block: str, allow_cart: bool) -> str:
+    """Strip the permitted differences, then flatten whitespace.
 
     Comments are dropped: a note explaining why the cart sits where it sits is
     not chrome drift. Whitespace is flattened because the canonical block is
     stored at one indent and pasted into the pages at another; indentation is
-    not drift either. Everything else, including attribute order and link
-    text, is compared character for character.
+    not drift either. Everything else, including attribute order and link text,
+    is compared token for token.
+
+    The cart is stripped ONLY for the two pages entitled to one. Before
+    2026-08-17 it was stripped everywhere, so a cart injected into team.html
+    built clean (verifier probe E).
     """
     block = NAV_COMMENT_RE.sub("", block)
-    block = NAV_CART_RE.sub("", block)
+    if allow_cart:
+        block = NAV_CART_RE.sub("", block)
     block = NAV_ACTIVE_CLASS_RE.sub('class="nav-link"', block)
     block = NAV_ARIA_CURRENT_RE.sub("", block)
     return WHITESPACE_RE.sub(" ", block).strip()
@@ -384,36 +443,55 @@ def nav_drift_lint() -> None:
         fail(f"the canonical navigation partial is missing: {partial}")
     canonical = NAV_BLOCK_RE.search(partial.read_text(encoding="utf-8"))
     if not canonical:
-        fail(f"{partial} does not contain a <nav class=\"nav-links\"> block")
-    want = normalize_nav(canonical.group(0))
+        fail(f'{partial} does not contain a <nav class="nav-links"> block')
+    want = normalize_nav(canonical.group(0), allow_cart=False)
 
     problems = []
-    for name in CORPORATE_PAGES:
+    for name in sorted(CORPORATE_PAGES):
+        expected_active = CORPORATE_PAGES[name]
         page = DIST / name
-        if not page.is_file():
-            problems.append(f"{name}: corporate page missing from the build")
-            continue
-        found = NAV_BLOCK_RE.search(page.read_text(encoding="utf-8"))
+        text = page.read_text(encoding="utf-8")
+        found = NAV_BLOCK_RE.search(text)
         if not found:
             problems.append(f'{name}: no <nav class="nav-links"> block')
             continue
         block = found.group(0)
 
-        # Contract section 2, rule 1: the active item carries BOTH is-active
-        # and aria-current="page". The normalizer strips both, so without
-        # this check a page could lose the accessible half of the pair and
-        # still match. There is at most one active item on a page.
-        for tag in NAV_ACTIVE_TAG_RE.findall(block):
+        # The cart, on the two pages entitled to one and nowhere else.
+        if name not in CART_PAGES and NAV_CART_PRESENT_RE.search(block):
+            problems.append(
+                f"{name}: carries a nav-cart element. The cart is permitted on "
+                f"{' and '.join(sorted(CART_PAGES))} only (contract section 2, rule 3).")
+
+        # The active item: REQUIRED, exactly one, on the right destination,
+        # with both halves of the marker.
+        #
+        # Two holes closed here on 2026-08-17. The lint used to accept
+        # is-active on any item, so moving it from Team to Shop inside
+        # team.html built clean (quality assurance finding L3). And it
+        # permitted the active state rather than requiring it, so faq.html
+        # shipped with no active item at all and passed.
+        active_tags = NAV_ACTIVE_TAG_RE.findall(block)
+        if len(active_tags) != 1:
+            problems.append(
+                f"{name}: {len(active_tags)} active navigation items, expected exactly 1 "
+                f'(class="nav-link is-active" href="{expected_active}" aria-current="page")')
+        else:
+            tag = active_tags[0]
+            href = HREF_RE.search(tag)
+            if not href or href.group(1) != expected_active:
+                problems.append(
+                    f"{name}: the active item points at "
+                    f'"{href.group(1) if href else "nothing"}", expected "{expected_active}"'
+                    f"\n      {tag}")
             if 'aria-current="page"' not in tag:
                 problems.append(
                     f"{name}: the active navigation item carries is-active but not "
                     f'aria-current="page"\n      {tag}')
 
-        got = normalize_nav(block)
+        got = normalize_nav(block, allow_cart=(name in CART_PAGES))
         if got == want:
             continue
-        # Report the first place the two diverge, so the message points at
-        # the edit rather than at a wall of markup.
         cut = next((i for i, (a, b) in enumerate(zip(got, want)) if a != b),
                    min(len(got), len(want)))
         problems.append(
@@ -424,12 +502,132 @@ def nav_drift_lint() -> None:
     if problems:
         for p in problems:
             print(f"  nav drift: {p}")
-        fail(f"{len(problems)} corporate page(s) diverge from the canonical "
-             "navigation in www/_partials/nav.html; only the active item and "
-             "the cart on shop.html and product.html may differ")
+        fail(f"{len(problems)} navigation problem(s) against the canonical block in "
+             "www/_partials/nav.html; only the active item and the cart on "
+             f"{' and '.join(sorted(CART_PAGES))} may differ")
     print(f"nav drift lint: {len(CORPORATE_PAGES)} corporate pages match "
-          f"_partials/nav.html (sign-in pages excluded: "
-          f"{', '.join(NAV_LINT_EXCLUDED)})")
+          f"_partials/nav.html, each marking its own page active")
+
+
+# ---------------------------------------------------------------------------
+# THE PRE-PAINT THEME SNIPPET
+# ---------------------------------------------------------------------------
+# It has to be inline and synchronous in every head, so nine copies are
+# unavoidable; that is exactly why it needs a lint. Quality assurance finding
+# L2, 2026-08-17: the nine copies had already grown two different wordings
+# within a day of being written.
+
+THEME_BOOT_SCRIPT_RE = re.compile(
+    r"<script>\s*\(function \(\) \{\s*var theme = 'dark';.*?\}\)\(\);\s*</script>", re.S)
+
+
+def theme_boot_lint() -> None:
+    partial = ROOT / "www" / "_partials" / "theme-boot.html"
+    if not partial.is_file():
+        fail(f"the canonical theme boot partial is missing: {partial}")
+    canonical = THEME_BOOT_SCRIPT_RE.search(partial.read_text(encoding="utf-8"))
+    if not canonical:
+        fail(f"{partial} does not contain the canonical theme boot script")
+    want = WHITESPACE_RE.sub(" ", canonical.group(0)).strip()
+
+    problems = []
+    for name in sorted(CORPORATE_PAGES):
+        text = (DIST / name).read_text(encoding="utf-8")
+        head = text.split("</head>", 1)[0]
+        found = THEME_BOOT_SCRIPT_RE.search(head)
+        if not found:
+            problems.append(
+                f"{name}: no canonical pre-paint theme snippet in <head>. Copy it "
+                "verbatim from www/_partials/theme-boot.html. It must be inline and "
+                "synchronous, or the page paints the wrong palette and snaps.")
+            continue
+        got = WHITESPACE_RE.sub(" ", found.group(0)).strip()
+        if got != want:
+            problems.append(f"{name}: the pre-paint theme snippet differs from "
+                            "www/_partials/theme-boot.html")
+
+    if problems:
+        for p in problems:
+            print(f"  theme boot: {p}")
+        fail(f"{len(problems)} page(s) carry a theme boot snippet that is missing or "
+             "not the canonical one")
+    print(f"theme boot lint: {len(CORPORATE_PAGES)} corporate pages carry the "
+          "canonical pre-paint snippet, inline and synchronous")
+
+
+# ---------------------------------------------------------------------------
+# CHROME PRESENTATION
+# ---------------------------------------------------------------------------
+# Quality assurance finding M1, 2026-08-17, and the standing checklist row it
+# earned: "shared markup is not shared chrome". The first pass unified the
+# navigation markup and behaviour and left its CSS in four places. comp-plan
+# rendered the bar at 12.80 pixel type, a 20 pixel gap and a 65 pixel header
+# against 13.44, 26 and 69 elsewhere, and left-packed it at 390 pixels wide.
+# Same items, different bar: the owner's original complaint, surviving.
+#
+# So www/css/site-chrome.css owns these selectors, and nothing else may declare
+# them at the head of a selector. Qualified forms are still allowed, because
+# they cannot reach the chrome: ".login-logo .brand-word" styles the sign-in
+# card, ".foot .legal" styles the brochure footer.
+
+CHROME_SELECTORS = (
+    "nav", "nav-inner", "nav-brand", "nav-logo", "nav-links", "nav-link",
+    "nav-signin", "nav-theme", "nav-support", "soon-pill", "brand-mark",
+    "brand-word", "footer", "footer-cols", "footer-head", "footer-meta",
+    "footer-contact", "footer-mail", "flink", "socials", "social", "legal",
+    "skip-link", "bpFab",
+)
+# The trailing lookahead matters. \b would treat ".nav-cart" as a match for
+# "nav", because a hyphen is a non-word character, and the cart is explicitly
+# NOT owned by the shared sheet. The class name must end here.
+CHROME_SELECTOR_RE = re.compile(
+    r"(?m)^[ \t]*((?:a|span|div|button)?\.(?:" + "|".join(CHROME_SELECTORS) +
+    r")(?![-\w])[^{;}]*)\{")
+STYLE_BLOCK_RE = re.compile(r"<style>(.*?)</style>", re.S)
+
+CHROME_CSS_OWNER = "site-chrome.css"
+
+
+def chrome_css_lint() -> None:
+    """Only site-chrome.css may declare a chrome rule."""
+    problems = []
+
+    for sheet in sorted((DIST / "css").glob("*.css")):
+        if sheet.name == CHROME_CSS_OWNER:
+            continue
+        # The sign-in areas have their own chrome by instruction.
+        if sheet.name in ("staff.css", "staff-ops.css"):
+            continue
+        for m in CHROME_SELECTOR_RE.finditer(sheet.read_text(encoding="utf-8")):
+            problems.append(f"css/{sheet.name}: {m.group(1).strip()}")
+
+    for name in sorted(CORPORATE_PAGES):
+        text = (DIST / name).read_text(encoding="utf-8")
+        for block in STYLE_BLOCK_RE.findall(text):
+            for m in CHROME_SELECTOR_RE.finditer(block):
+                problems.append(f"{name} (inline style): {m.group(1).strip()}")
+
+    if problems:
+        for p in problems:
+            print(f"  chrome css drift: {p}")
+        fail(f"{len(problems)} chrome rule(s) declared outside "
+             f"www/css/{CHROME_CSS_OWNER}. That file is the single source of chrome "
+             "presentation. Move the rule there, or qualify the selector with a "
+             "page-scoped ancestor if it genuinely styles something else.")
+    print(f"chrome css lint: chrome presentation declared only in css/{CHROME_CSS_OWNER}")
+
+
+def chrome_sheet_link_lint() -> None:
+    """Every corporate page must load the shared chrome sheet."""
+    problems = [n for n in sorted(CORPORATE_PAGES)
+                if f'href="css/{CHROME_CSS_OWNER}' not in (DIST / n).read_text(encoding="utf-8")]
+    if problems:
+        for p in problems:
+            print(f"  chrome sheet: {p}: does not link css/{CHROME_CSS_OWNER}")
+        fail(f"{len(problems)} corporate page(s) do not load css/{CHROME_CSS_OWNER}; "
+             "their navigation would render unstyled")
+    print(f"chrome sheet lint: {len(CORPORATE_PAGES)} corporate pages load "
+          f"css/{CHROME_CSS_OWNER}")
 
 
 def currency_mirror_check() -> None:
@@ -509,7 +707,11 @@ def main() -> None:
     assert_version_stamps()
     name_lint()
     secret_scan()
+    page_registry_lint()
     nav_drift_lint()
+    theme_boot_lint()
+    chrome_sheet_link_lint()
+    chrome_css_lint()
     currency_mirror_check()
 
     files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)

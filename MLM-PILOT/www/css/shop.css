@@ -371,11 +371,23 @@
    field. So the cart button must NOT use this sheet's flipping
    text token: on a light page that would paint dark ink on a
    near-black bar, about 1.5 to 1. It uses the chrome tokens
-   instead, which stay put. Measured on the bar as it composites
-   over a white page (#151A26): the cart glyph computes 11.18 to 1
-   and its hover 9.62 to 1. On the dark theme's bar (#060B18) the
-   same two are 12.64 and 10.87. The count badge is dark ink on
-   the brand cyan, 10.47 to 1, the same figure in both themes. */
+   instead, which stay put. Those tokens are DECLARED IN
+   css/site-chrome.css as of 2026-08-17, so this page must load
+   that sheet before this one or the cart loses its colour; the
+   link order is set in shop.html and commented there.
+
+   Measured on the bar as it composites over a white page: the
+   cart glyph computes 11.22 to 1 and its hover 9.65 to 1. On the
+   dark theme's bar (#060B18) the same two are 12.64 and 10.87.
+   The count badge is dark ink on the brand cyan, 10.47 to 1, the
+   same figure in both themes.
+   (The light-bar figure was first recorded as 11.18. That came
+   from rounding the composited bar colour to 8-bit, #151A26,
+   before taking the ratio. Carrying the composite unrounded gives
+   11.22, which is what the browser actually paints and what an
+   independent recomputation will get. The difference is 0.04 and
+   changes nothing, but the smaller number was the wrong method
+   and is corrected rather than left standing.) */
 
 .nav-cart {
   position: relative;
@@ -1190,6 +1202,47 @@ a.product-icon { display: block; }
   font-weight: 700;
   color: #202124;
 }
+/* THE BLUE G: 3.41 TO 1, ACCEPTED, AND WHY THE OBVIOUS DEFENCE OF
+   IT IS WRONG (quality assurance ruling, 2026-08-17).
+
+   #4285F4 on the tile's #F8FAFC face computes 3.41 to 1. That is
+   below the 4.5 to 1 floor every other piece of text on this page
+   is held to, and it is stated here rather than left to be
+   rediscovered.
+
+   THE ARGUMENT THAT WAS REJECTED. The first defence offered for
+   this was the logotype exemption: brand marks carry no contrast
+   requirement. That was considered and REJECTED, and the
+   rejection is the part worth keeping. This is not the Google Pay
+   logotype. It is page text, the letter G, set in Segoe UI at
+   weight 800 by the rule below, dressed to resemble a brand mark.
+   Accepting the exemption here would mean any text on any page
+   could opt out of the floor by asserting a brand, which empties
+   the rule. If this element ever becomes a real supplied
+   logotype, that is a different question and it should be argued
+   again from scratch.
+
+   WHY IT IS ACCEPTABLE ANYWAY, on grounds that survive scrutiny:
+     1. The whole mark is aria-hidden, so assistive technology
+        never reads it. It functions as an icon, and icons are
+        governed by the 3 to 1 non-text contrast criterion, which
+        3.41 clears.
+     2. The tile's accessible name is not this text at all. It
+        lives in a separate screen-reader span reading
+        "Google Pay", so nothing that a reader depends on hangs
+        off these pixels.
+     3. A sighted reader is not left guessing either: the word
+        "Pay" sits immediately beside the G at 15.38 to 1
+        (15.39 by the shop-side computation, a rounding
+        difference), on the same tile.
+
+   THE STANDING INSTRUCTION. The next time this tile is opened for
+   ANY other reason, take #1558C0 with it. That is Google's own
+   darker blue, it computes 6.29 to 1 on the same face, and it
+   clears the text floor outright so the argument above stops
+   being needed. It is not being taken today only because
+   repainting a payment brand mark is not a change to make as a
+   side effect of a chrome round. */
 .mark-googlepay .g-blue {
   color: #4285F4;
   font-size: 1.05rem;

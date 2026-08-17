@@ -7,24 +7,31 @@
 <meta name="description" content="The Orvanna agent catalog: artificial intelligence agents, bundles, and packs as monthly subscriptions or one-time purchases. Demonstration storefront, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="css/corporate.css?v=5.2">
+<!-- The shared chrome, in this order on purpose. corporate.css carries the
+     page tokens and the reading surface; css/site-chrome.css owns the bar and
+     the footer for all nine corporate pages, and it also DECLARES the
+     --chrome-* tokens, so it has to load before anything that reads them;
+     css/shop.css comes last because it owns the commerce layer and the cart,
+     which the contract calls a function of this page rather than chrome. -->
+<link rel="stylesheet" href="css/site-chrome.css?v=5.2">
 <link rel="stylesheet" href="css/shop.css?v=5.2">
-<script>document.documentElement.classList.add('js');</script>
-<!-- Theme, applied BEFORE first paint (corporate chrome contract, section 3).
-     This is deliberately inline and deliberately in the head: a deferred
-     script would let the dark theme paint first and then snap to light,
-     which on the checkout reads as the page reloading mid-payment. Dark is
-     the default, so a visitor who has never pressed the icon sees exactly
-     what they see today. One key for the whole site: orvanna-theme.
-     js/site-chrome.js owns everything after this: the button, the label,
-     and writing the choice back. -->
+<!-- Why this page in particular must never defer the block below: a deferred
+     script would let dark paint first and then snap to light, which on a
+     checkout reads as the page reloading mid-payment. The wording below is
+     the shared one, byte for byte, so build_dist.py's theme_boot lint holds
+     this page to the same snippet as the other eight. -->
+<!-- Theme boot. Applies the stored choice before first paint, so no page ever
+     flashes the wrong palette. Dark is the default everywhere, so a visitor who
+     never touches the theme icon sees exactly what they saw before. One key for
+     the whole site: orvanna-theme. See docs/CORPORATE-CHROME-CONTRACT.md. -->
 <script>
 (function () {
+  var theme = 'dark';
   try {
-    var saved = window.localStorage.getItem('orvanna-theme');
-    document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
+    if (window.localStorage.getItem('orvanna-theme') === 'light') { theme = 'light'; }
+  } catch (err) { /* storage blocked: dark, the default, stands */ }
+  document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.classList.add('js');
 })();
 </script>
 </head>

@@ -1,0 +1,146 @@
+page,theme,selector,text,foreground,background,font_px,large_text,ratio,floor,verdict
+comp-plan.html,light,"span.chip.soon","approved, not built",rgb(180 83 9),rgb(254 243 199),9.6,false,4.51,4.5,pass
+library.html,light,"span.tag-soon","Not yet written",rgb(107 114 128),rgb(248 250 252),9.92,false,4.621,4.5,pass
+conductor.html,light,"em.q","an ensemble plays, a team sells.",rgb(14 116 144),rgb(231 241 244),16.96,false,4.667,4.5,pass
+conductor.html,light,"span.chip.chip-lit","Coming",rgb(14 116 144),rgb(231 241 244),10.56,false,4.667,4.5,pass
+library-agent.html,light,"span.sep","/",rgb(107 114 128),rgb(255 255 255),11.84,false,4.834,4.5,pass
+shop.html,light,"span.pv-now","0 / 100 PV",rgb(14 116 144),rgb(241 244 250),11.84,false,4.863,4.5,pass
+shop.html,light,"span.total-pv-num","0 PV",rgb(14 116 144),rgb(241 244 250),13.76,false,4.863,4.5,pass
+comp-plan.html,light,"p.kicker","Section one",rgb(14 116 144),rgb(244 246 251),11.84,false,4.955,4.5,pass
+comp-plan.html,light,"a","Back to the top of the brochure",rgb(14 116 144),rgb(244 246 251),16,false,4.955,4.5,pass
+conductor.html,light,"p.kicker","The name",rgb(14 116 144),rgb(244 246 251),12.48,false,4.955,4.5,pass
+library-agent.html,light,"span.price-pv","100 Personal Volume (PV) a month",rgb(14 116 144),rgb(248 250 252),11.84,false,5.121,4.5,pass
+index.html,light,"span.count","12",rgb(14 116 144),rgb(252 253 254),51.2,true,5.238,3,pass
+product.html,light,"span.product-pv.pdp-pv","100 PV",rgb(14 116 144),rgb(252 253 254),13.76,false,5.238,4.5,pass
+shop.html,light,"span.tier-badge.badge-domain","Domain",rgb(14 116 144),rgb(252 253 254),9.92,false,5.238,4.5,pass
+shop.html,light,"span.product-pv","100 PV",rgb(14 116 144),rgb(252 253 254),12.48,false,5.238,4.5,pass
+team.html,light,"span.role-tag.tag-human","Human, founder",rgb(14 116 144),rgb(252 253 254),9.92,false,5.238,4.5,pass
+team.html,light,"p.phase-num","Phase 1-2",rgb(14 116 144),rgb(252 253 254),11.2,false,5.238,4.5,pass
+library.html,dark,"span.tag-soon","Not yet written",rgb(124 138 160),rgb(12 20 36),9.92,false,5.258,4.5,pass
+comp-plan.html,light,"p.kicker","Before you start",rgb(14 116 144),rgb(255 255 255),11.84,false,5.358,4.5,pass
+conductor.html,light,"p.kicker","The opportunity",rgb(14 116 144),rgb(255 255 255),12.48,false,5.358,4.5,pass
+conductor.html,light,"a.btn.btn-solid","See what a Conductor sells",rgb(255 255 255),rgb(14 116 144),13.76,false,5.358,4.5,pass
+conductor.html,light,"p.word","Ensemble",rgb(14 116 144),rgb(255 255 255),11.2,false,5.358,4.5,pass
+conductor.html,light,"td","20 minutes",rgb(14 116 144),rgb(255 255 255),16,false,5.358,4.5,pass
+conductor.html,light,"b","Done when",rgb(14 116 144),rgb(255 255 255),11.52,false,5.358,4.5,pass
+index.html,light,"p.kicker","Our story",rgb(14 116 144),rgb(255 255 255),12.48,false,5.358,4.5,pass
+index.html,light,"a.btn.btn-solid","Browse the catalog",rgb(255 255 255),rgb(14 116 144),13.76,false,5.358,4.5,pass
+library-agent.html,light,"span.badge.badge-domain","Domain agent",rgb(14 116 144),rgb(255 255 255),9.92,false,5.358,4.5,pass
+library-agent.html,light,"a","Open in the shop",rgb(14 116 144),rgb(255 255 255),14.4,false,5.358,4.5,pass
+library.html,light,"p.kicker","Conductor library",rgb(14 116 144),rgb(255 255 255),12.48,false,5.358,4.5,pass
+library.html,light,"button.filter-pill","All sixteen",rgb(255 255 255),rgb(14 116 144),12.16,false,5.358,4.5,pass
+library.html,light,"span.badge.badge-domain","Domain agent",rgb(14 116 144),rgb(255 255 255),9.92,false,5.358,4.5,pass
+library.html,light,"span.lib-card-pv","100 PV",rgb(14 116 144),rgb(255 255 255),12.16,false,5.358,4.5,pass
+library.html,light,"span.lib-card-go","Read the full entry",rgb(14 116 144),rgb(255 255 255),11.2,false,5.358,4.5,pass
+library.html,light,"a","Manager Agent",rgb(14 116 144),rgb(255 255 255),14.4,false,5.358,4.5,pass
+library.html,light,"strong","Ignition Pack",rgb(14 116 144),rgb(255 255 255),15.04,false,5.358,4.5,pass
+product.html,light,"span.tier-badge.badge-domain","Domain agent",rgb(14 116 144),rgb(255 255 255),9.92,false,5.358,4.5,pass
+shop.html,light,"p.kicker","The catalog",rgb(14 116 144),rgb(255 255 255),12.48,false,5.358,4.5,pass
+team.html,light,"p.kicker","The team",rgb(14 116 144),rgb(255 255 255),12.48,false,5.358,4.5,pass
+team.html,light,"a.btn.btn-solid","Browse the catalog",rgb(255 255 255),rgb(14 116 144),13.76,false,5.358,4.5,pass
+shop.html,dark,"span.tier-badge.badge-bundle","Bundle",rgb(167 139 250),rgb(30 41 59),9.92,false,5.375,4.5,pass
+library-agent.html,light,"p.table-note","The catalog is a loop: the last en",rgb(91 100 114),rgb(241 244 250),13.12,false,5.429,4.5,pass
+library.html,light,"p.lead","Six domain agents that run a whole",rgb(91 100 114),rgb(241 244 250),16,false,5.429,4.5,pass
+library.html,light,"p.table-note","The parts column is the sum of the",rgb(91 100 114),rgb(241 244 250),13.12,false,5.429,4.5,pass
+shop.html,light,"span","Qualified month",rgb(91 100 114),rgb(241 244 250),11.84,false,5.429,4.5,pass
+shop.html,light,"p.pv-meter-note","A qualified month needs 100 PV.",rgb(91 100 114),rgb(241 244 250),12.16,false,5.429,4.5,pass
+faq.html,light,"a.faq-chip","Getting started",rgb(79 70 229),rgb(239 238 253),13.12,false,5.497,4.5,pass
+comp-plan.html,light,"span.chip.no","no",rgb(185 28 28),rgb(253 232 230),10.56,false,5.503,4.5,pass
+comp-plan.html,light,"figcaption","One order through the monthly comm",rgb(91 100 114),rgb(244 246 251),13.44,false,5.532,4.5,pass
+comp-plan.html,light,"p.lead","One sentence each, with no jargon ",rgb(91 100 114),rgb(244 246 251),16.96,false,5.532,4.5,pass
+comp-plan.html,light,"p.small","Qualification resets every month. ",rgb(91 100 114),rgb(244 246 251),13.76,false,5.532,4.5,pass
+faq.html,light,"p.faq-intro","These are the questions Conductors",rgb(91 100 114),rgb(244 246 251),16,false,5.532,4.5,pass
+faq.html,light,"p.faq-group-note","What Orvanna is, what a Conductor ",rgb(91 100 114),rgb(244 246 251),15.04,false,5.532,4.5,pass
+faq.html,light,"p.faq-disclaimer","Nothing on this page is an earning",rgb(91 100 114),rgb(244 246 251),13.92,false,5.532,4.5,pass
+comp-plan.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(6 11 24),13.76,false,5.614,4.5,pass
+comp-plan.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(6 11 24),13.76,false,5.614,4.5,pass
+conductor.html,dark,"p.note","Enrollment opens soon. This page d",rgb(124 138 160),rgb(6 11 24),13.44,false,5.614,4.5,pass
+library-agent.html,dark,"span.sep","/",rgb(124 138 160),rgb(6 11 24),11.84,false,5.614,4.5,pass
+conductor.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+conductor.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+faq.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+faq.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+index.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+index.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+library-agent.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+library-agent.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+library.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+library.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+product.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+product.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+shop.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+shop.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+team.html,dark,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+team.html,light,"p.legal","Orvanna is a demonstration company",rgb(124 138 160),rgb(5 9 20),12.48,false,5.684,4.5,pass
+conductor.html,dark,"th","When",rgb(148 163 184),rgb(30 41 59),11.2,false,5.705,4.5,pass
+conductor.html,dark,"p.step-when","Week 1",rgb(148 163 184),rgb(30 41 59),10.88,false,5.705,4.5,pass
+conductor.html,dark,"p.done","Done when you have read one of its",rgb(148 163 184),rgb(30 41 59),14.72,false,5.705,4.5,pass
+index.html,dark,"div.metric-label","Specialist AI agents, sold solo or",rgb(148 163 184),rgb(30 41 59),12.8,false,5.705,4.5,pass
+index.html,dark,"p.card-body","A domain agent owns one function: ",rgb(148 163 184),rgb(30 41 59),15.04,false,5.705,4.5,pass
+index.html,dark,"p.feature-body","One layer assigns the work, sequen",rgb(148 163 184),rgb(30 41 59),15.04,false,5.705,4.5,pass
+index.html,dark,"p.teaser-note","(founder biography copy)",rgb(148 163 184),rgb(30 41 59),14.4,false,5.705,4.5,pass
+product.html,dark,"span.mode-note","Renews monthly. Cancel anytime.",rgb(148 163 184),rgb(30 41 59),12.48,false,5.705,4.5,pass
+product.html,dark,"span.pdp-per","/ month",rgb(148 163 184),rgb(30 41 59),12.48,false,5.705,4.5,pass
+product.html,dark,"p.pdp-pv-note","Every purchase carries Personal Vo",rgb(148 163 184),rgb(30 41 59),11.84,false,5.705,4.5,pass
+product.html,dark,"p.pdp-digital","Digital delivery: this product act",rgb(148 163 184),rgb(30 41 59),12.16,false,5.705,4.5,pass
+product.html,dark,"p.prose-body","Failed payments are quiet losses. ",rgb(148 163 184),rgb(30 41 59),13.44,false,5.705,4.5,pass
+shop.html,dark,"p.product-desc","Runs checkout, retries, and settle",rgb(148 163 184),rgb(30 41 59),14.72,false,5.705,4.5,pass
+shop.html,dark,"span.per","/ month",rgb(148 163 184),rgb(30 41 59),12.16,false,5.705,4.5,pass
+shop.html,dark,"div.product-once-hint","Own it outright: $1,000.00",rgb(148 163 184),rgb(30 41 59),11.84,false,5.705,4.5,pass
+shop.html,dark,"div.product-includes","Includes: Software Engineer, Secre",rgb(148 163 184),rgb(30 41 59),12.48,false,5.705,4.5,pass
+team.html,dark,"p.profile-bio","(founder biography copy)",rgb(148 163 184),rgb(30 41 59),15.2,false,5.705,4.5,pass
+team.html,dark,"p.member-bio","Writes the rulebook: the schema sp",rgb(148 163 184),rgb(30 41 59),13.6,false,5.705,4.5,pass
+team.html,dark,"p.phase-body","The rulebook and the database: the",rgb(148 163 184),rgb(30 41 59),13.6,false,5.705,4.5,pass
+library-agent.html,light,"span.per","/ month",rgb(91 100 114),rgb(248 250 252),11.2,false,5.717,4.5,pass
+library.html,light,"p","The first fourteen days: activatin",rgb(91 100 114),rgb(248 250 252),14.72,false,5.717,4.5,pass
+faq.html,light,"p.faq-kicker","Frequently asked questions",rgb(79 70 229),rgb(244 246 251),12.16,false,5.815,4.5,pass
+faq.html,light,"span.faq-group-num","01",rgb(79 70 229),rgb(244 246 251),11.84,false,5.815,4.5,pass
+shop.html,light,"div.cart-empty","Your cart is empty.Add an agent fr",rgb(91 100 114),rgb(251 252 254),14.72,false,5.825,4.5,pass
+index.html,light,"div.metric-label","Specialist AI agents, sold solo or",rgb(91 100 114),rgb(252 253 254),12.8,false,5.849,4.5,pass
+index.html,light,"p.card-body","A domain agent owns one function: ",rgb(91 100 114),rgb(252 253 254),15.04,false,5.849,4.5,pass
+index.html,light,"p.feature-body","One layer assigns the work, sequen",rgb(91 100 114),rgb(252 253 254),15.04,false,5.849,4.5,pass
+index.html,light,"p.teaser-note","(founder biography copy)",rgb(91 100 114),rgb(252 253 254),14.4,false,5.849,4.5,pass
+product.html,light,"span.mode-note","Renews monthly. Cancel anytime.",rgb(91 100 114),rgb(252 253 254),12.48,false,5.849,4.5,pass
+product.html,light,"span.pdp-per","/ month",rgb(91 100 114),rgb(252 253 254),12.48,false,5.849,4.5,pass
+product.html,light,"p.pdp-pv-note","Every purchase carries Personal Vo",rgb(91 100 114),rgb(252 253 254),11.84,false,5.849,4.5,pass
+product.html,light,"p.pdp-digital","Digital delivery: this product act",rgb(91 100 114),rgb(252 253 254),12.16,false,5.849,4.5,pass
+product.html,light,"p.prose-body","Failed payments are quiet losses. ",rgb(91 100 114),rgb(252 253 254),13.44,false,5.849,4.5,pass
+shop.html,light,"p.product-desc","Runs checkout, retries, and settle",rgb(91 100 114),rgb(252 253 254),14.72,false,5.849,4.5,pass
+shop.html,light,"span.per","/ month",rgb(91 100 114),rgb(252 253 254),12.16,false,5.849,4.5,pass
+shop.html,light,"div.product-once-hint","Own it outright: $1,000.00",rgb(91 100 114),rgb(252 253 254),11.84,false,5.849,4.5,pass
+shop.html,light,"div.product-includes","Includes: Software Engineer, Secre",rgb(91 100 114),rgb(252 253 254),12.48,false,5.849,4.5,pass
+team.html,light,"p.profile-bio","(founder biography copy)",rgb(91 100 114),rgb(252 253 254),15.2,false,5.849,4.5,pass
+team.html,light,"p.member-bio","Writes the rulebook: the schema sp",rgb(91 100 114),rgb(252 253 254),13.6,false,5.849,4.5,pass
+team.html,light,"p.phase-body","The rulebook and the database: the",rgb(91 100 114),rgb(252 253 254),13.6,false,5.849,4.5,pass
+comp-plan.html,light,"p.small","Acronym key for this page: Persona",rgb(91 100 114),rgb(255 255 255),13.76,false,5.982,4.5,pass
+comp-plan.html,light,"span.toc-note","the whole model",rgb(91 100 114),rgb(255 255 255),12.48,false,5.982,4.5,pass
+comp-plan.html,light,"p.lead","Two roles exist in this plan, and ",rgb(91 100 114),rgb(255 255 255),16.96,false,5.982,4.5,pass
+comp-plan.html,light,"figcaption","Two different things, two differen",rgb(91 100 114),rgb(255 255 255),13.44,false,5.982,4.5,pass
+comp-plan.html,light,"caption.small","The twelve agents the compensation",rgb(91 100 114),rgb(255 255 255),13.76,false,5.982,4.5,pass
+comp-plan.html,light,"span.small","run one business function end to e",rgb(91 100 114),rgb(255 255 255),13.76,false,5.982,4.5,pass
+conductor.html,light,"p.note","Enrollment opens soon. This page d",rgb(91 100 114),rgb(255 255 255),13.44,false,5.982,4.5,pass
+conductor.html,light,"figcaption","Left, an ensemble: agents around o",rgb(91 100 114),rgb(255 255 255),13.76,false,5.982,4.5,pass
+conductor.html,light,"th","When",rgb(91 100 114),rgb(255 255 255),11.2,false,5.982,4.5,pass
+conductor.html,light,"p.step-when","Week 1",rgb(91 100 114),rgb(255 255 255),10.88,false,5.982,4.5,pass
+conductor.html,light,"p.done","Done when you have read one of its",rgb(91 100 114),rgb(255 255 255),14.72,false,5.982,4.5,pass
+faq.html,light,"dd","Somebody enrolled in the Orvanna p",rgb(91 100 114),rgb(255 255 255),14.88,false,5.982,4.5,pass
+faq.html,light,"span.faq-jump-label","Jump to",rgb(91 100 114),rgb(255 255 255),11.52,false,5.982,4.5,pass
+faq.html,light,"p.faq-group-note","What things cost, what a one-time ",rgb(91 100 114),rgb(255 255 255),15.04,false,5.982,4.5,pass
+faq.html,light,"p","If the answer is not here, ask and",rgb(91 100 114),rgb(255 255 255),16,false,5.982,4.5,pass
+index.html,light,"p.lead","Orvanna builds AI agents that a bu",rgb(91 100 114),rgb(255 255 255),16,false,5.982,4.5,pass
+library-agent.html,light,"a","Conductor Library",rgb(91 100 114),rgb(255 255 255),11.84,false,5.982,4.5,pass
+library-agent.html,light,"p.detail-blurb","Runs checkout, retries, and settle",rgb(91 100 114),rgb(255 255 255),16.32,false,5.982,4.5,pass
+library-agent.html,light,"p.price-note","Personal Volume (PV) equals dollar",rgb(91 100 114),rgb(255 255 255),12.8,false,5.982,4.5,pass
+library-agent.html,light,"span","Buy it or read the sales page:",rgb(91 100 114),rgb(255 255 255),14.4,false,5.982,4.5,pass
+library-agent.html,light,"span.walk-dir","Previous",rgb(91 100 114),rgb(255 255 255),10.24,false,5.982,4.5,pass
+library.html,light,"p.hero-sub","The shop is built to sell. This li",rgb(91 100 114),rgb(255 255 255),16.8,false,5.982,4.5,pass
+library.html,light,"a.rail-link","About this library",rgb(91 100 114),rgb(255 255 255),11.2,false,5.982,4.5,pass
+library.html,light,"p.lead","A Conductor who knows the product ",rgb(91 100 114),rgb(255 255 255),16,false,5.982,4.5,pass
+library.html,light,"span.lib-card-blurb","Runs checkout, retries, and settle",rgb(91 100 114),rgb(255 255 255),14.4,false,5.982,4.5,pass
+library.html,light,"span.per","/ month",rgb(91 100 114),rgb(255 255 255),11.52,false,5.982,4.5,pass
+library.html,light,"span.lib-card-once","Or $1,000.00 once, at 1,000 PV",rgb(91 100 114),rgb(255 255 255),12.16,false,5.982,4.5,pass
+library.html,light,"p.table-note","Sixteen items in total. Every one-",rgb(91 100 114),rgb(255 255 255),13.12,false,5.982,4.5,pass
+product.html,light,"a.back-to-shop","Back to the catalog",rgb(91 100 114),rgb(255 255 255),12.48,false,5.982,4.5,pass
+product.html,light,"p.pdp-blurb","Runs checkout, retries, and settle",rgb(91 100 114),rgb(255 255 255),15.68,false,5.982,4.5,pass
+shop.html,light,"p.shop-hero-sub","Every item is a monthly subscripti",rgb(91 100 114),rgb(255 255 255),16,false,5.982,4.5,pass
+team.html,light,"p.lead","Orvanna sells artificial intellige",rgb(91 100 114),rgb(255 255 255),16,false,5.982,4.5,pass

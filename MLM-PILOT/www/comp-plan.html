@@ -6,6 +6,7 @@
 <title>Orvanna Compensation Plan</title>
 <meta name="description" content="The Orvanna compensation plan, version 1.3: how a Conductor earns, every term defined, every earning mechanism with worked arithmetic, the rank ladder, and the qualification rules. Demonstration document, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="css/site-chrome.css?v=5.2">
 <!-- Theme boot. Applies the stored choice before first paint, so no page ever
      flashes the wrong palette. Dark is the default everywhere, so a visitor who
      never touches the theme icon sees exactly what they saw before. One key for
@@ -86,16 +87,13 @@
   --d-good-stroke: #6EE7B7;
   --d-hatch:       rgba(129, 140, 248, 0.30);
 
-  /* --- chrome that never themes: the navigation strip and the cover are
-         dark in both themes, the way a printed brochure's cover is a fixed
-         object rather than a preference --- */
+  /* --- the cover's own fixed-dark tokens. The cover is dark in both
+         themes the way a printed brochure's cover is a fixed object
+         rather than a preference. The rest of the --chrome-* family
+         (text, head, muted, quiet, line) is declared once in
+         css/site-chrome.css and read from there. --- */
   --chrome:       #060B18;
   --chrome-2:     #0A1226;
-  --chrome-text:  #C7D0DE;
-  --chrome-head:  #F1F5F9;
-  --chrome-muted: #94A3B8;
-  --chrome-quiet: #7C8AA0;
-  --chrome-line:  rgba(129, 140, 248, 0.18);
   --chrome-lit:   #22D3EE;
   --chrome-ind:   #A5B4FC;
 
@@ -168,83 +166,20 @@ img, svg { max-width: 100%; display: block; }
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
 .narrow { max-width: 760px; }
 
-/* ------------------------------------------------------- navigation strip */
+/* ------------------------------------------------------- navigation strip
+   The navigation bar, the theme control, the Support control and the
+   Sign In link are styled by css/site-chrome.css, linked above. They
+   used to be declared here in full, and separately in corporate.css,
+   library.css and conductor.html. Quality assurance measured this page
+   on 2026-08-17 and it rendered the bar at 12.80 pixel type with a 20
+   pixel gap in a 65 pixel header, against 13.44, 26 and 69 elsewhere,
+   and at 390 pixels wide it left-packed the items instead of centring
+   them. Same markup, different bar: the owner's original complaint,
+   surviving on this page. Do not reintroduce a chrome rule here;
+   deploy/build_dist.py fails the build on it. */
 
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: rgba(6, 11, 24, 0.94);
-  border-bottom: 1px solid var(--chrome-line);
-  backdrop-filter: blur(9px);
-}
-.nav-inner {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 12px 28px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.nav-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  color: #F8FAFC;
-  text-decoration: none;
-  flex-shrink: 0;
-  min-width: 0;
-}
-.nav-logo { height: 30px; width: auto; }
-.brand-mark {
-  width: 18px;
-  height: 18px;
-  border: 1px solid rgba(34, 211, 238, 0.75);
-  border-radius: 5px;
-  box-shadow: inset 0 0 0 3px rgba(129, 140, 248, 0.18);
-}
-.brand-word {
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-.nav-links {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.nav-link {
-  color: var(--chrome-text);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  transition: color 0.16s ease;
-}
-.nav-link:hover { color: var(--chrome-lit); }
-.nav-link.is-active { color: var(--chrome-lit); }
-.nav-link.is-soon { color: #7C8AA0; cursor: default; }
-.soon-pill {
-  margin-left: 7px;
-  font-size: 0.58rem;
-  letter-spacing: 0.18em;
-  border: 1px solid #7C8AA0;
-  border-radius: 999px;
-  padding: 1px 7px;
-}
-.nav-signin {
-  color: var(--chrome-lit);
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
+/* .chrome-btn is NOT chrome despite the name: it is the brochure's own
+   Print and Contents buttons on the cover. It keeps its rules here. */
 .chrome-btn {
   font: inherit;
   font-size: 0.7rem;
@@ -263,59 +198,6 @@ img, svg { max-width: 100%; display: block; }
 .chrome-btn:hover { color: var(--chrome-lit); border-color: var(--accent-line); }
 .chrome-btn:focus-visible { outline: 2px solid var(--chrome-lit); outline-offset: 2px; }
 
-/* ---------- the theme control and the Support control ----------
-   Both are shared chrome now, driven by js/site-chrome.js. The
-   theme control is icon only: a sun while the dark theme is on, a
-   moon while the light theme is on, never the words Light or Dark.
-   The text button that used to sit here, reading the literal word
-   Dark, is gone. Forty by forty pixels is the minimum comfortable
-   target on a laptop trackpad. Same rule as corporate.css and
-   library.css, on purpose: this is chrome, and chrome is shared. */
-
-.nav-theme {
-  font: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 auto;
-  padding: 0;
-  border: 1px solid var(--chrome-line);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--chrome-text);
-  cursor: pointer;
-  transition: color 0.16s ease, border-color 0.16s ease, background-color 0.16s ease;
-}
-.nav-theme:hover {
-  color: var(--chrome-lit);
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(34, 211, 238, 0.08);
-}
-.nav-theme:focus-visible { outline: 2px solid var(--chrome-lit); outline-offset: 2px; }
-.nav-theme svg { width: 19px; height: 19px; }
-.nav-theme .icon-sun  { display: block; }
-.nav-theme .icon-moon { display: none; }
-:root[data-theme="light"] .nav-theme .icon-sun  { display: none; }
-:root[data-theme="light"] .nav-theme .icon-moon { display: block; }
-
-/* The Support control is a real button sitting among links, so the
-   browser's own widget styling is reset explicitly; colour and size
-   come from .nav-link beside it. Support did nothing on this page
-   before this round, because the widget was never loaded here. */
-.nav-support {
-  font-family: inherit;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-
-/* The chat vendor's own floating action button is suppressed, as it
-   is everywhere else: the panel opens from the Support item and
-   from nowhere else. */
-.bpFab { display: none !important; }
 
 /* -------------------------------------------------------------- the cover */
 
@@ -551,7 +433,9 @@ details.ledger[open] { padding-bottom: 18px; }
 .foot a { color: var(--chrome-ind); }
 .foot-links { display: flex; flex-wrap: wrap; gap: 22px; margin-bottom: 18px; }
 .foot-links a { text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.75rem; font-weight: 600; }
-.legal { color: #7C8AA0; max-width: 62em; }
+/* Inside .foot, the brochure's own footer, which is a different
+   element from the shared site footer that css/site-chrome.css owns. */
+.foot .legal { color: #7C8AA0; max-width: 62em; font-size: 0.86rem; }
 
 /* ------------------------------------------------------------ responsive */
 
@@ -566,8 +450,6 @@ details.ledger[open] { padding-bottom: 18px; }
   .deflist { grid-template-columns: 1fr; }
   .deflist dt { border-bottom: 0; padding-bottom: 0; }
   .deflist dd { padding-top: 4px; }
-  .nav-links { gap: 13px; }
-  .nav-link, .nav-signin { font-size: 0.7rem; letter-spacing: 0.1em; }
   .toc a { flex-wrap: wrap; }
   .toc .toc-note { margin-left: 3.2em; text-align: left; }
 }
@@ -605,7 +487,9 @@ details.ledger[open] { padding-bottom: 18px; }
   }
   @page { margin: 15mm 14mm; }
   body { background: #FFFFFF; color: #1F2937; font-size: 11pt; line-height: 1.5; }
-  .nav, .cover-actions, .no-print { display: none !important; }
+  /* .nav is hidden by css/site-chrome.css, which owns the chrome in
+     print as well as on screen. */
+  .cover-actions, .no-print { display: none !important; }
   .cover { background: #FFFFFF; color: #0F172A; padding: 0 0 18px; border-bottom: 2px solid #4F46E5; }
   .cover::before, .cover::after { display: none; }
   .cover h1 { color: #0F172A; }
@@ -627,7 +511,7 @@ details.ledger[open] { padding-bottom: 18px; }
   details.ledger > summary { list-style: none; }
   .foot { background: #FFFFFF; color: #4B5563; border-top: 2px solid #4F46E5; padding: 14px 0 0; }
   .foot a, .foot-links { color: #1F2937; }
-  .legal { color: #4B5563; }
+  .foot .legal { color: #4B5563; }
   a { color: #0F172A; text-decoration: none; }
 }
 

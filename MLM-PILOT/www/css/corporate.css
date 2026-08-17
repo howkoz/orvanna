@@ -83,27 +83,33 @@
   /* ---- the hero: dark in both themes (see the note above) ---- */
   --hero-bg:      #060B18;
 
-  /* ---- the chrome: dark in both themes, declared once ---- */
-  --chrome-bg:     rgba(6, 11, 24, 0.94);
-  --chrome-foot:   #050914;
-  --chrome-hi:     #FFFFFF;
-  --chrome-head:   #F1F5F9;
-  --chrome-brand:  #F8FAFC;
-  --chrome-text:   #C7D0DE;
-  --chrome-muted:  #94A3B8;
-  --chrome-quiet:  #7C8AA0;
-  --chrome-line:   rgba(129, 140, 248, 0.18);
-  --chrome-accent: #22D3EE;
-  --chrome-indigo: #818CF8;
+  /* The --chrome-* tokens moved to css/site-chrome.css, which is
+     now the single source of chrome presentation for all nine
+     corporate pages. Rules in this file may still READ them. */
 }
 
 /* ------------------------------------------------------------
-   THE LIGHT THEME. Only tokens are restated. Fifty-six
-   text-on-background pairs were computed across the two themes
-   when this was authored, alpha compositing included, and the
-   lowest was 4.51 to 1; nothing on these pages sits below the
-   4.5 to 1 floor in either theme. The values carrying their own
-   figure below are the ones worth knowing by heart.
+   THE LIGHT THEME. Only tokens are restated.
+
+   MEASURED, NOT ASSERTED. 4,314 rendered elements were swept
+   across the nine corporate pages in both themes on 2026-08-17,
+   compositing every translucent and gradient layer down to an
+   opaque backdrop. Zero fall below the floor. The lowest in the
+   light theme is 4.510, the "approved, not built" chip on the
+   compensation plan; the lowest in the dark theme among
+   load-state elements is 5.258, and the property's true dark
+   floor is 5.101 at the shop's Checkout button, which the
+   verifier reached by driving the checkout.
+
+   The evidence, the raw rows and the script that produces them
+   are in docs/verification/CONTRAST-SWEEP-2026-08-17.md.
+
+   An earlier version of this comment claimed "fifty-six pairs"
+   and a 5.32 dark floor. That was a token-pair matrix presented
+   as though it were page coverage, and the 5.32 was a real token
+   pair attached to the wrong element. Both were corrected after
+   the verifier could not reproduce them. The per-token figures
+   below are individually checked.
    ------------------------------------------------------------ */
 
 :root[data-theme="light"] {
@@ -408,184 +414,18 @@ section { scroll-margin-top: 84px; }
 .accent-bar.bar-violet { background: linear-gradient(90deg, var(--violet), var(--cyan)); }
 
 /* ============================================================
-   NAV: glass, sticky, underline sweep
+   NAV, THEME BUTTON, SUPPORT BUTTON, FOOTER: all moved to
+   css/site-chrome.css on 2026-08-17.
+
+   They were here, and in library.css, and inline in
+   comp-plan.html and conductor.html: four hand-maintained
+   copies of one component. Quality assurance measured the
+   consequence and comp-plan rendered the bar at 12.80 pixel
+   type with a 20 pixel gap in a 65 pixel header while these
+   pages rendered 13.44, 26 and 69, so the bar still changed
+   when the reader clicked Plan. Do not reintroduce a chrome
+   rule here; deploy/build_dist.py fails the build on it.
    ============================================================ */
-
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--chrome-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--chrome-line);
-}
-
-.nav-inner {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 14px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.nav-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  color: var(--chrome-brand);
-  text-decoration: none;
-  flex-shrink: 0;
-  min-width: 0;
-}
-.nav-logo  { height: 30px; width: auto; }
-
-.brand-mark {
-  width: 18px;
-  height: 18px;
-  border: 1px solid rgba(34, 211, 238, 0.75);
-  border-radius: 5px;
-  box-shadow: inset 0 0 0 3px rgba(129, 140, 248, 0.18);
-}
-
-.brand-word {
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  flex-wrap: wrap;
-}
-
-.nav-link {
-  position: relative;
-  font-size: 0.84rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  text-decoration: none;
-  color: var(--chrome-text);
-  padding-bottom: 3px;
-  transition: color 0.15s ease;
-}
-
-a.nav-link:hover { color: var(--chrome-hi); }
-
-/* underline sweep: gradient bar grows from the left on hover */
-a.nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--chrome-accent), var(--chrome-indigo));
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.28s ease;
-}
-a.nav-link:hover::after,
-a.nav-link.is-active::after { transform: scaleX(1); }
-
-.nav-link.is-active { color: var(--chrome-hi); }
-
-.nav-link.is-soon {
-  /* #7C8AA0 (the .legal tone) instead of #64748B: the old value
-     computed 4.13 to 1 against the nav field, under the 4.5 to 1
-     floor. This one computes 5.61 to 1 on solid navy and 5.48 to 1
-     over the strongest glow wash, and still sits well below the
-     live links (Sign In 7.66, nav links 12.64), so the pill keeps
-     its muted "not yet" register. */
-  color: var(--chrome-quiet);
-  cursor: default;
-}
-
-.soon-pill {
-  display: inline-block;
-  margin-left: 7px;
-  padding: 1px 7px 2px;
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
-  border: 1px solid rgba(124, 138, 160, 0.7);
-  border-radius: 999px;
-  vertical-align: 2px;
-}
-
-/* Quiet member entry: the one door to the member area.
-   Deliberately understated so first-time visitors skim past it. */
-.nav-signin {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  text-decoration: none;
-  color: var(--chrome-muted);
-  border-left: 1px solid var(--chrome-line);
-  padding-left: 24px;
-  transition: color 0.15s ease, text-shadow 0.15s ease;
-}
-
-.nav-signin:hover {
-  color: var(--chrome-accent);
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
-}
-
-/* ---------- the theme control ----------
-   Icon only, by instruction: a sun while the dark theme is on, a
-   moon while the light theme is on, and never the words Light or
-   Dark. The accessible name lives in aria-label and is rewritten
-   by js/site-chrome.js every time the theme changes, because an
-   icon-only control with a stale name lies in one of its states.
-   The box is 40 by 40 pixels, which is the minimum comfortable
-   target on a laptop trackpad. The control sits in the navigation
-   bar, which is dark in both themes, so it is coloured from the
-   fixed --chrome-* tokens. */
-
-.nav-theme {
-  font: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 auto;
-  padding: 0;
-  border: 1px solid var(--chrome-line);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--chrome-text);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.nav-theme:hover {
-  color: var(--chrome-accent);
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(34, 211, 238, 0.08);
-}
-
-.nav-theme:focus-visible {
-  outline: 2px solid var(--chrome-accent);
-  outline-offset: 2px;
-}
-
-.nav-theme svg { width: 19px; height: 19px; }
-
-/* Exactly one icon is ever visible. */
-.nav-theme .icon-sun  { display: block; }
-.nav-theme .icon-moon { display: none; }
-:root[data-theme="light"] .nav-theme .icon-sun  { display: none; }
-:root[data-theme="light"] .nav-theme .icon-moon { display: block; }
 
 /* ============================================================
    HERO: live constellation canvas behind centered copy
@@ -942,95 +782,7 @@ a.nav-link.is-active::after { transform: scaleX(1); }
   flex-wrap: wrap;
 }
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
-
-.footer {
-  background: var(--chrome-foot);
-  border-top: 1px solid var(--chrome-line);
-  padding: 64px 0 40px;
-  color: var(--chrome-muted);
-}
-
-.footer-cols {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
-  margin-bottom: 48px;
-}
-
-.footer-head {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--chrome-head);
-  margin-bottom: 14px;
-}
-
-.flink {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--chrome-muted);
-  padding: 3px 0;
-  cursor: default;
-  transition: color 0.15s ease;
-}
-
-.flink:hover { color: var(--chrome-text); }
-
-.footer-meta {
-  border-top: 1px solid var(--chrome-line);
-  padding-top: 28px;
-}
-
-.footer-contact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-
-.footer-mail {
-  color: var(--chrome-text);
-  text-decoration: none;
-  font-size: 0.92rem;
-  letter-spacing: 0.04em;
-  transition: color 0.15s ease, text-shadow 0.15s ease;
-}
-.footer-mail:hover {
-  color: var(--chrome-accent);
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
-}
-
-.socials { display: flex; gap: 14px; }
-
-.social {
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--chrome-line);
-  border-radius: 50%;
-  color: var(--chrome-muted);
-  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.social svg { width: 17px; height: 17px; }
-.social:hover {
-  color: var(--chrome-accent);
-  border-color: rgba(34, 211, 238, 0.5);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
-}
-
-.legal {
-  font-size: 0.78rem;
-  color: var(--chrome-quiet);
-  letter-spacing: 0.02em;
-}
+/* The footer moved to css/site-chrome.css. See the note above. */
 
 /* ============================================================
    LOGIN PAGE (login.html): centered glass card on the navy field
@@ -1076,6 +828,26 @@ a.nav-link.is-active::after { transform: scaleX(1); }
   text-decoration: none;
 }
 .login-logo img { height: 34px; width: auto; }
+
+/* The brand lockup, scoped to the login card. login.html is a
+   sign-in area, excluded from this round by name, so it does not
+   load css/site-chrome.css and cannot take the shared rule. This
+   is the one deliberate copy of .brand-mark and .brand-word, and
+   it is scoped so it can never style a navigation bar. */
+.login-logo .brand-mark {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(34, 211, 238, 0.75);
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 3px rgba(129, 140, 248, 0.18);
+}
+.login-logo .brand-word {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
 
 .login-card {
   position: relative;
@@ -1387,9 +1159,6 @@ a.nav-link.is-active::after { transform: scaleX(1); }
   margin: 0 auto 28px;
 }
 
-/* footer links that actually go somewhere */
-a.flink { text-decoration: none; cursor: pointer; }
-a.flink:hover { color: var(--chrome-accent); }
 
 /* ============================================================
    REDUCED MOTION: static everything, content fully visible
@@ -1420,23 +1189,12 @@ a.flink:hover { color: var(--chrome-accent); }
   .cards { grid-template-columns: 1fr; }
   .features { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr; gap: 22px; }
-  .footer-cols { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 480px) {
   .wrap { padding: 0 20px; }
   .hero-inner { padding: 0 20px; }
-  .nav-inner { padding: 12px 20px; justify-content: center; }
-  .nav-links { gap: 13px; justify-content: center; }
-  /* min-height 24px: the links measured about 23 pixels tall at this
-     size (quality assurance finding L5, fixed 2026-08-16); inline-flex
-     centres the label inside the taller touch target. */
-  .nav-link, .nav-signin { font-size: 0.72rem; letter-spacing: 0.1em;
-    min-height: 24px; display: inline-flex; align-items: center; }
-  .nav-signin { padding-left: 13px; }
-  .soon-pill { margin-left: 5px; padding: 1px 5px 2px; font-size: 0.55rem; }
   .leaders { grid-template-columns: 1fr; }
-  .footer-contact { justify-content: center; }
   .login-card { padding: 36px 24px 30px; }
   .member-grid { grid-template-columns: 1fr; }
   .phase-rail { grid-template-columns: 1fr; }
@@ -1446,23 +1204,10 @@ a.flink:hover { color: var(--chrome-accent); }
 }
 
 
-/* ---------- Support chat trigger (Botpress, nav driven) ----------
-   The vendor's floating action button is suppressed: the chat opens only from
-   the Support item in the navigation, so nothing floats over the cart control
-   on a phone or over the card form during checkout. The triggers are real
-   buttons, so the browser's own control styling is reset explicitly; color and
-   size still come from the companion nav class, which is the lesson from the
-   invisible-button defect of 2026-08-14. */
-.bpFab { display: none !important; }
-
-.nav-support {
-  font-family: inherit;
-  background: transparent;
-  border: 0;
-  padding: 0 0 3px;
-  cursor: pointer;
-}
-
+/* .bpFab and .nav-support moved to css/site-chrome.css.
+   .console-support is not corporate chrome: it is the support
+   trigger inside the member console, which does not load the
+   shared chrome sheet, so it stays here. */
 .console-support {
   font-family: inherit;
   background: transparent;

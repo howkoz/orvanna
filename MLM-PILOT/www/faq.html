@@ -7,6 +7,7 @@
 <meta name="description" content="Short, straight answers about the Orvanna Conductor program: the agents, the two purchase modes, how earning works, what makes a month qualified, and when commissions run. Demonstration company, all data synthetic.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="css/corporate.css?v=5.2">
+<link rel="stylesheet" href="css/site-chrome.css?v=5.2">
 <!-- Theme boot. Applies the stored choice before first paint, so no page ever
      flashes the wrong palette. Dark is the default everywhere, so a visitor who
      never touches the theme icon sees exactly what they saw before. One key for
@@ -429,7 +430,9 @@ body {
    rest: flat ink, no chrome, no chevrons. */
 
 @media print {
-  .nav, .footer, .faq-jump, .faq-sign { display: none !important; }
+  /* .nav and .footer are hidden by css/site-chrome.css, which owns
+     the chrome in print as well as on screen. */
+  .faq-jump, .faq-sign { display: none !important; }
   body { background: #FFFFFF; color: #111111; }
   .faq-hero, .faq-group, .faq-contact { background: #FFFFFF; padding: 18px 0; }
   .faq-item { border: 0; border-bottom: 1px solid #CCCCCC; border-radius: 0; margin: 0; }
@@ -450,7 +453,7 @@ body {
       <span class="brand-word">Orvanna</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="index.html">Learn</a>
+      <a class="nav-link is-active" href="index.html" aria-current="page">Learn</a>
       <a class="nav-link" href="shop.html">Shop</a>
       <a class="nav-link" href="library.html">Library</a>
       <a class="nav-link" href="comp-plan.html">Plan</a>
