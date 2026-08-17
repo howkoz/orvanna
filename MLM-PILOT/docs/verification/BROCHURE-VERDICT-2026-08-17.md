@@ -1280,3 +1280,366 @@ Two one-clause edits on the page whenever it is next touched, neither urgent:
 
 3. **L-8**, "the modelled runs" to the March run.
 4. **L-9**, add the 35 of 207 companion beside the 154 of 641.
+
+---
+---
+
+# DELTA RE-GATE, 2026-08-17, commit `2b20e11`
+
+**Graded by:** mlm-verifier
+**Scope:** narrow delta only, `3f43094` to `2b20e11`. Section 1A and its figure, plus anything
+they could have disturbed. The rest of the document was passed at `3f43094` and is not re-graded.
+
+## GATE: **PASS**
+## DEPLOY: **YES**
+
+All five lineage claims are true of this plan and match specification section 1A. No company is
+named anywhere on the page. The tone is provenance, not defence, and I could not find a single
+sentence that reads as answering a charge. The figure claims no protection the plan does not
+have. Every existing section number and every cross-reference is intact.
+
+Nine measured claims from the commit message reproduced exactly. One did not, at the level of
+wording rather than of effect, and it is finding L-1.
+
+Acronym key for this delta: Scalable Vector Graphics (SVG), Portable Document Format (PDF),
+Cascading Style Sheets (CSS), Commissionable Volume (CV), table of contents (ToC).
+
+### Artifacts graded, by hash
+
+| SHA-256 | Bytes | File |
+|---|---|---|
+| `872fa521416f2caa8e9bcd2884429bcfcc155ada45b33eae112aa59e1eefdf1a` | 215,055 | `MLM-PILOT/www/plan-brochure.html` |
+| `e21b073733147aba3a599d573a0f88acb93892f72a62450a243ac748da0a1550` | 67,067 | `MLM-PILOT/docs/ORVANNA-BUILDER-PLAN-SPEC.md` (reference, unchanged since `3f43094`) |
+| `68c564deebf204a74487d6414f7b81c65dd4fa4d489bbe72bd7a4b1d69c49d08` | 28,213 | `MLM-PILOT/docs/COMP-PLAN-INDUSTRY-ANALYSIS-2026-08-17.md` (rode along, not published) |
+
+Working tree clean at `2b20e11` throughout. Measured in Chrome against a local server, theme
+light, at 375, 768, 1024 and 1280 pixels, and in print through headless Chrome to PDF.
+
+---
+
+## F1. The five lineage claims, each checked twice
+
+Checked once against specification section 1A, and once against what this plan actually does.
+The second check is the one that matters, because a false claim about the plan's own mechanics
+in a document going to an expert is the worst thing this section could carry.
+
+| Row | Lineage | Failure named | Removal claimed | Matches spec 1A | True of this plan |
+|---|---|---|---|---|---|
+| Layer one, the unilevel spine | Unilevel, the most common chassis | Passivity toward development | Layers two and three pay for development; spine untouched | **Yes** | **Yes.** Spec section 2: unilevel v1.3 "exactly as live... Unchanged". The two paying layers exist. |
+| Layer two, the Builder override | Generational and breakaway, the oldest family | Volume theft | No breakaway, section seven; nothing leaves anybody's group | **Yes** | **Yes.** Spec section 3: "There is NO breakaway in this plan: a nested Builder's group stays inside every enclosing group." |
+| Layer three, the second-leg bonus | Binary's engine, paying the weaker leg | Placement gaming and carryover | No placement tree at all; legs are the real sponsorship; nothing carries over | **Partly**, see L-2 | **Yes.** Spec section 4: "no placement tree exists anywhere in this plan." Law A recomputes monthly, so there is nothing to carry. |
+| The leg-count multiplier | Standard leadership bonus structure | Cliff effects | Shallow steps; each needs another active leg, not a purchase; section eight proves it | **Yes** | **Yes.** Steps 2.0 / 2.3 / 2.5 percent are the spec's 1.00 / 1.15 / 1.25 multiplier on a 2.0 percent base. The step counts ACTIVE LEGS, which are people, so no purchase can cross it. |
+| The twenty percent ceiling | Ordinary solvency discipline | Cost drift | Enforced per order inside the calculation, not reviewed afterwards | **Yes** | **Yes.** Section ten: "Each order creates one pot, and that pot is 20 percent of what was paid for the order", drawn in a fixed seniority order. |
+
+**Every cross-reference lands on the right section.** The specification numbers its own sections
+differently from the brochure, so each citation had to be translated, and each translation is
+correct:
+
+| Row cites | Brochure section at that number | Does it contain the proof |
+|---|---|---|
+| "section seven" (no breakaway) | Section seven, Layer two: the Builder override | **Yes.** "Groups nest: a Builder inside your group stays inside it, and inside your sponsor's group too", plus Figure 11. |
+| "sections eight and eleven" (no placement tree, nothing carries over) | Eight, Layer three; eleven, Nothing carries over | **Yes.** Both. |
+| "section eight" (the step is never worth chasing) | Section eight | **Yes.** The figure inside it prints 12.00, 9.20 and 7.50 on the same 1,200 of volume. |
+| "section ten" (the ceiling) | Section ten, The twenty percent ceiling | **Yes.** |
+
+**One claim I worked out in full rather than accepting.** Row two says "developing a Builder is
+addition with no subtraction". I ran the boundary-counter walk of specification section 3 through
+all four displacement cases, because a new Builder appearing between you and an existing Builder
+does change which generation you occupy:
+
+- You held generation one on B, new Builder P appears between you and B. You move to generation
+  two on B and gain generation one on P. P's group contains B's group, so you gain.
+- You held generation two on B through Builder D, new Builder P appears between D and B. You are
+  pushed off B entirely, because the counter reaches two at D. You gain generation two on P.
+  P's group contains B's group, so you gain.
+- New Builder P appears between D and you. Same displacement off B, and you gain both generation
+  two on D and generation one on P.
+- New Builder P appears below B. B's upward walk is unchanged and you gain a claim on P.
+
+In every case the new Builder's group **contains** the displaced Builder's group, so the total is
+non-negative and in practice strictly larger. The claim survives. See L-4 for the one word in it
+that is looser than the arithmetic.
+
+---
+
+## F2. No company named, no comparison made or implied
+
+- Rendered page text extracted with markup, style and script stripped: **87,221 characters**,
+  scanned against a list of **107 direct-selling company names**. **Zero hits.** The only proper
+  noun on the page is Orvanna.
+- Scanned section 1A for the constructions that give a rebuttal away: "copied", "not a copy",
+  "some may", "it may appear", "contrary to", "unlike", "despite", "critics", "accus", "borrow",
+  "imitat", "derivative", "inspired by", "similar to", "rival", "competitor", "another company",
+  "other companies", "to be clear", "we are not", "this is not". **Zero hits.**
+- Every comparison in the section is to a plan **family**: the unilevel, the generational and
+  breakaway family, the binary family, standard leadership bonuses, professionally administered
+  plans generally. Never to a named plan, a named company, or an unnamed specific one.
+- The specification's own row five opens "The solvency discipline **this company already lives
+  by**: the live plan's published promise". That clause is **not on the page.** It is the one
+  phrase in specification 1A that could have been read as pointing at an existing plan, and
+  dropping it was the right call. I checked it was dropped rather than merely reworded.
+
+---
+
+## F3. Tone: **PROVENANCE, not defence.** Read as the specialist would.
+
+The section is titled "Where each part of this plan comes from" and opens "Nothing in this plan
+is new arithmetic." That is a designer disclaiming novelty, which is the opposite move from a
+designer defending originality. A rebuttal insists on what it did not do; this insists on what it
+took, and from whom, and then says what it changed.
+
+Three things put the ruling beyond doubt for me:
+
+1. **Every row spends most of its words on a weakness, and the weakness belongs to the family the
+   plan borrowed from.** A defensive document praises its own parts. This one names breakaway's
+   volume theft, binary's placement gaming, the leadership bonus's cliffs and the uncapped plan's
+   cost drift, and only then says what it did about each. That reads as an engineer's bill of
+   materials with known defects annotated, which is exactly what a compensation specialist reads
+   for a living.
+2. **The order is right, and the order is the whole argument.** It sits on printed page 5,
+   immediately after the one-page summary and before any mechanics. A reader meets the provenance
+   before forming a suspicion. The same 6,726 characters placed after section twelve would have
+   read as an answer, because by then the reader would have had time to ask the question.
+3. **Nothing in it is addressed to a reader who has objected.** There is no accusing second-person
+   voice anywhere, no "you may be wondering", no concession clause. The closing note is a design
+   summary in one sentence, not a defence.
+
+The one sentence with any edge on it is row two's "the field learns to hold its best people back",
+which is a criticism of the breakaway family. It has to be there, because it is the precise thing
+the plan removed, and it is stated as a textbook property of a family rather than as an
+observation about anybody. It stays inside the ruling.
+
+---
+
+## F4. The figure claims no protection the plan does not have
+
+This is the check that failed an earlier round of this material on the leg-splitting chart, where
+a drawing implied a defence the plan did not actually provide. I tested every assertion painted
+inside the SVG, not the caption:
+
+| Painted in the figure | Is it a protection claim | Does the plan have it |
+|---|---|---|
+| "Cost drift... enforced per order inside the calculation, not reviewed afterwards" | Yes | **Yes.** Section ten, per-order pot with fixed seniority. |
+| "Volume theft... Nothing ever leaves your group here" | Yes | **Yes.** Groups nest; nothing is excluded. |
+| "Placement gaming and carryover... No placement tree exists here, legs are the real sponsorship, and nothing carries over" | Yes | **Yes.** Both halves. |
+| "Cliff effects... The steps here are shallow, and each one needs another active person, not a purchase" | Yes | **Yes**, and it is the strongest of the five, because the step counts qualified people rather than volume, so a purchase has no term in the arithmetic that could cross it. |
+| "Passivity toward development... Layers two and three pay for that, and the spine is untouched" | Yes | **Yes.** |
+| "Every professionally administered plan has one" | No, an industry-norm claim | Not a claim about this plan. Matches spec wording. |
+| "Every part is proven and decades old. What is new is the assembly" | No, a provenance claim | Honest, and it names the assembly as the new thing rather than hiding it. |
+
+**No overstatement found.** The figure makes five narrow, family-specific removal claims and one
+honest statement of what is new. It does not claim the plan cannot be gamed, does not claim any
+general anti-abuse property, and does not touch the areas where this plan's honest limitations
+live. The multiplier module is drawn neutral grey rather than in a layer colour, which is correct
+under the document's own colour rule, because it is a rate step and not a layer. The other four
+use the exact document tokens: amber `#7A4A06` for the ceiling, indigo `#2A3E9E` for layer two,
+teal `#0F5F6E` for layer three, green `#0B5D3B` for layer one.
+
+---
+
+## F5. Numbering integrity: intact, and I checked the failure mode that has bitten this document
+
+**Section numbers: untouched.** The ToC now reads 1, **1A**, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+13, 14, 15, and each entry still points at the section it always did. Not one existing number
+moved, which is the entire reason 1A exists rather than a renumber.
+
+**Figure numbers: renumbered, and safely.** The new drawing took Figure 3, pushing the old 3
+through 18 to 4 through 19. I searched the whole rendered document for any cross-reference to a
+figure by number in body text, caption prose or drawing label, using `figure [0-9]` and
+`fig. [0-9]` case-insensitively outside the `fignum` label itself. **Zero.** No reference lands
+one figure away, because no reference to a figure number exists anywhere in the prose. The
+sixteen renumbered captions are the only text the parent commit lost, which I proved by diffing
+the printed text of both versions word by word:
+
+> Words present in the parent PDF and absent from the new one: the bare numerals 3 through 18,
+> and one repeated table header ("TERM WHAT IT MEANS") that changed page. Nothing else.
+
+---
+
+## F6. Craft, re-measured on the committed file
+
+Measured myself, in Chrome, against `2b20e11` as committed. Where a number matched the commit
+message I say so; where I could not reproduce one, it is a finding.
+
+| Claim | Measured | Verdict |
+|---|---|---|
+| 549 drawing labels | **549** SVG `text` nodes carrying content across every drawing, wide and phone variants counted | **Exact** |
+| Up from 512 | Figure 3 contributes **37**, and 512 + 37 = 549 | **Exact** |
+| Contrast floor 6.30 to 1 | **6.30**, `#A62020` on `#FBE9E9` in Figure 11, unchanged from the round before | **Exact** |
+| No new pair introduced | **Two pairs occur only in Figure 3.** See L-1 | **Not reproduced, as worded** |
+| Zero labels outside a viewBox | **Zero**, at 375, 768, 1024, 1280 and in print | **Exact** |
+| Zero overlap | **Zero real overlaps.** One candidate surfaced, Figure 10's "THE WALK GOES UP" against "qualified", and it is an artifact: that label carries `transform="rotate(-90 14 212)"` and `getBBox` reports the pre-transform box | **Exact** |
+| Zero overflow | Page `scrollWidth` equals `clientWidth` at all four widths, and **zero** elements extend past the viewport outside a scroll frame | **Exact** |
+| 37 printed pages | **37.** The parent commit prints **35**, so the section took exactly two and nothing else repaginated into or out of existence | **Exact** |
+| Figure and table each whole and unsplit | Figure 3 and its caption sit entirely on printed page 5. The five-row table and its closing note sit entirely on printed page 6. Neither crosses a page break | **Exact** |
+| Zero external references | **Zero**, across `img src`, `script src`, `link href`, `iframe`, `object`, `embed`, `video`, `audio`, `source`, `track`, `use`, `image`, CSS `url()`, `@import` and `meta http-equiv=refresh`. The only absolute addresses are three links to `orvanna.io`, all navigational | **Exact** |
+| "wide reach", "Instant Payout", "Howard" absent | **All three absent.** Also zero em dashes and zero en dashes | **Exact** |
+
+Figure 3's own contrast floor is **6.40 to 1** (`#4B5563` on the indigo tint `#E8ECF9`), above the
+document floor, so the new drawing did not lower the floor. Zero labels anywhere in the document
+measure below 6.0 to 1.
+
+Structural integrity, since a new section adds identifiers: **66** element identifiers, **zero**
+duplicates, **zero** broken internal anchors, **zero** unresolved `aria-labelledby` targets. The
+new drawing's `f2at` and `f2ad` resolve.
+
+---
+
+## F7. The phone defect: genuinely fixed, verified by measurement rather than by reading
+
+The commit reports that the figure was first given the class that hides a drawing on phones in
+favour of a phone variant it does not have. I verified the fix is real rather than nominal.
+
+The mechanism, so the record is complete. Below 560 pixels the stylesheet applies
+`.fig-wide { display: none }` and `.fig-narrow { display: block }`. A figure that carries
+`hasphone` on the `figure` and `fig-wide` on its frame therefore **disappears** at 375 unless a
+`fig-narrow` sibling exists to take its place. Figure 3 has no phone variant.
+
+As committed, line 821 reads `<figure class="fig w880">` and line 822 reads
+`<div class="figframe">`. **Neither `hasphone` nor `fig-wide` is present**, so the hiding rule
+never matches it. Measured live at 375 pixels:
+
+| Property | Measured |
+|---|---|
+| `display` / `visibility` / `opacity` | `block` / `visible` / `1` |
+| Rendered size | **840 by 520** pixels |
+| Frame `scrollWidth` against `clientWidth` | **844** against **330**, so it genuinely scrolls |
+| Scroll note `display` | `block` |
+| Frame right border | 8 pixels, `rgb(42, 62, 158)`, the indigo scroll marker |
+| Page `scrollWidth` against `clientWidth` | **375** against **375**, so the page itself does not scroll |
+| Labels rendered in it at 375 | **37 of 37** |
+
+So the drawing is visible, complete, scrollable, marked as scrollable, and does not drag the page
+sideways. Separately, the affordance check that caught the defect still holds document-wide: at
+375 pixels, **zero** figures show the scroll note without scrolling and **zero** figures scroll
+without showing it.
+
+---
+
+## F8. Findings
+
+All LOW. None blocks. Listed heaviest first.
+
+### L-1 (LOW). "No new pair introduced" does not reproduce, at the level of wording.
+
+Measured across all 549 labels, comparing the fill and composited background of every one, **two
+pairs occur only in Figure 3 and nowhere else in the document**:
+
+| Pair | Ratio | Where |
+|---|---|---|
+| `#4B5563` on `#E6F2F5` (muted on the teal tint) | **6.62 to 1** | Figure 3's "LEAVES BEHIND" in the second-leg module |
+| `#4B5563` on `#E4F3EB` (muted on the green tint) | **6.59 to 1** | Figure 3's "LEAVES BEHIND" in the spine |
+
+Thirteen of Figure 3's fifteen pairs already existed, including `#4B5563` on the indigo tint, so
+the pattern was established and these two extend it to the other two layer tints.
+
+**Why it does not block.** No new colour was introduced; both pairs use `--muted` on tints already
+in the palette. Both sit well clear of the floor, so the effect the claim was making, that the
+6.30 floor is unmoved, holds **exactly**. Only the sentence is wrong.
+
+**Why it is worth writing down anyway.** This project has a specific history with measurement
+claims in commit messages, recorded in the header of `contrast-sweep.js`: "the round before this
+one reported its figures in a commit message and two of them could not be reproduced." Nine of
+this commit's ten numbers reproduced to the digit. This one did not, and the honest correction is
+one word: no new **colour** was introduced, and no new pair below the floor.
+
+### L-2 (LOW). Half of binary's second failure mode did not make the compression.
+
+Specification 1A names **two** failure modes for the binary family: placement gaming, and
+"binary's CONCENTRATION and runaway-liability profile (pay-leg value compounding with depth,
+top-heavy checks, carryover banking)". The page names placement gaming and carryover. The
+concentration and runaway-liability half is not on the page, and neither is the specification's
+answer to it, that "the bonus sits JUNIOR in the waterfall and under the per-source cap".
+
+**Why it does not block.** The answer is present, structurally and in two places. The figure draws
+the second-leg module **inside** the ceiling, which is the liability bound made visual, and the
+closing note says "all inside a hard ceiling" in words. Section ten then proves the seniority
+order and the per-order pot. So a specialist gets the answer; they just do not get the question
+named alongside it.
+
+**Why it is the one omission worth naming.** Runaway pay-leg liability is the failure a
+compensation specialist associates with binaries at least as strongly as placement gaming. This
+section's whole method is to name the failure before answering it, and this is the one place it
+answers without naming. One clause in the "known failure mode" cell would close it.
+
+### L-3 (LOW). The lead and row two disagree about whether a rule is involved.
+
+The lead says each part arrives "with its best-known failure mode **absent from the arithmetic
+rather than forbidden by a rule**". Row two's removal column then says "There is no breakaway
+here, **stated as a rule** in section seven."
+
+Both are defensible in isolation. The no-breakaway property genuinely is arithmetic, because the
+definition of group CV includes the whole subtree with nothing excluded, and "stated as a rule"
+means the document states it rather than that a policy enforces it. But the section's thesis is
+precisely structure over policy, and this is the one row that uses the word the thesis rejects.
+A close reader can snag on it. **Fix, one phrase:** "stated as a rule" becomes "built into the
+definition of a group in section seven".
+
+### L-4 (LOW). "Addition with no subtraction" is true of volume and loose about lines.
+
+The sentence is anchored to volume throughout, and about volume it is exactly right: no volume
+ever leaves anybody's group, and no rank below you costs you a unit of volume. That is the claim
+it actually makes, and it is true.
+
+At the level of override **lines** it is looser. As worked in F1, a new Builder appearing between
+you and an existing Builder can move you from a first-generation override on that Builder to a
+second-generation one, or push you off that Builder entirely. A line does disappear. It is always
+replaced by a claim on the new Builder's group, which contains the displaced group, so your total
+never falls. A specialist who works the boundary-counter walk will find the displacement and then
+find that the conclusion holds.
+
+**Why it does not block.** The conclusion is correct in every case I tested, and the sentence's
+own anchor is volume, which is unambiguous. Recording it so that nobody is surprised by it in a
+meeting.
+
+### L-5 (LOW). An undeclared change rode along in the same commit.
+
+Both links to the compensation plan page gained `target="_blank" rel="noopener noreferrer"` in
+this commit. The change is correct, and `rel="noopener noreferrer"` is the right companion to
+`target="_blank"`.
+
+It is a finding only because the commit message discusses those two links at length, and
+discusses them as **pre-existing** absolutes inherited from `3f43094`, while silently changing
+them. The note as written would send the next reader to `3f43094` to find a change that is in
+`2b20e11`. Neither link's destination changed and no external reference was added.
+
+### Note, not a finding: two files rode along that have nothing to do with section 1A.
+
+`CLAUDE_NOTES.md` gained five lines and `MLM-PILOT/docs/COMP-PLAN-INDUSTRY-ANALYSIS-2026-08-17.md`
+was created, both from a separate analysis request. I checked the analysis document for the
+project guardrails anyway: zero em dashes, zero en dashes, zero references to Howard's employer.
+It names Howard, which is fine, because it is never published: `deploy/build_dist.py` copies
+`www/` and `site/` only, and `docs/` is not in the deploy set. I confirmed that rather than
+assuming it.
+
+---
+
+## F9. Deploy
+
+**YES.** Ship `2b20e11`.
+
+The section does the job it was built for. A compensation specialist opening this link meets, on
+the fifth printed page and before any mechanics, a plain statement of which family each mechanism
+came from, what that family is known to get wrong, and where in the document the removal is
+proved. Every one of those statements is true of this plan, and I checked the two hardest ones
+against the walk rather than against the specification's summary of the walk.
+
+No company is named and none is implied. The tone is a designer stating the tradition the work
+sits in. Read early, as it is placed, it frames what follows; the commit is right that read late
+it would have read as an answer.
+
+The five findings are all wording, all one clause each, and none of them makes anything on the
+page false. Fold them in whenever the page is next touched:
+
+1. **L-1**, correct the claim in the record: no new **colour**, and no new pair below the floor.
+   Two new pairs at 6.62 and 6.59 do exist.
+2. **L-2**, add binary's concentration and runaway-liability to row three's failure cell, with the
+   junior-in-the-waterfall answer beside it.
+3. **L-3**, "stated as a rule" becomes "built into the definition of a group".
+4. **L-4**, no change needed to the page; recorded so the displacement case is not a surprise.
+5. **L-5**, note the `target="_blank"` addition in the record.
+
+Everything the delta was asked to confirm undisturbed is undisturbed: 549 labels at a 6.30 floor,
+zero overflow, zero overlap, zero labels outside a viewBox at four widths and in print, 37 printed
+pages with the figure and the table each whole, zero external references, and the three forbidden
+words absent. The phone defect is genuinely fixed, and I measured the fix rather than reading it.

@@ -1102,3 +1102,402 @@ at the drawings finishes with the plan and no wrong impression.
   applied by `:not()` selectors rather than by measured overflow, re-check the mapping
   every time a drawing is resized.
 - **A count claimed as "down to zero" gets counted.** This gate's was down to one.
+
+---
+---
+
+# DELTA GATE 3: commit `2b20e11`, 2026-08-17
+
+- **Commit graded:** `2b20e11` ("Section 1A: where each part of the plan comes from")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\` rebuilt by `py deploy\build_dist.py`, bundle sha256 `b0e7a0b59cf55c93`, 39 files, 1522 KB, served over Hypertext Transfer Protocol (HTTP) from `deploy\dist`
+- **Grader:** mlm-qa. Read-only toward the product. Nothing was fixed.
+- **Date:** 2026-08-17
+- **Scope:** a narrow delta. Section 1A and its figure, plus everything the insertion could have disturbed: figure numbering, section numbering and every cross-reference, printed pagination, the contrast floor, the phone affordance mapping, table total rows, self-containment.
+- **One item not re-investigated, per the coordinator:** the two links to the compensation plan page are absolute by deliberate choice, because a relative link dies when the file is saved. I confirmed they work from a saved file and left the decision alone.
+
+## VERDICT: PASS
+
+## DEPLOY: YES
+
+The section does what it was built to do, the figure does not overstate, and the phone
+defect the measurement caught is genuinely fixed: I looked at the lineage figure on a
+375 pixel screen and it is visible, legible and complete. Six LOW findings, all new, none
+of which misleads a reader. I would ship over all six, and I would spend the two minutes
+on two of them before Howard sends the link.
+
+---
+
+## How this was graded
+
+The Browser pane again would not composite frames, exactly as in the two previous gates.
+Rather than fall back to reading the Document Object Model (DOM), which my standing lesson
+says is not visual proof, I drove a real Chrome over the Chrome DevTools Protocol (CDP).
+I looked at:
+
+- section 1A rendered at 1280 pixels, captured in four full width slices, top to bottom;
+- the lineage figure at 375 pixels with mobile emulation on, captured at the clipped frame
+  width so the capture is what a phone reader actually sees, at three scroll positions
+  (left, middle, right), plus the whole section in seven slices at 375;
+- Chrome's own print output at United States Letter, rendered back to images at 110 dots
+  per inch, printed pages 3 through 8 at full size;
+- printed page 5 converted to greyscale, to test the document's own promise that nothing
+  depends on telling colours apart;
+- the built file copied to a scratch folder and loaded over `file://` with every host
+  mapped to a dead address and a dead proxy.
+
+Every number below that I state as measured, I measured in this session.
+
+---
+
+## RULING 1: TONE. Does it read as a designer, or as somebody answering an accusation?
+
+### It reads as a designer naming the tradition the work sits in. PASS, and not marginally.
+
+This is the ruling I was asked for most, so here is the reasoning rather than the verdict
+alone. I read the section on screen and on paper as a compensation specialist would, from
+the kicker to the closing note, then read it a second time looking only for the shape of a
+rebuttal.
+
+**Four things make it read as engineering:**
+
+1. **The question in the heading is a provenance question, not a denial.** "Where each
+   part of this plan comes from" asks where the parts came from. A defensive section would
+   have been titled around what the plan is not. Nothing in the section is phrased as the
+   negation of an unstated charge.
+2. **The organising device is a failure mode table**, which is an engineering artifact.
+   The four columns are Mechanism, The family it comes from, The known failure mode, Why it
+   is not present here. That is how a designer documents a build, and it is the same shape
+   a reliability review takes.
+3. **Every claim is a forward reference to evidence in this same document.** Section seven,
+   sections eight and eleven, section eight, section ten. I followed all four and every one
+   lands on the section that proves the claim (see Ruling 3). A rebuttal asserts; this
+   cites.
+4. **It flatters the reader's expertise rather than defending against it.** "Anybody who
+   knows this industry should recognise every part on sight" hands the specialist the
+   position of the person who already knows. That is the opposite move to a defence.
+
+**The one place the shape comes closest to a rebuttal**, and it is worth naming so the
+ruling is honest: the figcaption's last clause, "the argument for it is not that the parts
+are new but that each one arrives without the abuse that family is known for." The
+construction "the argument is not X but Y" concedes a counterargument. But the
+counterargument it concedes is about the design, whether the parts are novel, not about an
+accuser, and the sentence resolves into a design claim. It stays on the right side.
+
+**Would a defensive reading be available to a hostile reader?** I looked for one and could
+not build it without adding words that are not on the page. The section never says copy,
+original, derivative, similar, unlike, competitor, accusation or any cognate. I swept for
+all of them and for thirty four company names: zero occurrences (Ruling 2).
+
+**My judgement on whether it should exist at all:** it should, and it should be exactly
+where it is. Read on printed page 5, before any mechanics, it hands the specialist the
+vocabulary they already own and tells them what to expect. Read after the mechanics it
+would have read as a rebuttal, because by then the reader would have formed the question
+the section answers. The placement is the thing that makes the tone work, and it is right.
+
+**The one tonal note I would change**, graded LOW below as D18: the word "abuse". It
+appears twice, both times in the two most-forwarded surfaces, inside the drawing and in the
+figcaption. The table uses "the known failure mode" for the identical idea and is better
+for it. "Abuse" is a moral word about other plan families, aimed at a reader who probably
+works inside one of them. It is the only place in the section where the register leaves
+engineering.
+
+---
+
+## RULING 2: NO COMPANY NAMED, NO COMPARISON MADE OR IMPLIED
+
+### Confirmed. Only plan families.
+
+Swept the section markup, the rendered text, the table, the figure's `<title>` and its 963
+character `<desc>` (which a screen reader speaks, and which is therefore rendered text for
+an assistive reader), and the extracted text of printed pages 5 and 6.
+
+| Sweep | Result |
+|---|---|
+| Thirty four direct selling company names | **0 occurrences**, in the section and in the whole file |
+| "Unicity" anywhere in the file | **0** |
+| Comparison and accusation cognates: competitor, unlike, in contrast, compared to, copied, copy, stolen, steal, accus, allegat, plagiar, borrowed, similar to, resembl, imitat, clone, derivative, not a copy, knock-off, my employer, another company | **0 occurrences each**, in the section and on printed pages 5 and 6 |
+| What is named instead | Five plan families only: the unilevel, generational and breakaway, the binary, standard leadership bonus structure, standard solvency discipline |
+
+The comparisons that do appear are to families in the generic ("In a classic breakaway,
+promoting a leader removes their whole group"; "Binary plans invite strategic placement"),
+which is what the brief permits and what a taxonomy requires. No company, no product, no
+person, no implied single target.
+
+---
+
+## RULING 3: DOES THE FIGURE OVERSTATE?
+
+### No. Every protection the drawing claims is proved in this document, and I checked each one against the section it cites.
+
+This is the check that failed an earlier round of this document, when a chart implied the
+plan punished a behaviour it does not. I traced all five.
+
+| What the drawing claims | Where it says the proof is | What that section actually says | Verdict |
+|---|---|---|---|
+| Volume theft is absent: "Nothing ever leaves your group here" | Section seven | "**No breakaway: developing a Builder never costs you volume**" | Claim proved |
+| Placement gaming and carryover are absent: "No placement tree exists here, legs are the real sponsorship, and nothing carries over" | Sections eight and eleven | Section eight: "this plan has **no second tree to place anybody in and nothing that carries forward** from one month to the next". Section eleven: "**Nothing carries over** ... Nothing is banked, carried forward, retained or grandfathered ... **There is no carryover**" | Claim proved, both halves |
+| Cliff effects are absent: "The steps here are shallow, and each one needs another active person, not a purchase" | Section eight | "The rate steps are **deliberately shallow**. Large steps at round numbers are what produce end-of-month buying to cross a threshold, and the arithmetic below shows why these steps are **never worth chasing**." Figure 13 works it: 12.00, then 9.20, then 7.50, and its caption closes "**no reason for anybody to buy anything at the end of a month to cross a threshold**" | Claim proved, including the "not a purchase" half, which I specifically went looking to break |
+| Cost drift is bounded: "enforced per order inside the calculation, not reviewed afterwards" | Section ten | "the ceiling is **not a monitoring policy applied afterwards. It is the arithmetic the payments are calculated by**, so no combination of ranks, depths or organisation shapes can push an order past 20 percent" | Claim proved |
+| Passivity toward development is absent: "Layers two and three pay for that, and **the spine is untouched**" | Implicit, and load-bearing | Section ten: "Level pay draws first and is **always paid in full** ... so level pay always fits and is **never reduced**" | Claim proved |
+
+**Nothing in the drawing claims a protection the plan does not have.** The two things I did
+find are not overstatements of protection; they are a broken pattern and an absolute
+industry claim, and both are LOW (D16 and D17).
+
+I also re-read the drawing as a pictures-only reader, which is this document's own bar.
+Reading only the boxes and the words inside them, the reader gets: one hard ceiling
+containing everything, three named modules standing on a named base, each module's origin
+family, each family's known weakness, and one sentence per module saying why that weakness
+is not here. No wrong reading is available from the drawing alone.
+
+---
+
+## RULING 4: THE PHONE
+
+### The lineage figure is visible and legible at 375 pixels. I looked at it. CONFIRMED.
+
+The defect the commit describes is real and is genuinely closed. The figure now carries
+`class="fig w880"` with no `hasphone`, so it renders its full drawing inside a scrolling
+frame rather than deferring to a phone variant that does not exist. Measured at 375 with
+mobile emulation on:
+
+| Measurement | Result |
+|---|---|
+| Visible Scalable Vector Graphics (SVG) inside the lineage frame | **840 by 520 pixels, rendered**, not hidden, not zero sized |
+| Frame | 330 pixels of visible width against 844 of scroll width |
+| Scroll cue, right border | **8 pixels**, `rgb(42, 62, 158)` |
+| Caption line | `.scrollnote` computed `display: block`, reading "SCROLLS SIDEWAYS INSIDE ITS FRAME" |
+| Page level horizontal overflow at 375 | **zero** |
+
+**Then I looked, which is the part that counts.** Three captures at the clipped frame
+width, at the left, middle and right scroll positions:
+
+- **At rest**, the phone reader sees the amber ceiling frame opening on the left, its
+  heading and its description, the whole of the first module (Generation overrides, layer
+  two) including its complete "leaves behind" paragraph, the left edge of the second module
+  cut mid word, the connector stub running down, and the unilevel spine below with its
+  heading legible. **The containment reads. The standing-on reads.** Nothing suggests the
+  plan has one module, because the second one is visibly cut and the indigo bar and the
+  caption line both say the frame scrolls.
+- **Mid scroll**, the second module (Second-leg bonus, layer three) is whole and every word
+  of it readable.
+- **Fully right**, the third module (The leg-count multiplier) is whole, the ceiling frame
+  closes on its right edge, and the spine closes with it.
+
+**Ruling against the standing rule** that a figure whose meaning is its overall shape must
+fit the narrowest supported width: this figure passes, and I considered failing it. Its
+meaning is containment and stacking, and both of those survive at rest, because the
+ceiling's left edge, one whole module, the connector and the spine are all on screen at
+once. That is the difference between this figure and the two that failed the rule in the
+first gate: Figure 6 lost the top of its organisation and Figure 8 lost three of five
+ranks, so their meaning could never be assembled. Here the meaning is present at rest and
+the scroll adds detail rather than restoring sense.
+
+---
+
+## RULING 5: PRINT
+
+### 37 pages, and the section lands where the commit says it does. Verified on paper.
+
+Chrome print pipeline, United States Letter, 612 by 792 points.
+
+| Promise | Evidence | Result |
+|---|---|---|
+| 37 printed pages, up from 35 | **37 pages** | Confirmed |
+| Section on printed page 5 | "SECTION 1A / WHERE EACH PART OF THIS PLAN COMES FROM" opens on **page 5**, directly under section one's closing note | Confirmed |
+| Before any mechanics | Section two, "The words, defined before they are used", opens on **page 7**. Nothing mechanical intervenes | Confirmed |
+| The figure whole and unsplit | **Looked at printed page 5.** Ceiling frame, all three modules, connectors, spine, in-drawing closing line and the Figure 3 caption are all on page 5 | Confirmed |
+| The table whole and unsplit | **Looked at printed page 6.** Header row plus all five rows, from "Layer one, the unilevel spine" to "The twenty percent ceiling", then the closing note, all on page 6 | Confirmed |
+| The section takes two pages | Pages 5 and 6 | Confirmed |
+| Readable in black and white | Printed page 5 converted to greyscale and read. Every box is named in words and the structure is positional, so nothing in the new figure depends on colour. The five stroke colours separate by only **1.01 to 1.26 to 1** in greyscale, computed, and the figure does not care | Confirmed |
+
+One print defect, D19 below: printed page 6 ends with an orphaned "SECTION TWO" kicker
+whose heading is on page 7. It is the **only** orphaned kicker in 37 pages; I checked all
+sixteen.
+
+---
+
+## RULING 6: NUMBERING AND CROSS-REFERENCES
+
+### Section numbering: intact. Every existing number and every cross-reference still valid.
+
+I clicked all sixteen contents links in a real browser and read what landed.
+
+| Result | Evidence |
+|---|---|
+| 16 of 16 links land on the correct section | Each landing section's kicker and heading match its contents entry word for word |
+| Zero land one section away | Sections one through fifteen all unchanged; 1A sits between 1 and 2 |
+| Zero pixels of heading covered by the sticky bar | Covered pixels equal 0 on all sixteen |
+| Every prose cross-reference still correct | Swept every "section <name>" reference in the file, thirty of them, and resolved each to the section it names. **All correct**, including the four the new section adds: seven (Layer two, the Builder override), eight (Layer three, the second-leg bonus), ten (The twenty percent ceiling), and eight and eleven together |
+
+### Figure numbering: renumbered completely, and I checked for the failure mode this creates.
+
+The new drawing is Figure 3, so Figures 3 through 18 became 4 through 19. That is the kind
+of change that leaves a stale "as Figure 6 shows" somewhere in the prose.
+
+**It does not.** Each of the nineteen strings "Figure 1" through "Figure 19" occurs
+**exactly once** in the whole file, and each of those single occurrences is inside a
+`.fignum` span in its own figcaption. There is not one cross-reference to a figure number
+anywhere in the body text, so there is nothing to go stale. Nineteen figures counted in the
+rendered DOM at all four widths.
+
+---
+
+## Undisturbed checks
+
+| Check | Evidence | Result |
+|---|---|---|
+| Build clean | 39 files, 1522 KB, sha256 `b0e7a0b59cf55c93`; document page lint, stamp assertion, name lint, secret scan, page registry, nav drift, theme boot, chrome sheet, chrome css and currency mirror all pass | PASS |
+| **Contrast floor 6.30 to 1 across drawing labels, recomputed** | Recomputed independently: walked every `<text>` and `<tspan>` in every visible SVG, took each label's fill, found the topmost painted shape whose bounding box contains the label's centre, composited that shape's fill and every alpha above it down through the DOM background stack. **Floor 6.30 to 1** at 375 (420 runs), 768, 1024 and 1280 (405 runs each). **Zero below 4.5, zero below 6.30** at every width | PASS, claim confirmed |
+| No new contrast pair introduced | The new figure's worst label is "LEAVES BEHIND", grey `#4B5563` on the indigo tint `#E8ECF9`, at **6.40**. That exact pair already existed on pre-existing labels ("Commissionable Volume, 0.80 x" and "reaches 2 levels"), and the floor is still the pre-existing red-on-red-tint label at 6.30 | PASS, claim confirmed |
+| Section 1A's own Hypertext Markup Language (HTML) text contrast | Composited every text-bearing element in the section against its real background stack: 39 elements, **floor 7.29 to 1** (the "Section 1A" kicker). Zero below 4.5 | PASS |
+| Zero horizontal page overflow | Document scrollWidth equals clientWidth at 375, 768, 1024 and 1280 | PASS |
+| Zero labels outside a viewBox | Walked every `<text>` bounding box against its owning viewBox across 26 SVGs at all four widths: **0 violations**. The new figure alone: 37 labels, 0 outside | PASS |
+| Zero overlap | Pairwise bounding box test across every label pair in the new figure: **0 overlaps**. Across the whole document the only hits are 1 to 2.7 pixel grazes between adjacent lines of pre-existing figures, which are ascender and descender box artifacts, not visual collisions | PASS |
+| Print overflow | No drawing clipped or split on any printed page; `.fig` and `figcaption` carry `break-inside: avoid` | PASS |
+| Total rows still appear once each | Reprinted all 37 pages and searched every one. "Totals" on pages 28 and 30, **once each**, each directly under the last row it totals. "Layer one, fifteen lines" once, on page 29. The third "Totals" on page 36 is prose, not a footer. **No total appears twice anywhere** | PASS, not disturbed |
+| Zero external references with the network blocked | Copied the built file to a scratch folder, launched Chrome with `MAP * 127.0.0.1:1` and a dead proxy, loaded over `file://`: `performance.getEntriesByType('resource')` returned an empty array, **19 figures**, 26 SVGs, zero scripts, full 48,093 pixel height, section 1A present, its drawing rendering at full width. All four links still absolute | PASS |
+| Scroll affordance on exactly the frames that scroll | At 375: **11 frames scroll, 8 do not**. All 11 scrolling frames carry the 8 pixel `rgb(42, 62, 158)` right border and a `display: block` scrollnote. **All 8 non-scrolling frames carry the 1 pixel grey border and no note.** Zero false positives, zero false negatives. Up from 10 scrolling, because the new figure correctly joins them | PASS |
+| Forbidden words absent | "wide reach", "Instant Payout", "Howard", "Koziara", "Unicity", "version 2.0", "Supersedes", "second-team bonus": **0 each**, in the source and in the extracted text of all 37 printed pages | PASS |
+| No em or en dashes | **0 and 0** in the whole file and in all 37 printed pages | PASS |
+| Console clean, zero scripts | One network 404 for `/favicon.ico`, which Chrome requests on its own and which the page does not reference. Zero page-originated messages, zero `<script>` tags | PASS |
+| Figure accessibility | The new SVG carries `role="img"`, `aria-labelledby="f2at f2ad"`, an 83 character `<title>` and a 963 character `<desc>` that walks the whole assembly. **Zero duplicate element identifiers in the file** | PASS |
+| Return links | Both compensation plan links now carry `target="_blank" rel="noopener noreferrer"`, which closes delta 2's LOW D14 | Closed |
+
+---
+
+## LOW defects, all new to this commit
+
+### D16. The fifth table row is not the same kind of row as the other four
+
+**Location:** the "The twenty percent ceiling" row, and the ceiling block in the drawing.
+
+For four of the five parts, the named failure belongs to the family the mechanism comes
+from: the unilevel is passive toward development, breakaway steals volume, binary invites
+placement gaming, leadership bonuses cliff. For the ceiling, the named failure is **cost
+drift in plans that do not have the mechanism**: the cell reads "Cost drift. **Uncapped
+plans** see the payout ratio creep upward". Nothing is untrue, but the column header
+promises "The known failure mode" of the family in the previous column, and solvency
+discipline's known failure mode is not cost drift. The figure's own `<title>` says "each
+with its known failure **removed**", and for the ceiling nothing was removed.
+
+A specialist reading five parallel rows will notice the fifth is not parallel. One sentence
+fixes it: name the failure mode of weak caps rather than of no caps, for example a cap that
+is a target reviewed after the month rather than arithmetic applied per order, which is
+exactly what the "why it is not present here" cell already argues against.
+
+### D17. "Every professionally administered plan has one" is the one sentence a specialist can falsify from memory
+
+**Location:** the drawing, "Standard solvency discipline. Every professionally administered
+plan has one." And the table, "Caps and payout governors are ordinary practice in **every**
+professionally administered plan."
+
+A hard per-order payout ceiling is not universal. The common practice is a target payout
+ratio managed after the fact, which is precisely the cost drift the same cell describes.
+The section's whole strength is that everything in it is checkable, and this is the only
+absolute industry claim in it. "Ordinary practice in professionally administered plans"
+says the same thing and cannot be contradicted. Recommend dropping the word "every" in both
+places.
+
+### D18. "Abuse" is the only word in the section that leaves the engineering register
+
+**Location:** the drawing's closing line, "each part arrives with its best-known **abuse**
+absent from the arithmetic", and the figcaption, "each one arrives without the **abuse**
+that family is known for". Two occurrences, both in the surfaces most likely to be
+screenshotted and forwarded.
+
+The table says "the known failure mode" for the identical idea. "Abuse" is a moral word
+about other plan families, read by somebody who probably works inside one. It does not make
+the section defensive, which is why this is LOW and not higher, but it is the one place
+where a reader could feel judged rather than informed. Swap both to "failure mode" and the
+section is uniform with its own table.
+
+### D19. Printed page 6 ends with an orphaned "SECTION TWO" kicker, the only one in 37 pages
+
+**Location:** print stylesheet. `h2` carries `break-after: avoid` but `.kicker` does not.
+
+I checked all sixteen section kickers on paper. Fifteen sit with their headings. Only
+section two is split: page 6 ends with "SECTION TWO" and page 7 opens with "THE WORDS,
+DEFINED BEFORE THEY ARE USED" carrying no number. The insertion of section 1A is what
+pushed it across the boundary, so this commit caused it, and the gap in the stylesheet is
+what allowed it. One declaration closes it: `.kicker { break-after: avoid; page-break-after:
+avoid; }` in the print block. Cosmetic, but this page is going to a professional and it is
+a two minute fix.
+
+### D20. The ceiling block is the one block in the drawing whose closing sentence does not negate
+
+**Location:** the drawing, the payout ceiling block.
+
+Every other block ends by explicitly saying the failure is not here: "Nothing ever leaves
+your group here", "nothing carries over", "The steps here are shallow", "the spine is
+untouched". The ceiling block ends "Cost drift. **It** is enforced per order inside the
+calculation, not reviewed afterwards." The pronoun means the ceiling, but the nearest noun
+is cost drift, so the sentence momentarily reads as though cost drift is what is enforced.
+The drawing's header is "LEAVES BEHIND", which is itself readable in two directions, and
+this is the one block where the sentence beneath it does not settle the direction. Replace
+"It is enforced" with "The ceiling is enforced" and the ambiguity is gone.
+
+### D21. At 768 pixels the lineage figure scrolls with no affordance, joining two figures that already did
+
+**Location:** the scroll cue is scoped to a maximum width of 559 pixels.
+
+Measured: at 768, three figure frames scroll (Figures 1, 3 and 7, all `w880` against a
+narrower content column), and **none of the three carries the cue**, because the cue only
+exists below 560 pixels. At 1024 and 1280, none scroll. This is a pre-existing pattern and
+the new figure is one more instance of it, not a new class of defect. Page level overflow at
+768 is still zero. I record it because the previous gate counted "two at 768" and the
+correct number is now three.
+
+---
+
+## LOW defects carried over, unchanged
+
+D6, D7, D9, D10, D11, D12 and D13 from the previous gates all stand and are unaddressed:
+the five colour key on the contents page still collapses in black and white (strokes 1.01
+to 1.26 to 1, recomputed this session); Figure 17 (formerly 16) is still the one legend
+that is colour only; the printed copy still has no page numbers, now across 37 of them;
+Figure 4 (formerly 3) still opens on a cut word at 375; the one surviving "This version" in
+the refunds bullet is still there; and the companion page's full address is still not
+printed. **D14 is now closed**: both compensation plan links carry `target="_blank"` and
+`rel="noopener noreferrer"`.
+
+---
+
+## Deploy
+
+**YES.** Safe to publish as built at sha256 `b0e7a0b59cf55c93`, and safe for Howard to send
+to a compensation specialist.
+
+The section reads as a designer naming the tradition, not as a defence. It names five plan
+families and no company, and makes no comparison to one. Every protection the drawing
+claims is proved in a section of this same document, and I followed all five. The figure is
+visible and legible on a phone, which is the defect the measurement caught and which I
+confirmed with my own eyes at three scroll positions. On paper it is 37 pages, the section
+opens on page 5 before any mechanics, and both the figure and the table are whole. Every
+section number and every cross-reference survived, and the figure renumbering left nothing
+stale because the document never cites a figure by number.
+
+If two things are changed before the link goes out, make them D17 (drop "every" from the
+two absolute industry claims) and D19 (one declaration so the section two kicker stops
+being orphaned on paper). Neither is a gate condition.
+
+## Standing checklist rows added by this gate
+
+- **Inserting a figure renumbers every figure after it.** Before passing any commit that
+  adds a drawing, count every occurrence of "Figure N" in the file and prove each number
+  occurs exactly the number of times it should. A body-text citation of a figure number is
+  the failure this creates, and it is silent.
+- **Inserting a section repaginates everything after it.** Re-print and re-check the orphan
+  and widow behaviour of every heading, kicker and table, not only the new one. The commit
+  changes pages it never touched.
+- **A parallel table must be parallel in every row.** When a table's column header promises
+  one relationship, read the last row against the first and confirm it is the same kind of
+  claim. The row that breaks the pattern is usually the one about the mechanism the author
+  is proudest of.
+- **An absolute claim about the industry is a claim, and it is the easiest one to falsify.**
+  "Every professionally administered plan", "the most common", "the oldest": each needs to
+  be either provable or softened, because the reader who checks it is the reader the
+  document was written for.
+- **A section written to pre-empt a reaction gets read twice**, once for what it says and
+  once for the shape it takes. Cite-and-prove is a designer's shape. Assert-and-deny is a
+  defendant's shape. Rule on the shape, not on the sentences.
