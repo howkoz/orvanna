@@ -258,3 +258,8 @@ Follow-up product detail page polish:
 - `MLM-PILOT/www/css/shop.css` now uses a compact PDP hero: small 60px product icon, tighter title scale, side-by-side purchase controls on desktop, full-width purchase card on mobile, and denser includes/prose cards.
 - Static deploy completed with deploy repo commit `7311565`; live check confirmed `shop.css?v=9cfe5bc3cf82`, no horizontal overflow, and the old 230px icon rule absent.
 - Follow-up badge correction deployed with commit `211ba1a`: the product tier badge now uses `width: max-content` and `justify-self: start`, so the border hugs labels like `Domain agent` instead of stretching across the product copy column.
+
+Follow-up compensation plan analysis:
+- Howard asked for analysis only, no functional or site changes, on whether the Orvanna compensation plan ranks better than most MLM compensation plans.
+- Created `MLM-PILOT/docs/COMP-PLAN-INDUSTRY-ANALYSIS-2026-08-17.md`, using the live brochure, local comp spec/proof files, and FTC MLM guidance as reference points.
+- Bottom line in the report: better than most on design quality, transparency, auditability, and cost control; not yet proven as an operating plan until customer mix, earnings disclosures, chargebacks, clawbacks, retention, and payout execution are proven.
