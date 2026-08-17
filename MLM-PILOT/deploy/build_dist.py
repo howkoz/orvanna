@@ -377,7 +377,7 @@ BUILD_GENERATED_PAGES = {"404.html"}
 # This class exists so that "no chrome" is a REGISTERED DECISION rather than a
 # hole. Without it the only way to ship such a page would be to bolt a
 # navigation onto a document, or to quietly widen the sign-in exclusion, which
-# would hand the next person a loophole. Contract section 6 names the class.
+# would hand the next person a loophole. Contract section 5A names the class.
 #
 # The defining property is self-containment, and document_page_lint below
 # CHECKS it rather than trusting it. A document page that grew an external
@@ -388,11 +388,36 @@ DOCUMENT_PAGES = {"plan-brochure.html"}
 
 # What a self-contained page may never reference. Anything here means the file
 # stops working the moment it leaves the server.
+#
+# WIDENED 2026-08-17 after the verifier probed the first version and got five
+# external references PAST it with exit 0: an <iframe src>, an <img srcset>
+# (only `src` was covered), an <object data>, an SVG <image href>, and an
+# inline <script>. It also flagged a FALSE POSITIVE: an internal
+# <use href="#id"> is a same-document reference and is exactly how an inline
+# drawing reuses a shape, so it must be allowed.
+#
+# The rule the pattern encodes: fetching anything from outside this file is
+# forbidden; pointing at something inside it is fine. Hence the (?!#) guards.
 EXTERNAL_REF_RE = re.compile(
-    r"""(<link\b[^>]*\bhref=|<script\b[^>]*\bsrc=|<img\b[^>]*\bsrc=|"""
-    r"""\burl\(\s*(?!['"]?\#)|@import\b|@font-face\b|<use\b[^>]*\bhref=)""",
+    r"""(?:<link\b[^>]*\bhref\s*=\s*["']?(?!\#)"""
+    r"""|<script\b[^>]*\bsrc\s*="""
+    r"""|<img\b[^>]*\b(?:src|srcset)\s*="""
+    r"""|<iframe\b[^>]*\bsrc\s*="""
+    r"""|<object\b[^>]*\bdata\s*="""
+    r"""|<embed\b[^>]*\bsrc\s*="""
+    r"""|<source\b[^>]*\b(?:src|srcset)\s*="""
+    r"""|<(?:use|image)\b[^>]*\b(?:xlink:)?href\s*=\s*["']?(?!\#)"""
+    r"""|\burl\(\s*(?!['"]?\#)"""
+    r"""|@import\b"""
+    r"""|@font-face\b)""",
     re.I,
 )
+
+# A document page carries no script at all. It is a document, and a script is
+# the one thing that can make the same file behave differently depending on
+# where it was opened from. The verifier got an inline <script> past the first
+# version of this lint, which only looked for a `src` attribute.
+DOCUMENT_SCRIPT_RE = re.compile(r"<script\b", re.I)
 
 NAV_BLOCK_RE = re.compile(r'<nav class="nav-links"[^>]*>.*?</nav>', re.S)
 # The cart is an <a> on product.html and a <button> on shop.html; both are the
@@ -469,6 +494,13 @@ def document_page_lint() -> None:
                 f"{name}:{line}: external reference {m.group(0).strip()!r}. A "
                 "document page must carry everything inline so it still works "
                 "saved to a desktop with no network.")
+        for m in DOCUMENT_SCRIPT_RE.finditer(text):
+            line = text.count("\n", 0, m.start()) + 1
+            problems.append(
+                f"{name}:{line}: carries a <script>. A document page is a "
+                "document: it must render the same opened from a server, from "
+                "a desktop, and on paper, and a script is the one thing that "
+                "can make those differ.")
     if problems:
         for p in problems[:20]:
             print(f"  document page: {p}")
