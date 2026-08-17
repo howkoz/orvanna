@@ -1,5 +1,37 @@
 # Enrollment Incentive: costed terms for Howard to choose between
 
+> ## SHELVED 2026-08-17 BY HOWARD. NOT PUBLISHED, NOT BUILT.
+>
+> His instruction, the same day the terms were completed: **"okay lets remove the
+> instant incentive for now then"**. Nothing from this document reached the public
+> compensation page, the standalone brief, the database, or the engine. There is
+> nothing to unwind.
+>
+> **This document is preserved intact, not withdrawn.** Every figure in it was
+> independently recomputed by the verifier, 47 of 47 claims reproducing exactly, so it
+> remains the best costing of this mechanism that exists. If the question reopens, start
+> here rather than from scratch.
+>
+> **What stays true regardless.** The compensation page and the brief already describe
+> Instant Payout as approved but not built, paying nothing today, at zero dollars. Those
+> statements were accurate before this decision and remain accurate after it, which is
+> why shelving cost nothing. Had the mechanism been published as live, this instruction
+> would have required a public correction instead.
+>
+> **The separate August approval is untouched by this.** Howard approved Instant Payout
+> at 20 percent on 2026-08-15, recorded in `DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`.
+> Shelving the build is not the same as revoking that approval, and nobody should read it
+> as such without asking him.
+>
+> **Two things here are worth acting on even with the mechanism shelved**, because both
+> concern documents that are quoted today:
+> 1. Document 10's headline of 234 qualifying events **does not reproduce from its own
+>    terms** under seven readings. Its term 8 is ambiguous and should be rewritten before
+>    that document is quoted to anyone.
+> 2. The launch-month exposure finding stands on its own: first orders were 76.11 percent
+>    of revenue in February 2026 against 4.2456 percent across March to July. Any future
+>    first-order mechanism has to be tested against a launch month, not a mature one.
+
 **Owner of this document:** the compensation engineer on the Orvanna build team.
 **Version 2, written 2026-08-17.** Version 1 was written the same day and failed the
 publication gate. See the correction note below.

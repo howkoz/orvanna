@@ -2,7 +2,24 @@
 
 **Date:** 2026-08-17
 **Decided by:** Howard, in four words: **"20 with the guardrail"**
-**Status:** RULED. Specification amendment in flight; publication gated.
+**Status:** **SUPERSEDED THE SAME DAY. SHELVED, NOT BUILT, NOT PUBLISHED.**
+
+> **SHELVED 2026-08-17, by Howard, hours after the ruling below.** His words: **"okay
+> lets remove the instant incentive for now then"**.
+>
+> The ruling recorded here was real and is left standing as written, because a decision
+> that was made and then shelved is still a decision, and the reasoning behind it is the
+> part worth keeping. Nothing was published, nothing was built, and no engine or database
+> change was ever made, so shelving required no unwinding.
+>
+> **If the question reopens, this ruling is the starting point, not a blank page.** The
+> rate was 20 percent bound to an 8-percent-of-monthly-revenue guardrail, and the
+> guardrail exists because the launch-month exposure cannot be pinned to a number from
+> the available data. That reasoning does not expire.
+>
+> **Untouched by this:** Howard's separate 2026-08-15 approval of Instant Payout at 20
+> percent, recorded in `DOCUMENTATION\10-INSTANT-PAYOUT-TERMS.md`. Shelving a build is
+> not revoking an approval.
 
 Acronym key: Sales Volume (SV), Structured Query Language (SQL).
 
