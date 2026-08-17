@@ -123,7 +123,7 @@ const HOUSE_CODE = "GW-000";
 
 function toInt(value: unknown, fallback: number): number {
   const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+  return Number.isInteger(n) && n >= 0 ? n : fallback;
 }
 
 /* deno-postgres returns numeric columns as strings (correctly: a

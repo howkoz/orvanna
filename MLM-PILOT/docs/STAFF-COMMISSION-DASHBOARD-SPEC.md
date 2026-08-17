@@ -259,7 +259,7 @@ rule.
 | OQ2 | Cache projections server-side for the rate window? | **No cache.** Compute on demand under the 6-per-minute scope; a cached projection is a stored projection, which rule 4 of the labeling rule forbids, and staleness questions are worse than sub-second recomputes at this scale. |
 | OQ3 | Build now or after the August run? | **Now.** The superseded trail and runs board have real data today, and the current-month panel is most valuable BEFORE a month's first run, which is exactly now. |
 | OQ4 | Export (spreadsheet download of a run's lines)? | **Not in version 1.** It is one more data egress path to review; add it as its own small change if Howard asks after using the drill. |
-| OQ5 | Which roles may open it: admin and staff, or staff only? | **Admin and staff both**, member refused; matches every other staff surface. |
+| OQ5 | Which roles may open it: admin and staff, or staff only? | **Admin and staff both**, member refused. The dashboard is read-only; write surfaces still keep their tighter staff-only gates. |
 
 ## 11. What this specification deliberately did not do
 

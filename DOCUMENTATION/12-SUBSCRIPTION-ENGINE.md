@@ -476,18 +476,20 @@ What is real right now:
   **deliberately inert**: its clock has no row, simulations never run in production
   by ruling, and nothing bills until an operator initializes the clock on purpose.
 - The complete simulated year is **proven locally, 75 proofs of 75**, on the exact
-  migration files. Migrations 024 through 027 are the cloud-applied inert base;
-  migrations 028 and 029 are local-proven and await the console deploy round.
-- The console and the commission dashboard are **written in full** and implement
-  everything section 5 describes, but the builder does not deploy; the deploy
-  engineer ships them after gating, with a byte-compare against the repository.
+  migration files. Migrations 024 through 029 are now represented in the cloud
+  status table, and the clock was initialized during the August 16, 2026 evening
+  deploy window.
+- The console and the commission dashboard are **written, deployed, and reachable**
+  from the staff operations page. Their safe behavior is intentional: preview gates
+  execution, inert service responses stay visibly inert, and execute cannot use a
+  stale browser date as a fallback run date.
 - Migrations 028 (the run limit) and 029 (the live dispatch seam) are **authored and
   proven locally against the simulated processor**. They are not complete for live
-  selling until the deploy-round acceptance written into migration 029 passes: a
-  limit-2 run producing exactly two payments visible in the HyperSwitch dashboard,
-  channel renewal_engine, succeeded through Braintree, no 3DS challenge requested
-  and zero challenges seen, plus a strand drill proving an unanswered live attempt
-  surfaces in the attention queue instead of vanishing.
+  selling until the live-rail acceptance written into migration 029 passes: a limit-2
+  run producing exactly two payments visible in the HyperSwitch dashboard, channel
+  renewal_engine, succeeded through Braintree, no 3DS challenge requested and zero
+  challenges seen, plus a strand drill proving an unanswered live attempt surfaces
+  in the attention queue instead of vanishing.
 
 What "sellable" still awaits, named so no reader assumes it exists:
 
@@ -511,7 +513,110 @@ What "sellable" still awaits, named so no reader assumes it exists:
   evidence on each attempt and must make refund, chargeback, and post-finalization
   adjustments legible without rewriting the billing state.
 
-## 9. What this document does not cover
+## 9. Concerns and hardening plan
+
+These concerns are not reasons to abandon the custom engine. They are the controls
+that make the engine operationally boring enough to trust.
+
+### 9.1 Documentation and code drift
+
+The biggest non-technical risk is a stale document that keeps describing yesterday's
+deployment. The cure is a small source-of-truth register for every subscription
+artifact: migration number, cloud status, console status, owner, last proof date,
+and last deploy date. Any deploy that changes billing, commissions, tax, vaulting,
+or console behavior should update that register in the same work packet.
+
+The staff console must also keep its copy honest. Every unavailable path should say
+whether it is source-only, deployed but gated, service-unavailable, or deliberately
+inert. That prevents an operator from reading "not built" when the code is deployed,
+or reading "ready" when the rail is still intentionally blocked.
+
+### 9.2 Stored credential and renewal payment rail
+
+The engine's logic is stronger than the live credential path today. Before it can be
+called sellable, the stored-credential spike must prove the whole lifecycle:
+
+- A cardholder-present setup payment creates the customer and reusable credential.
+- The renewal run uses merchant-initiated indicators and never stores CVV.
+- The first off-session renewal succeeds without an interactive 3DS challenge.
+- Amount, currency, idempotency key, subscription id, and processor reference are
+  visible on the billing attempt and in the payment dashboard.
+- A replaced card retires the old credential and uses the new one on the next run.
+- A deliberately bad stored credential fails into the member-fault retry lane, not
+  into silent processor limbo.
+
+### 9.3 Currency and tax snapshots
+
+Currency and tax cannot be derived later from today's member address or today's tax
+settings. Each billing attempt needs a frozen snapshot: billing currency, billing
+country or state, postal code, product tax code, tax engine source, quote id if one
+exists, taxable basis, tax cents, exemption state, and the final total sent to the
+processor.
+
+That snapshot becomes the receipt truth for that cycle. If a member changes address
+or a jurisdiction's tax rule changes later, the next cycle uses the new facts, but
+the old attempt remains intact.
+
+### 9.4 Refunds, reversals, chargebacks, and commissions
+
+Refunds and chargebacks are payment facts; they should not rewrite subscription
+history. The subscription ledger should keep the original attempt, then append a
+reversal event with processor reference, amount, reason, staff actor or webhook
+source, and commission impact.
+
+Before commission finalization, the bridge can correct the open period. After
+commission finalization, the bridge should create an adjustment or clawback row
+instead of editing closed commission history. That distinction keeps billing state,
+payment state, and compensation state honest at the same time.
+
+### 9.5 Scheduler and recovery
+
+The real scheduler should be deliberately boring: one idempotent daily clock, one
+runner lock, one active run per date, and an operator-visible reason when it does
+not run. The recovery matrix should be tested before the scheduler is trusted:
+
+- Missed scheduler tick.
+- Duplicate scheduler tick.
+- Crash after run creation but before payment dispatch.
+- Crash after payment dispatch but before webhook.
+- Processor timeout with late success webhook.
+- Processor timeout with late failure webhook.
+- Manual run limit that strands work intentionally.
+- Retry backoff after a member-fault decline.
+
+The operator should be able to resume the same run safely without creating duplicate
+charges.
+
+### 9.6 Proof expansion
+
+The current proof harness proves the deterministic engine. The next proof set should
+prove the live seams around it:
+
+- Stored credential setup and replacement.
+- First off-session renewal charge on the sandbox rail.
+- Currency and tax snapshot on the billing attempt.
+- Refund before commission finalization.
+- Refund or chargeback after commission finalization.
+- Late webhook after a timeout.
+- Scheduler missed-day recovery.
+- Manual run limit plus resume.
+- Member dunning event and card-update event.
+
+### 9.7 Acceptance checklist before "sellable"
+
+Do not call the engine sellable until these are true:
+
+- Stored credential creation, replacement, and retirement are proven.
+- First off-session sandbox renewal succeeds without cardholder challenge.
+- Tax and currency snapshots appear on the attempt, receipt, and staff console.
+- Refund, reversal, chargeback, and commission correction behavior is proven before
+  and after commission finalization.
+- Scheduler recovery has been driven once through every listed recovery path.
+- Staff console status matches the source register and does not contain stale phase
+  copy.
+- Member dunning and card-update surfaces exist and read the engine's own events.
+
+## 10. What this document does not cover
 
 The compensation plan's own arithmetic (document 03), the bridge's nine policies
 (document 09), refunds (document 11), and the checkout that creates a subscription

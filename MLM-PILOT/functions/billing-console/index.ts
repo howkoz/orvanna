@@ -162,7 +162,7 @@ type SubOp = (typeof SUB_OPS)[number];
 
 function toInt(value: unknown, fallback: number): number {
   const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+  return Number.isInteger(n) && n >= 0 ? n : fallback;
 }
 
 function num(value: unknown): number {

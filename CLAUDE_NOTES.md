@@ -236,3 +236,25 @@ Follow-up member portal backoffice redesign:
 - Portal panels, stat cards, wire feed, tables, and chart surfaces were tightened so the page reads more like an operating dashboard than a demo report page.
 - `applyTheme` now tolerates the removed logo image element, and tab changes maintain `aria-current` for the redesigned navigation state.
 - Browser visual verification covered desktop and mobile, with horizontal overflow fixed before build.
+
+Follow-up staff operations audit:
+- Howard asked for a documentation and code audit of `staff-operations.html#billing` and `staff-operations.html#commissions`.
+- The public staff operations page had stale pre-deploy wording even though the V2 documentation now records both surfaces as deployed. The page now says service calls may be unavailable or refusing the current staff session, not that the functions are simply undeployed.
+- The billing run flow now keeps `Execute run` disabled unless the backend preview returns a real runnable `tick_date`. An inert preview no longer unlocks execute, and execute no longer falls back to today's browser date.
+- Same-page hash navigation is now handled with `hashchange`, so moving between `#billing` and `#commissions` after the page is already loaded shows the intended panel.
+- The commission dashboard spec OQ5 now matches the implementation: admin plus staff may open the read-only commission dashboard, while write surfaces keep tighter staff-only gates.
+- The billing and commission Edge Function sources now require whole-number IDs and limits instead of silently flooring decimals.
+- Static deployment completed: deploy repo commit `880233a` pushed to `orvanna.io`, and live HTML verified with a cache-buster.
+- Edge Function source changes are not deployed from this machine. Supabase CLI remains blocked by missing `SUPABASE_ACCESS_TOKEN`; the connector can see the project, but the deploy tool requires embedding the large bundle contents directly, so the backend hardening remains source-side until the normal function deploy path is used.
+
+Follow-up subscription engine concerns:
+- Howard agreed with the subscription logic concerns and asked to implement that feedback in the documentation.
+- `DOCUMENTATION/12-SUBSCRIPTION-ENGINE.md` now has a dedicated V2 section, `Concerns and hardening plan`, covering documentation drift, stored credentials, currency and tax snapshots, refunds and chargebacks, scheduler recovery, proof expansion, and the acceptance checklist before calling the engine sellable.
+- Section 8 was also corrected so it no longer says the console is undeployed or that migrations 028 and 029 are only local-proven.
+
+Follow-up product detail page polish:
+- Howard asked to clean up `/product.html` because the product icon was oversized, the typography felt too large, and the first viewport did not show enough of the page.
+- The single product template is driven by `product.html?sku=...`, so the CSS update applies to every product page.
+- `MLM-PILOT/www/css/shop.css` now uses a compact PDP hero: small 60px product icon, tighter title scale, side-by-side purchase controls on desktop, full-width purchase card on mobile, and denser includes/prose cards.
+- Static deploy completed with deploy repo commit `7311565`; live check confirmed `shop.css?v=9cfe5bc3cf82`, no horizontal overflow, and the old 230px icon rule absent.
+- Follow-up badge correction deployed with commit `211ba1a`: the product tier badge now uses `width: max-content` and `justify-self: start`, so the border hugs labels like `Domain agent` instead of stretching across the product copy column.
