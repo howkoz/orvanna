@@ -426,3 +426,306 @@ Build bundle at the graded state: `sha256 67a23f23bbe813bc`, 37 files, 1178 KB. 
 before and after every mutation probe, so the tree I graded is the tree that stands.
 
 Report only. I fixed nothing.
+
+---
+---
+
+# DELTA GATE: commit `5928ff4`
+
+**Date:** 2026-08-17, later the same day
+**Agent:** mlm-verifier
+**Commit graded:** `5928ff4` "Fix round: one chrome stylesheet, and four more lints so it
+cannot drift back"
+**Scope:** the delta only. I did not re-grade what commit `713e3f8` already proved clean,
+except where my own earlier findings touched it.
+
+## DELTA GATE: PASS
+
+Every one of my five findings is closed, and I reproved each one myself rather than
+accepting the report. Eleven of thirteen mutation probes bite, including both of the holes
+I originally found. The geometry claim is correct and I measured it. The contrast artifact
+is real, re-runnable, and its arithmetic reproduces.
+
+Two new lint bypasses surfaced under harder pressure, and one reported figure is wrong
+again. None of them is present in this tree as a defect a reader would meet, so they are
+findings for the next round that touches the build, not blockers. I explain below why I
+did not fail on the more serious of the two.
+
+---
+
+## 1. My five findings, reproved
+
+| Finding | Closed? | How I proved it |
+|---|---|---|
+| C-1: 4.73 does not reproduce | **yes** | Corrected to 4.955 in every live location. The only surviving occurrences of 4.73 and 5.32 anywhere in the tree are inside text that documents them as wrong. |
+| C-2: 5.32 does not reproduce | **yes** | Corrected to 5.684, and the dark floor recorded as 5.101. `corporate.css` rewritten. |
+| C-3: no contrast artifact | **yes** | Three files committed. I recomputed all 145 rows myself, see section 4. |
+| L-1: the cart lint hole | **yes** | Probe E now fails the build with a named message. |
+| L-2: the page registry hole | **yes** | Probe J, my own hole, re-run by me. Now fails. |
+
+---
+
+## 2. Probes. Thirteen run, eleven bite
+
+Each probe mutated one thing, ran the build, then restored the tree from git. Tree verified
+clean at the end.
+
+| Probe | Mutation | Build | Result |
+|---|---|---|---|
+| E | cart injected into `team.html` | exit 1 | **bites**, names the rule and the two permitted pages |
+| J | new `pricing.html`, mangled navigation | exit 1 | **bites** on the page registry. My original hole is closed. |
+| J2 | new `pricing.html`, navigation perfect, just unregistered | exit 1 | **bites**. The registry catches the page, not just the drift. |
+| J3 | a registered page removed from source | exit 1 | build fails, but via the link checker, not the registry's own missing-page branch |
+| K | active item moved from Team to Shop on `team.html` | exit 1 | **bites**: "points at shop.html, expected team.html" |
+| L | active item removed entirely from `index.html` | exit 1 | **bites**: "0 active navigation items, expected exactly 1" |
+| M | one token added to the pre-paint snippet on `product.html` | exit 1 | **bites** |
+| N | `defer` added to the pre-paint script on `library.html` | exit 1 | **bites**, and names inline and synchronous as the requirement |
+| O | `site-chrome.css` link deleted from `comp-plan.html` | exit 1 | **bites** |
+| P | `.nav-link` declared in `corporate.css` | exit 1 | **bites** |
+| Q | `.nav-links` declared inline in `conductor.html` | exit 1 | **bites** |
+| **R** | `.some-thing, .nav-links { gap: 40px; }` in `corporate.css` | **exit 0** | **SILENT** |
+| **S** | the `site-chrome.css` link wrapped in an HTML comment on `team.html` | **exit 0** | **SILENT** |
+| T | descendant selector split so `.nav-links` starts a line | exit 1 | bites (safe direction) |
+
+**Probe R, finding D-1, MEDIUM.** The chrome selector pattern anchors at the start of a line,
+so it only ever inspects the FIRST selector in a comma-separated group. A chrome selector
+placed anywhere after a comma is invisible to it. Grouping selectors with commas is the most
+ordinary CSS there is, so this is not an exotic bypass. The single-source rule the round was
+built on can be defeated by a comma.
+
+**Probe S, finding D-2, MEDIUM.** The chrome sheet lint does a substring search over raw
+HTML, comments included. A page can comment out its `site-chrome.css` link and pass. That is
+precisely the incident described to me as the motivation for the lint: the window where
+`shop.html` rendered its links in default browser blue because the tokens had moved and the
+sheet was not yet linked. A lint that cannot catch the incident that motivated it is worth
+naming plainly.
+
+**Finding D-3, LOW.** Probe J3 shows the registry's "registered but missing from the build"
+branch is unreachable in practice, because the link checker fails first on any page that
+other pages link to. The build still fails, which is what matters, but that branch is
+unproven.
+
+---
+
+## 3. Geometry, measured
+
+Nine pages, four widths, real page loads at each width. Header height is the `.nav` element's
+own box; rows are clustered on element centres.
+
+| Width | Header height | Gap | Link font | Bar | Rows |
+|---|---|---|---|---|---|
+| **1280** | **69 on all nine** | 16px on all nine | 13.44px on all nine | 800 wide, or 886 on shop and product | 1 |
+| 1024 | 69 on seven, **105 on shop and product** | 16px | 13.44px | 800 at x=181, or 886 at x=28 | 1 |
+| 768 | **146.84 on all nine** | 16px | 13.44px | 697 at x=28 on all nine | 2 |
+| 390 | **175 on all nine** | 13px | 11.52px | 335 at x=20 on all nine | 3 |
+
+**The 69 pixel claim is correct.** Shop and product were 105 and are now 69 at 1280, and all
+nine agree on height, gap, font size, plain link colour `rgb(199,208,222)` and active colour
+`rgb(255,255,255)`. That is Howard's original complaint answered at his own width, measured
+rather than asserted.
+
+I also verified the 8.93 pixel arithmetic rather than restating it. At 1024 on `shop.html`,
+gap 9px still gives a 105 pixel header; gap 8.93px collapses it to 69. The threshold is real,
+and 8.93 is plainly not a bar anyone would ship.
+
+### Finding D-4, LOW to MEDIUM: the narrow-width report is wrong again
+
+"At 1024 and 390 the two cart pages still carry one extra row" is not what the tree does. I
+swept twenty widths comparing `index.html` against `shop.html`:
+
+| Width | index | shop | |
+|---|---|---|---|
+| 1280 to 1120 | 69 | 69 | same |
+| **1080, 1024** | 69 | **105** | diverge |
+| 980 | 105 | 105 | same |
+| **900** | 105 | **155** | diverge |
+| 860 to 600 | 146.84 | 146.84 | same |
+| 500 | 138 | 138 | same |
+| **430** | 138 | **185** | diverge |
+| **390, 360** | 175 | 175 | **same** |
+| **320** | 175 | **222** | diverge |
+
+There are **four** divergence bands, not two. **At 390 the pages are identical**, so that
+half of the claim is simply not true. And **320 pixels is not mentioned at all**, which is
+the worst case: 47 extra pixels of header on the smallest phone width in common use. This is
+the third time this round has put a number in a report that was not measured, and it is the
+reason the coordinator was right to tell me to measure it.
+
+### My ruling on the extra row: acceptable, it is the permitted eleventh control
+
+1. Contract section 2 rule 3 permits the cart on shop and product as "a function of those
+   pages, not chrome drift". A bar with one more control wraps one step earlier at some
+   widths. That is arithmetic, not drift.
+2. At the widths that answer Howard's complaint, 1280 and 768, all nine are identical. At
+   390 they are identical too.
+3. The alternative is a gap of 8.93 pixels or less on all nine, which I measured, and which
+   would crush the bar everywhere to tidy two pages in four narrow bands.
+
+Not a defect. But the record must say four bands including 320, not "1024 and 390".
+
+---
+
+## 4. The contrast artifact, checked rather than accepted
+
+**Arithmetic.** I recomputed the contrast ratio from the stored foreground and background of
+all **145** rows. Every row reproduces. Largest disagreement across the file: **0.0246**. All
+145 verdicts are consistent with their stated floor. Twenty-three rows differ by more than
+0.005 because the background is stored rounded to 8 bits while the ratio was taken unrounded,
+the same methodological point the builder documented for the cart glyph. **Finding D-5,
+LOW:** a data file whose purpose is re-checkability should regenerate its own answer exactly
+from its own columns.
+
+**Ground truth.** I re-ran my own full sweep on this commit, independently of their script:
+**4,352 measurements, 2,176 per theme, all nine pages, zero below 4.5 to 1.** The per-page
+minima are unchanged from my sweep of `713e3f8`, which is the useful result: consolidating
+four chrome stylesheets into one changed no contrast anywhere.
+
+| Page | Dark minimum | Light minimum |
+|---|---|---|
+| index.html | 5.614 | 4.983 |
+| shop.html | 5.101 | 4.863 |
+| product.html | 5.614 | 4.983 |
+| team.html | 5.614 | 4.983 |
+| faq.html | 5.614 | 4.983 |
+| comp-plan.html | 5.614 | 4.510 |
+| conductor.html | 5.614 | 4.667 |
+| library.html | 5.258 | 4.621 |
+| library-agent.html | 5.614 | 4.834 |
+| **all nine** | **5.101** | **4.510** |
+
+**Reconciling the two sets of numbers on record.** Nine of the eighteen page-and-theme minima
+in the committed artifact are higher than mine, for example index light 5.238 against my
+4.983, and shop dark 5.375 against my 5.101. The cause is not error. Their script skips
+anything inside a `disabled` or `aria-disabled` ancestor per Web Content Accessibility
+Guidelines success criterion 1.4.3, which excludes the Enroll-soon pill in the navigation and
+the Checkout button while the cart is empty. Those are exactly the elements that set my
+minima. **The exclusion is disclosed in their own document, with the criterion named**, so
+this is a stated method difference, not a hidden one. Both readings are defensible; recorded
+here so the two figures do not look like a contradiction later. Every excluded element passes
+4.5 anyway when measured.
+
+**Spot checks of the new figures, all recomputed by me, all reproduce:** hero gradient palest
+stop **9.856**, white stop **19.648**; Google blue `#4285F4` on `#F8FAFC` **3.406**; the named
+remedy `#1558C0` **6.294**; the word "Pay" **15.387**. The written rejection of the logotype
+exemption is the right call and the reasoning survives scrutiny: the mark is `aria-hidden`
+page text, governed by the 3 to 1 non-text criterion, with the accessible name carried
+elsewhere.
+
+---
+
+## 5. The new chrome stylesheet, graded as new work
+
+- **Deletion is complete.** The `--chrome-*` tokens are declared in `css/site-chrome.css` and
+  nowhere else. No declaration survives in `corporate.css`, `library.css`, `shop.css` or any
+  page.
+- **No page resolves a shared chrome token to nothing.** I checked all eleven shared tokens
+  at runtime on all nine pages: zero empty. The failure the coordinator warned about, the
+  window where `shop.html` painted default browser blue, is not present.
+- `--chrome-ind` and `--chrome-lit` resolve empty on eight pages, and that is correct: they
+  are declared and used only inside `comp-plan.html`. Page-local tokens, properly scoped.
+- **Link colours are identical on all nine:** plain `rgb(199,208,222)`, active
+  `rgb(255,255,255)`. comp-plan no longer renders differently.
+- `shop.css` changed by **comments only**. I stripped comments from both revisions and
+  compared: byte identical. No commerce rule moved.
+
+## 6. The coordinator's hand edit to `shop.html`
+
+Graded like any other. The diff is confined to `<head>`: the shared stylesheet link added in
+a commented order, and the page's own pre-paint wording replaced by the canonical block with
+the payment-specific reason kept as a separate note above it. `classList.add('js')` moved
+inside the canonical snippet and still runs synchronously in the head, outside the try block,
+so it is applied before first paint whether or not storage throws. **No payment code, cart
+code, currency code or checkout code is touched.** The edit is correct, and keeping the
+page-specific reason as a separate comment is the right way to preserve it without breaking a
+byte-exact lint.
+
+## 7. Support fallback, faq, and the rest
+
+- **Support fallback proved live.** With the vendor blocked, pressing Support sets
+  `data-support-state="unavailable"`, rewrites the accessible name to "Support chat is
+  unavailable. Press again to email support@orvanna.io.", and announces "The support chat did
+  not load. Press Support again to email support@orvanna.io instead." through a polite live
+  region. I did not observe the intermediate pending state in my probe because the failure
+  was detected immediately rather than after the deadline; that is better behaviour, not
+  worse.
+- **The deadline is wall clock.** `Date.now() + READY_TIMEOUT_MS`, compared against
+  `Date.now()`. The throttled-tab bug is genuinely fixed, not merely described.
+- **`faq.html` marks Learn active**, and probes K and L prove the lint now requires the
+  correct item rather than tolerating any item, or none.
+- **Sign-in pages untouched by `5928ff4`.** `login.html`, `staff.html` and
+  `staff-operations.html` appear nowhere in the commit.
+
+## 8. Finding D-6, LOW: the bundle hash is not a stable artifact identity
+
+This repository is checked out with `core.autocrlf=true`. The build hashes file bytes, so the
+same commit produces a different bundle hash depending on the checkout's line endings. I hit
+this myself: a line-feed-normalized tree gave `6e0b7c44e67bc265` and the byte-exact carriage
+-return checkout gave `0ded97e4546ebf1e`, both from a clean `5928ff4`. Since gate verdicts
+quote this hash as the identity of the thing being shipped, it should be computed over
+normalized bytes.
+
+---
+
+## 9. Why I did not fail on D-2
+
+I considered it seriously. D-2 lets a commented-out stylesheet link ship a page with unstyled
+navigation, and that is the exact incident the lint was written for. Against that:
+
+- The defect is **not present**. I verified at runtime, on all nine pages, that the sheet
+  loads and that no chrome token resolves empty.
+- Every finding I raised in the first gate is closed and independently reproved.
+- D-1 and D-2 are holes I found by pressing harder than I pressed in round one. A gate that
+  invents a new adversarial probe each round and fails on it can never be satisfied, which is
+  its own kind of decoration.
+- The round's purpose, Howard's "one site" complaint, is now measurably answered at every
+  width I tested.
+
+So: PASS, with D-1 and D-2 to be closed in the next round that touches `build_dist.py`, and
+D-4 corrected in the record now rather than left standing.
+
+---
+
+## 10. Deploy: YES
+
+- **The corporate chrome round deploys**, conditional on the quality assurance gate also
+  passing on `5928ff4`, per the standing both-gates rule.
+- **The two Edge Functions deploy**, and should. My ruling from the first gate stands: the
+  `toInt` change is safe, every write path guards the fallback, and the cloud currently runs
+  the weaker flooring behaviour while the repository holds the safer one. Until they
+  redeploy, a `subscription_id` of 12.9 reaching the live console is still floored to 12.
+- **`staff-operations.html` still does not ride this deploy.** It is a sign-in area, changed
+  only by the quarantine commit, and it needs its own gate.
+
+---
+
+## 11. Delta findings
+
+| # | Severity | Finding |
+|---|---|---|
+| D-1 | MEDIUM | The chrome CSS lint only inspects the first selector in a comma group. `.a, .nav-links { }` in `corporate.css` builds clean. Probe R. |
+| D-2 | MEDIUM | The chrome sheet lint searches raw HTML including comments. A commented-out `site-chrome.css` link builds clean. Probe S. This is the incident the lint was written to prevent. |
+| D-3 | LOW | The page registry's "registered but missing" branch is unreachable; the link checker fires first. Unproven code path. |
+| D-4 | LOW to MEDIUM | The narrow-width report is wrong. Four divergence bands (1080 to 1024, 900, 430, 320), not two. At 390 all nine are identical. 320 is unmentioned and is the worst case at 47 extra pixels. |
+| D-5 | LOW | Twenty-three of 145 rows in the contrast data do not exactly regenerate their own stated ratio from their own stored columns, up to 0.025, because the background is stored 8-bit rounded. |
+| D-6 | LOW | The bundle hash is line-ending sensitive under `core.autocrlf=true`, so it is not a stable identity for the artifact being shipped. |
+
+No HIGH findings. No MEDIUM or HIGH finding describes a defect present in this tree.
+
+---
+
+## 12. Artifacts graded in the delta, SHA-256
+
+```
+42c40f68b3452b83fcaeccee16dfc46d50b101dccd5534b98a31c43aad018a58  www/css/site-chrome.css
+68f0c8c44e2a02795aa4adec2cc0c4488cc8bab3cf33baa9a9420f3b6d21906b  www/_partials/theme-boot.html
+b3f5b5cc5eba7d57208c31ae64080c098ccc47d93050b3f8cc0003a1d81ea0fa  deploy/build_dist.py
+d043422cfa5175978ab4f0dfbd4c8ff84b76fb1c325d0e63cff44c226fc21b55  www/js/site-chrome.js
+e37661a45f060e350d1f10a28b21b6a5d85c494d852eb064518ef68504786fed  docs/verification/contrast-sweep.js
+f95f0220f71697dc6380beab4907b966edd00d39b194010986015434398af220  docs/verification/contrast-sweep-2026-08-17.csv
+```
+
+Build bundle from a byte-exact checkout of `5928ff4`: **`sha256 0ded97e4546ebf1e`**, 38 files,
+1189 KB, identical across two consecutive clean runs, so the build is deterministic. Working
+tree verified clean before and after all thirteen probes.
+
+Report only. I fixed nothing.
