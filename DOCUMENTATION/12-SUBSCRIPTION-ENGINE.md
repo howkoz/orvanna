@@ -45,7 +45,7 @@ Graphical User Interface (GUI).
 
 ## 1. Lead with the picture
 
-![The renewal pipeline](diagrams/renewal-pipeline.svg)
+![The renewal pipeline](C:\Users\howar\Desktop\Desktop\renewal-pipeline.svg)
 
 Plain path to that image:
 `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\diagrams\renewal-pipeline.svg`

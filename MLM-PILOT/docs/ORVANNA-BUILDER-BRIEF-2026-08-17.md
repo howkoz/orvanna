@@ -76,12 +76,16 @@ real team, and then a third.
 actual orders. Nothing is banked, nothing is grandfathered, nothing carries
 forward. If a Builder below you lapses, your override on them stops that month.
 
-**5. The 20 percent promise.** No order ever pays out more than 20 percent of its
-price, enforced order by order inside the arithmetic itself. Your BASE pay is
-never reduced by this. When an order reaches its cap, the two bonus layers on that
-order share what remains, so a bonus line can pay less than its listed rate. In a
-typical modelled month about one order in eight is at its cap, and every reduced
-line on a statement must print what it claimed, what it paid, and why.
+**5. The 20 percent promise.** The monthly commission run never pays out more than
+20 percent of an order's price, enforced inside the arithmetic itself, across your
+whole month of orders taken together. (One carve-out: once Instant Payout is built,
+a first order will additionally carry a payment made on the day, so a first order
+can exceed 20 percent in total. Instant Payout is not built and pays nothing
+today.) Your BASE pay is never reduced by the ceiling. When a month reaches its
+cap, the two bonus layers share what remains, so a bonus line can pay less than its
+listed rate. In a typical modelled month about one member-month in four with any
+volume is reduced, and every reduced line on a statement must print what it
+claimed, what it paid, and why.
 
 **What never pays.** Recruiting: not one dollar in this plan is paid for signing
 somebody up, and every payment is computed from product volume. Your own
@@ -100,17 +104,27 @@ fairest available control: people with the SAME personal volume, differing only 
 whether they developed a Builder. Modelled March, 1,001 members, at the rates of
 record.
 
-| Sales Volume band | Mean pay with at least one personally sponsored Builder | Mean pay with none | Multiple |
-|---|---|---|---|
-| 100.00 to 149.99 | 52.47 | 6.66 | **7.9 times** |
-| 150.00 to 299.99 | 725.57 | 7.90 | **92 times** |
-| 300.00 and above | 955.31 | 11.77 | **81 times** |
+| Sales Volume band | Members with a sponsored Builder | Their mean pay | Members with none | Their mean pay | Multiple |
+|---|---|---|---|---|---|
+| 100.00 to 149.99 | **8** | 52.47 | 141 | 6.66 | **7.9 times** |
+| 150.00 to 299.99 | **8** | 725.57 | 186 | 7.90 | **92 times** |
+| 300.00 and above | **8** | 955.31 | 97 | 11.77 | **81 times** |
+
+**Read the counts before the multiples.** Each mean in the Builder column is
+computed over EIGHT members, and this is a population where five people take 90.2
+percent of the structure budget, so a band mean can be moved a long way by one
+person. The multiples are real and they come from real recorded volume. They also
+rest on eight members a band. Both halves belong in any quotation of them, and the
+sample size is the first thing a professional will ask for.
 
 **These rows are never quoted without these four numbers, and that is a rule of
 this document, not a courtesy.**
 
-- **24** members of 1,001 hold that position today, meaning they personally
-  sponsored at least one Builder.
+- **34** members of 1,001 personally sponsored at least one Builder in March.
+  **24** of those 34 were ALSO QUALIFIED that month, and 24 is the number the table
+  above uses, because a member who is not qualified cannot earn and does not belong
+  in a comparison of earnings. Both are printed, because this companion is mandatory
+  and therefore has to be exact: 34 did the sponsoring, 24 could be paid for it.
 - **44** members earn any money at all from the two new layers.
 - The top **five** of those 44 take 3,590.97 of the 3,983.12 the two layers paid,
   which is **90.2 percent of the entire structure budget**. The top ten take 94.2
@@ -255,9 +269,9 @@ Three, the incentive still points the right way where anybody can act. The membe
 nearest the lapse, the only ones positioned to notice and help, lose the most: 17.00
 and 11.29 against a senior gain of 7.44.
 
-It is not a corner of the parameter space. At the rates of record, 120 of the 1,001
-modelled orders have a binding pool, so the inversion is live in any presentation
-month. It is therefore watched rather than assumed small: every consecutive pair of
+It is not a corner of the parameter space. At the rates of record, 154 of the 641
+modelled member-months that carry any volume have a binding pool, roughly one in
+four, so the inversion is live in any presentation month. It is therefore watched rather than assumed small: every consecutive pair of
 runs counts the members whose pay rose because somebody below them lapsed, and sums
 the gain, as a standing measurement.
 
@@ -267,7 +281,22 @@ watched, is worth more than one that waits to be caught.
 
 ### 6. Law B, the waterfall: why the company's outlay is bounded by construction
 
-Every order contributes a pool equal to 25 percent of its Commissionable Volume.
+**The unit, defined once, because it is not the unit a reader expects.** The
+ceiling is computed per SOURCE MEMBER-MONTH: one member's whole month of orders,
+taken together, counts as one unit. The modelled March holds 1,001 of those units,
+of which 641 have any volume at all. That same March holds 1,462 separate orders
+from those 641 buying members, and 357 of them, 56 percent, placed more than one
+order. So a count of 1,001 is a count of member-months and never a count of
+orders, and this brief does not use the two words for one thing.
+
+**What the promise means exactly.** The ceiling binds across a member's whole
+month of orders taken together, not on each order separately. Across that month it
+holds exactly, and zero of the 1,001 modelled member-months exceeded it. Inside a
+month that binds, one order can draw more of the pool than another, and 81 percent
+of March's orders sit in months carrying more than one order.
+
+Every source member-month contributes a pool equal to 25 percent of its
+Commissionable Volume.
 Since Commissionable Volume is 80 percent of the price, and 0.25 x 0.80 = 0.20,
 that pool is exactly 20 percent of the money in the door: the same ceiling the
 company already publishes.
@@ -320,7 +349,7 @@ at a factor of 0.166666, and the ten Builders collectively receive exactly 8.00.
 both cases the order pays at most 20.00, to the cent.
 
 In the actual modelled census the worst real order carries override claims at 0.56
-of its pool, and zero of 1,001 orders paid over pool.
+of its pool, and zero of the 1,001 member-months paid over pool.
 
 **Independent hostile cases.** A separate reviewer built worse ones on purpose. In
 one the proration factor lands on a repeating decimal, 0.454545, and the paid total
@@ -333,13 +362,24 @@ the claims stay fully recorded and auditable.
 
 Modelled March at the rates of record:
 
-- **120 of 1,001 orders reach their cap, about 12 percent, roughly one in eight.**
+- **154 of the 641 member-months that carry any volume are reduced on at least one
+  layer: 24.0 percent, roughly one in four.** Of those, 120 are reduced at the
+  override layer and 83 at the bonus layer, with 34 reduced only at the bonus
+  layer. An earlier draft printed "120 of 1,001, about one in eight", which
+  understated the frequency twice: it counted only the override layer, and it
+  divided by a population including 360 member-months with no volume, which can
+  never be reduced. Both errors ran in the same direction.
 - **35 of the 207 paid members, about 17 percent, carry at least one reduced
   line.**
 - Total reduced away: 943.68, being 638.00 from layer 2 and 305.68 from layer 3,
   against 17,417.12 paid, about 5.4 percent of the run.
-- Worst-affected member loses 324.14. Worst ratio is 21 percent of that member's
-  claims.
+- Worst-affected member loses 324.14. For the worst RATIO the answer depends
+  entirely on the denominator, so both are printed: 21 percent of that member's
+  total claims, and **34.5 percent of the claims the ceiling can actually reach**,
+  the second being the honest one, because the first denominator contains the spine
+  and the spine can never be reduced. The true worst case is not a ratio at all:
+  **five members lost 100 percent of their structure claims**, sums between 1.60
+  and 5.52 reduced entirely away.
 - Every cent of it comes off layers 2 and 3. The spine is structurally untouchable,
   so no member's live-plan-equivalent pay is ever reduced.
 
@@ -404,9 +444,17 @@ needs two more accounts at 100.00 Sales Volume: $300.00 a month of real money.
 
 **7.07 cents returned per attack dollar. A 92.9 percent loss, every month,
 forever**, because decay makes the puppet a subscription rather than a purchase.
-The floor under that is structural: no plan funded under a 20 percent revenue
-ceiling can return more than 20 cents on a self-funded dollar, so every
-self-funding attack on every layer loses at least 80 percent. This one loses 93.
+The floor under that is structural, and it has to be stated precisely, because the
+general form of it is false. **For commission generated BY the self-funded volume
+itself**, no plan funded under a 20 percent revenue ceiling can return more than 20
+cents on a self-funded dollar, so a self-funding attack of that kind loses at least
+80 percent, and this one loses 93. **What that bound does not cover:** self-funded
+volume bought to UNLOCK pay on other people's volume, which is exactly what the
+100.00 qualification gate does, since a member's own 100.00 purchase is what makes
+them eligible to collect level pay on their team. And once Instant Payout is built,
+a self-funded first order of 150.00 returns 42.00, which is 28 cents on the dollar,
+above 20. The 20-cent figure bounds one channel. It is not a law of the plan, and
+an earlier draft of this brief stated it as one.
 Funding an artificial second leg is the same trade: $100.00 a month to return at
 most 0.025 x 80.00 = 2.00, a 98 percent monthly loss.
 
@@ -523,7 +571,8 @@ standing.
 group volumes, its own override walk, its own leg ranking, its own per-order claims
 and its own truncated factors, and matched the engine on every line in both
 directions: zero differences on level pay, zero on overrides, zero on bonuses, zero
-invariant violations across 1,001 orders, and the same total of 17,417.12 to the
+invariant violations across 1,001 member-months, and the same total of 17,417.12
+to the
 cent. Zero high-severity findings. That gate also built three hostile cases of its
 own design, including the repeating-decimal factor and the fully exhausted pool
 described in section 6, and the ceiling held in all three.
@@ -562,12 +611,16 @@ same ordered set of lines and the same digest.
 
 | Figure | Source |
 |---|---|
-| Rates of record, multipliers, pool rate | Orvanna Builder plan specification, version 1.2, section 5 |
+| Rates of record, multipliers, pool rate | Orvanna Builder plan specification, version 1.2.1, section 5 |
 | Layer 1 equality, 1,630 lines, 13,434.00, zero differences | proof run 2026-08-16 and verifier verdict 2026-08-16 |
 | Decay fixture, stated at the rates of record: level pay 8.00 and 16.00, override 3.60 = 0.015 x 240.00, bonus 1.60 = 0.020 x 80.00 | specification section 6 as corrected in version 1.2.1, which prints the rate-of-record figures and, in section 13 rule 2, forbids presenting the fixture's own recorded draft-rate 9.60 and 4.00; level pay from the proof run and verifier verdict |
 | The single-override member going 7.80 to 0.00; the July fragility figures | red-team review 2026-08-16, attack 6 |
 | The inversion table and its factors | red-team review, attack 2b; specification section 6A |
-| 120 of 1,001 binding orders | specification sections 6A and 12A(e); red-team attack 4 |
+| Proration frequency: 154 of 641 member-months reduced on at least one layer, 24.0 percent; 120 at the override layer, 83 at the bonus layer, 34 at the bonus layer only; 360 member-months carry no volume | recomputed from run 86 waterfall traces by the publish gate, 2026-08-17. This supersedes the "120 of 1,001 sources, one in eight" framing carried by specification 6A and 12A(e) and by red-team attack 4, all three corrected in specification version 1.2.2 |
+| Worst ratio: 21 percent of total claims, 34.5 percent of the claims the ceiling can reach, five members reduced to zero structure pay | recomputed by the publish gate, 2026-08-17. Specification 12A(e) printed only the 21 and is corrected in version 1.2.2 |
+| Order and buyer counts: 1,462 orders from 641 buying members, 357 of them multi-order, 1,178 orders inside multi-order months | recomputed from the database by the publish gate, 2026-08-17 |
+| Per-band sample sizes: 8 against 141, 8 against 186, 8 against 97; 34 members sponsored a Builder, 24 of them qualified | recomputed independently by the publish gate, 2026-08-17 |
+| Instant Payout returning 42.00 on a self-funded first order of 150.00, 28 cents on the dollar | the live plan's approved Instant Payout terms, cited by the quality gate, 2026-08-17 |
 | One order followed: 14.80 of 20.00 | specification section 12A(d) at the rates of record |
 | Repeating decimal 0.454545 and 7.999992; exhausted pool | verifier verdict, section 2 |
 | Ten nested Builders worst case, factor 0.166666; worst real order at 0.56 of pool | specification 12A(a); red-team attack 4 |

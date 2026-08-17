@@ -63,6 +63,7 @@
   --indigo-soft: #A5B4FC;
   --violet:      #A78BFA;
   --accent:      #22D3EE;
+  --link:        #22D3EE;   /* link ink; see the light block for why it is a token */
   --accent-bg:   rgba(34, 211, 238, 0.10);
   --accent-line: rgba(34, 211, 238, 0.38);
   --good:        #6EE7B7;
@@ -120,6 +121,11 @@
   --indigo-soft:  #4338CA;
   --violet:       #6D28D9;
   --accent:       #0E7490;   /* the single lit accent, light-safe cyan */
+  /* Links sit on tinted note and panel backgrounds, where the accent above
+     measures 4.56 to 1 against the stop-note tint and 4.73 against the plain
+     note tint: passing, but with almost no margin. This darker cyan is 6.18
+     to 1 at its worst across every tint a link can land on. */
+  --link:         #155E75;
   --accent-bg:    #E7F6FB;
   --accent-line:  rgba(14, 116, 144, 0.35);
   --good:         #065F46;
@@ -275,7 +281,7 @@ p.lead { font-size: 1.06rem; color: var(--muted); }
 ul, ol { margin: 12px 0 12px 24px; max-width: 46em; }
 li { margin: 7px 0; }
 strong { color: var(--ink); font-weight: 700; }
-a { color: var(--accent); }
+a { color: var(--link); }
 .small { font-size: 0.86rem; color: var(--muted); }
 .num, .money { font-variant-numeric: tabular-nums; white-space: nowrap; }
 code, .mono {
@@ -506,7 +512,7 @@ details.ledger[open] { padding-bottom: 18px; }
     --line: #C8CEDA; --hairline: #C8CEDA; --code-bg: #F1F5F9;
     --shadow: none; --shadow-lift: none;
     --indigo: #4338CA; --indigo-soft: #4F46E5; --violet: #6D28D9;
-    --accent: #0E7490; --accent-bg: #E7F6FB; --accent-line: #0E7490;
+    --accent: #0E7490; --accent-bg: #E7F6FB; --accent-line: #0E7490; --link: #155E75;
     --good: #065F46; --good-bg: #E3F5EE;
     --bad: #B91C1C; --bad-bg: #FDE8E6;
     --amber: #92400E; --amber-bg: #FEF3C7;
@@ -688,15 +694,22 @@ details.ledger[open] { padding-bottom: 18px; }
     <p class="lead">A compensation document is only worth reading if it is clear about which parts are real. This one is, in the first minute rather than the last.</p>
 
     <div class="grid-2">
+      <!-- The two ranges below were wrong in the first build: part one was given
+           as "one to fifteen", which filed the modelled overview inside the one
+           panel whose whole job is separating modelled from operating. Two graders
+           caught it independently. The boundary sections are now NAMED as well as
+           numbered, so a stale number cannot survive on its own, and the endpoints
+           must be re-derived by reading the kickers in order if a section is ever
+           added. -->
       <div class="panel">
         <p><span class="chip ok">Operating today</span></p>
-        <h4>Part one, sections one to fifteen</h4>
-        <p>Everything in part one of this brochure, sections one to fifteen, is the plan the commission engine runs. It is unilevel version 1.3. Every monthly commission run this company has ever computed carries version 1.2 or version 1.3 of that specification, twelve runs across February to July 2026. Those runs produced statements. They are the plan.</p>
+        <h4>Part one, sections one to fourteen</h4>
+        <p>Everything in part one of this brochure, from section one through the section headed <a href="#limits">"What version 1.3 does not do"</a>, which is section fourteen and the last section before the part two divider, is the plan the commission engine runs. It is unilevel version 1.3. Every monthly commission run this company has ever computed carries version 1.2 or version 1.3 of that specification, twelve runs across February to July 2026. Those runs produced statements. They are the plan.</p>
       </div>
       <div class="panel">
         <p><span class="chip info">Modelled, never paid</span></p>
-        <h4>Part two, sections sixteen to twenty-four</h4>
-        <p>Part two, sections sixteen to twenty-four, describes a two-layer extension called the Builder plan. It exists as a working implementation inside a compensation laboratory, where twenty-nine runs of it have been computed against recorded orders. It has never been the live plan, has never produced a statement, and has never paid one dollar to one person. Every figure in part two is a what-if computed from real recorded volume under different rules.</p>
+        <h4>Part two, sections fifteen to twenty-four</h4>
+        <p>Part two, everything from the section headed <a href="#one-view">"The Builder plan in one view"</a>, which is section fifteen and carries the part two divider, through to the end of the glossary at section twenty-four, describes a two-layer extension called the Builder plan. It exists as a working implementation inside a compensation laboratory, where twenty-nine runs of it have been computed against recorded orders. It has never been the live plan, has never produced a statement, and has never paid one dollar to one person. Every figure in part two is a what-if computed from real recorded volume under different rules.</p>
       </div>
     </div>
 
@@ -1408,7 +1421,7 @@ details.ledger[open] { padding-bottom: 18px; }
     <p>Suppose the first order had been $400.00 instead. The basis is capped at $250.00, so the Instant Payout is 0.20 x 250.00 = <strong class="num">50.00</strong>, which is the most any single Instant Payout can ever pay. The level 1 commission at month end is unaffected by the cap and is still calculated on the full order.</p>
 
     <div class="note warn">
-      <p><strong>One consequence to be honest about.</strong> Section four of this brochure says the most a single order can pay through the monthly run is 20 percent of its price. That remains true of the monthly run. Once Instant Payout is built, a Conductor's <em>first</em> order will additionally carry up to 20 percent of its price paid on the day, so a first order can pay more than 20 percent in total. Every other order in the plan is unaffected, and the 20 percent figure still holds across the plan as a whole because first orders are a small share of what the company sells.</p>
+      <p><strong>One consequence to be honest about.</strong> Section four of this brochure says the most a single order can pay through the monthly run is 20 percent of its price. That remains true of the monthly run. Once Instant Payout is built, a Conductor's <em>first</em> order will additionally carry up to 20 percent of its price paid on the day, so a first order can pay more than 20 percent in total. Every other order in the plan is unaffected.</p>
     </div>
   </div>
 </section>
@@ -1705,7 +1718,7 @@ details.ledger[open] { padding-bottom: 18px; }
         <thead><tr><th>Law</th><th>What it says</th><th>What it protects</th></tr></thead>
         <tbody>
           <tr><td><strong>Law A, decay</strong></td><td>Every layer recomputes from scratch each month, from that month's actual orders and that month's actual ranks. Nothing is banked, grandfathered, or carried forward. A Builder who lapses stops paying their upline that month.</td><td>Sustained engagement. Helping your people stay active is worth money to you, every month, and the plan prices it exactly.</td></tr>
-          <tr><td><strong>Law B, the waterfall</strong></td><td>Every order contributes a fixed pool: 25 percent of its Commissionable Volume, which is 20 percent of its price. Layer 1 draws from that pool first, layer 2 second, layer 3 last. When the pool runs out, the junior layers share what is left in proportion.</td><td>Solvency. No order can ever pay out more than 20 percent of its price, whatever the rates are set to, because the ceiling is the arithmetic the amounts are computed by, not a limit somebody watches afterward.</td></tr>
+          <tr><td><strong>Law B, the waterfall</strong></td><td>Every source member-month contributes a fixed pool: 25 percent of its Commissionable Volume, which is 20 percent of its price. Layer 1 draws from that pool first, layer 2 second, layer 3 last. When the pool runs out, the junior layers share what is left in proportion.</td><td>Solvency. The monthly commission run can never pay out more than 20 percent of an order's price, whatever the rates are set to, because the ceiling is the arithmetic the amounts are computed by, not a limit somebody watches afterward. <strong>One carve-out, stated where the claim is made:</strong> once Instant Payout is built, a Conductor's first order will additionally carry a payment made on the day, so a first order can pay more than 20 percent in total. Instant Payout is not built and pays nothing today.</td></tr>
         </tbody>
       </table>
     </div>
@@ -1715,50 +1728,50 @@ details.ledger[open] { padding-bottom: 18px; }
     </div>
 
     <figure class="figure fig-mid">
-      <svg viewBox="0 0 480 362" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="d1Title d1Desc">
-        <title id="d1Title">The three layers inside one order's pool</title>
-        <desc id="d1Desc">One order contributes a pool of twenty-five percent of its Commissionable Volume, which is twenty percent of its price, and a hard ceiling sits above it. Inside the pool, layer 1, the spine, draws first at up to twenty-five percent of volume and always fits. Layer 2, the Builder override, draws next at one and a half percent for generation one and one percent for generation two. Layer 3, the second-team bonus, draws last at two to two and a half percent. Law A recomputes all of it every month and Law B enforces the ceiling per order.</desc>
+      <svg viewBox="0 0 480 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="d1Title d1Desc">
+        <title id="d1Title">The three layers inside one source member-month's pool</title>
+        <desc id="d1Desc">One source member-month contributes a pool of twenty-five percent of its Commissionable Volume, which is twenty percent of its price, and a hard ceiling sits above it which the monthly run never crosses. Instant Payout, once built, is the one exception, and it is not built. Inside the pool, layer 1, the spine, draws first at up to twenty-five percent of volume and always fits. Layer 2, the Builder override, draws next at one and a half percent for generation one and one percent for generation two. Layer 3, the second-team bonus, draws last at two to two and a half percent. Law A recomputes all of it every month and Law B enforces the ceiling.</desc>
 
-        <text class="svg-s" x="240" y="14" text-anchor="middle" fill="var(--d-text)">THE CEILING: 20 PERCENT OF THE PRICE. NO ORDER CROSSES IT.</text>
-        <line x1="20" y1="26" x2="460" y2="26" stroke="var(--d-lit-stroke)" stroke-width="3"/>
+        <text class="svg-s" x="240" y="14" text-anchor="middle" fill="var(--d-text)">THE CEILING: 20 PERCENT OF THE PRICE. The monthly run never crosses it.</text>
+        <line x1="20" y1="24" x2="460" y2="24" stroke="var(--d-lit-stroke)" stroke-width="3"/>
+        <text class="svg-s" x="240" y="40" text-anchor="middle" fill="var(--d-muted)">Instant Payout, once built, is the one exception. It is not built.</text>
 
-        <rect x="20" y="36" width="440" height="272" rx="10" fill="none"
+        <rect x="20" y="48" width="440" height="272" rx="10" fill="none"
               stroke="var(--d-key-stroke)" stroke-width="1.6"/>
 
-        <rect x="40" y="50" width="340" height="62" rx="8"
+        <rect x="40" y="62" width="340" height="62" rx="8"
               fill="var(--d-node-bg)" stroke="var(--d-node-stroke)" stroke-width="1.6"/>
-        <text class="svg-b" x="210" y="72" text-anchor="middle" fill="var(--d-text)">LAYER 3, THE SECOND-TEAM BONUS</text>
-        <text class="svg-s" x="210" y="89" text-anchor="middle" fill="var(--d-muted)">2.0 to 2.5 percent, paid from what</text>
-        <text class="svg-s" x="210" y="103" text-anchor="middle" fill="var(--d-muted)">layers 1 and 2 did not claim</text>
+        <text class="svg-b" x="210" y="84" text-anchor="middle" fill="var(--d-text)">LAYER 3, THE SECOND-TEAM BONUS</text>
+        <text class="svg-s" x="210" y="101" text-anchor="middle" fill="var(--d-muted)">2.0 to 2.5 percent, paid from what</text>
+        <text class="svg-s" x="210" y="115" text-anchor="middle" fill="var(--d-muted)">layers 1 and 2 did not claim</text>
 
-        <rect x="40" y="122" width="340" height="62" rx="8"
+        <rect x="40" y="134" width="340" height="62" rx="8"
               fill="var(--d-node-bg)" stroke="var(--d-node-stroke)" stroke-width="1.6"/>
-        <text class="svg-b" x="210" y="144" text-anchor="middle" fill="var(--d-text)">LAYER 2, THE BUILDER OVERRIDE</text>
-        <text class="svg-s" x="210" y="161" text-anchor="middle" fill="var(--d-muted)">generation 1 at 1.5, generation 2 at 1.0 percent</text>
-        <text class="svg-s" x="210" y="175" text-anchor="middle" fill="var(--d-muted)">paid from what the spine did not claim</text>
+        <text class="svg-b" x="210" y="156" text-anchor="middle" fill="var(--d-text)">LAYER 2, THE BUILDER OVERRIDE</text>
+        <text class="svg-s" x="210" y="173" text-anchor="middle" fill="var(--d-muted)">generation 1 at 1.5, generation 2 at 1.0 percent</text>
+        <text class="svg-s" x="210" y="187" text-anchor="middle" fill="var(--d-muted)">paid from what the spine did not claim</text>
 
-        <rect x="40" y="194" width="340" height="76" rx="8"
+        <rect x="40" y="206" width="340" height="76" rx="8"
               fill="var(--d-lit-bg)" stroke="var(--d-lit-stroke)" stroke-width="2.4"/>
-        <text class="svg-b" x="210" y="219" text-anchor="middle" fill="var(--d-text)">LAYER 1, THE SPINE</text>
-        <text class="svg-s" x="210" y="236" text-anchor="middle" fill="var(--d-muted)">up to 25 percent of volume</text>
-        <text class="svg-s" x="210" y="252" text-anchor="middle" fill="var(--d-muted)">always fits, never reduced</text>
+        <text class="svg-b" x="210" y="231" text-anchor="middle" fill="var(--d-text)">LAYER 1, THE SPINE</text>
+        <text class="svg-s" x="210" y="248" text-anchor="middle" fill="var(--d-muted)">up to 25 percent of volume</text>
+        <text class="svg-s" x="210" y="264" text-anchor="middle" fill="var(--d-muted)">always fits, never reduced</text>
 
-        <text class="svg-s" x="240" y="296" text-anchor="middle" fill="var(--d-muted)">the pool from one order: 25 percent of Commissionable Volume</text>
+        <text class="svg-s" x="240" y="308" text-anchor="middle" fill="var(--d-muted)">the pool from one source member-month: 25 percent of volume</text>
 
         <g stroke="var(--d-line)" stroke-width="1.6" fill="none">
-          <path d="M412 60 L412 254"/>
+          <path d="M412 72 L412 266"/>
         </g>
-        <path d="M412 262 l-4.5 -9 h9 z" fill="var(--d-line)"/>
-        <text class="svg-s" transform="rotate(90 436 160)" x="436" y="160" text-anchor="middle"
-              fill="var(--d-muted)">the spine draws first</text>
+        <path d="M412 274 l-4.5 -9 h9 z" fill="var(--d-line)"/>
+        <text class="svg-s" x="240" y="342" text-anchor="middle" fill="var(--d-muted)">seniority: the spine draws first, the bonus draws last</text>
 
         <g fill="none" stroke="var(--d-muted)" stroke-width="1.6">
-          <circle cx="29" cy="326" r="8"/>
-          <path d="M29 321 L29 326 L33 329" stroke-linecap="round"/>
+          <circle cx="29" cy="362" r="8"/>
+          <path d="M29 357 L29 362 L33 365" stroke-linecap="round"/>
         </g>
-        <text class="svg-s" x="46" y="330" fill="var(--d-muted)">Law A: recomputed from scratch every month</text>
-        <line x1="21" y1="348" x2="37" y2="348" stroke="var(--d-lit-stroke)" stroke-width="3"/>
-        <text class="svg-s" x="46" y="352" fill="var(--d-muted)">Law B: the ceiling, enforced order by order</text>
+        <text class="svg-s" x="46" y="366" fill="var(--d-muted)">Law A: recomputed from scratch every month</text>
+        <line x1="21" y1="384" x2="37" y2="384" stroke="var(--d-lit-stroke)" stroke-width="3"/>
+        <text class="svg-s" x="46" y="388" fill="var(--d-muted)">Law B: the ceiling, enforced every month</text>
       </svg>
       <figcaption>Seniority runs downward: the spine draws first, the override second, the bonus last. The ceiling is the arithmetic the amounts are computed by, not a limit somebody checks afterward.</figcaption>
     </figure>
@@ -1818,13 +1831,14 @@ details.ledger[open] { padding-bottom: 18px; }
         </g>
 
         <g stroke="var(--d-lit-stroke)" stroke-width="1.6" fill="none" stroke-dasharray="5 4">
-          <path d="M70 428 L70 154"/><path d="M70 342 L104 342"/><path d="M70 154 L104 154"/>
+          <path d="M88 428 L88 154"/><path d="M88 342 L104 342"/><path d="M88 154 L104 154"/>
         </g>
         <g fill="var(--d-lit-stroke)">
           <path d="M108 342 l-9 -4.5 v9 z"/><path d="M108 154 l-9 -4.5 v9 z"/>
         </g>
-        <text class="svg-s" transform="rotate(-90 52 291)" x="52" y="291" text-anchor="middle"
-              fill="var(--d-muted)">B's group volume is the basis</text>
+        <text class="svg-s" x="44" y="272" text-anchor="middle" fill="var(--d-muted)">B's group</text>
+        <text class="svg-s" x="44" y="286" text-anchor="middle" fill="var(--d-muted)">volume is</text>
+        <text class="svg-s" x="44" y="300" text-anchor="middle" fill="var(--d-muted)">the basis</text>
 
         <rect x="110" y="24" width="300" height="52" rx="9"
               fill="var(--d-node-bg)" stroke="var(--d-node-stroke)" stroke-width="1.4"/>
@@ -2089,7 +2103,7 @@ details.ledger[open] { padding-bottom: 18px; }
         <li>It is capped by Law B and it is never new money. The gain is exactly the freed share of pools that were already full: 7.44 on a 212.91 check, 3.5 percent, in a fixture built to maximise it. The company pays LESS on every lapse, not more.</li>
         <li>The incentive still points the right way where anybody can act. The Conductors nearest the lapse, the ones actually positioned to notice and help, lose the most: 17.00 and 11.29 against a senior gain of 7.44.</li>
       </ol>
-      <p>This is not a corner of the parameter space. At the rates of record, <strong class="num">120</strong> of the <strong class="num">1,001</strong> modelled orders have a binding pool, so the inversion is live in any month this plan is presented on. It is therefore watched rather than assumed small: every run pair counts the members whose pay rose because somebody below them lapsed, and sums the gain, as a standing measurement.</p>
+      <p>This is not a corner of the parameter space. At the rates of record, <strong class="num">154</strong> of the <strong class="num">641</strong> modelled Conductor-months that carry any volume have a binding pool, roughly one in four, so the inversion is live in any month this plan is presented on. It is therefore watched rather than assumed small: every run pair counts the members whose pay rose because somebody below them lapsed, and sums the gain, as a standing measurement.</p>
     </div>
 
     <figure class="figure">
@@ -2191,10 +2205,18 @@ details.ledger[open] { padding-bottom: 18px; }
   <div class="wrap">
     <p class="kicker">Section nineteen</p>
     <h2>Law B: the twenty percent promise</h2>
-    <p class="lead">Part one of this brochure already makes a promise: the most any order can ever pay is 20 percent of its price. Layers 2 and 3 do not raise that ceiling by one cent. They spend the head-room under it that the current plan leaves unspent. <strong>All the team-building money in this plan is reclaimed breakage, and nothing else.</strong></p>
+    <p class="lead">Part one of this brochure already makes a promise: the most the monthly commission run can ever pay on an order is 20 percent of its price. Layers 2 and 3 do not raise that ceiling by one cent. They spend the head-room under it that the current plan leaves unspent. <strong>All the team-building money in this plan is reclaimed breakage, and nothing else.</strong></p>
 
-    <h3>How it works, per order</h3>
-    <p>Every order contributes a pool equal to 25 percent of its Commissionable Volume. Since Commissionable Volume is 80 percent of the price, and 0.25 x 0.80 = 0.20, that pool is exactly 20 percent of the money that came in the door: the same ceiling the plan already publishes.</p>
+    <div class="note warn">
+      <p><strong>The one carve-out, repeated here rather than left in another section.</strong> Once Instant Payout is built, a first order will additionally carry a payment made on the day, so a first order can exceed 20 percent in total. Instant Payout is not built and pays nothing today. Everything else on this page describes the monthly run, where the ceiling holds.</p>
+    </div>
+
+    <h3>How it works</h3>
+    <div class="panel">
+      <p><strong>The unit, defined once, because it is not the unit a reader expects.</strong> The ceiling is computed per <strong>source member-month</strong>: one Conductor's whole month of orders, taken together, counts as one unit. The modelled March holds <strong class="num">1,001</strong> of those units, of which <strong class="num">641</strong> have any volume at all. That same March holds <strong class="num">1,462</strong> separate orders from those 641 buying Conductors, and <strong class="num">357</strong> of them, 56 percent, placed more than one order. So a count of 1,001 is a count of Conductor-months and never a count of orders, and this document does not use the two words for one thing.</p>
+      <p><strong>What the promise means exactly.</strong> The ceiling binds across a Conductor's whole month of orders taken together, not on each order separately. Across that month it holds exactly, and zero of the 1,001 modelled Conductor-months exceeded it. Inside a month that binds, one order can draw more of the pool than another, and <strong class="num">1,178</strong> of March's orders, 81 percent, sit in months carrying more than one order.</p>
+    </div>
+    <p>Every source member-month contributes a pool equal to 25 percent of its Commissionable Volume. Since Commissionable Volume is 80 percent of the price, and 0.25 x 0.80 = 0.20, that pool is exactly 20 percent of the money that came in the door: the same ceiling the plan already publishes.</p>
     <p>Then the layers draw from that pool in order of seniority.</p>
     <ol>
       <li><strong>Layer 1 draws first and is always paid in full.</strong> The five level rates add up to 10 + 5 + 5 + 3 + 2 = 25 percent of Commissionable Volume, and there is at most one Conductor at each level, so layer 1 can never claim more than the pool holds. <strong>The spine always fits. It is never reduced. That is what makes "layer 1 unchanged" a fact rather than an intention.</strong></li>
@@ -2225,18 +2247,18 @@ details.ledger[open] { padding-bottom: 18px; }
 
     <h3>And what happens when the ceiling actually binds</h3>
     <p>The engine's acceptance fixture contains an order where it binds exactly. That order carries 40.00 of Commissionable Volume, so a pool of 10.00. Level pay takes 8.00 across three Conductors. An override claim of 1.60 fits, leaving 0.40. A second-team bonus claims 2.00 against 0.40 of remaining pool, so it is scaled by 0.40 / 2.00 = <span class="num">0.200000</span> and paid 0.40. The order pays 8.00 + 1.60 + 0.40 = <strong class="num">10.00</strong> exactly, which is the cap, to the cent. (Recorded at that fixture's draft rates, as noted in <a href="#law-a">the section on Law A</a>.)</p>
-    <p>An independent reviewer then built worse cases on purpose. In one, the proration factor lands on a repeating decimal, <span class="num">0.454545</span>, and the paid total on that order comes to <span class="num">7.999992</span> against <span class="num">8.000000</span> of remaining pool: strictly under, because every reduced amount is rounded DOWN, never up. In another, the pool is exhausted entirely, the factor is <span class="num">0.000000</span>, and every override and bonus claim on that order pays nothing while the claims stay fully recorded and auditable. Across 1,001 modelled orders, zero exceeded the cap.</p>
+    <p>An independent reviewer then built worse cases on purpose. In one, the proration factor lands on a repeating decimal, <span class="num">0.454545</span>, and the paid total on that order comes to <span class="num">7.999992</span> against <span class="num">8.000000</span> of remaining pool: strictly under, because every reduced amount is rounded DOWN, never up. In another, the pool is exhausted entirely, the factor is <span class="num">0.000000</span>, and every override and bonus claim on that order pays nothing while the claims stay fully recorded and auditable. Across all 1,001 modelled Conductor-months, zero exceeded the cap.</p>
 
     <div class="panel">
       <p><strong>How often it binds, and who feels it.</strong> On the modelled March census at the rates of record:</p>
       <ul>
-        <li><strong>120 of 1,001 orders reach their cap, about 12 percent, roughly one order in eight.</strong></li>
+        <li><strong>154 of the 641 Conductor-months that have any volume are reduced on at least one layer: 24.0 percent, roughly one in four.</strong> Of those, 120 are reduced at the override layer and 83 at the bonus layer, with 34 reduced only at the bonus layer. An earlier draft of this document printed "120 of 1,001, about one in eight", which understated the frequency twice over: it counted only the override layer, and it divided by a population including 360 Conductor-months with no volume, which can never be reduced. Both errors ran in the same direction.</li>
         <li><strong>35 of the 207 paid Conductors, about 17 percent, have at least one reduced line.</strong></li>
         <li>The total reduced away is <span class="num">943.68</span>, being <span class="num">638.00</span> from layer 2 and <span class="num">305.68</span> from layer 3, against <span class="num">17,417.12</span> paid: about 5.4 percent of the run.</li>
-        <li>The worst-affected Conductor loses <span class="num">324.14</span>. The worst ratio is 21 percent of that Conductor's claims.</li>
+        <li>The worst-affected Conductor loses <span class="num">324.14</span>. For the worst RATIO the answer depends entirely on the denominator, so both are printed: that reduction is 21 percent of the Conductor's total claims, and <strong>34.5 percent of the claims the ceiling can actually reach</strong>, the second being the honest one, because the first denominator contains the spine and the spine can never be reduced. And the true worst case is not a ratio at all: <strong>five Conductors lost 100 percent of their structure claims</strong>, sums between 1.60 and 5.52 reduced entirely away.</li>
         <li>Every cent of it comes off layers 2 and 3. <strong>The spine is structurally untouchable, so no Conductor's live-plan-equivalent pay is ever reduced by this.</strong></li>
       </ul>
-      <p>The honest phrase is that proration is routine and junior: a working feature, not an edge case. An earlier draft of this plan predicted it would be rare. The measurement said 12 percent of orders, and the word "rare" was retired rather than defended.</p>
+      <p>The honest phrase is that proration is routine and junior: a working feature, not an edge case. An earlier draft of this plan predicted it would be rare. The measurement retired the word "rare" rather than defending it.</p>
     </div>
 
     <div class="note lit">
@@ -2248,15 +2270,16 @@ details.ledger[open] { padding-bottom: 18px; }
       <div class="fig-scroll">
       <svg viewBox="0 0 880 434" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="d6Title d6Desc">
         <title id="d6Title">The waterfall, in the usual case and when the cap binds</title>
-        <desc id="d6Desc">On the left, an order with a pool of twenty dollars pays twelve dollars of level pay, one dollar twenty of override and one dollar sixty of bonus, leaving five dollars twenty unspent inside the ceiling. On the right, an order with a pool of ten dollars pays eight dollars of level pay and one dollar sixty of override, and the second-team bonus claims two dollars but is paid only forty cents; the unpaid one dollar sixty is drawn above the rim, outside the vessel, because it does not fit and is not paid.</desc>
+        <desc id="d6Desc">Instant Payout, once built, is the one exception to this ceiling, and it is not built. On the left, a source member-month with a pool of twenty dollars pays twelve dollars of level pay, one dollar twenty of override and one dollar sixty of bonus, leaving five dollars twenty unspent inside the ceiling. On the right, an order with a pool of ten dollars pays eight dollars of level pay and one dollar sixty of override, and the second-team bonus claims two dollars but is paid only forty cents; the unpaid one dollar sixty is drawn above the rim, outside the vessel, because it does not fit and is not paid.</desc>
         <defs>
           <pattern id="hatch-d6" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="8" stroke="var(--d-hatch)" stroke-width="3"/>
           </pattern>
         </defs>
 
+        <text class="svg-s" x="440" y="20" text-anchor="middle" fill="var(--d-muted)">Instant Payout, once built, is the one exception to the ceilings below. It is not built.</text>
         <text class="svg-b" x="230" y="44" text-anchor="middle" fill="var(--d-text)">The usual case</text>
-        <text class="svg-s" x="230" y="68" text-anchor="middle" fill="var(--d-muted)">the ceiling. Nothing crosses it. Pool 20.00</text>
+        <text class="svg-s" x="230" y="68" text-anchor="middle" fill="var(--d-muted)">the ceiling. The monthly run never crosses it. Pool 20.00</text>
         <line x1="120" y1="80" x2="340" y2="80" stroke="var(--d-lit-stroke)" stroke-width="3"/>
         <rect x="140" y="80" width="180" height="240" fill="none" stroke="var(--d-node-stroke)" stroke-width="1.6"/>
         <rect x="140" y="176" width="180" height="144" fill="var(--d-lit-bg)" stroke="var(--d-lit-stroke)" stroke-width="1.6"/>
@@ -2271,7 +2294,7 @@ details.ledger[open] { padding-bottom: 18px; }
         <text class="svg-s" x="120" y="394" fill="var(--d-muted)">5.20 unspent, stays with the company</text>
 
         <text class="svg-b" x="610" y="44" text-anchor="middle" fill="var(--d-text)">When the cap binds</text>
-        <text class="svg-s" x="610" y="164" text-anchor="middle" fill="var(--d-muted)">the ceiling. Nothing crosses it. Pool 10.00</text>
+        <text class="svg-s" x="610" y="164" text-anchor="middle" fill="var(--d-muted)">the ceiling. The monthly run never crosses it. Pool 10.00</text>
         <rect x="520" y="180.8" width="180" height="19.2" fill="url(#hatch-d6)" stroke="var(--d-node-stroke)" stroke-width="1.2" stroke-dasharray="5 4"/>
         <text class="svg-s" x="712" y="194" fill="var(--d-muted)">1.60 does not fit, is not paid</text>
         <line x1="500" y1="200" x2="720" y2="200" stroke="var(--d-lit-stroke)" stroke-width="3"/>
@@ -2311,17 +2334,20 @@ details.ledger[open] { padding-bottom: 18px; }
     <div class="panel">
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Sales Volume band</th><th class="num">Mean pay, at least one personally sponsored Builder</th><th class="num">Mean pay, none</th><th class="num">Multiple</th></tr></thead>
+          <thead><tr><th>Sales Volume band</th><th class="num">Conductors with a sponsored Builder</th><th class="num">Their mean pay</th><th class="num">Conductors with none</th><th class="num">Their mean pay</th><th class="num">Multiple</th></tr></thead>
           <tbody>
-            <tr><td>100.00 to 149.99</td><td class="num">52.47</td><td class="num">6.66</td><td class="num"><strong>7.9 times</strong></td></tr>
-            <tr><td>150.00 to 299.99</td><td class="num">725.57</td><td class="num">7.90</td><td class="num"><strong>92 times</strong></td></tr>
-            <tr><td>300.00 and above</td><td class="num">955.31</td><td class="num">11.77</td><td class="num"><strong>81 times</strong></td></tr>
+            <tr><td>100.00 to 149.99</td><td class="num"><strong>8</strong></td><td class="num">52.47</td><td class="num">141</td><td class="num">6.66</td><td class="num"><strong>7.9 times</strong></td></tr>
+            <tr><td>150.00 to 299.99</td><td class="num"><strong>8</strong></td><td class="num">725.57</td><td class="num">186</td><td class="num">7.90</td><td class="num"><strong>92 times</strong></td></tr>
+            <tr><td>300.00 and above</td><td class="num"><strong>8</strong></td><td class="num">955.31</td><td class="num">97</td><td class="num">11.77</td><td class="num"><strong>81 times</strong></td></tr>
           </tbody>
         </table>
       </div>
+      <div class="note warn">
+        <p><strong>Read the counts before the multiples.</strong> Each mean in the Builder column is computed over EIGHT Conductors, and this is a population where five people take 90.2 percent of the structure budget, so a band mean can be moved a long way by one person. The multiples are real and they come from real recorded volume. They also rest on eight members a band. Both halves of that belong in any quotation of them, and the sample size is the first thing a professional will ask for.</p>
+      </div>
       <p><strong>These three rows never appear without the four numbers below them. That is a rule of this document.</strong></p>
       <ul>
-        <li><strong class="num">24</strong> Conductors in the modelled population of 1,001 hold that position today, meaning they personally sponsored at least one Builder.</li>
+        <li><strong class="num">34</strong> Conductors in the modelled population of 1,001 personally sponsored at least one Builder in March. <strong class="num">24</strong> of those 34 were ALSO QUALIFIED that month, and 24 is the number the table above uses, because a Conductor who is not qualified cannot earn and does not belong in a comparison of earnings. Both numbers are printed, because this companion is mandatory and therefore has to be exact: 34 did the sponsoring, 24 could be paid for it.</li>
         <li><strong class="num">44</strong> Conductors earn any money at all from the two new layers.</li>
         <li>The top <strong class="num">five</strong> of those 44 take <span class="num">3,590.97</span> of the <span class="num">3,983.12</span> that the two layers paid, which is <strong>90.2 percent of the entire structure budget</strong>. The top ten take 94.2 percent.</li>
         <li><strong>22.9 percent</strong> of the company's total payout comes from the two new layers (3,983.12 of 17,417.12).</li>
@@ -2378,7 +2404,7 @@ details.ledger[open] { padding-bottom: 18px; }
 
         <rect x="20" y="400" width="840" height="48" rx="8"
               fill="var(--d-key-bg)" stroke="var(--d-key-stroke)" stroke-width="1.8"/>
-        <text class="svg-t" x="440" y="421" text-anchor="middle" fill="var(--d-text)">24 Conductors hold this position   |   44 earn any structure money at all</text>
+        <text class="svg-t" x="440" y="421" text-anchor="middle" fill="var(--d-text)">8 Conductors per band   |   24 qualified, of 34 who sponsored a Builder   |   44 earn any structure money</text>
         <text class="svg-t" x="440" y="439" text-anchor="middle" fill="var(--d-text)">the top 5 take 90.2 percent of it   |   structure is 22.9 percent of total payout</text>
       </svg>
       </div>
@@ -2466,8 +2492,12 @@ details.ledger[open] { padding-bottom: 18px; }
       <figcaption>Six modelled months of the Builder plan against the live plan's March figure, with the structural ceiling drawn where it actually sits.</figcaption>
     </figure>
 
-    <details class="ledger">
-      <summary>How this plan compares to four other plan families</summary>
+    <!-- Deliberately OPEN, not a disclosure control. The quality gate found this was the
+         only collapsed panel in part two, one click away while the drift table
+         above it was open. These are the numbers that refute a breadth claim, so
+         they are not the ones to put behind a click. -->
+    <h3>How this plan compares to four other plan families</h3>
+    <div>
       <p>Same recorded month, same members, five plan families computed in the same laboratory.</p>
       <div class="table-scroll">
         <table>
@@ -2482,7 +2512,7 @@ details.ledger[open] { padding-bottom: 18px; }
           </tbody>
         </table>
       </div>
-    </details>
+    </div>
   </div>
 </section>
 
@@ -2533,7 +2563,10 @@ details.ledger[open] { padding-bottom: 18px; }
       </table>
     </div>
     <p><strong>7.07 cents returned per dollar spent. A 92.9 percent loss, every month, forever</strong>, because Law A makes the puppet a subscription rather than a purchase.</p>
-    <p>The floor under that is structural, not lucky: no plan funded under a 20 percent ceiling can return more than 20 cents of commission on a self-funded dollar, so every self-funding attack on every layer of this plan loses at least 80 percent. This one loses 93.</p>
+    <p>The floor under that is structural, and it has to be stated precisely, because the general form of it is false. <strong>For commission generated BY the self-funded volume itself</strong>, no plan funded under a 20 percent ceiling can return more than 20 cents on a self-funded dollar, so a self-funding attack of that kind loses at least 80 percent, and this one loses 93.</p>
+    <div class="note warn">
+      <p><strong>What that bound does not cover, stated here rather than left to be found.</strong> It does not cover self-funded volume bought to UNLOCK pay on other people's volume, and unlocking is exactly what the 100.00 qualification gate does: a Conductor's own 100.00 purchase is what makes them eligible to collect level pay on their team. And once Instant Payout is built, the worked example in the <a href="#m4">Instant Payout section</a> returns <strong class="num">42.00</strong> on a self-funded first order of <strong class="num">150.00</strong>, which is <strong>28 cents on the dollar</strong>, above 20. The 20-cent figure is a bound on one channel. It is not a law of the plan, and an earlier draft of this page stated it as one.</p>
+    </div>
     <p>Funding an artificial second leg to reach the bonus is the same trade: $100.00 a month of real subscription to return at most 0.025 x 80.00 = 2.00, a 98 percent monthly loss.</p>
 
     <h3>Attack four: buy rank and income with your own money</h3>
@@ -2546,7 +2579,7 @@ details.ledger[open] { padding-bottom: 18px; }
       <li>Exactly four kinds of commission line exist, and every one of them is computed from Commissionable Volume, which is 80 percent of product dollars. <strong>No line, no rate, and no parameter anywhere in this plan pays on a count of recruits, enrollments, or sign-ups.</strong></li>
       <li>Zero lines pay a Conductor on their own volume as the source. Overrides pay the upline on a Builder's group. The bonus basis is a leg, which excludes you by construction.</li>
       <li>Zero lines have a missing or non-positive basis.</li>
-      <li>Zero orders exceeded the 20 percent ceiling, in every run made, including every hostile fixture built specifically to break it.</li>
+      <li>Zero Conductor-months exceeded the 20 percent ceiling, in every run made, including every hostile fixture built specifically to break it.</li>
     </ul>
 
     <figure class="figure">
@@ -2669,7 +2702,7 @@ details.ledger[open] { padding-bottom: 18px; }
     <div class="qa">
       <h4>Overrides on group volume stack across generations and across nested Builders. The budget blows up.</h4>
       <p>The claims stack without limit. The PAYMENT cannot. Take an order carrying 80.00 of Commissionable Volume, so a pool of 20.00, sitting under ten nested Builders, so the override claims against it total two and a half times its entire pool. If a full five levels of qualified upline sit above it, level pay takes the whole 20.00, the remaining pool is zero, and every one of those override claims pays 0.00. If only two levels of qualified upline exist, level pay takes 12.00, the remaining 8.00 is shared across 48.00 of claims at a factor of <span class="num">0.166666</span>, and the ten Builders collectively receive exactly 8.00. In both cases the order pays out at most 20.00, to the cent.</p>
-      <p>In the actual modelled census the worst real order carries override claims at 0.56 of its pool, and zero of 1,001 orders paid over pool.</p>
+      <p>In the actual modelled census the worst real order carries override claims at 0.56 of its pool, and zero of the 1,001 modelled Conductor-months paid over pool.</p>
     </div>
 
     <div class="qa">
@@ -2694,7 +2727,7 @@ details.ledger[open] { padding-bottom: 18px; }
 
     <div class="qa">
       <h4>The ceiling will reduce the field's checks and they will be furious.</h4>
-      <p>An earlier draft predicted proration would be rare and junior. The measurement kept the word junior and retired the word rare: 120 of 1,001 orders reach their cap, and 35 of the 207 paid Conductors carry at least one reduced line. Those numbers, refreshed every run, are carried in any presentation of this plan.</p>
+      <p>An earlier draft predicted proration would be rare and junior. The measurement kept the word junior and retired the word rare: 154 of the 641 Conductor-months that carry any volume are reduced on at least one layer, 24 percent, roughly one in four, and 35 of the 207 paid Conductors carry at least one reduced line. Those numbers, refreshed every run, are carried in any presentation of this plan.</p>
       <p>What makes it survivable is structural and stated in <a href="#law-b">the section on Law B</a>: the spine is never reduced, so nobody's live-plan-equivalent pay ever falls; and every reduced line must print what it claimed, what it paid, and why. A shrunken number a member cannot recompute is survivable only when the statement itself shows the claim, the payment, and the reason.</p>
     </div>
 

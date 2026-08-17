@@ -10,208 +10,140 @@
    Self-contained. No external fonts, stylesheets, scripts or images.
    Light background, dark text, hardcoded colours, print first.
 
-   Colour tokens (hardcoded, not theme variables):
-     paper       #FFFFFF
-     ink         #0F172A   17.85:1 on paper
-     slate ink   #334155   10.35:1 on paper
-     muted       #5B6472    5.98:1 on paper
-     indigo      #4F46E5    6.29:1 on paper
-     deep indigo #3730A3    9.93:1 on paper
-     teal        #0E7490    5.36:1 on paper
-     loss red    #B91C1C    6.47:1 on paper
-     gain green  #166534    7.13:1 on paper
-   Every text-on-background pair used in this file is 4.5:1 or better.
-   Cyan #22D3EE is used only as a fill or rule, never behind text,
-   because it measures 1.81:1 on paper.
+   CLASS-NAMING RULE, added after a collision shipped:
+   No class that sets a fixed `height` may ever be applied to an element
+   that contains text. Utilities that set height carry the prefix `u-`
+   and are used ONLY on empty elements. Component modifiers are single
+   compound names (.callout-note, never .callout.rule) so a utility can
+   never be co-applied to a text container by accident.
    ============================================================ */
 
 *{box-sizing:border-box;}
 html{-webkit-text-size-adjust:100%;}
 body{
-  margin:0;
-  background:#FFFFFF;
-  color:#0F172A;
+  margin:0;background:#FFFFFF;color:#0F172A;
   font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-  font-size:16px;
-  line-height:1.55;
+  font-size:16px;line-height:1.55;
 }
 .sheet{max-width:1000px;margin:0 auto;padding:38px 30px 70px;}
 
 /* ---------- typography ---------- */
-h1{
-  font-size:34px;line-height:1.15;margin:0 0 6px;
-  letter-spacing:0.02em;font-weight:700;color:#0F172A;
-}
-.kicker{
-  font-size:12px;letter-spacing:0.20em;text-transform:uppercase;
-  font-weight:700;color:#3730A3;margin:0 0 10px;
-}
+h1{font-size:34px;line-height:1.15;margin:0 0 6px;letter-spacing:0.02em;font-weight:700;}
+.kicker{font-size:12px;letter-spacing:0.20em;text-transform:uppercase;font-weight:700;color:#3730A3;margin:0 0 10px;}
 .subtitle{font-size:17px;color:#334155;margin:0 0 4px;}
 .meta{font-size:13px;color:#5B6472;margin:0;}
-h2{
-  font-size:23px;line-height:1.2;margin:44px 0 4px;font-weight:700;color:#0F172A;
-  padding-top:14px;border-top:3px solid #0F172A;
-}
-h3{font-size:18px;line-height:1.25;margin:30px 0 6px;font-weight:700;color:#3730A3;}
-h4{font-size:15px;margin:18px 0 4px;font-weight:700;color:#0F172A;}
+h2{font-size:23px;line-height:1.2;margin:44px 0 4px;font-weight:700;padding-top:14px;border-top:3px solid #0F172A;}
+h3{font-size:18px;line-height:1.25;margin:32px 0 6px;font-weight:700;color:#3730A3;}
+h4{font-size:15px;margin:18px 0 4px;font-weight:700;}
 p{margin:0 0 11px;}
-strong{font-weight:700;color:#0F172A;}
 ul,ol{margin:0 0 12px;padding-left:22px;}
 li{margin:0 0 6px;}
 .lead{font-size:17px;color:#334155;}
 .small{font-size:13px;color:#5B6472;}
-.rule{height:3px;background:#0F172A;border:0;margin:34px 0 0;}
-.mono{font-family:Consolas,"Courier New",monospace;font-size:0.94em;}
 
 /* ---------- header ---------- */
 header.doc{border-bottom:4px solid #0F172A;padding-bottom:18px;margin-bottom:8px;}
 .logomark{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .logomark svg{display:block;}
-.logotype{
-  font-size:15px;letter-spacing:0.30em;text-transform:uppercase;font-weight:700;color:#0F172A;
-}
+.logotype{font-size:15px;letter-spacing:0.30em;text-transform:uppercase;font-weight:700;}
 
 /* ---------- panels ---------- */
-.panel{
-  border:2px solid #0F172A;background:#F8FAFC;
-  padding:16px 18px;margin:0 0 16px;
-}
-.panel-indigo{border:2px solid #4F46E5;background:#EEF2FF;}
-.panel-amber{border:2px solid #92400E;background:#FFFBEB;}
-.panel-title{
-  font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;
-  color:#3730A3;margin:0 0 8px;
-}
-.panel-amber .panel-title{color:#92400E;}
+.panel{border:2px solid #0F172A;background:#F8FAFC;padding:14px 16px;margin:0 0 16px;}
+.panel-title{font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#3730A3;margin:0 0 7px;}
 .panel p:last-child{margin-bottom:0;}
+
+/* ---------- callouts (single compound class, never a utility) ---------- */
+.callout-note,.callout-risk,.callout-good,.callout-warn{
+  border-left:6px solid #4F46E5;background:#EEF2FF;padding:12px 14px;margin:0 0 16px;
+}
+.callout-risk{border-left-color:#B91C1C;background:#FEE2E2;}
+.callout-good{border-left-color:#166534;background:#DCFCE7;}
+.callout-warn{border-left-color:#92400E;background:#FFFBEB;}
+.callout-note p:last-child,.callout-risk p:last-child,
+.callout-good p:last-child,.callout-warn p:last-child{margin-bottom:0;}
+.ct{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:#3730A3;margin:0 0 5px;}
+.callout-risk .ct{color:#B91C1C;}
+.callout-good .ct{color:#166534;}
+.callout-warn .ct{color:#92400E;}
 
 /* ---------- figures ---------- */
 figure{margin:22px 0 24px;padding:0;}
 figure svg{display:block;width:100%;height:auto;}
-figcaption{
-  font-size:12.5px;color:#334155;margin-top:8px;
-  border-left:4px solid #4F46E5;padding-left:10px;line-height:1.45;
-}
-.fignum{
-  font-weight:700;color:#3730A3;letter-spacing:0.08em;text-transform:uppercase;
-  font-size:11.5px;display:block;margin-bottom:2px;
-}
+figcaption{font-size:12.5px;color:#334155;margin-top:8px;border-left:4px solid #4F46E5;padding-left:10px;line-height:1.45;}
+.fignum{font-weight:700;color:#3730A3;letter-spacing:0.08em;text-transform:uppercase;font-size:11.5px;display:block;margin-bottom:2px;}
 
 /* ---------- tables ---------- */
 table{border-collapse:collapse;width:100%;font-size:13.5px;margin:0 0 16px;}
-caption{
-  caption-side:top;text-align:left;font-size:12px;font-weight:700;color:#3730A3;
-  letter-spacing:0.08em;text-transform:uppercase;padding-bottom:6px;
-}
+caption{caption-side:top;text-align:left;font-size:12px;font-weight:700;color:#3730A3;letter-spacing:0.08em;text-transform:uppercase;padding-bottom:6px;}
 th,td{border:1px solid #CBD5E1;padding:7px 9px;text-align:left;vertical-align:top;}
 thead th{background:#0F172A;color:#FFFFFF;font-weight:700;border-color:#0F172A;}
 tbody tr:nth-child(even) td{background:#F8FAFC;}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
-tr.total td{background:#E0E7FF;font-weight:700;border-top:2px solid #4F46E5;}
 tr.hilite td{background:#E0E7FF;font-weight:700;}
-.tw-narrow{width:120px;}
 
-/* ---------- two panel exhibit ---------- */
-.exhibit{
-  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0;
+/* ---------- two panel exhibit ----------
+   The two panels must stay side by side at equal width and equal weight, on
+   screen and in print. Below ~700px the tables inside them cannot compress
+   further, so the FRAME scrolls rather than the page. Desktop and print are
+   untouched by this. */
+.exhibit-frame{margin:0;}
+@media screen and (max-width:700px){
+  .exhibit-frame{overflow-x:auto;}
+  .exhibit{min-width:620px;}
 }
-.exhibit > div{
-  border:2px solid #0F172A;background:#FFFFFF;display:flex;flex-direction:column;
-}
-.exhibit .eh{
-  background:#0F172A;color:#FFFFFF;padding:8px 12px;
-  font-size:12px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;
-}
+.exhibit{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:0;}
+.exhibit > div{border:2px solid #0F172A;background:#FFFFFF;display:flex;flex-direction:column;}
+.exhibit .eh{background:#0F172A;color:#FFFFFF;padding:8px 12px;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;}
 .exhibit .eb{padding:12px 14px;font-size:13.5px;flex:1;}
 .exhibit .eb p{margin:0 0 9px;}
 .exhibit table{font-size:12.5px;margin-bottom:8px;}
-.exhibit .headline{
-  font-size:15px;font-weight:700;color:#0F172A;background:#FEE2E2;
-  border-left:5px solid #B91C1C;padding:8px 10px;margin:0 0 9px;
-}
+.exhibit .headline{font-size:15px;font-weight:700;background:#FEE2E2;border-left:5px solid #B91C1C;padding:8px 10px;margin:0 0 9px;}
 .exhibit .headline.calm{background:#E0E7FF;border-left-color:#4F46E5;}
-.equalnote{
-  font-size:12.5px;color:#334155;margin-top:8px;border-left:4px solid #4F46E5;padding-left:10px;
+
+/* ---------- table scroll frame ----------
+   Wide data tables cannot compress below their min-content width. Below ~700px
+   the FRAME scrolls rather than the page. Print restores normal table flow so a
+   long table can still break across pages with its header repeated. */
+.table-frame{margin:0;}
+@media screen and (max-width:700px){
+  .table-frame{overflow-x:auto;}
+  .table-frame > table{min-width:560px;}
 }
 
-/* ---------- key numbers strip ---------- */
-.kstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 6px;}
-.kstrip.three{grid-template-columns:repeat(3,1fr);}
-.kstrip .k{border:2px solid #4F46E5;background:#EEF2FF;padding:10px 12px;}
-.kstrip .kv{font-size:26px;font-weight:700;color:#0F172A;line-height:1.1;}
-.kstrip .kl{font-size:12px;color:#334155;line-height:1.35;margin-top:4px;}
-
-/* ---------- callouts ---------- */
-.callout{
-  border-left:6px solid #B91C1C;background:#FEE2E2;padding:12px 14px;margin:0 0 16px;
+/* ---------- stat grid ---------- */
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 16px;}
+.statgrid.four{grid-template-columns:repeat(4,1fr);}
+@media screen and (max-width:700px){
+  .statgrid,.statgrid.four{grid-template-columns:1fr;}
 }
-.callout.good{border-left-color:#166534;background:#DCFCE7;}
-.callout.rule{border-left-color:#4F46E5;background:#EEF2FF;}
-.callout p:last-child{margin-bottom:0;}
-.callout .ct{
-  font-size:12px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;
-  color:#B91C1C;margin:0 0 5px;
-}
-.callout.good .ct{color:#166534;}
-.callout.rule .ct{color:#3730A3;}
+.statgrid .s{border:2px solid #4F46E5;background:#EEF2FF;padding:10px 12px;}
+.statgrid .sv{font-size:24px;font-weight:700;line-height:1.1;}
+.statgrid .sl{font-size:12px;color:#334155;line-height:1.35;margin-top:4px;}
 
 /* ============================================================
    THE ONE PAGE EXPLANATION
-   Sized by tokens so print can shrink it as one unit and it
-   provably lands inside one Letter page (251.4 mm of content
-   height at the 14 mm page margin below).
    ============================================================ */
-:root{
-  --op-fs:14px;      /* body size inside the one pager   */
-  --op-lh:1.45;      /* line height inside the one pager */
-  --op-gap:12px;     /* vertical rhythm                  */
-  --op-h1:22px;      /* its own heading                  */
-}
-@media print{
-  :root{--op-fs:8.7pt;--op-lh:1.30;--op-gap:2.6mm;--op-h1:14pt;}
-}
+:root{--op-fs:14px;--op-lh:1.45;--op-gap:12px;--op-h1:22px;}
+@media print{:root{--op-fs:8.7pt;--op-lh:1.30;--op-gap:2.6mm;--op-h1:14pt;}}
 #onepage{font-size:var(--op-fs);line-height:var(--op-lh);}
-#onepage h2{
-  font-size:var(--op-h1);margin:0 0 var(--op-gap);padding-top:0;border-top:0;
-}
-#onepage .opgrid{
-  display:grid;grid-template-columns:1fr 1fr;gap:var(--op-gap);
-  margin-top:var(--op-gap);
-}
+#onepage h2{font-size:var(--op-h1);margin:0 0 var(--op-gap);padding-top:0;border-top:0;}
+#onepage .opgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--op-gap);margin-top:var(--op-gap);}
 #onepage .opblock{border:1.5px solid #CBD5E1;background:#FFFFFF;padding:0.7em 0.8em;}
 #onepage .opblock.newlayer{border:1.5px solid #4F46E5;background:#F8FAFC;}
-#onepage .opblock h4{
-  margin:0 0 0.35em;font-size:1.02em;color:#0F172A;
-}
-#onepage .opblock .tag{
-  display:inline-block;font-size:0.76em;letter-spacing:0.12em;text-transform:uppercase;
-  font-weight:700;padding:0.1em 0.5em;margin-left:0.4em;vertical-align:0.12em;
-}
-#onepage .tag.live{background:#CFFAFE;color:#0F172A;border:1px solid #0E7490;}
-#onepage .tag.new{background:#E0E7FF;color:#0F172A;border:1px solid #4F46E5;}
+#onepage .opblock h4{margin:0 0 0.35em;font-size:1.02em;}
+#onepage .opblock .tag{display:inline-block;font-size:0.76em;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;padding:0.1em 0.5em;margin-left:0.4em;vertical-align:0.12em;}
+#onepage .tag.live{background:#CFFAFE;border:1px solid #0E7490;}
+#onepage .tag.new{background:#E0E7FF;border:1px solid #4F46E5;}
 #onepage .opblock p{margin:0 0 0.4em;}
 #onepage .opblock p:last-child{margin-bottom:0;}
-#onepage .words{
-  border:1.5px solid #0F172A;background:#F8FAFC;padding:0.6em 0.8em;
-  margin-bottom:var(--op-gap);font-size:0.96em;
-}
-#onepage .words b{color:#0F172A;}
-#onepage .never{
-  border:2px solid #B91C1C;background:#FEE2E2;padding:0.6em 0.8em;
-  margin-top:var(--op-gap);font-size:0.96em;
-}
-#onepage .never .nt{
-  font-size:0.82em;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;
-  color:#B91C1C;margin-bottom:0.25em;
-}
+#onepage .words{border:1.5px solid #0F172A;background:#F8FAFC;padding:0.6em 0.8em;margin-bottom:var(--op-gap);font-size:0.96em;}
+#onepage .never{border:2px solid #B91C1C;background:#FEE2E2;padding:0.6em 0.8em;margin-top:var(--op-gap);font-size:0.96em;}
+#onepage .never .nt{font-size:0.82em;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:#B91C1C;margin-bottom:0.25em;}
 #onepage figure{margin:0 0 var(--op-gap);}
 #onepage figcaption{font-size:0.84em;margin-top:0.35em;}
 
 /* ---------- footer ---------- */
-footer.doc{
-  margin-top:44px;border-top:3px solid #0F172A;padding-top:14px;
-  font-size:12px;color:#5B6472;
-}
+footer.doc{margin-top:44px;border-top:3px solid #0F172A;padding-top:14px;font-size:12px;color:#5B6472;}
 
 /* ---------- print ---------- */
 @page{size:auto;margin:14mm 12mm;}
@@ -219,46 +151,34 @@ footer.doc{
   html,body{background:#FFFFFF;}
   body{font-size:9.5pt;line-height:1.42;}
   .sheet{max-width:none;padding:0;}
-  h1{font-size:22pt;}
-  h2{font-size:14pt;margin:16pt 0 3pt;padding-top:6pt;}
-  h3{font-size:11.5pt;margin:12pt 0 3pt;}
-  h4{font-size:10pt;}
-  .lead{font-size:10pt;}
-  table{font-size:8.4pt;}
-  th,td{padding:3.2pt 4.5pt;}
-  figcaption{font-size:8pt;}
-  .kstrip .kv{font-size:15pt;}
-  .kstrip .kl{font-size:8pt;}
-  .small{font-size:8pt;}
-
-  /* keep atoms whole */
-  figure,table,.panel,.callout,.kstrip,.exhibit,.exhibit > div,
-  #onepage .opblock,#onepage .words,#onepage .never{
+  h1{font-size:22pt;} h2{font-size:14pt;margin:16pt 0 3pt;padding-top:6pt;}
+  h3{font-size:11.5pt;margin:12pt 0 3pt;} h4{font-size:10pt;} .lead{font-size:10pt;}
+  table{font-size:8.4pt;} th,td{padding:3.2pt 4.5pt;}
+  figcaption{font-size:8pt;} .statgrid .sv{font-size:14pt;} .statgrid .sl{font-size:8pt;} .small{font-size:8pt;}
+  .exhibit-frame,.table-frame{overflow:visible;}
+  .exhibit{min-width:0;}
+  .table-frame > table{min-width:0;}
+  /* NOTE: <table> is deliberately NOT in this list. A long data table must be
+     allowed to break across pages: its rows are unbreakable and its header
+     repeats, which is correct. Pinning a table taller than the page would force
+     the browser to break it anyway, in a worse place. */
+  figure,.panel,.callout-note,.callout-risk,.callout-good,.callout-warn,
+  .statgrid,.exhibit-frame,.exhibit,.exhibit > div,#onepage .opblock,#onepage .words,#onepage .never{
     break-inside:avoid;page-break-inside:avoid;
   }
-  tr,thead{break-inside:avoid;page-break-inside:avoid;}
+  tr,thead,tbody tr{break-inside:avoid;page-break-inside:avoid;}
   thead{display:table-header-group;}
-  h1,h2,h3,h4,caption,.panel-title{break-after:avoid;page-break-after:avoid;}
-
-  /* the one page explanation owns exactly one page */
-  #onepage{
-    break-before:page;page-break-before:always;
-    break-after:page;page-break-after:always;
-    break-inside:avoid;page-break-inside:avoid;
-  }
-  #part-two{break-before:auto;}
+  caption{break-after:avoid;page-break-after:avoid;}
+  h1,h2,h3,h4,caption,.panel-title,.ct{break-after:avoid;page-break-after:avoid;}
+  #onepage{break-before:page;page-break-before:always;break-after:page;page-break-after:always;break-inside:avoid;page-break-inside:avoid;}
   #sources{break-before:page;page-break-before:always;}
-
-  /* keep the fills when printing, and keep them legible in grey */
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  a{color:#0F172A;text-decoration:none;}
 }
 </style>
 </head>
 <body>
 <div class="sheet">
 
-<!-- ============================================================ HEADER -->
 <header class="doc">
   <div class="logomark">
     <svg width="34" height="38" viewBox="0 0 34 38" role="img" aria-label="Orvanna hexagon mark">
@@ -271,26 +191,24 @@ footer.doc{
   <p class="kicker">Compensation plan brief</p>
   <h1>The Orvanna Builder Plan</h1>
   <p class="subtitle">A unilevel spine carrying two additive layers that pay for developing leaders, funded entirely out of money the existing plan already leaves unpaid.</p>
-  <p class="meta">Prepared 2026-08-17. Written to be read on its own, with no website and no system access. Every figure traces to the source table at the end.</p>
+  <p class="meta">Prepared 2026-08-17. Reads on its own, with no website and no system access. Every figure traces to the source table at the end.</p>
 </header>
 
-<!-- ============================================================ STATUS -->
+<!-- ===================================================== STATUS -->
 <h2 id="status">Status, first, because it decides how you read everything else</h2>
 
 <p class="lead">One plan has run every month for six months and produced member statements.
-A different, larger plan has never been run for anybody at all. They share a spine. That
-sentence is the whole document in miniature, so it goes first.</p>
+A different, larger plan has never been run for anybody. They share a spine.</p>
 
-<p class="lead">And one fact frames both of them: <strong>Orvanna is a demonstration company.
-No money has been paid to anyone, by either plan.</strong> The orders behind every run were
-real orders placed through the live storefront using sandbox test cards, so the volume is
-genuine and the arithmetic ran on it, but no funds move at any point in the system.</p>
+<p class="lead"><strong>Orvanna is a demonstration company. No money has been paid to anyone,
+by either plan.</strong> The orders behind every run were real orders placed through the live
+storefront using sandbox test cards, so the volume is genuine and the arithmetic ran on it,
+but no funds move at any point in the system.</p>
 
 <figure>
-<svg viewBox="0 0 1000 532" role="img" aria-label="Figure 1. Left panel: the operating unilevel plan, twelve commission runs across six months, which produced member statements. No money has been paid to anyone because Orvanna is a demonstration company running on sandbox test cards. Right panel: the modelled Builder plan, twenty nine laboratory runs and zero live runs. A tie between them shows layer one is identical.">
+<svg viewBox="0 0 1000 532" role="img" aria-label="Figure 1. Left panel: the operating unilevel plan, twelve commission runs across six months, two a month, six on version 1.2 and six on version 1.3, which produced member statements. Right panel: the modelled Builder plan, twenty nine laboratory runs and zero live runs. A tie shows layer one is identical across 1,630 lines and 13,434.00 with zero differences.">
   <rect x="0" y="0" width="1000" height="532" fill="#FFFFFF"></rect>
 
-  <!-- LEFT PANEL : operating -->
   <rect x="8" y="8" width="462" height="34" fill="#0F172A"></rect>
   <text x="24" y="31" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" letter-spacing="2.6">OPERATING TODAY</text>
   <rect x="8" y="42" width="462" height="328" fill="#F8FAFC" stroke="#0F172A" stroke-width="2"></rect>
@@ -298,8 +216,8 @@ genuine and the arithmetic ran on it, but no funds move at any point in the syst
   <text x="26" y="70" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#0F172A">Unilevel, specification version 1.3</text>
   <text x="26" y="127" font-family="Segoe UI,Arial,sans-serif" font-size="44" font-weight="700" fill="#0F172A">12</text>
   <text x="92" y="105" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">commission runs across the six months</text>
-  <text x="92" y="124" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">February through July 2026, so more than</text>
-  <text x="92" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">one run a month, each on version 1.2 or 1.3.</text>
+  <text x="92" y="124" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">February through July 2026: two a month,</text>
+  <text x="92" y="143" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">six on version 1.2 and six on version 1.3.</text>
   <text x="26" y="170" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#3730A3" letter-spacing="2">THE FIVE PAID LEVELS</text>
 
   <g font-family="Segoe UI,Arial,sans-serif">
@@ -329,7 +247,6 @@ genuine and the arithmetic ran on it, but no funds move at any point in the syst
   <text x="34" y="340" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">No money has been paid to anyone.</text>
   <text x="34" y="357" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">Orvanna is a demonstration company.</text>
 
-  <!-- RIGHT PANEL : modelled -->
   <rect x="530" y="8" width="462" height="34" fill="#3730A3"></rect>
   <text x="546" y="31" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" letter-spacing="2.6">MODELLED ONLY</text>
   <rect x="530" y="42" width="462" height="328" fill="#F8FAFC" stroke="#3730A3" stroke-width="2"></rect>
@@ -356,46 +273,35 @@ genuine and the arithmetic ran on it, but no funds move at any point in the syst
   <text x="560" y="332" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Nothing here becomes real without a published</text>
   <text x="560" y="348" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">effective month.</text>
 
-  <!-- tie between the two -->
   <path d="M 456 200 H 500 V 259 H 542" fill="none" stroke="#0E7490" stroke-width="2.5" stroke-dasharray="7 5"></path>
   <polygon points="542,259 532,254 532,264" fill="#0E7490"></polygon>
   <polygon points="456,200 466,195 466,205" fill="#0E7490"></polygon>
 
-  <!-- equality strip -->
   <rect x="8" y="382" width="984" height="140" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"></rect>
   <text x="30" y="414" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="700" fill="#0F172A">Layer 1 is not a new version of the live plan. It IS the live plan.</text>
   <text x="30" y="442" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">Same rates, same five levels, same rank-gated depth, same 100.00 Sales Volume gate.</text>
-  <text x="30" y="466" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">Checked on one month of orders, in both directions, on earner, source, level, basis, rate and amount:</text>
+  <text x="30" y="466" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">Checked on one month, in both directions, on earner, source, level, basis, rate and amount:</text>
   <text x="30" y="500" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#3730A3">1,630 lines, 13,434.00 in total, zero differences.</text>
 </svg>
-<figcaption><span class="fignum">Figure 1</span>What has run and what has not, with the tie between them. The left panel's engine has produced statements every month for six months. The right panel's has never been run for anybody. Neither has paid money to anyone: Orvanna is a demonstration company and no funds move at any point in the system.</figcaption>
+<figcaption><span class="fignum">Figure 1</span>What has run and what has not. Neither has paid money to anyone: Orvanna is a demonstration company and no funds move at any point in the system.</figcaption>
 </figure>
 
-<div class="callout rule">
+<div class="callout-note">
   <p class="ct">The caveat that rides on every measured number here</p>
   <p>The laboratory replays orders that really happened, under different rules. It shows exactly
   how pay would be redistributed. It cannot show that anybody would have <strong>behaved</strong>
-  differently. Every claim in this brief about incentive is a claim about the shape of the payout,
-  not a measured behavioural response. Separately, the modelled population grows steadily and
-  almost never cancels, so it cannot certify how volatile real checks would be.</p>
+  differently. Every claim about incentive is a claim about the shape of the payout, not a measured
+  behavioural response. The modelled population also grows steadily and almost never cancels, so it
+  cannot certify how volatile real checks would be.</p>
 </div>
-
-<p><strong>Why the modelled status is not a hole in the argument.</strong> The two new layers are
-additive, and they are funded entirely by money the live plan already leaves unpaid. Nobody's
-existing pay moves to fund them. That is a release test that was run, not a claim that was made:
-on the same month of orders the modelled plan's level-pay lines were compared against the live
-plan's lines in both directions, and there were zero differences across 1,630 lines totalling
-13,434.00.</p>
 
 <div class="panel">
   <p class="panel-title">Acronym key</p>
   <p class="small" style="margin:0;">Sales Volume (SV), Commissionable Volume (CV), Personal Volume (PV),
-  Team Volume (TV), Multi-Level Marketing (MLM), Quality Assurance (QA). This brief spells the
-  terms out in full wherever it can, and uses the short forms only inside tables where space
-  demands it.</p>
+  Team Volume (TV), Multi-Level Marketing (MLM), Quality Assurance (QA).</p>
 </div>
 
-<!-- ============================================================ ONE PAGE -->
+<!-- ===================================================== ONE PAGE -->
 <section id="onepage">
   <h2>Part one: the whole plan on one page</h2>
 
@@ -403,302 +309,334 @@ plan's lines in both directions, and there were zero differences across 1,630 li
     <b>Sales Volume</b> is the dollar volume of product bought by you and your customers in a month.
     <b>Commissionable Volume</b> is 80 percent of Sales Volume, and it is the only number any
     percentage is ever applied to. You are <b>ACTIVE</b> in any month your Sales Volume is at least
-    100.00, which is one subscription, or your customers' orders. A <b>LEG</b> is one person you
-    personally sponsored plus everyone under them. A leg is <b>ACTIVE</b> when the person at its head
-    is active.
+    100.00. A <b>LEG</b> is one person you personally sponsored plus everyone under them, and it is
+    <b>ACTIVE</b> when the person at its head is active.
   </div>
 
   <figure>
-  <svg viewBox="0 0 1000 300" role="img" aria-label="Figure 2. Three layers inside a hard twenty percent ceiling. Layer one is base pay and draws first. Layer two is the Builder override. Layer three is the second team bonus and draws last.">
-    <rect x="0" y="0" width="1000" height="300" fill="#FFFFFF"></rect>
-
-    <!-- ceiling frame -->
+  <svg viewBox="0 0 1000 356" role="img" aria-label="Figure 2. Three layers inside a hard twenty percent ceiling. Layer one is base pay and draws first. Layer two is the Builder override. Layer three is the second team bonus and draws last. The monthly run never crosses the ceiling, with one carve-out for Instant Payout, which is not built.">
+    <rect x="0" y="0" width="1000" height="356" fill="#FFFFFF"></rect>
     <rect x="4" y="26" width="992" height="242" fill="#FFFFFF" stroke="#0F172A" stroke-width="2.5"></rect>
     <rect x="4" y="26" width="992" height="26" fill="#0F172A"></rect>
-    <text x="18" y="45" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">THE HARD CEILING: no order ever pays out more than 20 percent of its price, enforced order by order inside the arithmetic</text>
+    <text x="18" y="45" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">THE HARD CEILING: the monthly commission run never pays out more than 20 percent of an order's price</text>
 
-    <!-- layer 3 -->
     <rect x="18" y="62" width="964" height="62" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
     <text x="34" y="86" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#0F172A">LAYER 3  Second-team bonus</text>
     <text x="34" y="110" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">2.0 percent of your SECOND-biggest leg, 2.3 percent with three active legs, 2.5 percent with four or more</text>
     <rect x="790" y="70" width="180" height="24" fill="#4F46E5"></rect>
     <text x="880" y="87" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">DRAWS THIRD</text>
 
-    <!-- layer 2 -->
     <rect x="18" y="130" width="964" height="62" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"></rect>
     <text x="34" y="154" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#0F172A">LAYER 2  Builder override</text>
     <text x="34" y="178" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">1.5 percent of a Builder's WHOLE group volume to the person who developed them, 1.0 percent one generation further up</text>
     <rect x="790" y="138" width="180" height="24" fill="#4F46E5"></rect>
     <text x="880" y="155" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">DRAWS SECOND</text>
 
-    <!-- layer 1 -->
     <rect x="18" y="198" width="964" height="62" fill="#CFFAFE" stroke="#0E7490" stroke-width="2.5"></rect>
     <text x="34" y="222" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#0F172A">LAYER 1  Base pay, the plan that runs today, unchanged</text>
     <text x="34" y="246" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">10, 5, 5, 3 and 2 percent of each person's Commissionable Volume through five levels, depth set by rank</text>
     <rect x="740" y="206" width="230" height="24" fill="#0E7490"></rect>
     <text x="855" y="223" font-family="Segoe UI,Arial,sans-serif" font-size="12.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.2">DRAWS FIRST, ALWAYS IN FULL</text>
 
-    <text x="4" y="290" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" fill="#334155">Everything above recomputes from scratch each month, from that month's actual orders. Nothing is banked, grandfathered or carried forward.</text>
+    <text x="4" y="288" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Everything above recomputes from scratch each month, from that month's actual orders. Nothing is banked, grandfathered or carried forward.</text>
+    <rect x="4" y="298" width="992" height="52" fill="#FFFBEB" stroke="#92400E" stroke-width="1.5"></rect>
+    <text x="18" y="318" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#0F172A">One carve-out: once Instant Payout is built, a first order will additionally carry a payment made on the day,</text>
+    <text x="18" y="337" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#0F172A">so a first order can exceed 20 percent in total. Instant Payout is not built and pays nothing today.</text>
   </svg>
-  <figcaption><span class="fignum">Figure 2</span>The three layers and the ceiling they all sit under. Seniority runs bottom to top: the spine is paid first and in full, the two new layers draw only from what is left.</figcaption>
+  <figcaption><span class="fignum">Figure 2</span>Seniority runs bottom to top: the spine is paid first and in full, the two new layers draw only from what is left.</figcaption>
   </figure>
 
   <div class="opgrid">
     <div class="opblock">
       <h4>1. Base pay <span class="tag live">runs today</span></h4>
-      <p>You earn a percentage of the Commissionable Volume of each person in your organisation,
-      by their level below you: 10, 5, 5, 3 and 2 percent through five levels. Your rank sets how
-      deep you are paid. Two or more active legs makes you a Builder, paid two levels. Larger teams
-      unlock Leader, Director and Executive at three, four and five levels.</p>
+      <p>A percentage of the Commissionable Volume of each person in your organisation, by their
+      level below you: 10, 5, 5, 3 and 2 percent through five levels. Rank sets how deep you are
+      paid. Two or more active legs makes you a Builder, paid two levels. Larger teams unlock
+      Leader, Director and Executive at three, four and five levels.</p>
     </div>
     <div class="opblock newlayer">
       <h4>2. The Builder override <span class="tag new">new</span></h4>
       <p>Any month somebody in your organisation holds Builder rank, the person who developed them
       earns 1.5 percent of that Builder's whole group volume, and the developer one generation
-      further up earns 1.0 percent of the same thing. Nobody ever loses volume when somebody below
-      them ranks up. Developing a Builder is pure addition to your check.</p>
+      further up earns 1.0 percent of the same thing. Nobody loses volume when somebody below them
+      ranks up. Developing a Builder is pure addition.</p>
     </div>
     <div class="opblock newlayer">
       <h4>3. The second-team bonus <span class="tag new">new</span></h4>
-      <p>Rank your legs by volume. If at least two of your legs are active, you earn 2.0 percent of
-      your second-biggest leg's volume, stepping to 2.3 percent with three active legs and 2.5
-      percent with four or more. One giant leg pays nothing extra, on purpose. The plan pays you to
-      build a second real team, and then a third.</p>
+      <p>Rank your legs by volume. With at least two active legs you earn 2.0 percent of your
+      second-biggest leg, stepping to 2.3 percent with three and 2.5 percent with four or more. One
+      giant leg pays nothing extra, on purpose.</p>
     </div>
     <div class="opblock">
       <h4>4. Fresh every month</h4>
-      <p>Everything above recomputes each month from that month's actual orders. Nothing is banked,
-      nothing is grandfathered, nothing carries forward. If a Builder below you lapses, your
-      override on them stops that month.</p>
+      <p>Everything recomputes each month from that month's actual orders. Nothing is banked,
+      grandfathered or carried forward. If a Builder below you lapses, your override on them stops
+      that month.</p>
     </div>
     <div class="opblock" style="grid-column:1 / -1;">
       <h4>5. The 20 percent promise</h4>
-      <p>No order ever pays out more than 20 percent of its price, enforced order by order inside
-      the arithmetic itself. Your base pay is never reduced by this. When an order reaches its cap,
-      the two bonus layers on that order share what remains, so a bonus line can pay less than its
-      listed rate. In a typical modelled month about one order in eight is at its cap, and every
-      reduced line on a statement must print what it claimed, what it paid, and why.</p>
+      <p>The monthly commission run never pays out more than 20 percent of an order's price,
+      enforced inside the arithmetic itself, across your whole month of orders taken together.
+      <em>One carve-out: once Instant Payout is built, a first order will additionally carry a
+      payment made on the day, so a first order can exceed 20 percent in total. Instant Payout is
+      not built and pays nothing today.</em></p>
+      <p>Your base pay is never reduced by the ceiling. When a month reaches its cap the two bonus
+      layers share what remains, so a bonus line can pay less than its listed rate. In a typical
+      modelled month about one member-month in four with any volume is reduced, and every reduced
+      line on a statement must print what it claimed, what it paid, and why.</p>
     </div>
   </div>
 
   <div class="never">
     <div class="nt">What never pays</div>
-    <b>Recruiting:</b> not one dollar in this plan is paid for signing somebody up, and every
-    payment is computed from product volume. &nbsp;<b>Your own purchases:</b> they keep you active,
-    they never earn you commission and never buy you a rank. &nbsp;<b>One giant leg.</b>
-    &nbsp;<b>Shell accounts:</b> the bonus counts only ACTIVE legs, meaning real people with real
-    100.00 Sales Volume months.
+    <b>Recruiting:</b> not one dollar is paid for signing somebody up; every payment is computed
+    from product volume. &nbsp;<b>Your own purchases:</b> they keep you active, they never earn you
+    commission and never buy you a rank. &nbsp;<b>One giant leg.</b> &nbsp;<b>Shell accounts:</b>
+    the bonus counts only ACTIVE legs, meaning real people with real 100.00 Sales Volume months.
   </div>
 </section>
 
-<!-- ============================================================ PART TWO -->
+<!-- ===================================================== PART TWO -->
 <section id="part-two">
 <h2>Part two: the evidence</h2>
 
-<!-- 1 -->
-<h3>1. The headline number, and the four numbers it is never quoted without</h3>
-
-<p>The plan is supposed to pay for development. Here is whether it does, against the fairest
-available control: people with the <strong>same personal volume</strong>, differing only in whether
-they developed a Builder. Modelled March, 1,001 members, at the rates of record.</p>
+<!-- 1 : the unit -->
+<h3>1. What the engine counts, before any number means anything</h3>
 
 <figure>
-<svg viewBox="0 0 1000 470" role="img" aria-label="Figure 3. Mean pay by Sales Volume band, comparing members with at least one personally sponsored Builder against members with none. The multiples are 7.9 times, 92 times and 81 times, and they do not rise monotonically.">
-  <rect x="0" y="0" width="1000" height="470" fill="#FFFFFF"></rect>
+<svg viewBox="0 0 1000 330" role="img" aria-label="Figure 3. The census is 1,001 source member-months, of which 641 carry volume and 360 carry none. Those 641 member-months contain 1,462 actual orders, and 357 of the 641 buying members placed more than one order.">
+  <rect x="0" y="0" width="1000" height="330" fill="#FFFFFF"></rect>
 
-  <!-- legend -->
-  <rect x="0" y="6" width="18" height="14" fill="#3730A3"></rect>
-  <text x="26" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Mean pay with at least one personally sponsored Builder</text>
-  <rect x="480" y="6" width="18" height="14" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <text x="506" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Mean pay with none</text>
+  <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The unit the arithmetic runs on is the SOURCE MEMBER-MONTH, not the order.</text>
 
-  <line x1="330" y1="34" x2="330" y2="330" stroke="#CBD5E1" stroke-width="1.5"></line>
+  <rect x="2" y="34" width="486" height="118" fill="#F8FAFC" stroke="#0F172A" stroke-width="2"></rect>
+  <text x="18" y="58" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#3730A3" letter-spacing="2">THE CENSUS</text>
+  <text x="18" y="96" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#0F172A">1,001</text>
+  <text x="118" y="96" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">source member-months</text>
+  <text x="18" y="122" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">641 carry volume and can bind against the ceiling.</text>
+  <text x="18" y="140" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">360 carry none and can never bind.</text>
 
-  <!-- band A -->
-  <text x="318" y="76" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
-  <text x="318" y="94" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">100.00 to 149.99</text>
-  <rect x="330" y="58" width="23.1" height="26" fill="#3730A3"></rect>
-  <text x="362" y="77" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">52.47</text>
-  <rect x="330" y="90" width="2.9" height="26" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <text x="344" y="109" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">6.66</text>
-  <rect x="800" y="58" width="196" height="58" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"></rect>
-  <text x="898" y="92" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">7.9 times</text>
+  <rect x="512" y="34" width="486" height="118" fill="#F8FAFC" stroke="#0F172A" stroke-width="2"></rect>
+  <text x="528" y="58" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#3730A3" letter-spacing="2">WHAT THOSE MONTHS CONTAIN</text>
+  <text x="528" y="96" font-family="Segoe UI,Arial,sans-serif" font-size="30" font-weight="700" fill="#0F172A">1,462</text>
+  <text x="628" y="96" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">actual orders, from 641 buying members</text>
+  <text x="528" y="122" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">357 of those 641, being 56 percent, placed more than one.</text>
+  <text x="528" y="140" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">1,178 of the 1,462 orders, 81 percent, sit in such a month.</text>
 
-  <!-- band B -->
-  <text x="318" y="166" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
-  <text x="318" y="184" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">150.00 to 299.99</text>
-  <rect x="330" y="148" width="319.3" height="26" fill="#3730A3"></rect>
-  <text x="639" y="167" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="end">725.57</text>
-  <rect x="330" y="180" width="3.5" height="26" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <text x="344" y="199" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">7.90</text>
-  <rect x="800" y="148" width="196" height="58" fill="#CFFAFE" stroke="#0E7490" stroke-width="2.5"></rect>
-  <text x="898" y="182" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">92 times</text>
+  <rect x="2" y="168" width="996" height="72" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="18" y="192" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">What that means for the 20 percent promise, said plainly.</text>
+  <text x="18" y="214" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Across a member's month the ceiling holds exactly, and zero of the 1,001 member-months exceeded it in any run ever made.</text>
+  <text x="18" y="232" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">But it is enforced on the month, so inside a bound month one order can carry the whole pool while another carries none.</text>
 
-  <!-- band C -->
-  <text x="318" y="256" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
-  <text x="318" y="274" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">300.00 and above</text>
-  <rect x="330" y="238" width="420.3" height="26" fill="#3730A3"></rect>
-  <text x="740" y="257" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="end">955.31</text>
-  <rect x="330" y="270" width="5.2" height="26" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <text x="346" y="289" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">11.77</text>
-  <rect x="800" y="238" width="196" height="58" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"></rect>
-  <text x="898" y="272" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">81 times</text>
-
-  <!-- non monotone warning -->
-  <rect x="0" y="318" width="1000" height="52" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
-  <text x="16" y="341" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The premium is not a rising ladder. The biggest multiple is the MIDDLE band at 92 times.</text>
-  <text x="16" y="361" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" fill="#334155">The top band is 81 times. All three multiples are always shown together, because a range invites the false reading that the top is the highest.</text>
-
-  <!-- the four companions -->
-  <g font-family="Segoe UI,Arial,sans-serif">
-    <rect x="0" y="382" width="238" height="84" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
-    <text x="14" y="416" font-size="30" font-weight="700" fill="#0F172A">24</text>
-    <text x="14" y="437" font-size="13" fill="#334155">of 1,001 members hold that</text>
-    <text x="14" y="454" font-size="13" fill="#334155">position: at least one Builder</text>
-    <rect x="254" y="382" width="238" height="84" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
-    <text x="268" y="416" font-size="30" font-weight="700" fill="#0F172A">44</text>
-    <text x="268" y="437" font-size="13" fill="#334155">members earn any money at all</text>
-    <text x="268" y="454" font-size="13" fill="#334155">from the two new layers</text>
-    <rect x="508" y="382" width="238" height="84" fill="#FEE2E2" stroke="#B91C1C" stroke-width="1.5"></rect>
-    <text x="522" y="416" font-size="30" font-weight="700" fill="#0F172A">90.2%</text>
-    <text x="522" y="437" font-size="13" fill="#334155">of the whole structure budget</text>
-    <text x="522" y="454" font-size="13" fill="#334155">goes to the top five of those 44</text>
-    <rect x="762" y="382" width="238" height="84" fill="#FEE2E2" stroke="#B91C1C" stroke-width="1.5"></rect>
-    <text x="776" y="416" font-size="30" font-weight="700" fill="#0F172A">94.2%</text>
-    <text x="776" y="437" font-size="13" fill="#334155">goes to the top ten.</text>
-    <text x="776" y="454" font-size="13" fill="#334155">3,590.97 of 3,983.12 to the five.</text>
-  </g>
+  <rect x="2" y="256" width="996" height="68" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"></rect>
+  <text x="18" y="280" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Read every "of 1,001" in this brief as member-months, and every "of 641" as the member-months that carry volume.</text>
+  <text x="18" y="302" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">An earlier draft printed these counts as orders. That was wrong and it flattered the plan, because the 360 empty months</text>
+  <text x="18" y="318" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">sat in the denominator of a rate they could never affect. The counts below use the corrected unit throughout.</text>
 </svg>
-<figcaption><span class="fignum">Figure 3</span>The development premium, with the four numbers that are part of it. Quoting the multiples without the four boxes at the bottom is not permitted by this document, and that is a rule rather than a courtesy.</figcaption>
+<figcaption><span class="fignum">Figure 3</span>The denominator matters more than any single statistic in this brief, so it is settled before the statistics start.</figcaption>
 </figure>
 
-<p>The two new layers are <strong>22.9 percent</strong> of total payout, 3,983.12 of 17,417.12.
-That figure is never shown alone either. On its own it measures only that two layers exist and
-that the apex of the tree captures them.</p>
+<!-- 2 : the premium -->
+<h3>2. The development premium, with its sample sizes and its companions</h3>
 
-<p>Read together, these numbers say something specific: the premium on development is enormous and
-real, and it is concentrated today in a very small number of people, because a very small number of
-people have done that work.</p>
+<p>Does the plan pay for development? Against the fairest control available: members with the
+<strong>same personal volume</strong>, differing only in whether they developed a Builder. Modelled
+March, at the rates of record, over members who qualified that month.</p>
 
-<!-- 2 -->
-<h3>2. What this plan does not do, said before anybody else says it</h3>
+<figure>
+<svg viewBox="0 0 1000 536" role="img" aria-label="Figure 4. Mean pay by Sales Volume band comparing members with at least one personally sponsored Builder against members with none. Multiples are 7.9, 92 and 81 times. Each with-a-Builder mean is computed on eight members. The premium is not monotone: the biggest multiple is the middle band.">
+  <rect x="0" y="0" width="1000" height="536" fill="#FFFFFF"></rect>
 
-<p>It does not pay more people. Modelled March: the live plan pays 206 members of 1,001, the
-Builder plan pays 207. One more. A different plan family run through the same laboratory, stairstep
-breakaway, pays 448. Concentration is slightly <strong>higher</strong> than the live plan, not
-lower.</p>
+  <rect x="2" y="6" width="18" height="14" fill="#3730A3"></rect>
+  <text x="28" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Mean pay, at least one personally sponsored Builder</text>
+  <rect x="470" y="6" width="18" height="14" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+  <text x="496" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Mean pay, none</text>
 
-<div class="kstrip">
-  <div class="k"><div class="kv">206 &rarr; 207</div><div class="kl">Members paid, live plan to Builder plan. One more person.</div></div>
-  <div class="k"><div class="kv">448</div><div class="kl">Members paid by stairstep breakaway on the same month.</div></div>
-  <div class="k"><div class="kv">0.9625 &rarr; 0.9687</div><div class="kl">Gini coefficient. Concentration rises.</div></div>
-  <div class="k"><div class="kv">94.25% &rarr; 95.33%</div><div class="kl">Share taken by the top ten percent. Also rises.</div></div>
-</div>
+  <line x1="360" y1="34" x2="360" y2="272" stroke="#CBD5E1" stroke-width="1.5"></line>
 
-<div class="callout">
-  <p class="ct">The honest sentence, and the only one this plan will make</p>
-  <p><strong>The same paid population, a far deeper premium on development.</strong> Anybody
-  describing this plan as broadening participation is describing a different plan.</p>
-</div>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="348" y="66" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
+    <text x="348" y="84" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">100.00 to 149.99</text>
+    <rect x="360" y="48" width="21" height="24" fill="#3730A3"></rect>
+    <text x="390" y="66" font-size="14" font-weight="700" fill="#0F172A">52.47</text>
+    <text x="446" y="66" font-size="13" fill="#5B6472">n = 8</text>
+    <rect x="360" y="78" width="2.7" height="24" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <text x="374" y="96" font-size="14" fill="#334155">6.66</text>
+    <text x="422" y="96" font-size="13" fill="#5B6472">n = 141</text>
+    <rect x="810" y="48" width="186" height="54" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"></rect>
+    <text x="903" y="82" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">7.9 times</text>
 
-<!-- 3 -->
-<h3>3. Why it is shaped this way: proven parts, each with its worst habit removed</h3>
+    <text x="348" y="144" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
+    <text x="348" y="162" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">150.00 to 299.99</text>
+    <rect x="360" y="126" width="290.2" height="24" fill="#3730A3"></rect>
+    <text x="640" y="144" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="end">725.57</text>
+    <text x="660" y="144" font-size="13" fill="#5B6472">n = 8</text>
+    <rect x="360" y="156" width="3.2" height="24" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <text x="374" y="174" font-size="14" fill="#334155">7.90</text>
+    <text x="422" y="174" font-size="13" fill="#5B6472">n = 186</text>
+    <rect x="810" y="126" width="186" height="54" fill="#CFFAFE" stroke="#0E7490" stroke-width="2.5"></rect>
+    <text x="903" y="160" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">92 times</text>
 
-<p>Nothing here is invented mathematics. Every mechanism has decades of industry service. What is
-new is the assembly, and specifically that each part arrives with its best-known failure mode
-structurally absent rather than forbidden by policy.</p>
+    <text x="348" y="222" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Sales Volume</text>
+    <text x="348" y="240" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">300.00 and above</text>
+    <rect x="360" y="204" width="382.1" height="24" fill="#3730A3"></rect>
+    <text x="732" y="222" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="end">955.31</text>
+    <text x="752" y="222" font-size="13" fill="#5B6472">n = 8</text>
+    <rect x="360" y="234" width="5.2" height="24" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <text x="376" y="252" font-size="14" fill="#334155">11.77</text>
+    <text x="428" y="252" font-size="13" fill="#5B6472">n = 97</text>
+    <rect x="810" y="204" width="186" height="54" fill="#E0E7FF" stroke="#4F46E5" stroke-width="1.5"></rect>
+    <text x="903" y="238" font-size="22" font-weight="700" fill="#0F172A" text-anchor="middle">81 times</text>
+  </g>
 
+  <rect x="2" y="286" width="996" height="90" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="18" y="310" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Read the counts before the multiples.</text>
+  <text x="18" y="332" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Each mean in the Builder column is computed over EIGHT members, in a population where five people take 90.2 percent of the</text>
+  <text x="18" y="350" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">structure budget, so a band mean can be moved a long way by one person. Two decimal places do not make eight into a large sample.</text>
+  <text x="18" y="370" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">The premium is also not a rising ladder: the biggest multiple is the MIDDLE band at 92 times, and the top band is 81 times.</text>
+
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="2" y="390" width="320" height="66" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
+    <text x="16" y="422" font-size="26" font-weight="700" fill="#0F172A">34</text>
+    <text x="60" y="414" font-size="12.5" fill="#334155">members personally sponsored at</text>
+    <text x="60" y="430" font-size="12.5" fill="#334155">least one Builder in March.</text>
+    <text x="16" y="448" font-size="12.5" font-weight="700" fill="#0F172A">34 did the sponsoring.</text>
+
+    <rect x="340" y="390" width="320" height="66" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
+    <text x="354" y="422" font-size="26" font-weight="700" fill="#0F172A">24</text>
+    <text x="398" y="414" font-size="12.5" fill="#334155">of those 34 were ALSO QUALIFIED</text>
+    <text x="398" y="430" font-size="12.5" fill="#334155">that month, at 100.00 Sales Volume.</text>
+    <text x="354" y="448" font-size="12.5" font-weight="700" fill="#0F172A">24 could be paid for it. These 24 are the ones compared above.</text>
+
+    <rect x="678" y="390" width="320" height="66" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
+    <text x="692" y="422" font-size="26" font-weight="700" fill="#0F172A">44</text>
+    <text x="736" y="414" font-size="12.5" fill="#334155">members earn any money at all</text>
+    <text x="736" y="430" font-size="12.5" fill="#334155">from the two new layers.</text>
+    <text x="692" y="448" font-size="12.5" fill="#334155">Members who cannot earn are excluded above.</text>
+
+    <rect x="2" y="464" width="320" height="66" fill="#FEE2E2" stroke="#B91C1C" stroke-width="1.5"></rect>
+    <text x="16" y="496" font-size="26" font-weight="700" fill="#0F172A">90.2%</text>
+    <text x="16" y="514" font-size="12.5" fill="#334155">of the structure budget goes to the top</text>
+    <text x="16" y="528" font-size="12.5" fill="#334155">five of those 44: 3,590.97 of 3,983.12.</text>
+
+    <rect x="340" y="464" width="320" height="66" fill="#FEE2E2" stroke="#B91C1C" stroke-width="1.5"></rect>
+    <text x="354" y="496" font-size="26" font-weight="700" fill="#0F172A">94.2%</text>
+    <text x="354" y="514" font-size="12.5" fill="#334155">goes to the top ten of the 44.</text>
+    <text x="354" y="528" font-size="12.5" fill="#334155">A very small number of people have done this work.</text>
+
+    <rect x="678" y="464" width="320" height="66" fill="#FEE2E2" stroke="#B91C1C" stroke-width="1.5"></rect>
+    <text x="692" y="496" font-size="26" font-weight="700" fill="#0F172A">22.9%</text>
+    <text x="692" y="514" font-size="12.5" fill="#334155">the two new layers as a share of total</text>
+    <text x="692" y="528" font-size="12.5" fill="#334155">payout: 3,983.12 of 17,417.12. Never shown alone.</text>
+  </g>
+</svg>
+<figcaption><span class="fignum">Figure 4</span>The multiples, their sample sizes, and the six companion figures. Quoting the multiples without the boxes below them is not permitted by this document, and that is a rule rather than a courtesy.</figcaption>
+</figure>
+
+<p>Read together: the premium on development is enormous and real, it is measured on eight members
+per band, and it is concentrated today in a very small number of people, because a very small
+number of people have done that work.</p>
+
+<!-- 3 : what it does not do -->
+<h3>3. What this plan does not do, said before anybody else says it</h3>
+
+<figure>
+<svg viewBox="0 0 1000 300" role="img" aria-label="Figure 5. The live plan pays 206 members, the Builder plan pays 207, and stairstep breakaway pays 448 on the same month. Concentration rises rather than falls: Gini 0.9625 to 0.9687 and top ten percent share 94.25 to 95.33.">
+  <rect x="0" y="0" width="1000" height="300" fill="#FFFFFF"></rect>
+  <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Members paid on the same modelled month, of 1,001 member-months</text>
+
+  <g font-family="Segoe UI,Arial,sans-serif" font-size="14">
+    <text x="278" y="52" fill="#0F172A" text-anchor="end">The live plan</text>
+    <rect x="288" y="34" width="294" height="26" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
+    <text x="592" y="52" fill="#0F172A" font-weight="700">206</text>
+
+    <text x="278" y="96" fill="#0F172A" text-anchor="end" font-weight="700">The Builder plan</text>
+    <rect x="288" y="78" width="295.4" height="26" fill="#3730A3" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="594" y="96" fill="#0F172A" font-weight="700">207</text>
+    <text x="640" y="96" fill="#B91C1C" font-weight="700">one more person</text>
+
+    <text x="278" y="140" fill="#0F172A" text-anchor="end">Stairstep breakaway, for scale</text>
+    <rect x="288" y="122" width="639.4" height="26" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
+    <text x="938" y="140" fill="#0F172A" font-weight="700">448</text>
+  </g>
+
+  <rect x="2" y="170" width="490" height="56" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
+  <text x="18" y="194" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Concentration RISES, it does not fall.</text>
+  <text x="18" y="216" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Gini 0.9625 to 0.9687. Top ten percent share 94.25 to 95.33.</text>
+
+  <rect x="508" y="170" width="490" height="56" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
+  <text x="524" y="194" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">A different plan family pays more than twice as many.</text>
+  <text x="524" y="216" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Breakaway reaches 448 on the same members and the same month.</text>
+
+  <rect x="2" y="240" width="996" height="56" fill="#0F172A"></rect>
+  <text x="18" y="264" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">The honest sentence, and the only one this plan will make:</text>
+  <text x="18" y="286" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">the same paid population, a far deeper premium on development.</text>
+</svg>
+<figcaption><span class="fignum">Figure 5</span>Anybody describing this plan as broadening participation is describing a different plan.</figcaption>
+</figure>
+
+<!-- 4 : where the parts come from -->
+<h3>4. Proven parts, each with its worst habit removed</h3>
+
+<p>Nothing here is invented mathematics. What is new is the assembly: each part arrives with its
+best-known failure mode structurally absent rather than forbidden by policy.</p>
+
+<div class="table-frame">
 <table>
   <caption>The four borrowed mechanisms and the ceiling</caption>
   <thead>
-    <tr><th style="width:15%;">The part</th><th style="width:24%;">Where it comes from</th><th style="width:26%;">Its known failure mode</th><th style="width:35%;">Removed how</th></tr>
+    <tr><th style="width:14%;">The part</th><th style="width:22%;">Where it comes from</th><th style="width:28%;">Its known failure mode</th><th style="width:36%;">Removed how</th></tr>
   </thead>
   <tbody>
-    <tr>
-      <td><strong>Layer 1</strong><br>the unilevel spine</td>
-      <td>The industry's most common chassis, because it is the easiest plan to explain and the hardest to game.</td>
-      <td>Passivity toward development. It pays on whatever depth happens to exist and pays nothing extra for turning a recruit into a leader.</td>
-      <td>Layers 2 and 3 exist to pay for development explicitly. The spine itself is untouched, which keeps the explainability.</td>
-    </tr>
-    <tr>
-      <td><strong>Layer 2</strong><br>generation overrides</td>
-      <td>The core of generational and breakaway plans, the oldest plan family in this industry.</td>
-      <td>Volume theft. In a classic stairstep breakaway, promoting a leader removes their whole group from your volume, so the plan punishes the promotion it claims to want and the field learns to hold its best people down.</td>
-      <td>No breakaway, stated as a rule: no volume ever leaves anybody's group. Developing a Builder is pure addition with zero subtraction, and there is no rank a downline can reach that costs an upline a cent.</td>
-    </tr>
-    <tr>
-      <td><strong>Layer 3</strong><br>lesser-leg pay</td>
-      <td>Binary's engine. Paying on the weaker leg is the industry's most effective known driver of balance, which is why binaries dominate the fast-growth segment.</td>
-      <td>Two of them: placement gaming, meaning spillover lotteries and purchased positions, and a runaway liability profile with carryover banking.</td>
-      <td>No placement tree exists here. Legs are the real sponsorship genealogy, so there is nothing to place and no spillover to lottery, and nothing carries over. Liability is bounded twice: the bonus is junior in the waterfall and under the per-order cap.</td>
-    </tr>
-    <tr>
-      <td><strong>The leg-count step</strong></td>
-      <td>Standard leadership-bonus structure, used by leadership pools and car programs for decades.</td>
-      <td>Cliff effects. Big steps at magic numbers produce month-end buying to cross a threshold.</td>
-      <td>The steps are deliberately shallow, 1.00 / 1.15 / 1.25, each one requires another qualified human rather than a purchase, and the arithmetic in section 8 shows the step never reverses the dilution, so there is no cliff worth buying.</td>
-    </tr>
-    <tr>
-      <td><strong>The hard payout ceiling</strong></td>
-      <td>The discipline the company already lives by: the published promise that no order pays more than 20 percent of its price.</td>
-      <td>Cost drift. Payout ratio creeping up as a field matures, discovered in the accounts months later, fixed by emergency plan changes that burn field trust.</td>
-      <td>The ceiling is enforced per order, inside the calculation, not monitored after the fact. Drift is bounded by construction and plotted monthly.</td>
-    </tr>
+    <tr><td><strong>Layer 1</strong><br>unilevel spine</td><td>The industry's most common chassis: easiest to explain, hardest to game.</td><td>Passivity toward development. It pays on whatever depth happens to exist and nothing extra for turning a recruit into a leader.</td><td>Layers 2 and 3 pay for development explicitly. The spine is untouched, which keeps the explainability.</td></tr>
+    <tr><td><strong>Layer 2</strong><br>generation overrides</td><td>The core of generational and breakaway plans, the oldest family in this industry.</td><td>Volume theft. Promoting a leader removes their group from your volume, so the plan punishes the promotion it claims to want and the field learns to hold its best people down.</td><td>No breakaway, stated as a rule: no volume ever leaves anybody's group. There is no rank a downline can reach that costs an upline a cent.</td></tr>
+    <tr><td><strong>Layer 3</strong><br>lesser-leg pay</td><td>Binary's engine. Paying on the weaker leg is the most effective known driver of balance.</td><td>Placement gaming, meaning spillover lotteries and purchased positions; and a runaway liability profile with carryover banking.</td><td>No placement tree exists. Legs are the real sponsorship genealogy, so there is nothing to place, and nothing carries over. Liability is bounded twice: junior in the waterfall and under the cap.</td></tr>
+    <tr><td><strong>The leg-count step</strong></td><td>Standard leadership-bonus structure, used by leadership pools and car programs for decades.</td><td>Cliff effects. Big steps at magic numbers produce month-end buying to cross a threshold.</td><td>Steps are deliberately shallow, 1.00 / 1.15 / 1.25, each requires another qualified human rather than a purchase, and section 9 shows the step never reverses the dilution.</td></tr>
+    <tr><td><strong>The payout ceiling</strong></td><td>The discipline the company already lives by: no order pays more than 20 percent of its price.</td><td>Cost drift. Payout creeping up as a field matures, discovered in the accounts months later, fixed by emergency plan changes that burn field trust.</td><td>Enforced inside the calculation on every member-month, not monitored after the fact. Drift is bounded by construction and plotted monthly.</td></tr>
   </tbody>
 </table>
-
-<div class="panel panel-indigo">
-  <p class="panel-title">Put plainly, for a hostile reader</p>
-  <p style="margin:0;">A unilevel chassis carrying breakaway's development engine without the
-  breakaway, binary's balance engine without the binary tree, a standard leadership step without
-  the cliffs, all inside a solvency cap the company already promises.</p>
 </div>
 
-<!-- 4 -->
-<h3>4. Law A, decay, with both exhibits at the same size</h3>
+<div class="callout-note">
+  <p class="ct">Put plainly, for a hostile reader</p>
+  <p>A unilevel chassis carrying breakaway's development engine without the breakaway, binary's
+  balance engine without the binary tree, a standard leadership step without the cliffs, all inside
+  a solvency cap the company already promises.</p>
+</div>
 
-<p>Every layer recomputes from scratch each month from that month's orders and ranks. Nothing is
-banked or grandfathered. A Builder who lapses stops paying their upline that month. That property
-has a flattering face and an ugly one, and both are printed here at equal size.</p>
+<!-- 5 : law A -->
+<h3>5. Law A, decay, with both exhibits at the same size</h3>
+
+<p>Every layer recomputes from scratch each month. A Builder who lapses stops paying their upline
+that month. That property has a flattering face and an ugly one, and both are printed here at equal
+size.</p>
 
 <figure>
+<div class="exhibit-frame">
 <div class="exhibit">
   <div>
     <div class="eh">Exhibit one: the tidy version</div>
     <div class="eb">
       <div class="headline calm">The loss is exactly the override, to the cent.</div>
-      <p>Four members. A sponsors B. B sponsors C and D. Everybody at 100.00 Sales Volume, 80.00
-      Commissionable Volume, all qualified. In month one B has two active legs, so B is a Builder
-      with a group volume of 240.00. In month two C cancels, B has one active leg and is no longer
-      a Builder.</p>
+      <p>A sponsors B. B sponsors C and D. Everybody at 100.00 Sales Volume, 80.00 Commissionable
+      Volume, all qualified. In month one B has two active legs, so B is a Builder with a group
+      volume of 240.00. In month two C cancels and B is no longer a Builder.</p>
       <table>
         <thead><tr><th style="width:14%;">Member</th><th>Month one</th><th>Month two</th><th>Change</th></tr></thead>
         <tbody>
-          <tr>
-            <td>A</td>
-            <td>8.00 of level pay, plus a Builder override of <strong>3.60</strong>, being 1.5 percent of B's group volume of 240.00</td>
-            <td>8.00 of level pay. The override is gone.</td>
-            <td><strong>-3.60,</strong> exactly the override</td>
-          </tr>
-          <tr>
-            <td>B</td>
-            <td>16.00 of level pay, plus a second-team bonus of 1.60</td>
-            <td>8.00 of level pay. The bonus is gone.</td>
-            <td>-9.60, being 8.00 of lost level pay on C plus the 1.60 bonus</td>
-          </tr>
+          <tr><td>A</td><td>8.00 of level pay, plus a Builder override of <strong>3.60</strong>, being 1.5 percent of B's group volume of 240.00</td><td>8.00 of level pay. The override is gone.</td><td><strong>-3.60,</strong> exactly the override</td></tr>
+          <tr><td>B</td><td>16.00 of level pay, plus a second-team bonus of 1.60</td><td>8.00 of level pay. The bonus is gone.</td><td>-9.60, being 8.00 of lost level pay on C plus the 1.60 bonus</td></tr>
         </tbody>
       </table>
-      <p>A's level pay never reached C, so A's whole loss is the override, to the cent, and the
-      engine's attribution assigns 100 percent of it to the single cause. A's check tells A
-      precisely what keeping C active was worth: <strong>3.60 a month.</strong></p>
-      <p class="small"><strong>Rate note, so nobody has to catch it.</strong> The figures above are
-      stated at the rates of record, the Builder override at 1.5 percent and the bonus at 2.0
-      percent. The engine's acceptance fixture itself is recorded at the plan's earlier draft rates,
-      and it is kept that way deliberately, because a fixture is a contract the engine is tested
-      against and every run stores the rates it used. Specification version 1.2.1 prints the
-      rate-of-record figures and forbids presenting the fixture's own draft-rate figures anywhere.
-      What the fixture proves, that the loss equals the override exactly, does not depend on the
-      rate.</p>
+      <p>A's level pay never reached C, so A's whole loss is the override, and the engine assigns
+      100 percent of it to that single cause. A's check tells A precisely what keeping C active was
+      worth: <strong>3.60 a month.</strong></p>
+      <p class="small"><strong>Rate note.</strong> The figures above are at the rates of record, the
+      override at 1.5 percent and the bonus at 2.0 percent. The engine's acceptance fixture is
+      recorded at earlier draft rates and kept that way deliberately, because a fixture is a
+      contract the engine is tested against. Specification 1.2.1 prints the rate-of-record figures
+      and forbids presenting the fixture's draft-rate figures anywhere. What it proves, that the
+      loss equals the override exactly, does not depend on the rate.</p>
     </div>
   </div>
   <div>
@@ -706,174 +644,133 @@ has a flattering face and an ugly one, and both are printed here at equal size.<
     <div class="eb">
       <div class="headline">One bad month somewhere else wipes an entire check. 7.80 to 0.00, one hundred percent, in one month.</div>
       <p>In the modelled census one member's entire check is a single Builder override of 7.80,
-      being 1.5 percent of a Builder's group volume of 520.00. That Builder is two hops down. The
-      Builder misses qualification for one month: a holiday, a card decline.</p>
+      being 1.5 percent of a Builder's group volume of 520.00. That Builder is two hops down, and
+      misses qualification for one month: a holiday, a card decline.</p>
       <table>
-        <thead><tr><th>Member</th><th>Before</th><th>After</th><th class="num">Change</th></tr></thead>
+        <thead><tr><th>Member</th><th>Before</th><th>After</th><th>Change</th></tr></thead>
         <tbody>
-          <tr><td>The single-override member</td><td>7.80</td><td>0.00</td><td class="num">-7.80, all of it</td></tr>
-          <tr><td>The Builder who lapsed</td><td colspan="2">lost 33.20 of their own pay</td><td class="num">-33.20</td></tr>
-          <tr><td>Three uplines</td><td colspan="2">lost level pay</td><td class="num">-4.00 to -12.40</td></tr>
+          <tr><td>The single-override member</td><td>7.80</td><td>0.00</td><td>-7.80, all of it</td></tr>
+          <tr><td>The Builder who lapsed</td><td colspan="2">lost pay of their own</td><td>-33.20</td></tr>
+          <tr><td>Three uplines</td><td colspan="2">lost level pay</td><td>-4.00 to -12.40</td></tr>
         </tbody>
       </table>
-      <p>That is not a curiosity. Several modelled members are in the same fragile class today: in
-      July, one member's check is 100 percent override lines, another's 90 percent, another's 87
-      percent.</p>
+      <p>Several modelled members are in the same fragile class today: in July, one member's check
+      is 100 percent override lines, another's 90 percent, another's 87 percent.</p>
       <p><strong>The countermeasure is part of the plan, not part of the marketing:</strong> hold
       more than one Builder and more than one active leg.</p>
+      <p class="small"><strong>Volatility.</strong> Across 215 modelled member-month pairs there
+      were 22 declines, four to seven members a month with falling override income, two drops of
+      more than half, and one total wipe, which is this exhibit. Because the modelled population
+      grows steadily and almost never cancels, those months certify only that decay is attributable
+      and countable, never what real churn would look like.</p>
     </div>
   </div>
 </div>
-<figcaption><span class="fignum">Figure 4</span>Both exhibits are printed at the same size, in the same frame, on purpose. Neither one is a summary of the other, and neither may be shown without the other.</figcaption>
+</div>
+<figcaption><span class="fignum">Figure 6</span>Both exhibits are printed at the same size, in the same frame, on purpose. Neither is a summary of the other, and neither may be shown without the other.</figcaption>
 </figure>
 
-<div class="panel">
-  <p class="panel-title">Volatility, measured and caveated</p>
-  <p style="margin:0;">Across 215 modelled member-month pairs there were 22 declines, four to seven
-  members a month with falling override income, two drops of more than half, and one total wipe,
-  which is exhibit two above. Because the modelled population grows steadily and almost never
-  cancels, those months certify only that decay is attributable and countable. They cannot certify
-  what real churn would look like.</p>
-</div>
+<!-- 6 : the inversion -->
+<h3>6. The lapse-benefit inversion: the one claim that broke</h3>
 
-<!-- 5 -->
-<h3>5. The lapse-benefit inversion: the one claim that broke, disclosed with its bounds</h3>
-
-<p>When this plan was handed to a reviewer briefed to break it, one claim broke. The claim was that
-decay makes every upline the retention agent of everybody below them. Measured, that is true for
-the one or two Builder generations nearest a lapse, and it <strong>inverts</strong> above a binding
-ceiling.</p>
-
-<p>The mechanism is Law B doing what it says. A lapse removes claims from pools that were
-oversubscribed, and the relief is shared out to everybody else claiming those same orders. Senior
-checks can rise when a deep member fails. The reviewer built it and ran it: nineteen members, eight
-nested Builders, one order whose pool was binding at a factor of 0.526315. One mid-stack Builder
-lapses to zero Sales Volume. The field loses 100.00 of Sales Volume, one hundred dollars of monthly
-order value rather than an abstract unit.</p>
+<p>Handed to a reviewer briefed to break it, one claim broke: that decay makes every upline the
+retention agent of everybody below them. Measured, that is true for the one or two Builder
+generations nearest a lapse and it <strong>inverts</strong> above a binding ceiling, because a lapse
+frees claims from pools that were oversubscribed and the relief is shared out. Nineteen members,
+eight nested Builders, one member-month whose pool was binding at a factor of 0.526315. One
+mid-stack Builder lapses to zero Sales Volume.</p>
 
 <figure>
-<svg viewBox="0 0 1000 610" role="img" aria-label="Figure 5. Change in pay after one mid-stack Builder lapses. Six checks rise, three fall, and the company pays 36.37 less overall.">
-  <rect x="0" y="0" width="1000" height="610" fill="#FFFFFF"></rect>
+<svg viewBox="0 0 1000 632" role="img" aria-label="Figure 7. Change in pay after one mid-stack Builder lapses. Six checks rise, three fall, and the company pays 36.37 less overall.">
+  <rect x="0" y="0" width="1000" height="632" fill="#FFFFFF"></rect>
 
   <text x="2" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#B91C1C">LOSS</text>
-  <text x="1000" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#166534" text-anchor="end">GAIN</text>
+  <text x="998" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#166534" text-anchor="end">GAIN</text>
   <line x1="650" y1="26" x2="650" y2="470" stroke="#0F172A" stroke-width="2"></line>
   <text x="650" y="42" font-family="Segoe UI,Arial,sans-serif" font-size="12" fill="#5B6472" text-anchor="middle">no change</text>
 
   <g font-family="Segoe UI,Arial,sans-serif" font-size="14">
-    <!-- E -->
     <text x="238" y="72" fill="#0F172A" text-anchor="end">E, four Builder generations above</text>
     <rect x="650" y="56" width="74.4" height="22" fill="#166534"></rect>
     <text x="734" y="73" fill="#166534" font-weight="700">+7.44   (212.91 to 220.35)</text>
-    <!-- B1 -->
     <text x="238" y="108" fill="#0F172A" text-anchor="end">B1</text>
     <rect x="650" y="92" width="30.4" height="22" fill="#166534"></rect>
     <text x="690" y="109" fill="#166534">+3.04</text>
-    <!-- B2 -->
     <text x="238" y="144" fill="#0F172A" text-anchor="end">B2</text>
     <rect x="650" y="128" width="30.4" height="22" fill="#166534"></rect>
     <text x="690" y="145" fill="#166534">+3.04</text>
-    <!-- B3 -->
     <text x="238" y="180" fill="#0F172A" text-anchor="end">B3</text>
     <rect x="650" y="164" width="30.4" height="22" fill="#166534"></rect>
     <text x="690" y="181" fill="#166534">+3.04</text>
-    <!-- B4 -->
     <text x="238" y="216" fill="#0F172A" text-anchor="end">B4</text>
     <rect x="650" y="200" width="8.5" height="22" fill="#166534"></rect>
     <text x="668" y="217" fill="#166534">+0.85</text>
-    <!-- B5 -->
     <text x="238" y="252" fill="#0F172A" text-anchor="end">B5, two above the lapse</text>
     <rect x="537.1" y="236" width="112.9" height="22" fill="#B91C1C"></rect>
     <text x="527" y="253" fill="#B91C1C" font-weight="700" text-anchor="end">-11.29</text>
-    <!-- B6 -->
     <text x="238" y="288" fill="#0F172A" text-anchor="end">B6, directly above the lapse</text>
     <rect x="480" y="272" width="170" height="22" fill="#B91C1C"></rect>
     <text x="470" y="289" fill="#B91C1C" font-weight="700" text-anchor="end">-17.00</text>
-    <!-- B7 -->
     <text x="238" y="324" fill="#0F172A" text-anchor="end">B7, the member who lapsed</text>
     <rect x="391.1" y="308" width="258.9" height="22" fill="#0F172A"></rect>
     <text x="381" y="325" fill="#0F172A" font-weight="700" text-anchor="end">-25.89</text>
-    <!-- B8 -->
     <text x="238" y="360" fill="#0F172A" text-anchor="end">B8, below the lapse</text>
     <rect x="650" y="344" width="4" height="22" fill="#166534"></rect>
     <text x="662" y="361" fill="#166534">+0.40</text>
   </g>
 
-  <line x1="0" y1="384" x2="1000" y2="384" stroke="#CBD5E1" stroke-width="1.5"></line>
+  <line x1="2" y1="384" x2="998" y2="384" stroke="#CBD5E1" stroke-width="1.5"></line>
   <text x="238" y="418" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A" text-anchor="end">Company payout</text>
   <rect x="286.3" y="400" width="363.7" height="26" fill="#3730A3"></rect>
   <text x="276" y="419" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#3730A3" text-anchor="end">-36.37</text>
-  <text x="660" y="419" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">481.14 to 444.77. The company pays LESS on every lapse.</text>
+  <text x="662" y="419" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Company pays LESS on every lapse: 481.14 to 444.77.</text>
+  <text x="2" y="456" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#5B6472">Scale: 10 units of horizontal width per 1.00 of change. The field loses 100.00 of Sales Volume in this fixture.</text>
 
-  <text x="2" y="456" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#5B6472">Scale: 10 units of horizontal width per 1.00 of change.</text>
-
-  <!-- bounds box -->
-  <rect x="0" y="474" width="1000" height="126" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
-  <text x="16" y="500" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Six checks rose when the field lost a member. The bounds, stated rather than softened:</text>
-  <text x="16" y="524" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Largest gain 7.44 on a 212.91 check, which is 3.5 percent, in a fixture built to maximise it.</text>
-  <text x="16" y="543" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">It is never new money: it is exactly the freed share of pools that were already full, and the company pays less on every lapse.</text>
-  <text x="16" y="567" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">At the rates of record, 120 of the 1,001 modelled orders have a binding pool, so the inversion is</text>
-  <text x="16" y="586" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">live in any presentation month. It is watched, not assumed small.</text>
+  <rect x="2" y="474" width="996" height="146" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="18" y="500" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Six checks rose when the field lost a member. The bounds, stated rather than softened:</text>
+  <text x="18" y="524" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">It cannot be farmed. You cannot make somebody lapse, and every attack built to construct this actively returned less than doing nothing.</text>
+  <text x="18" y="543" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">It is never new money. The gain is exactly the freed share of pools that were already full: 7.44 on a 212.91 check, 3.5 percent, in a fixture built to maximise it.</text>
+  <text x="18" y="567" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">The incentive still points the right way where anybody can act: the two nearest the lapse lose 17.00 and 11.29 against a senior gain of 7.44.</text>
+  <text x="18" y="586" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">It is not a corner case. 154 of the 641 member-months that carry any volume have a binding pool, roughly one in four,</text>
+  <text x="18" y="605" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">so the inversion is live in any presentation month. It is watched, not assumed small.</text>
 </svg>
-<figcaption><span class="fignum">Figure 5</span>The inversion, run rather than argued. E's second-team bonus rose from 10.60 to 15.00 while the volume it was computed on FELL from 1,360.00 to 1,280.00: less volume, more bonus, to the cent. The binding factor went from 0.526315 to 1, and the ceiling held on both sides to the microcent, that order paying 19.999996 before and 20.000000 after.</figcaption>
+<figcaption><span class="fignum">Figure 7</span>E's second-team bonus rose from 10.60 to 15.00 while the volume it was computed on FELL from 1,360.00 to 1,280.00: less volume, more bonus, to the cent. The binding factor went from 0.526315 to 1, and the ceiling held on both sides to the microcent, that member-month paying 19.999996 before and 20.000000 after. Every consecutive pair of runs counts the members whose pay rose because somebody below them lapsed, and sums the gain, as a standing measurement.</figcaption>
 </figure>
 
-<h4>Three facts make it survivable, and each one is checkable</h4>
-<ol>
-  <li><strong>It cannot be farmed.</strong> You cannot make somebody lapse. You can only decline to
-  help them recover, and every attack built to construct this actively returned less than doing
-  nothing.</li>
-  <li><strong>It is capped and it is never new money.</strong> The gain is exactly the freed share
-  of pools that were already full: 7.44 on a 212.91 check, 3.5 percent, in a fixture built to
-  maximise it. The company pays less on every lapse.</li>
-  <li><strong>The incentive still points the right way where anybody can act.</strong> The members
-  nearest the lapse, the only ones positioned to notice and help, lose the most: 17.00 and 11.29
-  against a senior gain of 7.44.</li>
-</ol>
-
-<p>It is not a corner of the parameter space. Every consecutive pair of runs counts the members
-whose pay rose because somebody below them lapsed, and sums the gain, as a standing
-measurement.</p>
-
-<div class="panel panel-indigo">
-  <p class="panel-title">Why this is in the brief at all</p>
-  <p style="margin:0;">A hostile reader finds this in one careful reading of the waterfall. A plan
-  document that hands over its own worst finding, bounded and watched, is worth more than one that
-  waits to be caught.</p>
+<div class="callout-note">
+  <p class="ct">Why this is in the brief at all</p>
+  <p>A hostile reader finds this in one careful reading of the waterfall. A plan document that hands
+  over its own worst finding, bounded and watched, is worth more than one that waits to be caught.</p>
 </div>
 
-<!-- 6 -->
-<h3>6. Law B, the waterfall: why the company's outlay is bounded by construction</h3>
+<!-- 7 : law B -->
+<h3>7. Law B, the waterfall: why the outlay is bounded by construction</h3>
 
-<p>Every order contributes a pool equal to 25 percent of its Commissionable Volume. Since
+<p>Every member-month contributes a pool of 25 percent of its Commissionable Volume. Since
 Commissionable Volume is 80 percent of the price, and 0.25 x 0.80 = 0.20, that pool is exactly 20
-percent of the money in the door: the same ceiling the company already publishes. The layers then
-draw from that pool in order of seniority.</p>
+percent of the money in the door. The layers draw from it in order of seniority.</p>
 
 <figure>
-<svg viewBox="0 0 1000 490" role="img" aria-label="Figure 6. One order followed all the way. A 100.00 order gives 80.00 of Commissionable Volume, a pool of 20.00. Layer one takes 8.00 and 4.00, layer two takes 1.20, layer three takes 1.60, and 5.20 is unspent.">
+<svg viewBox="0 0 1000 490" role="img" aria-label="Figure 8. One member-month followed all the way. 100.00 of Sales Volume gives 80.00 of Commissionable Volume and a pool of 20.00. Layer one takes 8.00 and 4.00, layer two takes 1.20, layer three takes 1.60, and 5.20 is unspent.">
   <rect x="0" y="0" width="1000" height="490" fill="#FFFFFF"></rect>
 
-  <!-- the three step header -->
   <g font-family="Segoe UI,Arial,sans-serif">
-    <rect x="0" y="6" width="286" height="52" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
-    <text x="14" y="28" font-size="13.5" fill="#334155">One order</text>
-    <text x="14" y="48" font-size="18" font-weight="700" fill="#0F172A">100.00 Sales Volume</text>
-    <polygon points="296,32 316,22 316,42" fill="#0F172A"></polygon>
-    <rect x="322" y="6" width="286" height="52" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
-    <text x="336" y="28" font-size="13.5" fill="#334155">80 percent of the price</text>
-    <text x="336" y="48" font-size="18" font-weight="700" fill="#0F172A">80.00 Commissionable Volume</text>
-    <polygon points="618,32 638,22 638,42" fill="#0F172A"></polygon>
-    <rect x="644" y="6" width="356" height="52" fill="#CFFAFE" stroke="#0E7490" stroke-width="2"></rect>
-    <text x="658" y="28" font-size="13.5" fill="#334155">25 percent of Commissionable Volume</text>
-    <text x="658" y="48" font-size="18" font-weight="700" fill="#0F172A">Pool 20.00, the hard cap</text>
+    <rect x="2" y="6" width="286" height="52" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="16" y="28" font-size="13.5" fill="#334155">One member-month</text>
+    <text x="16" y="48" font-size="18" font-weight="700" fill="#0F172A">100.00 Sales Volume</text>
+    <polygon points="298,32 318,22 318,42" fill="#0F172A"></polygon>
+    <rect x="324" y="6" width="286" height="52" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="338" y="28" font-size="13.5" fill="#334155">80 percent of the price</text>
+    <text x="338" y="48" font-size="18" font-weight="700" fill="#0F172A">80.00 Commissionable Volume</text>
+    <polygon points="620,32 640,22 640,42" fill="#0F172A"></polygon>
+    <rect x="646" y="6" width="352" height="52" fill="#CFFAFE" stroke="#0E7490" stroke-width="2"></rect>
+    <text x="660" y="28" font-size="13.5" fill="#334155">25 percent of Commissionable Volume</text>
+    <text x="660" y="48" font-size="18" font-weight="700" fill="#0F172A">Pool 20.00, the hard cap</text>
   </g>
 
-  <!-- the column -->
   <line x1="120" y1="90" x2="960" y2="90" stroke="#0F172A" stroke-width="2" stroke-dasharray="6 4"></line>
   <text x="966" y="86" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" font-weight="700" fill="#0F172A" text-anchor="end">the cap, 20.00</text>
 
-  <!-- layer 1a : 8.00 -> 104px -->
   <rect x="120" y="90" width="200" height="104" fill="#312E81"></rect>
   <text x="130" y="128" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">8.00</text>
   <text x="130" y="150" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#FFFFFF">LAYER 1</text>
@@ -881,7 +778,6 @@ draw from that pool in order of seniority.</p>
   <text x="390" y="138" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The sponsor, level 1</text>
   <text x="390" y="158" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">0.10 x 80.00 = 8.00</text>
 
-  <!-- layer 1b : 4.00 -> 52px -->
   <rect x="120" y="194" width="200" height="52" fill="#4F46E5"></rect>
   <text x="130" y="220" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">4.00</text>
   <text x="196" y="220" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#FFFFFF">LAYER 1</text>
@@ -889,19 +785,16 @@ draw from that pool in order of seniority.</p>
   <text x="390" y="216" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The next person up, level 2</text>
   <text x="390" y="236" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">0.05 x 80.00 = 4.00</text>
 
-  <!-- layer 2 : 1.20 -> 15.6 -->
   <rect x="120" y="246" width="200" height="15.6" fill="#818CF8"></rect>
   <line x1="320" y1="253.8" x2="380" y2="264" stroke="#0F172A" stroke-width="1.2"></line>
   <text x="390" y="262" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">1.20 to the Builder's generation one upline</text>
   <text x="390" y="282" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">LAYER 2, 0.015 x 80.00 = 1.20</text>
 
-  <!-- layer 3 : 1.60 -> 20.8 -->
   <rect x="120" y="261.6" width="200" height="20.8" fill="#22D3EE"></rect>
   <line x1="320" y1="272" x2="380" y2="308" stroke="#0F172A" stroke-width="1.2"></line>
   <text x="390" y="306" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">1.60 to the Builder, on the second-strongest leg</text>
   <text x="390" y="326" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">LAYER 3, 0.020 x 80.00 = 1.60</text>
 
-  <!-- unspent : 5.20 -> 67.6 -->
   <rect x="120" y="282.4" width="200" height="67.6" fill="#FFFFFF" stroke="#334155" stroke-width="1.5" stroke-dasharray="5 4"></rect>
   <text x="130" y="322" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#0F172A">5.20</text>
   <line x1="320" y1="316" x2="380" y2="356" stroke="#0F172A" stroke-width="1.2"></line>
@@ -910,110 +803,149 @@ draw from that pool in order of seniority.</p>
   <line x1="120" y1="350" x2="960" y2="350" stroke="#0F172A" stroke-width="1.5"></line>
   <text x="966" y="368" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#5B6472" text-anchor="end">0.00</text>
 
-  <!-- brace for total paid -->
   <path d="M 108 90 H 96 V 282.4 H 108" fill="none" stroke="#0F172A" stroke-width="1.8"></path>
   <text x="88" y="182" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A" text-anchor="end">14.80</text>
   <text x="88" y="202" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155" text-anchor="end">total paid</text>
 
-  <!-- summary strip -->
-  <rect x="0" y="390" width="1000" height="94" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"></rect>
-  <text x="16" y="416" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Three layers, four payments to three different people, and the order still pays 14.80 of a 20.00 ceiling.</text>
-  <text x="16" y="438" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Layer 1 can never claim more than the pool holds: the five rates sum to 10 + 5 + 5 + 3 + 2 = 25 percent of</text>
-  <text x="16" y="456" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Commissionable Volume, and there is at most one person at each level. So the spine always fits and is never reduced.</text>
-  <text x="16" y="474" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">That is what makes "layer 1 unchanged" a fact rather than an intention.</text>
+  <rect x="2" y="390" width="996" height="94" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"></rect>
+  <text x="18" y="416" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Three layers, four payments to three different people, and the member-month still pays 14.80 of a 20.00 ceiling.</text>
+  <text x="18" y="438" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Layer 1 can never claim more than the pool holds: the five rates sum to 10 + 5 + 5 + 3 + 2 = 25 percent of</text>
+  <text x="18" y="456" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Commissionable Volume, and there is at most one person at each level. So the spine always fits and is never reduced.</text>
+  <text x="18" y="474" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">That is what makes "layer 1 unchanged" a fact rather than an intention.</text>
 </svg>
-<figcaption><span class="fignum">Figure 6</span>One order followed all the way, at the rates of record. Every override plan in this industry pays several people on one order. The only honest question is whether the sum is bounded, and here it is bounded by the arithmetic that computes it.</figcaption>
+<figcaption><span class="fignum">Figure 8</span>One member-month followed all the way, at the rates of record. Every override plan pays several people on one source. The only honest question is whether the sum is bounded, and here it is bounded by the arithmetic that computes it.</figcaption>
 </figure>
 
-<p>Layer 2 draws from what is left. If the override claims on that order fit, they pay in full;
-otherwise every override claim on that order is scaled by the same factor. Layer 3 draws from what
-is left after that, by the same rule.</p>
+<p>Layer 2 draws from what is left; if the override claims fit they pay in full, otherwise every
+override claim on that member-month is scaled by the same factor. Layer 3 draws from what is left
+after that, by the same rule.</p>
 
-<div class="callout rule">
+<div class="callout-note">
   <p class="ct">Where the money for the new layers comes from</p>
   <p><strong>All the team-building money in this plan is reclaimed breakage, and nothing else:</strong>
   unreachable levels, unqualified earners, depth gates. The factors are closed formulas over the
-  complete claim set on each order, never a ledger drained in some sequence, so no ordering of
-  members, claims or layers can change any answer.</p>
+  complete claim set on each member-month, never a ledger drained in some sequence, so no ordering
+  of members, claims or layers can change any answer.</p>
 </div>
 
-<h4>And the case that blows up if it can</h4>
-<p>Take an order carrying 80.00 of Commissionable Volume, so a pool of 20.00, sitting under ten
-nested Builders, so override claims total two and a half times its whole pool. With a full five
-levels of qualified upline, level pay takes the entire 20.00, the remaining pool is zero and every
-one of those override claims pays 0.00. With only two levels of qualified upline, level pay takes
-12.00, the remaining 8.00 is shared across 48.00 of claims at a factor of 0.166666, and the ten
-Builders collectively receive exactly 8.00. In both cases the order pays at most 20.00, to the
-cent. In the actual modelled census the worst real order carries override claims at 0.56 of its
-pool, and zero of 1,001 orders paid over pool.</p>
+<h4>And the cases built to blow it up</h4>
+<ul>
+  <li><strong>Ten nested Builders</strong> over a pool of 20.00, so override claims total two and a
+  half times the whole pool. With five levels of qualified upline, level pay takes the entire 20.00
+  and every override claim pays 0.00. With two levels, level pay takes 12.00 and the remaining 8.00
+  is shared across 48.00 of claims at a factor of 0.166666, so the ten Builders collectively receive
+  exactly 8.00. Both cap at 20.00, to the cent.</li>
+  <li><strong>A repeating decimal.</strong> An independent reviewer forced a factor of 0.454545; the
+  paid total came to 7.999992 against 8.000000 of remaining pool, strictly under, because every
+  reduced amount is rounded down.</li>
+  <li><strong>An exhausted pool.</strong> Factor 0.000000, every override and bonus claim pays
+  nothing, and the claims stay fully recorded and auditable.</li>
+  <li><strong>In the actual census</strong> the worst real member-month carries override claims at
+  0.56 of its pool, and zero of the 1,001 member-months paid over pool.</li>
+</ul>
 
-<p><strong>Independent hostile cases.</strong> A separate reviewer built worse ones on purpose. In
-one the proration factor lands on a repeating decimal, 0.454545, and the paid total comes to
-7.999992 against 8.000000 of remaining pool: strictly under, because every reduced amount is
-rounded down. In another the pool is exhausted entirely, the factor is 0.000000, every override and
-bonus claim on that order pays nothing, and the claims stay fully recorded and auditable.</p>
-
-<!-- 7 -->
-<h3>7. How often the ceiling bites, and who feels it</h3>
+<!-- 8 : how often and how deep -->
+<h3>8. How often the ceiling bites, and how deep</h3>
 
 <figure>
-<svg viewBox="0 0 1000 300" role="img" aria-label="Figure 7. About one order in eight reaches its cap in the modelled March, 120 of 1001. About 17 percent of paid members carry at least one reduced line, 35 of 207. The total reduced away is 5.4 percent of the run.">
-  <rect x="0" y="0" width="1000" height="300" fill="#FFFFFF"></rect>
+<svg viewBox="0 0 1000 386" role="img" aria-label="Figure 9. Of the 641 member-months that carry any volume, 154 are prorated on at least one layer, which is 24 percent or roughly one in four. 120 bind at the override layer, 83 at the bonus layer, and 34 only at the bonus layer.">
+  <rect x="0" y="0" width="1000" height="386" fill="#FFFFFF"></rect>
 
-  <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Orders that reach their cap: 120 of 1,001, about 12 percent, roughly one in eight</text>
+  <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Of the 641 member-months that carry any volume, how many are reduced by the ceiling?</text>
+
   <g>
-    <rect x="0" y="32" width="112" height="52" fill="#3730A3" stroke="#0F172A" stroke-width="1.5"></rect>
-    <text x="56" y="64" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">capped</text>
-    <rect x="120" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="240" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="360" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="480" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="600" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="720" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-    <rect x="840" y="32" width="112" height="52" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <rect x="2" y="34" width="243" height="56" fill="#3730A3" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="123" y="68" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">REDUCED</text>
+    <rect x="253" y="34" width="243" height="56" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <rect x="504" y="34" width="243" height="56" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
+    <rect x="755" y="34" width="243" height="56" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
   </g>
+  <text x="2" y="112" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#0F172A">154 of 641, which is 24.0 percent, roughly ONE IN FOUR.</text>
 
-  <text x="2" y="126" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Paid members carrying at least one reduced line: 35 of 207, about 17 percent</text>
-  <rect x="2" y="136" width="950" height="30" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <rect x="2" y="136" width="161" height="30" fill="#3730A3"></rect>
-  <text x="173" y="157" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">35 members</text>
+  <g font-family="Segoe UI,Arial,sans-serif" font-size="14">
+    <text x="238" y="150" fill="#0F172A" text-anchor="end">Bind at layer 2, the override layer</text>
+    <rect x="248" y="132" width="240" height="24" fill="#4F46E5"></rect>
+    <text x="498" y="150" fill="#0F172A" font-weight="700">120</text>
+    <text x="238" y="186" fill="#0F172A" text-anchor="end">Bind at layer 3, the bonus layer</text>
+    <rect x="248" y="168" width="166" height="24" fill="#818CF8"></rect>
+    <text x="424" y="186" fill="#0F172A" font-weight="700">83</text>
+    <text x="238" y="222" fill="#0F172A" text-anchor="end">Bind ONLY at the bonus layer</text>
+    <rect x="248" y="204" width="68" height="24" fill="#818CF8"></rect>
+    <text x="326" y="222" fill="#0F172A" font-weight="700">34</text>
+    <text x="238" y="258" fill="#0F172A" text-anchor="end" font-weight="700">Bind on at least one layer</text>
+    <rect x="248" y="240" width="308" height="24" fill="#3730A3"></rect>
+    <text x="566" y="258" fill="#0F172A" font-weight="700">154</text>
+  </g>
+  <text x="2" y="288" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#5B6472">120 at the override layer plus the 34 that bind only at the bonus layer gives the 154.</text>
 
-  <text x="2" y="200" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Total reduced away: 943.68 against 17,417.12 paid, about 5.4 percent of the run</text>
-  <rect x="2" y="210" width="950" height="30" fill="#FFFFFF" stroke="#334155" stroke-width="1.5"></rect>
-  <rect x="2" y="210" width="34.4" height="30" fill="#B91C1C"></rect>
-  <text x="46" y="231" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">638.00 from layer 2 plus 305.68 from layer 3. Every cent of it comes off layers 2 and 3.</text>
-
-  <rect x="0" y="258" width="1000" height="40" fill="#CFFAFE" stroke="#0E7490" stroke-width="2"></rect>
-  <text x="16" y="284" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The spine is structurally untouchable, so no member's live-plan-equivalent pay is ever reduced.</text>
+  <rect x="2" y="304" width="996" height="76" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="18" y="328" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Both halves of this rate are chosen so it cannot be understated.</text>
+  <text x="18" y="350" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">The numerator counts BOTH layers, so the 34 member-months reduced only at the bonus layer are in it.</text>
+  <text x="18" y="368" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">The denominator counts only member-months that can be reduced, so the 360 carrying no volume are out of it. The rate is one in four.</text>
 </svg>
-<figcaption><span class="fignum">Figure 7</span>The ceiling in the modelled March at the rates of record. Worst-affected member loses 324.14. The worst ratio is 21 percent of that member's claims.</figcaption>
+<figcaption><span class="fignum">Figure 9</span>How often the ceiling bites, on the denominator that can actually bind.</figcaption>
 </figure>
 
-<p>An earlier draft of this plan predicted proration would be "rare and junior". The measurement
-kept "junior" and retired "rare". The word was changed rather than defended.</p>
+<figure>
+<svg viewBox="0 0 1000 400" role="img" aria-label="Figure 10. The worst haircut measured three ways: 21 percent of total claims, 34.5 percent of the claims the ceiling can reach, and five members who lost 100 percent of their structure claims.">
+  <rect x="0" y="0" width="1000" height="400" fill="#FFFFFF"></rect>
 
-<div class="callout rule">
+  <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">How deep. The same haircut, against three different denominators.</text>
+
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="2" y="34" width="996" height="62" fill="#F8FAFC" stroke="#334155" stroke-width="1.5"></rect>
+    <text x="18" y="58" font-size="14.5" font-weight="700" fill="#0F172A">21.0 percent</text>
+    <text x="150" y="58" font-size="14" fill="#334155">19.24 shaved of that member's 91.80 of TOTAL claims.</text>
+    <text x="18" y="82" font-size="13.5" fill="#5B6472">The flattering reading, because this denominator contains the spine, and the spine can never be reduced.</text>
+
+    <rect x="2" y="106" width="996" height="62" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+    <text x="18" y="130" font-size="14.5" font-weight="700" fill="#0F172A">34.5 percent</text>
+    <text x="150" y="130" font-size="14" fill="#334155">The same 19.24, against the 55.80 of STRUCTURE claims the ceiling can actually reach.</text>
+    <text x="18" y="154" font-size="13.5" font-weight="700" fill="#0F172A">The honest figure, because it measures what was lost against what was actually at risk.</text>
+
+    <rect x="2" y="178" width="996" height="62" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
+    <text x="18" y="202" font-size="14.5" font-weight="700" fill="#0F172A">100 percent</text>
+    <text x="150" y="202" font-size="14" fill="#334155">FIVE members lost their entire structure claim, sums between 1.60 and 5.52, reduced entirely away.</text>
+    <text x="18" y="226" font-size="13.5" font-weight="700" fill="#0F172A">The true worst case, and it is not a ratio at all. A different, smaller set of members than the rows above.</text>
+  </g>
+
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="2" y="256" width="490" height="60" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="18" y="280" font-size="14" fill="#334155">Largest amount taken off any one member</text>
+    <text x="18" y="304" font-size="20" font-weight="700" fill="#0F172A">324.14</text>
+    <rect x="508" y="256" width="490" height="60" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5"></rect>
+    <text x="524" y="280" font-size="14" fill="#334155">Members carrying at least one reduced line</text>
+    <text x="524" y="304" font-size="20" font-weight="700" fill="#0F172A">35 of 207 paid, about 17 percent</text>
+  </g>
+
+  <rect x="2" y="330" width="996" height="66" fill="#CFFAFE" stroke="#0E7490" stroke-width="2"></rect>
+  <text x="18" y="354" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Total taken: 943.68, being 638.00 from layer 2 and 305.68 from layer 3, against 17,417.12 paid. About 5.4 percent of the run.</text>
+  <text x="18" y="378" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Every cent comes off layers 2 and 3. The spine is structurally untouchable, so no member's live-plan-equivalent pay is ever reduced.</text>
+</svg>
+<figcaption><span class="fignum">Figure 10</span>How deep. An earlier draft predicted proration would be "rare and junior". The measurement kept "junior" and retired "rare", and the word was changed rather than defended.</figcaption>
+</figure>
+
+<div class="callout-note">
   <p class="ct">The statement rule, which is part of the plan</p>
-  <p>A reduced line is not recomputable by the person receiving it. It depends on other people's
-  claims against shared orders, order by order, at six decimal places. One real example: a member's
-  bonus line shows rate 2.0 percent and basis 120.00. Rate times basis is 2.40. The line pays 0.17,
-  a 93 percent reduction, with nothing on the statement to explain it.</p>
+  <p>A reduced line is not recomputable by the person receiving it: it depends on other people's
+  claims against shared member-months, at six decimal places. One real example: a bonus line shows
+  rate 2.0 percent and basis 120.00, so rate times basis is 2.40, and the line pays <strong>0.17,
+  a 93 percent cut</strong>, with nothing on the statement to explain it.</p>
   <p>So the plan requires, as normative text with a release-gate condition attached, that
-  <strong>every reduced line prints the amount claimed, the amount paid, and a one-line reason.</strong>
-  A shrunken number a member cannot recompute is survivable only when the statement shows the claim,
-  the payment, and the why.</p>
+  <strong>every reduced line prints the amount claimed, the amount paid, and a one-line reason.</strong></p>
 </div>
 
-<!-- 8 -->
-<h3>8. What we attacked, and what it paid back</h3>
+<!-- 9 : attacks -->
+<h3>9. What we attacked, and what it paid back</h3>
 
 <p>Every attack below was <strong>run in the engine</strong> at the rates of record, not argued on
 paper.</p>
 
 <h4>Splitting recruits across more legs to chase the rate step</h4>
-<p>The same six recruits, the same 700.00 of Sales Volume, three arrangements.</p>
 
+<div class="table-frame">
 <table>
+  <caption>Same six recruits, same 700.00 of Sales Volume, three arrangements</caption>
   <thead>
     <tr><th>Arrangement</th><th class="num">Level pay</th><th class="num">Overrides</th><th class="num">Bonus</th><th class="num">Attacker total</th><th class="num">Paid to the field</th></tr>
   </thead>
@@ -1023,12 +955,13 @@ paper.</p>
     <tr><td>All six flat on the frontline</td><td class="num">48.00</td><td class="num">0.00</td><td class="num">2.00 at 2.5 percent</td><td class="num">50.00</td><td class="num">50.00</td></tr>
   </tbody>
 </table>
+</div>
 
 <p>The bonus <strong>falls</strong> as the step rises, because dilution beats the step at every
 count: fixed downline volume V across two equal legs pays 0.0100 x V, across three 0.0077 x V,
 across four 0.0063 x V. Splitting also forfeits overrides entirely.</p>
 
-<div class="callout">
+<div class="callout-risk">
   <p class="ct">The uncomfortable finding from the same test, published rather than buried</p>
   <p>The attacker's own best outcome is the flat, undeveloped shape at 50.00, because the 10 percent
   frontline rate beats every development rate in the plan. The plan pays the <strong>field</strong>
@@ -1041,14 +974,13 @@ across four 0.0063 x V. Splitting also forfeits overrides entirely.</p>
 <p>Base: legs of 240.00 and 120.00, bonus 2.40, total 38.40. Cut the strongest frontline from 300.00
 to 100.00 Sales Volume: legs become 80.00 and 120.00, the second-ranked value <strong>falls</strong>
 to 80.00, bonus falls to 1.60, level pay falls from 36.00 to 20.00, total falls to 21.60. Removing
-volume from any leg can never raise the second-largest value, and nothing carries over, so volume
-withheld is pay lost permanently.</p>
+volume from any leg can never raise the second-largest value, and nothing carries over.</p>
 
-<h4>Funding a fake Builder</h4>
+<h4>Funding a fake Builder, and the bound on self-funding</h4>
 
 <figure>
-<svg viewBox="0 0 1000 326" role="img" aria-label="Figure 8. Funding a fake Builder costs 300.00 a month and returns 21.20 a month, which is 7.07 cents on the dollar, a 92.9 percent monthly loss.">
-  <rect x="0" y="0" width="1000" height="326" fill="#FFFFFF"></rect>
+<svg viewBox="0 0 1000 424" role="img" aria-label="Figure 11. Funding a fake Builder costs 300.00 a month and returns 21.20, which is 7.07 cents on the dollar. The 20-cent bound applies only to commission generated by the self-funded volume itself, not to a purchase that unlocks pay on other people's volume, and not to the Instant Payout case which returns 28 cents on the dollar.">
+  <rect x="0" y="0" width="1000" height="424" fill="#FFFFFF"></rect>
 
   <text x="2" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#334155">Builder needs two active legs, so a puppet Builder needs two more accounts at 100.00 Sales Volume.</text>
 
@@ -1062,68 +994,68 @@ withheld is pay lost permanently.</p>
 
   <text x="282" y="150" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#5B6472">Pay before 8.00. After: level pay 24.00, generation one override 0.015 x 240.00 = 3.60, bonus 1.60, total 29.20.</text>
 
-  <rect x="2" y="168" width="486" height="80" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
-  <text x="18" y="204" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#0F172A">7.07 cents per attack dollar</text>
-  <text x="18" y="230" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" fill="#334155">A 92.9 percent loss, every month, forever.</text>
+  <rect x="2" y="168" width="490" height="60" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
+  <text x="18" y="196" font-family="Segoe UI,Arial,sans-serif" font-size="24" font-weight="700" fill="#0F172A">7.07 cents per attack dollar</text>
+  <text x="18" y="218" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" fill="#334155">A 92.9 percent loss, every month, forever.</text>
 
-  <rect x="510" y="168" width="488" height="80" fill="#F8FAFC" stroke="#0F172A" stroke-width="2"></rect>
-  <text x="526" y="190" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">The structural floor under every self-funded attack</text>
-  <text x="526" y="210" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">No plan funded under a 20 percent revenue ceiling can</text>
-  <text x="526" y="227" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">return more than 20 cents on a self-funded dollar.</text>
-  <text x="526" y="244" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155">Every self-funding attack loses 80 percent or more.</text>
+  <rect x="508" y="168" width="490" height="60" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
+  <text x="524" y="196" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#0F172A">An artificial second leg: 98 percent loss</text>
+  <text x="524" y="218" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" fill="#334155">100.00 a month to return at most 0.025 x 80.00 = 2.00.</text>
 
-  <rect x="2" y="262" width="996" height="56" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"></rect>
-  <text x="18" y="286" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Funding an artificial second leg is the same trade: 100.00 a month to return at most 0.025 x 80.00 = 2.00, a 98 percent monthly loss.</text>
-  <text x="18" y="306" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#0F172A">Decay makes the puppet a subscription rather than a purchase.</text>
+  <rect x="2" y="242" width="996" height="176" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="18" y="266" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">The floor under these attacks is structural, and it has to be stated precisely, because the general form of it is false.</text>
+  <text x="18" y="292" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#166534">TRUE, for commission generated BY the self-funded volume itself:</text>
+  <text x="18" y="310" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">no plan funded under a 20 percent revenue ceiling can return more than 20 cents on a self-funded dollar, so an attack of that</text>
+  <text x="18" y="328" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">kind loses at least 80 percent. The fake Builder above loses 93 percent and the artificial leg loses 98 percent.</text>
+  <text x="18" y="354" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#B91C1C">WHAT THAT BOUND DOES NOT COVER. It bounds one channel; it is not a law of the plan:</text>
+  <text x="18" y="372" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Self-funded volume bought to UNLOCK pay on other people's volume. The 100.00 qualification gate is exactly that: a member's own</text>
+  <text x="18" y="390" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">100.00 purchase is what makes them eligible to collect level pay on their team. And once Instant Payout is built, a self-funded</text>
+  <text x="18" y="408" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">first order of 150.00 returns 42.00, which is 28 cents on the dollar, above 20. The 20-cent figure bounds one channel, not the plan.</text>
 </svg>
-<figcaption><span class="fignum">Figure 8</span>The economics of the cheapest available attack, run in the engine at the rates of record.</figcaption>
+<figcaption><span class="fignum">Figure 11</span>The cheapest available attacks, and the honest scope of the bound underneath them. Decay makes a puppet a subscription rather than a purchase, which is why the loss repeats every month.</figcaption>
 </figure>
 
 <h4>Buying rank and income with your own money</h4>
 <p>One member, Sales Volume 10,000.00, no downline. <strong>Total earned 0.00. Rank: Member.</strong>
-Own purchases buy qualification, the standard low gate, and nothing else. Builder requires two
-active legs, meaning two other people each reaching 100.00 Sales Volume that month. Leader and above
-require Team Volume, which excludes your own. And a 2,000.00 one-time order is recognised as 200
-Personal Volume a month for ten months rather than 2,000 at once, so it cannot spike a month to grab
-a rank.</p>
+Builder requires two active legs, meaning two other people each reaching 100.00 Sales Volume that
+month. Leader and above require Team Volume, which excludes your own. And a 2,000.00 one-time order
+is recognised as 200 Personal Volume a month for ten months rather than 2,000 at once, so it cannot
+spike a month to grab a rank.</p>
 
 <h4>Waterfall arbitrage: none</h4>
-<p>Claims attach to orders by tree position, never by an earner's choice, so nobody can route a claim
-toward a richer pool. Proration factors are per-order facts, not a negotiable order of
+<p>Claims attach to member-months by tree position, never by an earner's choice, so nobody can route
+a claim toward a richer pool. Proration factors are per-source facts, not a negotiable order of
 operations.</p>
 
 <h4>Regulatory smell test, checked against engine output rather than prose</h4>
-<p>On a full 1,001-member run: exactly four kinds of commission line exist and every one is computed
-from Commissionable Volume, which is product dollars. No line, rate or parameter anywhere pays on a
-count of recruits, enrollments or sign-ups. Zero lines pay anybody on their own volume as the
-source. Zero lines have a missing or non-positive basis. Zero orders exceeded the 20 percent ceiling
-in any run made, including every fixture built specifically to break it.</p>
+<p>On the full 1,001-member-month run: exactly four kinds of commission line exist and every one is
+computed from Commissionable Volume, which is product dollars. No line, rate or parameter anywhere
+pays on a count of recruits, enrollments or sign-ups. Zero lines pay anybody on their own volume as
+the source. Zero lines have a missing or non-positive basis. Zero member-months exceeded the 20
+percent ceiling in any run made, including every fixture built specifically to break it.</p>
 
-<div class="callout good">
+<div class="callout-good">
   <p class="ct">What survives after every attack fails</p>
-  <p>The intended behaviour: qualify yourself, keep two or more real legs active, develop Builders,
-  and help them stay qualified, because decay re-prices all of it monthly. <strong>The best exploit
-  anybody found is doing the work.</strong></p>
+  <p>Qualify yourself, keep two or more real legs active, develop Builders, and help them stay
+  qualified, because decay re-prices all of it monthly. <strong>The best exploit anybody found is
+  doing the work.</strong></p>
 </div>
 
-<!-- 9 -->
-<h3>9. What it costs, and the drift, plotted rather than discovered</h3>
+<!-- 10 : cost and drift -->
+<h3>10. What it costs, and the drift, plotted rather than discovered</h3>
 
-<p>The live plan pays 14.6085 percent of Commissionable Volume on the modelled March. This plan pays
+<p>The live plan pays 14.6085 percent of Commissionable Volume on the modelled March; this plan pays
 18.9399 percent on the same month. Those two figures are printed side by side everywhere this plan
-is discussed, and the phrase "size held equal" is banned from every surface, because it would not be
+is discussed, and the phrase "size held equal" is banned from every surface because it would not be
 true. The cost also <strong>rises</strong> as a field matures, because a more developed field
 produces more Builders and more balanced legs, which is the entire point.</p>
 
 <figure>
-<svg viewBox="0 0 1000 440" role="img" aria-label="Figure 9. Payout as a percent of Commissionable Volume across six modelled months, rising from 18.5594 in February to 19.6812 in July, against a live plan reference of 14.6085 and a hard arithmetic ceiling of 25 percent.">
+<svg viewBox="0 0 1000 440" role="img" aria-label="Figure 12. Payout as a percent of Commissionable Volume across six modelled months, rising from 18.5594 in February to 19.6812 in July, against a live plan reference of 14.6085 and a hard arithmetic ceiling of 25 percent.">
   <rect x="0" y="0" width="1000" height="440" fill="#FFFFFF"></rect>
-
-  <!-- axes -->
   <line x1="120" y1="60" x2="120" y2="360" stroke="#0F172A" stroke-width="2"></line>
   <line x1="120" y1="360" x2="940" y2="360" stroke="#0F172A" stroke-width="2"></line>
 
-  <!-- y gridlines every 2 points from 14 to 26 -->
   <g font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#5B6472">
     <line x1="120" y1="310" x2="940" y2="310" stroke="#E2E8F0" stroke-width="1"></line><text x="112" y="315" text-anchor="end">16%</text>
     <line x1="120" y1="260" x2="940" y2="260" stroke="#E2E8F0" stroke-width="1"></line><text x="112" y="265" text-anchor="end">18%</text>
@@ -1133,53 +1065,36 @@ produces more Builders and more balanced legs, which is the entire point.</p>
     <text x="112" y="365" text-anchor="end">14%</text>
   </g>
 
-  <!-- ceiling at 25 -> y=85 -->
   <line x1="120" y1="85" x2="940" y2="85" stroke="#B91C1C" stroke-width="2.5"></line>
   <text x="128" y="78" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#B91C1C">25 percent: the arithmetic ceiling, unreachable by construction</text>
-
-  <!-- live plan at 14.6085 -> y=344.8 -->
   <line x1="120" y1="344.8" x2="940" y2="344.8" stroke="#0E7490" stroke-width="2.5" stroke-dasharray="8 5"></line>
   <text x="128" y="338" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0E7490">14.6085 percent: the live plan on modelled March</text>
 
-  <!-- data line : x from 190 to 890, step 140 -->
-  <polyline points="190,246.02 330,236.50 470,231.94 610,223.97 750,221.42 890,217.97"
-            fill="none" stroke="#3730A3" stroke-width="3.5"></polyline>
+  <polyline points="190,246.02 330,236.50 470,231.94 610,223.97 750,221.42 890,217.97" fill="none" stroke="#3730A3" stroke-width="3.5"></polyline>
   <g fill="#3730A3">
-    <circle cx="190" cy="246.02" r="6"></circle>
-    <circle cx="330" cy="236.50" r="6"></circle>
-    <circle cx="470" cy="231.94" r="6"></circle>
-    <circle cx="610" cy="223.97" r="6"></circle>
-    <circle cx="750" cy="221.42" r="6"></circle>
-    <circle cx="890" cy="217.97" r="6"></circle>
+    <circle cx="190" cy="246.02" r="6"></circle><circle cx="330" cy="236.50" r="6"></circle>
+    <circle cx="470" cy="231.94" r="6"></circle><circle cx="610" cy="223.97" r="6"></circle>
+    <circle cx="750" cy="221.42" r="6"></circle><circle cx="890" cy="217.97" r="6"></circle>
   </g>
   <g font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" fill="#0F172A" text-anchor="middle">
-    <text x="190" y="234">18.5594</text>
-    <text x="330" y="224">18.9399</text>
-    <text x="470" y="220">19.1224</text>
-    <text x="610" y="212">19.4412</text>
-    <text x="750" y="209">19.5434</text>
-    <text x="890" y="206">19.6812</text>
+    <text x="190" y="234">18.5594</text><text x="330" y="224">18.9399</text><text x="470" y="220">19.1224</text>
+    <text x="610" y="212">19.4412</text><text x="750" y="209">19.5434</text><text x="890" y="206">19.6812</text>
   </g>
   <g font-family="Segoe UI,Arial,sans-serif" font-size="13.5" fill="#334155" text-anchor="middle">
-    <text x="190" y="382">Feb 2026</text>
-    <text x="330" y="382">Mar 2026</text>
-    <text x="470" y="382">Apr 2026</text>
-    <text x="610" y="382">May 2026</text>
-    <text x="750" y="382">Jun 2026</text>
-    <text x="890" y="382">Jul 2026</text>
+    <text x="190" y="382">Feb 2026</text><text x="330" y="382">Mar 2026</text><text x="470" y="382">Apr 2026</text>
+    <text x="610" y="382">May 2026</text><text x="750" y="382">Jun 2026</text><text x="890" y="382">Jul 2026</text>
   </g>
   <text x="2" y="30" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#0F172A">Payout as a percent of Commissionable Volume, six modelled months</text>
   <text x="2" y="408" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">1.12 points of drift across five month-steps, about 0.22 points a month at this maturity.</text>
-  <text x="2" y="428" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">No month, however mature, can pass 25 percent of Commissionable Volume, because the ceiling is enforced per order.</text>
+  <text x="2" y="428" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">No month, however mature, can pass 25 percent of Commissionable Volume, because the ceiling is enforced on every member-month.</text>
 </svg>
-<figcaption><span class="fignum">Figure 9</span>The drift curve. The classic failure this describes, a plan discovered at 45 percent payout in year three and emergency-amended with the field's trust as the price, is arithmetically unreachable here.</figcaption>
+<figcaption><span class="fignum">Figure 12</span>The drift curve. The classic failure this describes, a plan discovered at 45 percent payout in year three and emergency-amended with the field's trust as the price, is arithmetically unreachable here. The drift comes out of the gap between what the plan pays today and the ceiling the price already carries, so what a maturing field shrinks is the company's unpaid remainder, never the margin the product was priced against.</figcaption>
 </figure>
 
+<div class="table-frame">
 <table>
   <caption>The six modelled months in full</caption>
-  <thead>
-    <tr><th>Month, modelled</th><th class="num">Commissionable Volume</th><th class="num">Payout</th><th class="num">Percent of Commissionable Volume</th><th class="num">Members paid</th></tr>
-  </thead>
+  <thead><tr><th>Month, modelled</th><th class="num">Commissionable Volume</th><th class="num">Payout</th><th class="num">Percent of Commissionable Volume</th><th class="num">Members paid</th></tr></thead>
   <tbody>
     <tr><td>February 2026</td><td class="num">83,560.00</td><td class="num">15,508.27</td><td class="num">18.5594</td><td class="num">180</td></tr>
     <tr><td>March 2026</td><td class="num">91,960.00</td><td class="num">17,417.12</td><td class="num">18.9399</td><td class="num">207</td></tr>
@@ -1189,78 +1104,16 @@ produces more Builders and more balanced legs, which is the entire point.</p>
     <tr><td>July 2026</td><td class="num">138,040.00</td><td class="num">27,167.87</td><td class="num">19.6812</td><td class="num">285</td></tr>
   </tbody>
 </table>
-
-<p><strong>Where the drift comes from also matters.</strong> It comes out of the gap between the
-14.6 percent the plan actually pays today and the 25 point ceiling the price already carries. What a
-maturing field shrinks is the company's unpaid remainder, never the margin the product was priced
-against.</p>
+</div>
 
 <h4>How the plan compares to four other plan families</h4>
-<p>Same recorded month, same members, all computed in the same laboratory.</p>
+<p>Same recorded month, same members, all computed in the same laboratory. This comparison is
+printed in the open, never behind a control a reader has to click.</p>
 
-<figure>
-<svg viewBox="0 0 1000 380" role="img" aria-label="Figure 10. Five plan families compared on the same month. Payout as a percent of Commissionable Volume on the left, members paid on the right. The Builder plan pays 18.9399 percent to 207 members. Stairstep breakaway pays 22.8639 percent to 448 members.">
-  <rect x="0" y="0" width="1000" height="380" fill="#FFFFFF"></rect>
-
-  <text x="270" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">Percent of Commissionable Volume paid out</text>
-  <text x="700" y="20" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#0F172A">Members paid, of 1,001</text>
-
-  <g font-family="Segoe UI,Arial,sans-serif" font-size="13.5">
-    <!-- row 1 : unilevel live -->
-    <text x="258" y="52" fill="#0F172A" text-anchor="end">Unilevel v1.3, the live plan</text>
-    <rect x="268" y="34" width="234" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="510" y="52" fill="#0F172A" font-weight="700">14.6085</text>
-    <rect x="700" y="34" width="107" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="815" y="52" fill="#0F172A" font-weight="700">206</text>
-
-    <!-- row 2 : matrix -->
-    <text x="258" y="102" fill="#0F172A" text-anchor="end">Matrix, three wide by seven deep</text>
-    <rect x="268" y="84" width="262" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="538" y="102" fill="#0F172A" font-weight="700">16.3541</text>
-    <rect x="700" y="84" width="123" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="831" y="102" fill="#0F172A" font-weight="700">237</text>
-
-    <!-- row 3 : binary spillover -->
-    <text x="258" y="152" fill="#0F172A" text-anchor="end">Binary, spillover placement</text>
-    <rect x="268" y="134" width="263" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="539" y="152" fill="#0F172A" font-weight="700">16.4522</text>
-    <rect x="700" y="134" width="86" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="794" y="152" fill="#0F172A" font-weight="700">166</text>
-
-    <!-- row 4 : binary balanced -->
-    <text x="258" y="202" fill="#0F172A" text-anchor="end">Binary, volume-balanced placement</text>
-    <rect x="268" y="184" width="280" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="556" y="202" fill="#0F172A" font-weight="700">17.4898</text>
-    <rect x="700" y="184" width="75" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="783" y="202" fill="#0F172A" font-weight="700">145</text>
-
-    <!-- row 5 : the builder plan -->
-    <text x="258" y="252" fill="#0F172A" text-anchor="end" font-weight="700">The Builder plan</text>
-    <rect x="268" y="234" width="303" height="24" fill="#3730A3" stroke="#0F172A" stroke-width="1.5"></rect>
-    <text x="579" y="252" fill="#0F172A" font-weight="700">18.9399</text>
-    <rect x="700" y="234" width="107" height="24" fill="#3730A3" stroke="#0F172A" stroke-width="1.5"></rect>
-    <text x="815" y="252" fill="#0F172A" font-weight="700">207</text>
-
-    <!-- row 6 : breakaway -->
-    <text x="258" y="302" fill="#0F172A" text-anchor="end">Stairstep breakaway</text>
-    <rect x="268" y="284" width="366" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="642" y="302" fill="#0F172A" font-weight="700">22.8639</text>
-    <rect x="700" y="284" width="233" height="24" fill="#94A3B8" stroke="#334155" stroke-width="1"></rect>
-    <text x="941" y="302" fill="#0F172A" font-weight="700">448</text>
-  </g>
-
-  <rect x="0" y="326" width="1000" height="48" fill="#FEE2E2" stroke="#B91C1C" stroke-width="2"></rect>
-  <text x="16" y="348" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">The Builder plan costs more than the live plan and pays one more person. Breakaway pays more than twice as many people, at a higher cost.</text>
-  <text x="16" y="366" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Gini: live 0.9625, Builder 0.9687, breakaway 0.9330. Top ten percent share: live 94.25, Builder 95.33, breakaway 89.12.</text>
-</svg>
-<figcaption><span class="fignum">Figure 10</span>Five plan families on the same recorded month, same members, same laboratory. Bar scales differ between the two columns and each bar is labelled with its exact value.</figcaption>
-</figure>
-
+<div class="table-frame">
 <table>
-  <caption>The same comparison, with the concentration measures</caption>
-  <thead>
-    <tr><th>Plan family modelled</th><th class="num">Payout</th><th class="num">Percent of Commissionable Volume</th><th class="num">Members paid</th><th class="num">Gini</th><th class="num">Top ten percent share</th></tr>
-  </thead>
+  <caption>Five plan families on one month</caption>
+  <thead><tr><th>Plan family modelled</th><th class="num">Payout</th><th class="num">Percent of Commissionable Volume</th><th class="num">Members paid</th><th class="num">Gini</th><th class="num">Top ten percent share</th></tr></thead>
   <tbody>
     <tr><td>Unilevel version 1.3, the live plan</td><td class="num">13,434.00</td><td class="num">14.6085</td><td class="num">206</td><td class="num">0.9625</td><td class="num">94.25</td></tr>
     <tr><td>Matrix, three wide by seven deep</td><td class="num">15,039.20</td><td class="num">16.3541</td><td class="num">237</td><td class="num">0.9418</td><td class="num">91.41</td></tr>
@@ -1270,88 +1123,96 @@ against.</p>
     <tr><td>Stairstep breakaway</td><td class="num">21,025.60</td><td class="num">22.8639</td><td class="num">448</td><td class="num">0.9330</td><td class="num">89.12</td></tr>
   </tbody>
 </table>
-
-<!-- 10 -->
-<h3>10. The calibration, including the part that missed</h3>
-
-<p>The rates were not chosen by taste. A budget was set first: the two new layers should land between
-2.0 and 4.0 points of Commissionable Volume above the live plan's 14.6085 on a stated month. The
-draft rates were then measured against it and scaled once by a stated rule.</p>
-
-<div class="kstrip three">
-  <div class="k"><div class="kv">21.9712%</div><div class="kl">What the draft rates of 4, 2 and 5 percent paid. An increment of 7.3627 points, far outside the budget.</div></div>
-  <div class="k"><div class="kv">x 0.4075</div><div class="kl">The one-shot rule: a single common factor of 3.0 / 7.3627, giving 1.5, 1.0 and 2.0 percent, each rounded to the nearest half of a tenth of a percent.</div></div>
-  <div class="k"><div class="kv">18.9399%</div><div class="kl">The calibrated result. An increment of 4.3314 points, which is 0.33 of a point ABOVE the budget's ceiling.</div></div>
 </div>
 
-<p>The miss has a cause worth naming: proration relief is not linear. As rates shrink, fewer orders
-reach their cap, with orders carrying a binding override factor falling from 333 to 120, so the
-payout shrinks more slowly than the rates do.</p>
+<!-- 11 : calibration -->
+<h3>11. The calibration, including the part that missed</h3>
 
-<div class="callout rule">
-  <p class="ct">That residue was accepted and displayed rather than tuned away</p>
-  <p>Iterating the rates to convergence would have been solving a fixed point against the ceiling's
-  own proration, which is fitting a number rather than measuring one. The budget was a budget, not a
+<p>The rates were not chosen by taste. A budget was set first: the two new layers should land
+between 2.0 and 4.0 points of Commissionable Volume above the live plan's 14.6085. The draft rates
+were measured against it and scaled once by a stated rule.</p>
+
+<div class="statgrid">
+  <div class="s"><div class="sv">21.9712%</div><div class="sl">What the draft rates of 4, 2 and 5 percent paid. An increment of 7.3627 points, far outside the budget.</div></div>
+  <div class="s"><div class="sv">x 0.4075</div><div class="sl">The one-shot rule: a single common factor of 3.0 / 7.3627, giving 1.5, 1.0 and 2.0 percent, each rounded to the nearest half of a tenth of a percent.</div></div>
+  <div class="s"><div class="sv">18.9399%</div><div class="sl">The calibrated result. An increment of 4.3314 points, which is 0.33 of a point ABOVE the budget's ceiling.</div></div>
+</div>
+
+<p>The miss has a cause worth naming: proration relief is not linear. As rates shrink, fewer
+member-months reach their cap, with those carrying a binding override factor falling from 333 to
+120, so the payout shrinks more slowly than the rates do.</p>
+
+<div class="callout-note">
+  <p class="ct">The residue was accepted and displayed rather than tuned away</p>
+  <p>Iterating to convergence would have been solving a fixed point against the ceiling's own
+  proration, which is fitting a number rather than measuring one. The budget was a budget, not a
   law, and the miss is printed here for the same reason the inversion is.</p>
-</div>
-
-<p>Two more things the calibration produced, both published:</p>
-<ul>
-  <li><strong>A prediction of ours was falsified and corrected.</strong> The specification expected
-  the real population to be sparser in nested Builders than the small teaching fixture, so the
-  increment should have landed lower. It landed far higher. The sentence was corrected to the
-  measured truth rather than defended.</li>
-  <li><strong>A counter-intuitive redistribution.</strong> Shrinking the senior rates made the junior
+  <p><strong>A prediction of ours was falsified.</strong> The specification expected the real
+  population to be sparser in nested Builders than the small teaching fixture, so the increment
+  should have landed lower. It landed far higher, and the sentence was corrected to the measured
+  truth rather than defended.</p>
+  <p><strong>A counter-intuitive redistribution.</strong> Shrinking the senior rates made the junior
   layer's total pay rise, from 287.78 to 367.49, because smaller senior claims leave the junior class
-  more room under the ceiling. That was verified independently as pure waterfall arithmetic, not a
-  defect.</li>
-</ul>
-
-<!-- 11 -->
-<h3>11. How this was checked before anybody saw it</h3>
-
-<p>The plan was not presentable until three independent gates passed it, each equal in standing.</p>
-
-<div class="panel">
-  <p class="panel-title">Arithmetic gate: pass</p>
-  <p>An independent implementation recomputed the entire 1,001-member month from raw data with its
-  own level map, its own ranks, its own group volumes, its own override walk, its own leg ranking,
-  its own per-order claims and its own truncated factors, and matched the engine on every line in
-  both directions: zero differences on level pay, zero on overrides, zero on bonuses, zero invariant
-  violations across 1,001 orders, and the same total of 17,417.12 to the cent. Zero high-severity
-  findings. That gate also built three hostile cases of its own design, including the
-  repeating-decimal factor and the fully exhausted pool described in section 6, and the ceiling held
-  in all three.</p>
+  more room under the ceiling. Verified independently as pure waterfall arithmetic, not a defect.</p>
 </div>
 
-<div class="panel">
-  <p class="panel-title">Quality gate: pass</p>
-  <p style="margin:0;">Passed.</p>
-</div>
+<!-- 12 : gates -->
+<h3>12. How this was checked before anybody saw it</h3>
 
-<div class="panel panel-amber">
-  <p class="panel-title">Red-team gate: initially NOT PRESENTABLE, then pass</p>
-  <p>A reviewer briefed as a veteran compensation consultant and told to make the plan fail before
-  anybody saw it ran eight lines of attack in the live engine. Seven held. One broke a claim the plan
-  document made, which is the inversion in section 5 above. The reviewer also caught the document
-  quoting rates its own parameter table had superseded, and required three number-pairings for any
-  presentation, which this brief follows.</p>
-  <p style="margin:0;">The plan was amended the same day, the reviewer re-inspected item by item
-  against their own required list, and the gate flipped to pass.</p>
-</div>
+<figure>
+<svg viewBox="0 0 1000 300" role="img" aria-label="Figure 13. Three independent gates. The arithmetic gate passed, the quality gate passed, and the red-team gate first ruled the plan not presentable before flipping to pass after amendment.">
+  <rect x="0" y="0" width="1000" height="300" fill="#FFFFFF"></rect>
 
-<p>Two further properties on the record. Two independent implementations of this plan must agree to
-the cent, and they do. And the same month computed twice produces the same ordered set of lines and
-the same digest.</p>
+  <rect x="2" y="6" width="324" height="30" fill="#166534"></rect>
+  <text x="164" y="27" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.4">ARITHMETIC GATE: PASS</text>
+  <rect x="2" y="36" width="324" height="150" fill="#F8FAFC" stroke="#166534" stroke-width="2"></rect>
+  <text x="16" y="60" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">An independent implementation recomputed</text>
+  <text x="16" y="78" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">the entire month from raw data with its own</text>
+  <text x="16" y="96" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">level map, ranks, group volumes, override</text>
+  <text x="16" y="114" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">walk, leg ranking and truncated factors.</text>
+  <text x="16" y="138" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" font-weight="700" fill="#0F172A">Zero differences in both directions.</text>
+  <text x="16" y="158" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Same total, 17,417.12, to the cent. Zero</text>
+  <text x="16" y="176" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">high-severity findings.</text>
 
-<!-- 12 -->
-<h3>12. What is genuinely still open</h3>
+  <rect x="338" y="6" width="324" height="30" fill="#166534"></rect>
+  <text x="500" y="27" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.4">QUALITY GATE: PASS</text>
+  <rect x="338" y="36" width="324" height="150" fill="#F8FAFC" stroke="#166534" stroke-width="2"></rect>
+  <text x="352" y="60" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Both artifacts driven in a browser rather</text>
+  <text x="352" y="78" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">than read as source, then printed.</text>
+  <text x="352" y="102" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Contrast recomputed rather than trusted.</text>
+  <text x="352" y="120" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Every figure's text checked against its own</text>
+  <text x="352" y="138" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">frame, and every block against its own box.</text>
+  <text x="352" y="162" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Readable in black and white; nothing rests</text>
+  <text x="352" y="180" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">on colour alone.</text>
 
+  <rect x="674" y="6" width="324" height="30" fill="#92400E"></rect>
+  <text x="836" y="27" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.4">RED-TEAM GATE</text>
+  <rect x="674" y="36" width="324" height="150" fill="#FFFBEB" stroke="#92400E" stroke-width="2"></rect>
+  <text x="688" y="60" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" font-weight="700" fill="#B91C1C">First ruling: NOT PRESENTABLE.</text>
+  <text x="688" y="82" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">A reviewer briefed as a veteran consultant</text>
+  <text x="688" y="100" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">ran eight lines of attack in the live engine.</text>
+  <text x="688" y="118" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Seven held. One broke a claim the document</text>
+  <text x="688" y="136" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">made: the inversion in section 6.</text>
+  <text x="688" y="160" font-family="Segoe UI,Arial,sans-serif" font-size="13" fill="#334155">Amended the same day, re-inspected item by</text>
+  <text x="688" y="178" font-family="Segoe UI,Arial,sans-serif" font-size="13.5" font-weight="700" fill="#166534">item, and the gate flipped to PASS.</text>
+
+  <rect x="2" y="200" width="996" height="70" fill="#EEF2FF" stroke="#4F46E5" stroke-width="2"></rect>
+  <text x="18" y="226" font-family="Segoe UI,Arial,sans-serif" font-size="14.5" font-weight="700" fill="#0F172A">Two further properties on the record.</text>
+  <text x="18" y="248" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">Two independent implementations of this plan must agree to the cent, and they do.</text>
+  <text x="18" y="264" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#334155">The same month computed twice produces the same ordered set of lines and the same digest.</text>
+</svg>
+<figcaption><span class="fignum">Figure 13</span>Three independent gates, each equal in standing. The reviewer also caught the plan document quoting rates its own parameter table had superseded, and required three number-pairings for any presentation, which this brief follows.</figcaption>
+</figure>
+
+<!-- 13 : open -->
+<h3>13. What is genuinely still open</h3>
+
+<div class="table-frame">
 <table>
   <thead><tr><th style="width:30%;">Open</th><th>Where it stands</th></tr></thead>
   <tbody>
     <tr><td><strong>Whether this plan runs at all</strong></td><td>It is modelled. It has never been live. Nothing here becomes real without a published effective month.</td></tr>
-    <tr><td><strong>A one-month grace for Builder status</strong></td><td>Today: no grace, everything strictly monthly, matching the live plan's ranks. The reviewer concurs with no grace and noted that grace would blunt the near-upline's incentive to help while doing nothing about the inversion, which lives in the ceiling rather than the rank. To be re-decided with both exhibits in hand.</td></tr>
+    <tr><td><strong>A one-month grace for Builder status</strong></td><td>Today: no grace, everything strictly monthly, matching the live plan's ranks. The reviewer concurs with no grace and noted that grace would blunt the near-upline's incentive to help while doing nothing about the inversion, which lives in the ceiling rather than the rank.</td></tr>
     <tr><td><strong>The rates</strong></td><td>1.5, 1.0 and 2.0 percent are the calibrated figures of record from one pass. They are parameters, recorded with every run.</td></tr>
     <tr><td><strong>The budget</strong></td><td>The 2.0 to 4.0 point window was a target, and the result sits 0.33 above it, accepted and displayed. Confirming or replacing that budget is an open decision.</td></tr>
     <tr><td><strong>Whether an override earner must be a Builder themselves</strong></td><td>Today: no, qualified is enough, because the walk already requires a Builder below. The alternative is recorded.</td></tr>
@@ -1360,53 +1221,60 @@ the same digest.</p>
     <tr><td><strong>A name</strong></td><td>The extension has an engineering code, no field name, and no member booklet.</td></tr>
   </tbody>
 </table>
+</div>
 </section>
 
-<!-- ============================================================ SOURCES -->
+<!-- ===================================================== SOURCES -->
 <section id="sources">
 <h2>Where every number in this brief comes from</h2>
 
+<div class="table-frame">
 <table>
-  <thead><tr><th style="width:45%;">Figure</th><th>Source</th></tr></thead>
+  <thead><tr><th style="width:44%;">Figure</th><th>Source</th></tr></thead>
   <tbody>
-    <tr><td>Rates of record, multipliers, pool rate</td><td>Orvanna Builder plan specification, version 1.2, section 5</td></tr>
-    <tr><td>Layer 1 equality, 1,630 lines, 13,434.00, zero differences</td><td>proof run 2026-08-16 and verifier verdict 2026-08-16</td></tr>
-    <tr><td>Decay fixture, stated at the rates of record: level pay 8.00 and 16.00, override 3.60 = 0.015 x 240.00, bonus 1.60 = 0.020 x 80.00</td><td>specification section 6 as corrected in version 1.2.1, which prints the rate-of-record figures and, in section 13 rule 2, forbids presenting the fixture's own recorded draft-rate figures; level pay from the proof run and verifier verdict</td></tr>
+    <tr><td>Rates of record, multipliers, pool rate</td><td>Orvanna Builder plan specification, version 1.2.1, section 5</td></tr>
+    <tr><td>Layer 1 equality, 1,630 lines, 13,434.00, zero differences</td><td>proof run 2026-08-16; verifier verdict 2026-08-16; re-confirmed by symmetric set difference in the publish verdict 2026-08-17</td></tr>
+    <tr><td>Twelve production runs, two a month, six on version 1.2 and six on version 1.3; 29 laboratory runs and zero live ones</td><td>confirmed directly against the database, publish verdict 2026-08-17</td></tr>
+    <tr><td>Order and buyer counts: 1,462 orders from 641 buying members, 357 of them multi-order, 1,178 orders inside multi-order months, 360 member-months carrying no volume</td><td>recomputed from the database by the publish gate, 2026-08-17</td></tr>
+    <tr><td>Decay fixture at the rates of record: level pay 8.00 and 16.00, override 3.60 = 0.015 x 240.00, bonus 1.60 = 0.020 x 80.00</td><td>specification section 6 as corrected in version 1.2.1, which prints the rate-of-record figures and, in section 13 rule 2, forbids presenting the fixture's own recorded draft-rate figures; hand-recomputed in the publish verdict 2026-08-17</td></tr>
     <tr><td>The single-override member going 7.80 to 0.00; the July fragility figures</td><td>red-team review 2026-08-16, attack 6</td></tr>
     <tr><td>The inversion table and its factors</td><td>red-team review, attack 2b; specification section 6A</td></tr>
-    <tr><td>120 of 1,001 binding orders</td><td>specification sections 6A and 12A(e); red-team attack 4</td></tr>
-    <tr><td>One order followed: 14.80 of 20.00</td><td>specification section 12A(d) at the rates of record</td></tr>
+    <tr><td>Proration frequency: 154 of 641 member-months reduced on at least one layer, 24.0 percent; 120 at the override layer, 83 at the bonus layer, 34 at the bonus layer only; 360 member-months carry no volume</td><td>recomputed from run 86 waterfall traces by the publish gate, 2026-08-17. This supersedes the narrower override-layer-only framing carried by specification 6A and 12A(e) and by red-team attack 4, all three corrected in specification version 1.2.2</td></tr>
+    <tr><td>Worst ratio: 21 percent of total claims, 34.5 percent of the claims the ceiling can reach, five members reduced to zero structure pay</td><td>recomputed by the publish gate, 2026-08-17. Specification 12A(e) printed only the 21 and is corrected in version 1.2.2</td></tr>
+    <tr><td>35 of 207 members; 943.68 = 638.00 + 305.68; worst member 324.14; the 0.17 reduced line</td><td>specification 12A(e); red-team attack 4; every figure re-verified in the publish verdict 2026-08-17</td></tr>
+    <tr><td>One member-month followed: 14.80 of 20.00</td><td>specification section 12A(d) at the rates of record; re-verified in the publish verdict</td></tr>
     <tr><td>Repeating decimal 0.454545 and 7.999992; exhausted pool</td><td>verifier verdict, section 2</td></tr>
-    <tr><td>Ten nested Builders worst case, factor 0.166666; worst real order at 0.56 of pool</td><td>specification 12A(a); red-team attack 4</td></tr>
-    <tr><td>35 of 207 members; 943.68 = 638.00 + 305.68; worst member 324.14; worst ratio 21 percent; the 0.17 reduced line</td><td>specification 12A(e); red-team attack 4 and its re-inspection correction</td></tr>
+    <tr><td>Ten nested Builders worst case, factor 0.166666; worst real member-month at 0.56 of pool</td><td>specification 12A(a); red-team attack 4</td></tr>
     <tr><td>Development premium by band</td><td>red-team attack 5; specification section 13</td></tr>
-    <tr><td>24 / 44 / 90.2 percent / 94.2 percent</td><td>red-team attack 5</td></tr>
-    <tr><td>Structure share 3,983.12 of 17,417.12</td><td>proof run; verifier verdict</td></tr>
-    <tr><td>207 versus 206 versus 448; Gini and top-ten shares</td><td>proof run comparison record; red-team attack 5</td></tr>
-    <tr><td>The six-month drift table</td><td>red-team attack 6, and every row re-confirmed directly against the laboratory runs on 2026-08-17</td></tr>
-    <tr><td>Comparison of five plan families</td><td>proof run comparison record</td></tr>
-    <tr><td>Anti-gaming tables and figures</td><td>red-team attacks 1, 2a and 3; specification section 11 at the rates of record</td></tr>
-    <tr><td>Sales Volume 10,000.00 earning 0.00; the four reason codes; zero self-source lines</td><td>red-team attack 7</td></tr>
+    <tr><td>Per-band sample sizes: 8 against 141, 8 against 186, 8 against 97; 34 members sponsored a Builder, 24 of them qualified</td><td>recomputed independently by the publish gate, 2026-08-17</td></tr>
+    <tr><td>Instant Payout returning 42.00 on a self-funded first order of 150.00, 28 cents on the dollar</td><td>the live plan's approved Instant Payout terms, cited by the quality gate, 2026-08-17</td></tr>
+    <tr><td>44 earners; 90.2 percent; 94.2 percent; structure share 3,983.12 of 17,417.12</td><td>red-team attack 5; proof run; all re-verified in the publish verdict</td></tr>
+    <tr><td>207 versus 206 versus 448; Gini and top-ten shares; the five-family comparison</td><td>proof run comparison record; red-team attack 5</td></tr>
+    <tr><td>The six-month drift table</td><td>red-team attack 6; every row re-confirmed against the laboratory runs on 2026-08-17 and again in the publish verdict</td></tr>
+    <tr><td>Anti-gaming tables and figures</td><td>red-team attacks 1, 2a and 3; specification section 11; the three-arrangement table hand-derived and re-run in the publish verdict</td></tr>
+    <tr><td>The scope of the self-funding bound</td><td>publish quality verdict 2026-08-17, finding M4, which showed the unscoped form is false because a qualifying purchase unlocks pay on other people's volume</td></tr>
+    <tr><td>Sales Volume 10,000.00 earning 0.00; the four reason codes; zero self-source lines</td><td>red-team attack 7; re-queried directly in the publish verdict</td></tr>
     <tr><td>Calibration figures and the falsified density expectation</td><td>specification section 9; proof run; verifier verdict</td></tr>
     <tr><td>Volatility counts across 215 member-month pairs</td><td>red-team attack 6</td></tr>
     <tr><td>Three gates and the initial NOT PRESENTABLE ruling</td><td>specification section 13; verifier verdict; red-team review and its re-inspection</td></tr>
-    <tr><td>12 commission runs of the live plan, across the six months February through July 2026, on specification versions 1.2 and 1.3; 29 laboratory runs of the Builder plan and zero live ones</td><td>confirmed directly against the database on 2026-08-17</td></tr>
   </tbody>
 </table>
+</div>
 
-<div class="panel panel-amber">
-  <p class="panel-title">Two figures deliberately not used</p>
+<div class="callout-warn">
+  <p class="ct">Two figures deliberately not used</p>
   <p>A partial August month exists in the laboratory and is excluded from every table here: it is
   eleven bridged orders and two members paid, and it is evidence of nothing.</p>
-  <p style="margin:0;">And the specification's small worked example of the ten-member month is not
-  reproduced here, because it is recorded at the draft rates rather than the rates of record. The
-  single order followed in section 6 does the same teaching job at the rates that actually apply.</p>
+  <p>And the specification's small worked example of the ten-member month is not reproduced here,
+  because it is recorded at the draft rates rather than the rates of record. The single member-month
+  followed in section 7 does the same teaching job at the rates that actually apply.</p>
 </div>
 </section>
 
 <footer class="doc">
   <p style="margin:0 0 4px;"><strong>The Orvanna Builder Plan: a brief.</strong> Prepared 2026-08-17.
-  Self-contained: this file loads no fonts, stylesheets, scripts or images from anywhere.</p>
+  Self-contained: this file loads no fonts, stylesheets, scripts or images from anywhere. Orvanna is
+  a demonstration company and has never paid any amount to any person.</p>
   <p style="margin:0;">Acronym key: Sales Volume (SV), Commissionable Volume (CV), Personal Volume
   (PV), Team Volume (TV), Multi-Level Marketing (MLM), Quality Assurance (QA).</p>
 </footer>
