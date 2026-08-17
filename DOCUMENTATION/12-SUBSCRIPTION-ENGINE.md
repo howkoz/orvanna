@@ -1,23 +1,28 @@
-# 12. The Subscription Engine: renewals, logical retries, and the console that drives them
+# 12. The Subscription Engine V2: renewals, logical retries, and the console that drives them
 
 **Owner of this document:** the writer on the Orvanna build team, working from the
 architect's specification, the builder's proof run, and the console source files.
 **Written:** 2026-08-16.
+**Version:** V2, rewritten after Howard's documentation review request to make the
+live-readiness boundaries, tax seam, reversal seam, and operational health story
+plain without changing the flows.
 **Status as of 2026-08-16, stated plainly up front:**
 
 | Artefact | State |
 |---|---|
-| The engine schema and pipeline (migrations 024 to 027) | **APPLIED to the cloud project**, gated, and deliberately **INERT** there: the engine's clock is empty and nothing bills until it is initialized on purpose |
+| The engine schema and pipeline (migrations 024 to 027) | **APPLIED to the cloud project**, gated. The engine clock was **initialized on purpose on 2026-08-16 evening** (clock date and engine epoch both 2026-08-16) after the console deploy round; before that moment it sat deliberately inert |
 | The full simulated year | **PROVEN LOCALLY: 75 automated proofs of 75 pass**, one command, on the real migration files |
-| The staff billing console (page plus its server function) | **BUILT**, implementing the full option list; not yet deployed by its builder (gates first, then the deploy engineer ships it) |
-| The staff commission dashboard (five panels plus projection) | **BUILT** to its own specification; same deploy discipline |
-| The run limit and the live Braintree dispatch (migrations 028 and 029) | **AUTHORED AND PROVEN LOCALLY**; they ride the console deploy round, closed by a seven-row live acceptance |
+| The staff billing console (page plus its server function) | **DEPLOYED LIVE 2026-08-16** at orvanna.io/staff-operations.html after both gates passed; server function byte-compared to the gated artifact |
+| The staff commission dashboard (five panels plus projection) | **DEPLOYED LIVE 2026-08-16** on the same page, same gate discipline |
+| The run limit and the live Braintree dispatch seam (migrations 028 and 029) | **APPLIED to the cloud project 2026-08-16** in the console deploy round, ledger fidelity exact; the seven-row live acceptance closes with Howard's first live run |
 | Real stored cards, the daily alarm, member-facing dunning notices | **NOT BUILT YET.** Named honestly in section 8 |
 
 This document exists because Howard asked for exactly it: what the subscription
-program does, how it retries, and the console, written so it can be sold. Everything
-below comes from the specification, the proof-run record, and the source files listed
-under Sources. Nothing is invented, and anything not yet real says so.
+program does, how it retries, and the console, written so it can be sold without
+pretending the live vault already exists. Everything below comes from the
+specification, the proof-run record, and the source files listed under Sources.
+When a behavior is proven locally, cloud-applied but inert, or still Phase S2/S3
+work, this document says which one.
 
 **Acronym key, spelled out here and used short afterwards.** Personal Volume (PV).
 Sales Volume (SV). Commissionable Volume (CV). Customer Initiated Transaction (CIT),
@@ -45,21 +50,27 @@ Graphical User Interface (GUI).
 Plain path to that image:
 `C:\Users\howar\Desktop\Desktop\ORVANNA\DOCUMENTATION\diagrams\renewal-pipeline.svg`
 
-Read it top to bottom. One daily tick reconciles anything left hanging, gathers
-everything due, prices it fresh, checks the stored card is coherent, charges it
-through the payment orchestrator, classifies the answer from a data table, moves the
-subscription through its state machine, and hands only the genuinely paid charges to
-the bridge, which books the volume the commission engine reads. The right-hand column
-is the selling story: each step exists to make a specific, named production failure
-impossible.
+Read it top to bottom as the intended operating flow. One daily tick reconciles
+anything left hanging, gathers everything due, prices and taxes it fresh, checks the
+stored credential is coherent, dispatches the charge through the payment
+orchestrator once the live vault phase is complete, classifies the answer from a data
+table, moves the subscription through its state machine, and hands only genuinely
+paid charges to the bridge. The bridge books the volume the commission engine reads.
+The right-hand column is the selling story: each step exists to make a specific,
+named production failure impossible.
 
 ## 2. What it is, in one page
 
-Orvanna's subscription engine bills recurring memberships for a direct-selling
-company. A member subscribes to a product, and from then on the engine charges their
-stored card on their own schedule and turns each successful charge into the volume
-that drives their qualification and their upline's commissions. The whole design can
-be stated in seven sentences:
+Orvanna's subscription engine is the renewal system for a direct-selling company.
+A member subscribes to a product, the engine accounts for every expected billing
+cycle, and every successful renewal becomes the volume that drives qualification
+and upline commissions. In the current build, the state machine, run accounting,
+retry rules, and bridge integration are proven locally and the core migrations are
+cloud-applied but inert. The live card-vault step is the next phase, so the charging
+language below describes the target live lane unless it is explicitly labeled
+simulated.
+
+The design can be stated in seven sentences:
 
 1. **Four frequencies:** monthly, bi-monthly (every two months), quarterly, and
    semi-annual, stored as plain data on the subscription.
@@ -67,9 +78,11 @@ be stated in seven sentences:
    would land on the 29th through the 31st normalize to the 28th, disclosed at
    signup). If they do not pick, the first renewal lands 30 days after the initial
    purchase and that anniversary recurs.
-3. **Every charge goes through the payment orchestrator** (HyperSwitch, in front of
-   Braintree), the same rail the shop checkout already uses, as a Merchant Initiated
-   Transaction against a stored credential.
+3. **The live charging lane goes through the payment orchestrator** (HyperSwitch, in
+   front of Braintree), the same rail the shop checkout already uses, as a Merchant
+   Initiated Transaction (MIT) against a stored credential. That live vault lane is
+   not claimed complete until Phase S2 proves the cardholder-present setup payment
+   and the later off-session renewal charge on the actual sandbox rail.
 4. **Every cycle is accounted.** Each expected billing has exactly one accounting
    row: paid, unpaid with its attempts on record, skipped because paused, or void
    because cancelled. A cycle can never silently vanish, and never bill twice.
@@ -78,9 +91,11 @@ be stated in seven sentences:
    month by month, to a monthly member. This was Howard's ruling, made because the
    alternative would let identical money qualify differently by billing frequency.
 6. **Volume flows to the commission engine automatically** through the existing
-   bridge, which admits only processor-confirmed paid charges. A failed month means
-   no payment, no volume, not qualified. The engine physically cannot invent volume,
-   because only the bridge writes orders.
+   bridge, which admits only confirmed paid charges. In simulation, confirmation
+   comes from the scripted outcome table. In the live lane, confirmation must come
+   from a fresh processor retrieve with an exact integer-cent amount match. A failed
+   month means no payment, no volume, not qualified. The engine physically cannot
+   invent volume, because only the bridge writes orders.
 7. **Everything is recomputable.** Given the same subscriptions, rules, and outcomes,
    the engine produces identical rows to the cent, every run, and an independent
    checker did exactly that recomputation across a simulated year.
@@ -92,8 +107,10 @@ this document twice. Howard named five failure modes he deals with today, in rea
 production systems moving real money, and required each to be defended **by name,
 with a mechanism and a proof**, in a living register that grows whenever he names
 another. None of these are hypothetical. Every one has happened somewhere money was
-real. Each defense below was then exercised by the proof run: the proof labels (A1,
+real. Each defense below was exercised in the local proof run: the proof labels (A1,
 B4, and so on) are rows in the automated battery anyone can re-run with one command.
+Where a defense depends on live payment credentials, Phase S2 must still prove it on
+the actual HyperSwitch/Braintree sandbox rail.
 
 ### 3.1 The double release
 
@@ -117,14 +134,17 @@ due subscriptions: zero new charges the second time. Across the whole simulated 
 payment platform, and the order sits there, unpaid and invisible.
 
 *The defense:* every tick opens with a reconciler that hunts for exactly this: any
-attempt still without a terminal answer. It asks the payment platform for the truth,
-re-dispatches idempotently, or fails the attempt explicitly into a staff attention
-queue a human sees. Nothing resolves silently.
+attempt still without a terminal answer. In the simulated lane it reads the recorded
+outcome truth. In the live lane it must ask the payment platform for the truth,
+re-dispatch idempotently only when that is allowed, or fail the attempt explicitly
+into a staff attention queue a human sees. Nothing resolves silently.
 
 *The proof (rows B1 to B4):* the engine was deliberately killed mid-batch, with
-payment 47 of 60 dispatched. The rerun reconciled attempt 47 from the recorded
-answer, billed cycles 48 through 60 exactly once each, and touched cycles 1 through
-46 not at all. Sixty members, sixty periods, sixty paid, zero orphans.
+payment 47 of 60 dispatched in the local proof rig. The rerun reconciled attempt 47
+from the recorded answer, billed cycles 48 through 60 exactly once each, and touched
+cycles 1 through 46 not at all. Sixty members, sixty periods, sixty paid, zero
+orphans. Migration 029 carries the live acceptance that must repeat this discipline
+against real sandbox dispatches.
 
 ### 3.3 Stale pricing
 
@@ -167,20 +187,22 @@ Does Not Match") because the stored-credential anchor points at the wrong card b
 usually after a card change that updated one record but not the other. The member did
 nothing wrong, and no retry can ever succeed.
 
-*The defense, three layers:* the card identity and its network anchor live together
-in **one immutable credential record**; a card change never edits it but mints a new
-credential through a fresh cardholder-present checkout and retires the old one, so
-the pieces cannot drift apart. A pre-flight check at dispatch refuses to send any
-rebill whose credential is retired, expired, or internally incoherent. And such
-refusals are classified **system fault, our defect**: they never consume the member's
-retries, never push the member toward cancellation, and are totalled separately in
-run history so they cannot hide inside decline statistics.
+*The defense, three layers:* in the target live lane, the card identity and its
+network anchor live together in **one immutable credential record**; a card change
+never edits it but mints a new credential through a fresh cardholder-present checkout
+and retires the old one, so the pieces cannot drift apart. A pre-flight check at
+dispatch refuses to send any rebill whose credential is retired, expired, or
+internally incoherent. And such refusals are classified **system fault, our defect**:
+they never consume the member's retries, never push the member toward cancellation,
+and are totalled separately in run history so they cannot hide inside decline
+statistics.
 
-*The proof (rows E1 to E5):* one member's credential was deliberately corrupted
-(brand mismatched to its anchor). Every one of her thirteen billing attempts across
-the year was stopped at pre-flight, none ever reached the processor, all thirteen
-surfaced in the attention queue, and her account ended the year with zero marks
-against it.
+*The proof (rows E1 to E5):* one member's simulated credential was deliberately
+corrupted (brand mismatched to its anchor). Every one of her thirteen billing
+attempts across the year was stopped at pre-flight, none reached the simulated
+processor, all thirteen surfaced in the attention queue, and her account ended the
+year with zero marks against it. Phase S2 must prove the same pre-flight and
+classification behavior with real sandbox credentials.
 
 The register is open-ended by design: when Howard names failure mode six, it enters
 the specification with a mechanism and a proof row the same day.
@@ -195,8 +217,10 @@ Plain path to that image:
 The governing rule, in one sentence: **the decline reason decides the retry, never a
 blind schedule.** A blind schedule retries stolen cards, which card networks fine you
 for, and gives up on empty accounts two days before payday. This engine reads the
-processor's decline code, looks it up in a data table (changing a rule is a data
-change with an effective date, never a code deploy), and acts on the class.
+decline code, looks it up in a data table (changing a rule is a data change with an
+effective date, never a code deploy), and acts on the class. In the simulated lane,
+the code is supplied by the scripted proof table. In the live lane, it must come from
+the payment orchestrator and connector response stored on the attempt.
 
 ### 4.1 The classification principle: member fault versus system fault
 
@@ -232,15 +256,17 @@ queue as our problem to fix, and every run report totals the two families separa
 - **The merchant-initiated invariant, absolute:** a renewal never asks an absent
   cardholder to answer a bank identity challenge. If a challenge comes back anyway,
   the attempt fails cleanly with the reason recorded, and the subscription moves to
-  CARD UPDATE REQUIRED. This invariant is asserted on every attempt of every proof
-  run, so the discipline was tested before real charging existed.
+  CARD UPDATE REQUIRED. This invariant is asserted on every simulated attempt and is
+  one of the named live acceptance rows for Phase S2.
 
 ### 4.3 Dunning, pause, auto-cancel, reactivation
 
 When the ladder's day-8 retry fails, DUNNING begins: the member must be contacted
 (the notices themselves are a later phase; the engine records every event they will
 read). The late payday retries still run during dunning, because recovering the
-member is the point. At day 26 of the billing month, a period still unpaid suspends.
+member is the point. At day 26 of the billing month, a period still unpaid suspends,
+except for late billing days such as the 28th, where the specified checkpoint is
+month-end because the billing attempt itself happens after day 26.
 
 A member may pause for one or two months. Nothing bills, no volume books, the months
 are marked "skipped, paused" and never count as unpaid. One deliberate asymmetry,
@@ -284,6 +310,49 @@ disclosed when the date is picked, the single attempt runs, and a soft decline g
 straight to dunning. The proof year drives this exact case, suspension at month-end
 and reactivation included.
 
+### 4.5 Tax on a renewal
+
+Tax is not an afterthought on recurring billing. A renewal must quote tax at billing
+time, using the member's current subscription billing address, tax identifier, product
+tax code, and currency. The subscription row does not store a tax amount for future
+use, for the same reason it does not store a product price: rates, registrations,
+addresses, exemptions, and currency treatment can change between signup and the next
+cycle.
+
+The order of operations is deliberate. First the engine prices the subscription from
+the catalog. Then it quotes tax for the billing address and billing currency. Then it
+creates the attempt for the exact amount that will be charged. If the tax service is
+unavailable, the run must not invent tax. The attempt is either held as a system fault
+for staff attention, or handled by an explicit fallback policy that is visible in the
+run report. There is no silent "use last month's tax" lane.
+
+Volume remains product volume, not tax. Personal Volume (PV), Sales Volume (SV), and
+Commissionable Volume (CV) come from the subscription product and the bridge rules;
+sales tax, value-added tax, and similar government amounts are collected money, not
+commissionable volume. A tax-only change can change the amount charged without
+changing the member's volume.
+
+Address and exemption changes are effective-dated facts. If the member updates their
+billing address before a renewal run, the next unbilled cycle uses the new address.
+Already finalized cycles are not rewritten. A tax ID or exemption answer affects only
+the quote that uses it, and the quote result is retained on the attempt so the charge
+can be explained later.
+
+### 4.6 Reversals after the charge
+
+This document does not own the refund system, but the subscription engine must name
+where post-payment reversals land. A successful renewal creates an ordinary paid
+order, and the bridge books its volume. If that money is later refunded, charged back,
+or reversed before the commission period is finalized, the refund and bridge policies
+decide the volume correction. If it happens after finalization, the correction must
+follow the finalized-history rules rather than editing history in place.
+
+The subscription state does not become "unpaid" merely because a separate refund was
+approved later. That would collapse two different facts: whether the renewal charge
+succeeded at billing time, and whether the business later reversed the money. The
+state machine records the billing truth; the refund and adjustment ledgers record the
+post-payment truth. Staff surfaces should show both when they both exist.
+
 ## 5. The console: the staff surface
 
 The billing console is a staff-only screen behind the same server-verified sign-in
@@ -326,6 +395,12 @@ What staff can do, option by option, as implemented in the console's server func
 - **Seven-day forecast.** The next week of scheduled billing, computed from the same
   date arithmetic the engine itself uses, so the forecast shows what the engine will
   actually do.
+- **Operational health.** The console should make the engine's condition visible at a
+  glance: run duration, due count, processed count, remaining count, retry recovery
+  by step, decline mix by class, system-fault count, stuck dispatched attempts,
+  attention-queue age, forecasted charge volume, auto-cancel trend, and tax-quote
+  failures. These are not cosmetic statistics. They are how an operator sees whether
+  the engine is healthy before members feel it.
 
 One honesty detail worth selling on its own: while the production engine is inert
 (section 8), the console does not fake a preview. It says plainly that the engine's
@@ -366,7 +441,9 @@ from it is ever stored, exported, or reachable from any member-facing surface.
   a scripted year of 394 daily ticks, and grades 75 proof rows, in well under a
   minute of wall time. The battery includes the deliberate crash, the deliberate
   double-run, the corrupted credential, the day-28 case, both pause lanes, the
-  limit-of-5 run, and the three worked dollar examples recomputed to the cent.
+  limit-of-5 run, and the three worked dollar examples recomputed to the cent. That
+  is local proof on the migration files; it is not a claim that 028, 029, or live
+  stored credentials have been cloud-accepted yet.
 - **Every staff action is audited with the username**, to the same ledger the refund
   system writes, and everything member-visible is reconstructible from the event
   stream. An independent verifier recomputed the year's every date, transition, and
@@ -382,8 +459,13 @@ one of them against a simulated year and publishing the transcript. The retry en
 follows card-network rules an auditor would recognize, the console shows its staff
 exactly what will happen before it happens, partial runs say so out loud, our own
 mistakes are never charged to the member's record, and every number on every screen
-can be recomputed independently from first principles. That combination, honesty
-made structural, is the product.
+can be recomputed independently from first principles.
+
+The sellable claim is not "we already have live rebilling." The sellable claim is
+more precise and stronger: the hard subscription logic is built as deterministic
+accounting first, proven locally, cloud-staged inertly, and waiting for a narrow live
+stored-credential acceptance before real sandbox money moves. That honesty is part
+of the product.
 
 ## 8. Where it stands today, honestly
 
@@ -394,17 +476,18 @@ What is real right now:
   **deliberately inert**: its clock has no row, simulations never run in production
   by ruling, and nothing bills until an operator initializes the clock on purpose.
 - The complete simulated year is **proven locally, 75 proofs of 75**, on the exact
-  files the cloud runs.
+  migration files. Migrations 024 through 027 are the cloud-applied inert base;
+  migrations 028 and 029 are local-proven and await the console deploy round.
 - The console and the commission dashboard are **written in full** and implement
   everything section 5 describes, but the builder does not deploy; the deploy
   engineer ships them after gating, with a byte-compare against the repository.
 - Migrations 028 (the run limit) and 029 (the live dispatch seam) are **authored and
-  proven locally against the simulated processor**. The live half is deliberately
-  reserved for a deploy-round acceptance written into migration 029 itself, seven
-  rows: a limit-2 run producing exactly two payments visible in the HyperSwitch
-  dashboard, channel renewal_engine, succeeded through Braintree, no 3DS challenge
-  requested and zero challenges seen, plus a strand drill proving an unanswered live
-  attempt surfaces in the attention queue instead of vanishing.
+  proven locally against the simulated processor**. They are not complete for live
+  selling until the deploy-round acceptance written into migration 029 passes: a
+  limit-2 run producing exactly two payments visible in the HyperSwitch dashboard,
+  channel renewal_engine, succeeded through Braintree, no 3DS challenge requested
+  and zero challenges seen, plus a strand drill proving an unanswered live attempt
+  surfaces in the attention queue instead of vanishing.
 
 What "sellable" still awaits, named so no reader assumes it exists:
 
@@ -412,8 +495,11 @@ What "sellable" still awaits, named so no reader assumes it exists:
   orchestrator's. The first task of the live-charging phase is the stored-credential
   spike: one cardholder-present payment with the setup flag, then one merchant-
   initiated charge against the returned credential, on our actual sandbox rail. The
-  test plan is written, including the deliberate saboteur card that must fail
-  correctly to prove the no-challenge invariant live.
+  acceptance must prove customer creation, reusable credential creation, correct
+  off-session indicators, no stored CVV, no interactive 3DS on renewal,
+  idempotency-key visibility, exact amount matching, and old-credential retirement
+  when a card is replaced. The test plan is written, including the deliberate
+  saboteur card that must fail correctly to prove the no-challenge invariant live.
 - **The real alarm clock.** The scheduler (a five-minute database cron job that does
   nothing but open a run when the staff-set time passes) is specified and decided,
   but not installed on the cloud instance. The console shows an honest banner saying
@@ -421,14 +507,18 @@ What "sellable" still awaits, named so no reader assumes it exists:
 - **Member-facing dunning surfaces.** The notices, the member's own card-update
   page, and the member subscription-management page are the next phase. The engine
   already records every event those surfaces will read.
+- **Tax and reversal surface polish.** The renewal pipeline must show tax quote
+  evidence on each attempt and must make refund, chargeback, and post-finalization
+  adjustments legible without rewriting the billing state.
 
 ## 9. What this document does not cover
 
 The compensation plan's own arithmetic (document 03), the bridge's nine policies
 (document 09), refunds (document 11), and the checkout that creates a subscription
-in the first place (document 04). The exact decline-code tables, the transition
-rules for changing a billing date mid-cycle, and the ten-table schema live in the
-specification, which remains the law where this document summarizes. And nothing
-here has been graded by QA as a user-facing surface yet: the console's screens,
-like the refund button before them, will get their own checklist rows before
-anyone calls them done.
+in the first place (document 04). This document now names the subscription seams for
+tax and reversals, but those documents still own the detailed rules. The exact
+decline-code tables, the transition rules for changing a billing date mid-cycle, and
+the ten-table schema live in the specification, which remains the law where this
+document summarizes. And nothing here has been graded by QA as a user-facing surface
+yet: the console's screens, like the refund button before them, will get their own
+checklist rows before anyone calls them done.
