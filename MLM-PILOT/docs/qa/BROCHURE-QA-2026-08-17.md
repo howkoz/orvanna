@@ -1614,3 +1614,81 @@ on a scratch copy only; the product was not touched.
   how the second orphan survived a gate that said there was one. Printing both builds and
   comparing page images makes the unchanged pages provable and shrinks the reading to the
   pages that actually moved.
+
+---
+
+# Re-gate 2, 2026-08-17 18:0x: commit `33db578`
+
+- **Commit graded:** `33db578` ("Close both halves, and the reason I missed one")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\plan-brochure.html`, bundle sha256 `65e2102f3246a2ef`, printed through Chrome's own pipeline over the Chrome DevTools Protocol (CDP) at US Letter, against the `2b20e11` baseline printed the same way
+- **Scope:** the two fixes and any regression. The document was not re-graded.
+
+## VERDICT: FAIL
+
+## DEPLOY: NO
+
+Both fixes are now correctly and completely closed. Every number the coordinator asked me
+to prove came out at the predicted value. One new widow appeared, caused by the remedy I
+myself recommended, and I did not catch it when I tested that remedy. It is one line to
+close and it is the last thing standing between this document and the link.
+
+## The six confirmations requested
+
+| # | Asked | Measured | Result |
+|---|---|---|---|
+| 1 | 37 pages, unchanged | baseline **37**, this commit **37** | PASS |
+| 2 | Zero kicker orphans, including page 35 | baseline had **2** (pages 6 and 35); this commit has **0** | PASS |
+| 3 | 18 of 18 rules travelling with their kicker | **18 of 18**, zero stranded, the number the remedy predicted | PASS |
+| 4 | The absolute gone from rendered text in both locations | Printed text of all 37 pages: `professionally administered` **0**, `Every professionally` **0**, `ordinary practice` **0**. Markup-stripped source: **0** each. Page 5 now reads "Standard solvency discipline. Long-standing practice in this industry.", page 6 "Caps and payout governors are long-standing practice in this industry." The figure's accessibility description never carried the claim | PASS |
+| 5 | Nothing else in the figure or the row shifted | `git diff dccf12e..33db578` is two Scalable Vector Graphics (SVG) `<text>` lines and one style declaration. SVG text is absolutely positioned, so no reflow is possible; the ceiling panel is otherwise pixel-unchanged | PASS |
+| 6 | No new orphan or widow, nothing that must stay whole splits | Zero splits: no figure, table or panel touches a page edge in either build. **One new widow**, defect R3 | **FAIL** |
+
+## R3. LOW. A one-word widow at the page 8 to 9 boundary
+
+**Location:** the section three lead paragraph. Printed pages 8 and 9.
+
+Holding the kicker together moved the section three opener down by about 22 points, which
+pushed the last word of its lead paragraph across the boundary. Page 8 now ends
+"...Commissionable Volume, which is the only one any commission is calculated" and page 9
+opens with the single word **"from."** alone above Figure 3. In the passed baseline that
+paragraph was whole at the foot of page 8.
+
+A one-word line alone at the top of a page is the most recognisable typographic fault there
+is, and this document is going to a professional. It is the same class of defect as the
+kicker orphan that was worth fixing before the link went out, so it gets the same treatment.
+
+**Verified remedy, one declaration, tested properly this time.** I printed three candidates
+through the identical pipeline and audited each one for page count, kicker orphans, rule
+census, splits and widows across all 37 boundaries:
+
+| Candidate | Pages | Kicker orphans | Rules | Splits | Widows |
+|---|---|---|---|---|---|
+| `33db578` as it stands | 37 | 0 | 18/18 | 0 | **"from." on page 9** |
+| `p, li { orphans: 2; widows: 2 }` | 37 | 0 | 18/18 | 0 | **unchanged**, Chrome's default is already 2 |
+| `p, li { orphans: 3; widows: 3 }` | **38** | 0 | 18/18 | 0 | closed, at the cost of a page |
+| **`.lead { break-inside: avoid; page-break-inside: avoid; }`** | **37** | **0** | **18/18** | **0** | **closed** |
+
+The last one is the answer. The whole section three opener, rule, kicker, heading and lead
+paragraph, travels to page 9 as a unit; only pages 8, 9 and 10 change; the page count holds
+at 37. Tested on a scratch copy only. The product was not touched.
+
+## My own miss, recorded
+
+I recommended `break-inside: avoid` on `.kicker` in the previous re-gate and reported it as
+verified. It was verified for the three things I measured (page count, kicker orphans, rule
+census) and not for the fourth (widows), and the widow was already present in my scratch
+print. The coordinator applied a remedy I under-tested.
+
+## Standing checklist rows added by this re-gate
+
+- **A recommended remedy is graded to the same standard as a shipped fix.** Before reporting
+  any pagination remedy as verified, run the full boundary audit on it: page count, kicker
+  orphans, rule census, split blocks and widows at all boundaries. Measuring only the thing
+  the remedy targets is how a remedy ships a new defect.
+- **Every pagination change gets a widow scan, not just an orphan scan.** The scan: for each
+  page, take the first text line, and flag any body-size line under 200 points wide starting
+  at the left margin. It found this in one pass and would have found it in the last one.
+- **Search rendered text, not source, on this document.** Its drawing labels are split
+  across `<text>` elements, so a phrase can be plainly visible on the page and absent from
+  the file as a searchable string. Strip markup, or read the printed Portable Document
+  Format (PDF) text, before claiming any wording is gone.

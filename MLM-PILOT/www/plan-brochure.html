@@ -424,6 +424,12 @@ tfoot td {
      orphan in 37 pages this way. */
   .kicker { break-after: avoid; page-break-after: avoid;
             break-inside: avoid; page-break-inside: avoid; }
+  /* Holding the kicker together moved a section opener down and pushed the
+     last word of its lead over the page boundary. Keeping the lead whole
+     travels the opener as a unit: 37 pages, zero orphans, zero widows,
+     18 of 18 rules with their kicker. Two other candidates were printed
+     and audited; orphans/widows 3 also closes it but costs a 38th page. */
+  .lead { break-inside: avoid; page-break-inside: avoid; }
   h3, h4 { break-after: avoid; page-break-after: avoid; margin-top: 14px; }
   .kicker::before { margin-bottom: 5px; }
   .panel, .note, .fig, figcaption { break-inside: avoid; page-break-inside: avoid; margin: 12px 0; }
