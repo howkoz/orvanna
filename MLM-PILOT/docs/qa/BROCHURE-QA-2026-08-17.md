@@ -1501,3 +1501,116 @@ being orphaned on paper). Neither is a gate condition.
 - **A section written to pre-empt a reaction gets read twice**, once for what it says and
   once for the shape it takes. Cite-and-prove is a designer's shape. Assert-and-deny is a
   defendant's shape. Rule on the shape, not on the sentences.
+
+---
+
+# Re-gate, 2026-08-17 17:47: the two fixes named above, commit `dccf12e`
+
+- **Commit graded:** `dccf12e` ("The two the gate said to fix before the link goes out")
+- **Artifact graded:** `MLM-PILOT\deploy\dist\plan-brochure.html`, built by `py deploy\build_dist.py`, bundle sha256 `e27cd32fa0c9ebe3`, served over Hypertext Transfer Protocol (HTTP) and printed through Chrome's own print pipeline
+- **Scope:** deliberately narrow. Only the two fixes, and any regression they caused. The document was not re-graded.
+- **Grader:** mlm-qa. Read-only toward the product. Nothing was fixed.
+
+## VERDICT: FAIL
+
+## DEPLOY: NO
+
+Both fixes are half-landed. Neither failure is a wrong number and neither is expensive to
+close, but each is exactly the thing the fix set out to remove, still present.
+
+- **Fix 1 closed one of the two places D17 named.** D17 above reads, word for word,
+  "Recommend dropping the word 'every' in **both** places." The table row was corrected.
+  The drawing was not. Printed page 5 still reads "Standard solvency discipline. **Every
+  professionally administered plan has one.**" That is the same claim in a stronger form,
+  one page before the row that was softened.
+- **Fix 2 removed the text orphan and left a rule orphan in its place.** The kicker's
+  decorative rule is drawn by `.kicker::before`, which is a block inside the kicker.
+  `break-after: avoid` stops a break after the kicker but not one inside it, so the break
+  simply moved up by one box: the teal rule now stays behind on the previous page and the
+  kicker text goes over. Printed pages 6 and 35 each end with a short teal dash labelling
+  blank paper, and two of the sixteen section openers now start with no rule above them
+  while the other fourteen have one.
+
+## How this was graded
+
+The Browser pane again refused to composite frames, as at every previous gate of this
+document. I drove a real Chrome over the Chrome DevTools Protocol (CDP) and used
+`Page.printToPDF` at US Letter, and I printed the **passed** commit `2b20e11` the same way
+so every claim below is a measured before-and-after rather than a recollection.
+
+## Acceptance checklist
+
+| # | What the brief asked me to confirm | Evidence | Result |
+|---|---|---|---|
+| 1 | The new sentence renders | Printed page 5 of the after build, table row four: "Caps and payout governors are long-standing practice in this industry." Read on paper at 200 dots per inch | PASS |
+| 2 | It is true as written and needs no defending | "Long-standing practice in this industry" asserts prevalence over time, not universality. Nothing falsifies it by counterexample | PASS |
+| 3 | The old absolute is gone from the whole file | **No.** `Every professionally administered plan has one` survives in the Figure 2 drawing, source line 835, printed page 5 at y=335 | **FAIL, defect R1** |
+| 4 | Nothing else in that row or table shifted | The row is character-identical outside the replaced clause, and no other content line in the file changed. Confirmed by `git diff 2b20e11..dccf12e`: two hunks only | PASS |
+| 5 | The SECTION TWO orphan is gone | Page 6 of the before build ended on the kicker at y=712; page 7 of the after build opens with the kicker and its heading together | PASS |
+| 6 | The document is still 37 printed pages | Chrome print pipeline, US Letter 612 by 792 points: before **37**, after **37** | PASS |
+| 7 | No new orphan or widow appeared anywhere | Every one of the 37 page boundaries checked in both builds. Zero kicker orphans and zero heading orphans remain, and every page break falls between whole paragraphs, whole bullets or whole table rows. **But two decorative rules are now stranded** | PARTIAL, defect R2 |
+| 8 | Nothing that must stay whole now splits | 31 of 37 printed pages are byte-identical to the passed build at 110 dots per inch. The 6 that changed (6, 7, 8, 35, 36, 37) were read on paper one by one: the lineage table, the terms table, the glossary table, Figure 4, the "Stated in one sentence" panel, the Team Volume panel and the legal panel are each whole on a single page | PASS |
+
+## Two findings the prior gate got wrong, recorded for the record
+
+- **The Section Two orphan was not the only one.** D19 states "It is the **only** orphaned
+  kicker in 37 pages; I checked all sixteen." Measured on the printed before build, page 35
+  also ended on the "SECTION FIFTEEN" kicker with "LEGAL NOTICE AND INCOME DISCLOSURE"
+  overleaf. There were two. The one rule closed both, so the fix did more good than it was
+  credited for, but the prior count was wrong.
+- **The count of sixteen section kickers was right.** Sections one through fifteen plus
+  section 1A is sixteen, and the file carries eighteen kickers in all once the cover and
+  the contents kicker are counted. The error in D19 was the orphan count, not this one.
+
+## Defects
+
+### R1. MEDIUM. Half of D17 shipped, and the stronger half is the half that stayed
+
+**Location:** `www/plan-brochure.html` line 835, the Figure 2 drawing. Printed page 5.
+
+The corrected table row and the uncorrected drawing sit one page apart and describe the
+same mechanism. The drawing is the surface most likely to be screenshotted and forwarded,
+which the prior gate said about a different word in D18. As written, the drawing asserts
+that a hard per-order payout ceiling is universal, which is the claim D17 established is
+not true. The commit message states the absolute "now reads long-standing practice in this
+industry", which is true of the table and not of the document.
+
+Closing it is two `<text>` lines in the drawing.
+
+### R2. MEDIUM. The break rule moved the orphan up one box instead of removing it
+
+**Location:** `www/plan-brochure.html` print block, the `.kicker` declaration added by this
+commit.
+
+Measured across both builds by locating every short teal rule near the left margin and
+asking whether a kicker follows it on the same page:
+
+| Build | Rules that label a kicker | Rules stranded with nothing under them |
+|---|---|---|
+| `2b20e11`, passed | 18 of 18 | 0 |
+| `dccf12e`, this commit | 16 of 18 | **2**, on printed pages 6 and 35 |
+
+On page 35 the stranded dash sits above roughly a third of a blank page. On pages 7 and 36
+the section opener begins flush at y=42 with no rule, against y=64 to y=70 and a rule at
+every other section opener in the document.
+
+**Verified remedy, one declaration.** I copied the built file to a scratch folder, added
+`break-inside: avoid; page-break-inside: avoid;` to the same `.kicker` rule, and printed it
+through the identical pipeline. Result: 37 pages, zero kicker orphans, and 18 of 18 rules
+travelling with their kicker. That is the state the fix was aiming at. The remedy was tested
+on a scratch copy only; the product was not touched.
+
+## Standing checklist rows added by this re-gate
+
+- **A finding that names two locations is not closed until both are closed.** When a defect
+  cites "both places", grade it by re-reading every location it named, not by reading the
+  commit message. Half a fix reads as a whole fix in a diff.
+- **A print break rule fixes the box, not the ink.** After adding any `break-after` or
+  `break-before` declaration, check the fixed element's pseudo-elements, borders and rules
+  as well as its text. `break-after: avoid` does not hold an element together internally;
+  `break-inside: avoid` is usually needed beside it, and the tell is a decorative mark left
+  alone at the foot of a page.
+- **Print the previous build too.** Grading pagination against memory of a prior report is
+  how the second orphan survived a gate that said there was one. Printing both builds and
+  comparing page images makes the unchanged pages provable and shrinks the reading to the
+  pages that actually moved.
