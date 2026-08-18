@@ -1110,6 +1110,15 @@
         cls: 'ops-next-retry'
       };
     }
+    /* STILL IN FLIGHT. Added 2026-08-18 after this column shipped calling
+       unresolved attempts "no retry", which reads as a decision that has been
+       made. It has not: the processor has not answered yet, and the next
+       execute sweeps these from the rail's own ledger. Saying "no retry" here
+       is the same fault as telling a shopper their bank declined a payment the
+       bank never saw. An unresolved state must LOOK unresolved. */
+    if (a.outcome === 'dispatched' || a.outcome === 'processor_unreachable') {
+      return { text: 'awaiting verdict', cls: 'ops-next-pending' };
+    }
     if (a.outcome === 'succeeded') {
       return {
         text: (a.next_billing_date ? fmtDate(a.next_billing_date) : 'next cycle') + ' · next cycle',
