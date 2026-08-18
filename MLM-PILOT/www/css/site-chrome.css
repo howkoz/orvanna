@@ -69,21 +69,21 @@
   /* The bar is translucent so content shows through the blur.
      0.94 rather than the 0.78 it started at: in the light theme
      a white page scrolls underneath, and at 0.78 the bar
-     composited to about #3D4143, which put the Enroll
+     composited to about #4B453D, which put the Enroll
      placeholder at 2.84 to 1. At 0.94 it composites to about
-     #151A26 over white and 4.98 to 1, and over the dark field
+     #F1EDE6 over white and 4.98 to 1, and over the dark field
      it is indistinguishable from the old value. */
-  --chrome-bg:     rgba(6, 11, 24, 0.94);
-  --chrome-foot:   #050914;
-  --chrome-hi:     #FFFFFF;
-  --chrome-head:   #F1F5F9;
-  --chrome-brand:  #F8FAFC;
-  --chrome-text:   #C7D0DE;
-  --chrome-muted:  #94A3B8;
-  --chrome-quiet:  #7C8AA0;
-  --chrome-line:   rgba(129, 140, 248, 0.18);
-  --chrome-accent: #22D3EE;
-  --chrome-indigo: #818CF8;
+  --chrome-bg:     #EAE4D9;
+  --chrome-foot:   #1B1917;
+  --chrome-hi:     #1B1917;
+  --chrome-head:   #1B1917;
+  --chrome-brand:  #1B1917;
+  --chrome-text:   #4B453D;
+  --chrome-muted:  #6B645A;
+  --chrome-quiet:  #8A8278;
+  --chrome-line:   #1B1917;
+  --chrome-accent: #EC3013;
+  --chrome-indigo: #1B1917;
 }
 
 /* ============================================================
@@ -97,7 +97,7 @@
   z-index: 100;
   padding: 12px 20px;
   background: var(--chrome-accent);
-  color: #05121C;
+  color: #FFFFFF;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -115,9 +115,9 @@
   top: 0;
   z-index: 50;
   background: var(--chrome-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--chrome-line);
+  backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom: 2px solid var(--chrome-line);
 }
 
 .nav-inner {
@@ -148,9 +148,9 @@
 .brand-mark {
   width: 18px;
   height: 18px;
-  border: 1px solid rgba(34, 211, 238, 0.75);
-  border-radius: 5px;
-  box-shadow: inset 0 0 0 3px rgba(129, 140, 248, 0.18);
+  border: 1px solid rgba(236, 48, 19, 0.75);
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .brand-word {
@@ -192,10 +192,10 @@
 
 .nav-link {
   position: relative;
-  font-size: 0.84rem;
+  font-size: 12.5px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   text-decoration: none;
   color: var(--chrome-text);
   padding-bottom: 3px;
@@ -212,8 +212,8 @@ a.nav-link::after {
   right: 0;
   bottom: -2px;
   height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--chrome-accent), var(--chrome-indigo));
+  border-radius: 0;
+  background: #1B1917;
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.28s ease;
@@ -232,11 +232,11 @@ span.nav-link.is-active::after {
   right: 0;
   bottom: -2px;
   height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--chrome-accent), var(--chrome-indigo));
+  border-radius: 0;
+  background: #1B1917;
 }
 
-/* The "not yet" register. #7C8AA0 rather than #64748B: the old
+/* The "not yet" register. #8A8278 rather than #64748B: the old
    value computed 4.13 to 1 against the bar, under the floor.
    This one computes 5.61 to 1 on the dark field and 4.98 to 1
    where the bar composites over a white page, and it still sits
@@ -253,7 +253,7 @@ span.nav-link.is-active::after {
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   border: 1px solid rgba(124, 138, 160, 0.7);
-  border-radius: 999px;
+  border-radius: 0;
   vertical-align: 2px;
 }
 
@@ -276,7 +276,7 @@ span.nav-link.is-active::after {
 
 .nav-signin:hover {
   color: var(--chrome-accent);
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.55);
+  text-shadow: none;
 }
 
 /* ---------- the theme control ----------
@@ -298,7 +298,7 @@ span.nav-link.is-active::after {
   flex: 0 0 auto;
   padding: 0;
   border: 1px solid var(--chrome-line);
-  border-radius: 10px;
+  border-radius: 0;
   background: transparent;
   color: var(--chrome-text);
   cursor: pointer;
@@ -307,8 +307,8 @@ span.nav-link.is-active::after {
 
 .nav-theme:hover {
   color: var(--chrome-accent);
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(34, 211, 238, 0.08);
+  border-color: rgba(236, 48, 19, 0.5);
+  background: rgba(236, 48, 19, 0.08);
 }
 
 .nav-theme:focus-visible {
@@ -431,7 +431,7 @@ span.nav-link.is-active::after {
 }
 .footer .footer-mail:hover {
   color: var(--chrome-accent);
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
+  text-shadow: none;
 }
 
 .footer .socials { display: flex; gap: 14px; }
@@ -443,15 +443,15 @@ span.nav-link.is-active::after {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--chrome-line);
-  border-radius: 50%;
+  border-radius: 0;
   color: var(--chrome-muted);
   transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .footer .social svg { width: 17px; height: 17px; }
 .footer .social:hover {
   color: var(--chrome-accent);
-  border-color: rgba(34, 211, 238, 0.5);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+  border-color: rgba(236, 48, 19, 0.5);
+  box-shadow: none;
 }
 
 .footer .legal {
@@ -518,3 +518,24 @@ span.nav-link.is-active::after {
   .skip-link,
   .footer { display: none !important; }
 }
+
+
+/* ============================================================
+   THE FOOTER KEEPS THE INK GROUND (redesign, 2026-08-18)
+
+   The bar moved to paper but the footer stays ink, and both were
+   reading the same --chrome-* text tokens. Those tokens now carry
+   paper values, so the footer's own text is restated here against
+   its dark ground rather than inheriting ink-on-ink.
+   ============================================================ */
+.footer { background: #1B1917; border-top: 2px solid #1B1917; }
+.footer,
+.footer .flink,
+.footer .footer-mail { color: #C9C6C1; }
+.footer .footer-head { color: #F8F7F5; }
+.footer .flink:hover,
+.footer .footer-mail:hover { color: #FF6A4A; }
+.footer .footer-meta,
+.footer .footer-legal,
+.footer .disclaimer { color: #8F8981; }
+.footer .social { border-color: #4A453F; color: #C9C6C1; }

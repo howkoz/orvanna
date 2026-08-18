@@ -1283,7 +1283,7 @@ async function renderCompany() {
       ["executive", c.rank_executive_count]
     ];
     const maxCount = Math.max(...dist.map(function (d) { return Number(d[1]); })) || 1;
-    const colors = { member: "#64748B", builder: "#818CF8", leader: "#22D3EE", director: "#FBBF24", executive: "#C084FC" };
+    const colors = { member: "#64748B", builder: "#1B1917", leader: "#EC3013", director: "#FBBF24", executive: "#C084FC" };
     html += '<div class="chart-box"><div class="chart-title">Rank distribution, ' + esc(periodShort(state.period)) + "</div>";
     dist.forEach(function (d) {
       const w = Math.max(0.8, Number(d[1]) / maxCount * 100);
