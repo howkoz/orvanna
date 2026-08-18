@@ -2916,7 +2916,27 @@ body.payment-in-flight .checkout-summary {
   align-items: start;
 }
 
-.catalog-main { min-width: 0; padding-top: 34px; }
+/* THE COLUMN DIVIDER. The comp shows one continuous 2px ink rule between
+   the list and the rail, running the height of the catalog. It cannot live
+   on .rail: the rail is position:sticky and align-self:start, so its border
+   is only as tall as its own content and stops dead a third of the way down
+   an empty cart. It lives here instead, on the taller column, centred in the
+   34px grid gap. */
+.catalog-main {
+  min-width: 0;
+  padding-top: 34px;
+  position: relative;
+}
+
+.catalog-main::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -18px;
+  width: 2px;
+  background: var(--shop-strong);
+}
 
 .catalog-title {
   font-size: clamp(1.9rem, 3.4vw, 2.6rem);
@@ -3188,7 +3208,6 @@ body.payment-in-flight .checkout-summary {
   position: sticky;
   top: 88px;
   align-self: start;
-  border-left: 2px solid var(--shop-strong);
   padding: 34px 0 26px 24px;
 }
 .rail.is-tall { position: static; }
@@ -3354,6 +3373,8 @@ body.payment-in-flight .checkout-summary {
 @media (max-width: 1080px) {
   /* the rail stops being a rail and becomes a block above the list */
   .catalog-shell { grid-template-columns: minmax(0, 1fr); }
+  /* stacked: there is no column boundary left to draw */
+  .catalog-main::after { display: none; }
   .rail {
     position: static;
     order: -1;
@@ -3389,40 +3410,37 @@ body.payment-in-flight .checkout-summary {
 
 
 /* ---------- catalog delta against the approved design, 2026-08-18 ----------
-   The reading column sits on the ground as a bordered panel rather than
-   floating on the page, and the active filter pill is ink. The accent is
-   reserved for the one primary action, which on this page is Add the pack. */
+   CORRECTED 2026-08-18 (second pass), and the correction is smaller than
+   the thing it corrects.
 
-.catalog-shell {
-  padding-top: 26px;
-  align-items: stretch;
-}
+   The first pass read the comp's ARTBOARD EDGE as a page element and
+   rebuilt the reading column as a bordered panel on a raised ground, then
+   set the rail's border-left to 0 because the new box already looked
+   divided. Neither was in the design. In 9a that border wraps the whole
+   screen, nav included: it is the canvas separating the artboard from its
+   background, the way every design tool draws a frame. Recreating it put a
+   card back on a page whose stated premise is that rules and alignment
+   organise INSTEAD of boxes, and it spent the page's heaviest line to do
+   it. What Howard saw as thin lines was the 2px ink rule between the list
+   and the rail being replaced by a 1px box edge.
 
-.catalog-main {
-  background: #F1EDE6;
-  border: 1px solid rgba(27, 25, 23, 0.28);
-  padding: 30px 30px 34px;
-}
+   It also inverted the two grounds: the column was raised to #F1EDE6 and
+   the promoted pack sunk to #EAE4D9, when the token table gives
+   paper-raised to "a panel that must separate from the ground" and the
+   pack is the only such panel here.
 
-.rail {
-  border-left: 0;
-  border-top: 0;
-  padding: 30px 0 26px 26px;
-}
+   So the base rules above were right all along and this block no longer
+   overrides them. What the first pass got right is kept, and it is only
+   this: the active filter pill is ink, so the accent stays on the one
+   primary action, which on this page is Add the pack. (Whole money and
+   the per-pack marks were markup changes and live in shop.html.)
 
-.promo {
-  background: #EAE4D9;
-  border-left: 1px solid rgba(27, 25, 23, 0.25);
-  border-right: 1px solid rgba(27, 25, 23, 0.25);
-}
+   The lesson, for the pages still to come: an artboard frame is not a
+   border. Read a comp's outermost rectangle as the canvas until something
+   inside it proves otherwise. */
 
 .filter-pill[aria-pressed="true"] {
   background: var(--shop-strong);
   border-color: var(--shop-strong);
   color: #EAE4D9;
-}
-
-@media (max-width: 1080px) {
-  .catalog-main { padding: 22px 20px 26px; }
-  .rail { padding: 22px 0 20px; }
 }
