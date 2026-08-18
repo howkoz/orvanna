@@ -1657,7 +1657,8 @@ a.back-to-shop { text-decoration: none; }
 
 .pdp-buy > .tier-badge,
 .pdp-name,
-.pdp-blurb {
+.pdp-blurb,
+.pdp-facts {
   grid-column: 1;
 }
 
@@ -1688,6 +1689,48 @@ a.back-to-shop { text-decoration: none; }
   color: var(--shop-muted);
   max-width: 42em;
   margin-bottom: 0;
+}
+
+/* ---------- the product's non-price facts ----------
+   A definition list in all but name: a short key, then the fact.
+   It lives under the blurb so the left column carries the product
+   and the price box carries the purchase. Keys are a fixed column
+   so the values line up; below 620px that column collapses and the
+   pairs stack, because a 92px key beside a wrapped sentence on a
+   phone is worse than two lines. */
+
+.pdp-facts {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(129, 140, 248, 0.14);
+  max-width: 42em;
+}
+
+.pdp-fact {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 4px 14px;
+  padding: 7px 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.pdp-fact + .pdp-fact {
+  border-top: 1px solid rgba(129, 140, 248, 0.08);
+}
+
+.pdp-fact-key {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--shop-indigo-ink);
+  padding-top: 2px;
+}
+
+.pdp-fact-val {
+  color: var(--shop-muted);
 }
 
 .pdp-price-box {
@@ -1789,13 +1832,6 @@ a.back-to-shop { text-decoration: none; }
   margin-bottom: 6px;
 }
 
-.pdp-pv-note {
-  font-size: 0.74rem;
-  line-height: 1.55;
-  color: var(--shop-muted);
-  margin-bottom: 16px;
-}
-
 .btn-add-pdp {
   max-width: none;
   min-height: 44px;
@@ -1809,14 +1845,6 @@ a.back-to-shop { text-decoration: none; }
 .pdp-toast a {
   color: var(--shop-accent-ink);
   font-weight: 700;
-}
-
-.pdp-digital {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(129, 140, 248, 0.14);
-  font-size: 0.76rem;
-  color: var(--shop-muted);
 }
 
 /* includes section (bundles and packs) */
@@ -2026,6 +2054,11 @@ a.back-to-shop { text-decoration: none; }
   .prose-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 620px) {
+  /* a 128px key beside a wrapped sentence is worse than two lines */
+  .pdp-fact { grid-template-columns: 1fr; gap: 2px; }
+}
+
 @media (max-width: 600px) {
   .product-grid { grid-template-columns: 1fr; gap: 20px; }
   .tier-band { padding: 48px 0 16px; }
@@ -2039,9 +2072,14 @@ a.back-to-shop { text-decoration: none; }
   .pdp-hero { padding: 34px 0 46px; }
   .pdp-grid { grid-template-columns: 64px minmax(0, 1fr); gap: 14px; }
   .pdp-buy { display: contents; }
+  /* .pdp-facts belongs in this list. When .pdp-buy becomes
+     display: contents its children are laid out by .pdp-grid, whose
+     first column is the 64px product mark. Anything left at column 1
+     is squeezed into that 64px and wraps one word per line. */
   .pdp-buy > .tier-badge,
   .pdp-name,
-  .pdp-blurb {
+  .pdp-blurb,
+  .pdp-facts {
     grid-column: 2;
   }
   .pdp-mark {

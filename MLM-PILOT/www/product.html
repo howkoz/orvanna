@@ -98,6 +98,23 @@
         <h1 class="pdp-name" id="prodName">Agent</h1>
         <p class="pdp-blurb" id="prodBlurb"></p>
 
+        <!-- THE LEFT COLUMN CARRIES THE FACTS THAT ARE NOT PRICES.
+             Both of these lines used to sit inside the price box, which made
+             that box 390px tall next to 120px of copy and left 270px of empty
+             column beside it. They are product facts, not payment facts, so
+             they belong with the name and the blurb; the box is left to say
+             only what it costs and how to buy it. -->
+        <ul class="pdp-facts">
+          <li class="pdp-fact">
+            <span class="pdp-fact-key">Delivery</span>
+            <span class="pdp-fact-val">Digital. This product activates on your account, nothing ships.</span>
+          </li>
+          <li class="pdp-fact">
+            <span class="pdp-fact-key">Volume</span>
+            <span class="pdp-fact-val">Every purchase carries Personal Volume (PV), the number that counts toward your qualified month, in either mode.</span>
+          </li>
+        </ul>
+
         <div class="pdp-price-box glass">
           <span class="accent-bar" aria-hidden="true"></span>
 
@@ -118,8 +135,6 @@
           </div>
 
           <p class="pdp-alt" id="prodAlt"></p>
-          <p class="pdp-pv-note">Every purchase carries Personal Volume (PV), the number that counts toward your qualified month, in either mode.</p>
-
           <button class="btn-add btn-add-pdp" type="button" id="addBtn">
             <span class="add-label-default" id="addLabel">Add to cart</span>
             <svg class="add-check" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -128,8 +143,6 @@
             <span class="add-label-added" hidden>Added</span>
           </button>
           <p class="pdp-toast" id="addedToast" hidden>Added to your cart. <a href="shop.html#cart">View cart</a></p>
-
-          <p class="pdp-digital">Digital delivery: this product activates on your account, nothing ships.</p>
         </div>
       </div>
 
