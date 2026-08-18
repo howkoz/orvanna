@@ -1243,21 +1243,33 @@ html[data-theme="light"] .panel-body {
   color: var(--muted);
   font-size: 11px;
 }
+/* THE CHARTS REJOIN THE PALETTE, 2026-08-18.
+
+   These four rules restated the old indigo #7C8CF8 and cyan #38BDF8 as
+   literals, AFTER the token definitions, so every bar and every trend line
+   in the office stayed periwinkle through the whole palette pass. The pass
+   zeroed the border-radius in this very block and did not touch the fills
+   beside them, which is what a search-and-replace over colour values does
+   when a rule overrides a token rather than using it.
+
+   They resolve through the drawing tokens now, which is what those tokens
+   were declared for: "every fill inside a chart resolves through one of
+   these so the light theme can restate it". */
 .seg-own,
 .mom-own {
-  fill: #7C8CF8;
+  fill: var(--c-own);
 }
 .seg-cust,
 .mom-cust {
-  fill: #38BDF8;
+  fill: var(--c-cust);
   stroke: none;
 }
 .mom-area {
-  fill: rgba(124, 140, 248, 0.14);
+  fill: var(--c-earn-fill);
 }
 .mom-stroke,
 .trend-line {
-  stroke: #7C8CF8;
+  stroke: var(--c-earn);
 }
 .mix-bar,
 .dist-track,
@@ -1350,4 +1362,370 @@ html[data-theme="light"] .panel-body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
   .spinner { border-top-color: var(--indigo-soft); }
+}
+
+
+/* ============================================================
+   THE MEMBER OFFICE, REDESIGNED
+   Handoff screen 7a, built 2026-08-18.
+
+   The structural change is that five tab-swapped panels became one
+   page. Everything below dresses that: the ink sidebar, the answer
+   band, and the numbered blocks under it.
+
+   Zero radius, no shadows. Every numeric surface is tabular and
+   every numeric column is right aligned.
+   ============================================================ */
+
+.portal-shell {
+  display: grid;
+  grid-template-columns: 252px 1fr;
+  min-height: 100vh;
+  align-items: start;
+}
+
+/* ---------- the sidebar ---------- */
+
+.portal-sidebar {
+  background: #1B1917;
+  color: #C9C6C1;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #F8F7F5;
+  text-decoration: none;
+}
+.portal-brand .brand-mark { width: 24px; height: 24px; border: 0; flex-shrink: 0; }
+.portal-brand .brand-mark svg { display: block; width: 100%; height: 100%; }
+/* On ink the structural bars are paper and the accent takes its on-ink
+   form; #EC3013 on #1B1917 is too close to read. */
+.portal-brand .mark-bar { fill: #EAE4D9; }
+.portal-brand .mark-accent { fill: #FF6A4A; }
+.portal-brand .brand-word {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.portal-pill {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid #4A453F;
+  padding: 4px 7px;
+  color: #8F8981;
+  margin-left: auto;
+}
+
+.side-block { border-top: 1px solid #4A453F; padding-top: 18px; }
+
+.side-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8F8981;
+  margin: 0 0 10px;
+}
+.side-kicker-sm { margin-top: 18px; }
+
+.side-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #F8F7F5;
+  margin: 0 0 4px;
+}
+.side-code {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #C9C6C1;
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 12px;
+}
+.side-rank {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: #EAE4D9;
+  color: #1B1917;
+  padding: 5px 9px;
+  margin: 0;
+}
+
+.side-period { display: flex; align-items: center; gap: 10px; }
+.side-period .period-select {
+  flex: 1 1 auto;
+  background: none;
+  border: 1px solid #4A453F;
+  border-radius: 0;
+  color: #F8F7F5;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 9px;
+}
+.side-period-state {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FF6A4A;
+  white-space: nowrap;
+}
+.side-period-state.is-locked { color: #8F8981; }
+.side-note {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #8F8981;
+  margin: 10px 0 0;
+}
+
+.side-block .picker-input {
+  width: 100%;
+  background: none;
+  border: 1px solid #4A453F;
+  border-radius: 0;
+  color: #F8F7F5;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 8px 9px;
+}
+
+/* One-pixel gaps, and the active item is a paper block with ink text. */
+.side-nav { display: grid; gap: 1px; border-top: 1px solid #4A453F; padding-top: 18px; }
+.side-link {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #C9C6C1;
+  padding: 13px 12px;
+  border: 0;
+  background: none;
+}
+.side-link:hover { color: #F8F7F5; }
+.side-link.is-active { background: #EAE4D9; color: #1B1917; }
+
+.site-links { margin-top: auto; border-top: 1px solid #4A453F; padding-top: 18px; display: grid; gap: 2px; }
+.site-link {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #8F8981;
+  background: none;
+  border: 0;
+  padding: 7px 0;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+.site-link:hover { color: #F8F7F5; }
+
+/* ---------- the workspace ---------- */
+
+.portal-workspace { background: #EAE4D9; min-width: 0; }
+
+.topbar { border-bottom: 2px solid #1B1917; }
+.topbar-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  flex-wrap: wrap;
+}
+.top-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8A8278;
+  margin: 0 0 10px;
+}
+.workspace-title h1 {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: #1B1917;
+  margin: 0;
+}
+.controls { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.pbtn {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid #1B1917;
+  border-radius: 0;
+  padding: 11px 16px;
+  cursor: pointer;
+}
+.pbtn-line { background: none; color: #1B1917; }
+.pbtn-line:hover { background: rgba(236, 48, 19, 0.07); }
+.pbtn-solid { background: #1B1917; color: #EAE4D9; }
+.pbtn-solid:hover { background: #EC3013; border-color: #EC3013; color: #FFFFFF; }
+
+/* ---------- the answer band ---------- */
+
+.answers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #1B1917;
+  border-bottom: 2px solid #1B1917;
+}
+.answer { padding: 26px 30px 30px; }
+.answer + .answer { border-left: 1px solid #4A453F; }
+.answer-raised { background: #232019; }
+
+.answer-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8F8981;
+  margin: 0 0 16px;
+}
+.answer-kicker-accent { color: #FF6A4A; }
+
+.answer-head { display: flex; align-items: baseline; gap: 14px; }
+.answer-big {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: #F8F7F5;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+.answer-side {
+  font-size: 15px;
+  font-weight: 700;
+  color: #C9C6C1;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+/* THE METER CAPS AT 100 PERCENT, in the stylesheet as well as the script:
+   the width is written by renderAnswers with Math.min, and max-width here
+   is the second lock. A ratio above one is not a measurement. */
+.answer-meter { height: 8px; background: #4A453F; margin: 18px 0 14px; }
+.answer-fill {
+  height: 100%;
+  max-width: 100%;
+  background: #EAE4D9;
+  transition: width 0.35s ease;
+}
+
+.answer-note {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #8F8981;
+  margin: 0;
+}
+
+.answer-tag {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid #8F8981;
+  color: #C9C6C1;
+  padding: 5px 8px;
+  margin: 14px 0 12px;
+}
+
+.todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.todo-row { display: grid; grid-template-columns: 11px 1fr; gap: 0 12px; align-items: start; }
+.todo-sq {
+  width: 11px;
+  height: 11px;
+  margin-top: 4px;
+  border: 1.5px solid #FF6A4A;
+  background: none;
+}
+.todo-sq.is-blocking { background: #FF6A4A; }
+.todo-what { display: block; font-size: 13.5px; font-weight: 700; color: #F8F7F5; margin-bottom: 4px; }
+.todo-why { display: block; font-size: 12.5px; line-height: 1.45; color: #8F8981; }
+
+/* ---------- the numbered blocks ---------- */
+
+/* Every panel is visible. `.panel.active` used to be the only one shown;
+   that class no longer decides anything and is left inert rather than
+   hunted through five renderers. */
+.panel { display: block; border-bottom: 2px solid #1B1917; padding: 26px 32px 32px; }
+.panel:last-of-type { border-bottom: 0; }
+
+/* The number and title come from the markup, so a panel cannot ship
+   without one and the renderers do not each invent their own heading. */
+.panel::before {
+  content: attr(data-num) "   " attr(data-title);
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #1B1917;
+  margin-bottom: 18px;
+  white-space: pre;
+}
+
+#main.is-loading .panel:not(:first-of-type) { display: none; }
+#main.is-loading .answers { display: none; }
+
+.footer {
+  background: #1B1917;
+  color: #8F8981;
+  font-size: 12px;
+  padding: 18px 32px;
+  border-top: 2px solid #1B1917;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1080px) {
+  .portal-shell { grid-template-columns: 1fr; }
+  .portal-sidebar {
+    position: static;
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 18px 28px;
+  }
+  .site-links { margin-top: 0; }
+  .answers { grid-template-columns: 1fr; }
+  .answer + .answer { border-left: 0; border-top: 1px solid #4A453F; }
+}
+
+@media (max-width: 700px) {
+  .topbar-inner, .panel, .footer { padding-left: 20px; padding-right: 20px; }
+  .workspace-title h1 { font-size: 30px; }
+  .answer { padding: 22px 20px 26px; }
 }
