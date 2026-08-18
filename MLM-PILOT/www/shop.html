@@ -869,17 +869,21 @@
   var MARKS = {
     payment: 'P',  shipping: 'S',  pricing: '%',  inventory: 'I',
     marketing: 'M', tax: 'T',      engineer: '<>', qa: 'Q',
-    secretary: 'C', executive: 'E', accounting: '$', care: 'H'
+    secretary: 'C', executive: 'E', accounting: '$', care: 'H',
+    manager: 'A',   ignition: '1',  momentum: '5',   constellation: '*'
   };
+
+  /* Catalog money is whole: every price here is a round figure and the
+     design shows it that way. Checkout keeps fmtMoney and its cents. */
+  function fmtRound(n) {
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
 
   function markOf(p) {
     /* Packs count what they contain; agents carry a distinct character.
        The first letter alone collided three ways: Payment and Pricing
        were both P, and Shipping, Software Engineer and Secretary were
        all S. */
-    if (p.tier === 'bundle' || p.tier === 'pack') {
-      return String(p.includes ? p.includes.length : 1);
-    }
     return MARKS[p.sku] || p.name.charAt(0).toUpperCase();
   }
 
@@ -894,7 +898,7 @@
           '<a class="row-link" href="product.html?sku=' + p.sku + '">' + p.name + '</a>' +
           '<span class="row-desc">' + p.blurb + '</span>' +
         '</span>' +
-        '<span class="row-price">' + fmtMoney(p.sub.price) + '<span class="per">/mo</span></span>' +
+        '<span class="row-price">' + fmtRound(p.sub.price) + '<span class="per">/mo</span></span>' +
         '<span class="row-pv">' + fmtPv(p.sub.pv) + '</span>' +
         (held
           ? '<button class="row-btn is-held" type="button" data-remove-sku="' + p.sku + '">Remove</button>'
@@ -937,9 +941,9 @@
         '<div class="promo-chips">' + chips + '</div>' +
       '</div>' +
       '<div class="promo-buy">' +
-        '<span class="promo-price">' + fmtMoney(p.sub.price) + '<span class="per">/mo</span></span>' +
+        '<span class="promo-price">' + fmtRound(p.sub.price) + '<span class="per">/mo</span></span>' +
         '<span class="promo-pv">' + fmtPv(p.sub.pv) + '</span>' +
-        '<span class="promo-once">or ' + fmtMoney(p.once.price) + ' outright</span>' +
+        '<span class="promo-once">or ' + fmtRound(p.once.price) + ' outright</span>' +
         (held
           ? '<button class="promo-btn is-held" type="button" data-remove-sku="' + p.sku + '">Remove the pack</button>'
           : '<button class="promo-btn" type="button" data-add="' + p.sku + '">Add the pack</button>') +
@@ -965,14 +969,14 @@
       return '<div class="rail-line">' +
         '<span class="rail-line-name">' + p.name + (q > 1 ? ' &times; ' + q : '') +
           '<span class="rail-line-pv">' + fmtPv(pv) + (one ? ' &middot; one time' : '') + '</span></span>' +
-        '<span class="rail-line-money">' + fmtMoney(money) + '</span>' +
+        '<span class="rail-line-money">' + fmtRound(money) + '</span>' +
         '<button class="rail-remove" type="button" data-remove="' + key + '">Remove</button>' +
       '</div>';
     }).join('');
 
     el.innerHTML =
       '<p class="rail-kicker">Your month</p>' +
-      '<p class="rail-total">' + fmtMoney(t.subMoney) + '<span class="per">/mo</span></p>' +
+      '<p class="rail-total">' + fmtRound(t.subMoney) + '<span class="per">/mo</span></p>' +
       '<div class="rail-qual">' +
         '<span>Qualified month</span>' +
         '<span class="rail-qual-state' + (met ? ' is-met' : '') + '">' +
