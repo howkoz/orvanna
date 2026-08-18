@@ -762,14 +762,28 @@
 
 #paymentPanel { position: relative; }
 
+/* THE ORDER SUMMARY IS NOT A SCROLL REGION.
+   It used to be capped at calc(100vh - 120px) with its own
+   overflow-y, which put a second scrollbar inside the page's
+   scrollbar. Measured 2026-08-18 at 1440x950: a three-item cart
+   already trapped 27px behind it, six items trapped 157px, and a
+   full cart trapped 1,180px. Three items is an ordinary order, so
+   this was not an edge case.
+
+   The rail now grows to its content. It still sticks, but only
+   while it actually fits: a sticky box taller than the viewport
+   pins its own top and puts its bottom permanently out of reach,
+   which is worse than the nested scrollbar it replaced. The
+   .is-tall switch is set from shop.html by a ResizeObserver. */
 .checkout-summary {
   position: sticky;
   top: 96px;
   align-self: start;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  scrollbar-gutter: stable;
   z-index: 2;
+}
+
+.checkout-summary.is-tall {
+  position: static;
 }
 
 .checkout-panel-title {

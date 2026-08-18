@@ -519,31 +519,51 @@ section { scroll-margin-top: 84px; }
 }
 
 /* ============================================================
-   SCROLL REVEALS (JavaScript adds .is-in once per section)
-   Hidden state is gated behind html.js so content is never
-   invisible if scripts fail to run.
+   SCROLL REVEALS: FAIL VISIBLE, NEVER INVISIBLE
+
+   Until 2026-08-18 hidden was the DEFAULT and JavaScript added
+   .is-in to bring content back. Anything the observer never saw
+   therefore stayed at opacity 0 for good. That was not a
+   hypothetical: measured on the live site, a full-page capture
+   taken without scrolling rendered the whole technology section
+   and the whole team section blank, and jumping straight to the
+   bottom of the page left two sections permanently unrevealed.
+   Screenshot tools, printing, and any reader who follows an
+   anchor or scrolls faster than the observer samples all hit it.
+
+   The comment this replaces claimed html.js meant content was
+   "never invisible if scripts fail to run". That covered only
+   the case where scripting is off entirely. It did not cover the
+   far more common one: scripting on, observer alive, element
+   simply never intersected.
+
+   Visible is now the default. JavaScript adds .is-out only to
+   elements ALREADY below the fold, so the hide is never
+   witnessed, and only when there is an observer to take it off
+   again. A missed intersection now fails readable.
    ============================================================ */
 
 .js .reveal {
-  opacity: 0;
-  transform: translateY(22px);
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
-.js .reveal.is-in {
-  opacity: 1;
-  transform: none;
-}
-
-/* staggered children: tiles arrive one after another */
-.js .stagger > * {
+.js .reveal.is-out {
   opacity: 0;
   transform: translateY(22px);
+}
+
+/* staggered children: tiles arrive one after another. The delays
+   sit on the visible state, because that is the direction that
+   gets watched; the hide happens off screen. */
+.js .stagger > * {
   transition: opacity 0.65s ease, transform 0.65s ease;
 }
-.js .stagger.is-in > * { opacity: 1; transform: none; }
-.js .stagger.is-in > *:nth-child(2) { transition-delay: 0.12s; }
-.js .stagger.is-in > *:nth-child(3) { transition-delay: 0.24s; }
-.js .stagger.is-in > *:nth-child(4) { transition-delay: 0.36s; }
+.js .stagger.is-out > * {
+  opacity: 0;
+  transform: translateY(22px);
+}
+.js .stagger > *:nth-child(2) { transition-delay: 0.12s; }
+.js .stagger > *:nth-child(3) { transition-delay: 0.24s; }
+.js .stagger > *:nth-child(4) { transition-delay: 0.36s; }
 
 /* ============================================================
    OVERVIEW METRICS: glass tiles, numbers count up
@@ -1160,6 +1180,13 @@ section { scroll-margin-top: 84px; }
 }
 
 
+/* Printing never scrolls, so it must never inherit a scroll
+   trigger's hidden state. */
+@media print {
+  .js .reveal.is-out,
+  .js .stagger.is-out > * { opacity: 1 !important; transform: none !important; }
+}
+
 /* ============================================================
    REDUCED MOTION: static everything, content fully visible
    ============================================================ */
@@ -1167,8 +1194,8 @@ section { scroll-margin-top: 84px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
-  .js .reveal,
-  .js .stagger > * { opacity: 1 !important; transform: none !important; }
+  .js .reveal.is-out,
+  .js .stagger.is-out > * { opacity: 1 !important; transform: none !important; }
 }
 
 /* ============================================================

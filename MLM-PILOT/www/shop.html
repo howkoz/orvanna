@@ -1042,7 +1042,17 @@
     if (!fill) return;
     var pct = Math.min(100, pv);
     fill.style.width = pct + '%';
-    now.textContent = pv.toLocaleString('en-US') + ' / 100 PV';
+    /* A FRACTION ONLY MAKES SENSE WHILE YOU ARE STILL SHORT OF THE
+       LINE. Past it the same template printed "800 / 100 PV", which
+       reads as a ratio above one and invites the reader to think
+       something is broken. Below the line the fraction is exactly
+       what you want to see; at or above it, the figure alone is.
+       The bar itself was never the problem: pct is capped above and
+       .pv-track clips, measured 379px of fill in a 381px track at
+       800 PV. */
+    now.textContent = pv >= 100
+      ? fmtPv(pv)
+      : pv.toLocaleString('en-US') + ' / 100 PV';
     if (pv >= 100) {
       meter.classList.add('is-qualified');
       note.textContent = 'Qualified month reached at ' + fmtPv(pv) + '.';
@@ -3346,6 +3356,47 @@
      script, recorded in ROADMAP.md; the vendor's own floating button stays
      hidden in the stylesheet so nothing can open itself over the cart control
      on a phone or over the card form during checkout. -->
+<script>
+/* ============================================================
+   ORDER SUMMARY: STICK ONLY WHILE IT FITS
+
+   The rail no longer scrolls inside itself (see .checkout-summary
+   in css/shop.css). That leaves one hazard: position: sticky on a
+   box TALLER than the viewport pins the box's top and carries its
+   bottom off screen, where the page scroll can never reach it. So
+   stickiness is withdrawn at exactly the height where it would
+   start trapping content, and the rail becomes an ordinary column
+   that scrolls with the page.
+
+   Driven by a ResizeObserver rather than the cart's render path,
+   because the rail also changes height when a tax line appears, a
+   promotion is applied, or the window is resized, and none of
+   those go through the same function.
+   ============================================================ */
+(function () {
+  var rail = document.querySelector('.checkout-summary');
+  if (!rail) return;
+
+  var TOP_GAP = 120;            /* the 96px offset plus breathing room */
+
+  function sync() {
+    var room = (window.innerHeight || document.documentElement.clientHeight) - TOP_GAP;
+    rail.classList.toggle('is-tall', rail.scrollHeight > room);
+  }
+
+  sync();
+  window.addEventListener('resize', sync, { passive: true });
+
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(sync).observe(rail);
+  } else {
+    /* No ResizeObserver: re-check on the interactions that change
+       the rail's height. Coarser, but never leaves it trapped. */
+    document.addEventListener('click', function () { window.setTimeout(sync, 60); }, true);
+  }
+})();
+</script>
+
 <script src="js/site-chrome.js?v=5.2"></script>
 </body>
 </html>

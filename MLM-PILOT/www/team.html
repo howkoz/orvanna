@@ -502,21 +502,75 @@
    ============================================================ */
 (function () {
   var reveals = document.querySelectorAll('.reveal');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (!('IntersectionObserver' in window)) {
-    reveals.forEach(function (el) { el.classList.add('is-in'); });
-    return;
-  }
+  /* No observer: nothing was ever hidden, so there is nothing to
+     un-hide. */
+  if (!('IntersectionObserver' in window)) { return; }
 
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-in');
+      entry.target.classList.remove('is-out');
       io.unobserve(entry.target);
     });
   }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
 
-  reveals.forEach(function (el) { io.observe(el); });
+  /* HIDE ONLY WHAT IS ALREADY OUT OF SIGHT.
+     The stylesheet starts every .reveal visible. We add .is-out
+     here, and only to elements below the fold, so the hide is
+     never witnessed and an element the observer never reaches
+     stays readable rather than vanishing. Under reduced motion
+     nothing is hidden at all. */
+  var fold = window.innerHeight || document.documentElement.clientHeight;
+  reveals.forEach(function (el) {
+    if (!reduceMotion && el.getBoundingClientRect().top > fold) {
+      el.classList.add('is-out');
+    }
+    io.observe(el);
+  });
+
+  /* ONE ESCAPE ROUTE IS NOT ENOUGH. The observer alone leaves two
+     holes, both measured on the live site 2026-08-18:
+
+       a fast scroll or a jump to an anchor steps straight over a
+       section, because the observer samples rather than tracks;
+
+       and a reader that never scrolls at all -- a screenshot tool,
+       a print, a crawler -- never triggers anything, which is what
+       rendered the whole technology and team sections blank in a
+       full-page capture.
+
+     So the sweep catches anything that has reached the fold
+     whether or not the observer noticed, and the failsafe gives up
+     on animating entirely if nothing has scrolled by the time it
+     fires. The failsafe checks that flag, so a real reader never
+     loses the animation to it. */
+  function sweep() {
+    var fold = window.innerHeight || document.documentElement.clientHeight;
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.reveal.is-out'),
+      function (el) {
+        if (el.getBoundingClientRect().top < fold) { el.classList.remove('is-out'); }
+      }
+    );
+  }
+
+  var hasScrolled = false, queued = false;
+  window.addEventListener('scroll', function () {
+    hasScrolled = true;
+    if (queued) return;
+    queued = true;
+    window.requestAnimationFrame(function () { queued = false; sweep(); });
+  }, { passive: true });
+
+  window.setTimeout(function () {
+    if (hasScrolled) return;
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.reveal.is-out'),
+      function (el) { el.classList.remove('is-out'); }
+    );
+  }, 2000);
 })();
 </script>
 
