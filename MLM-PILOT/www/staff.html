@@ -280,7 +280,7 @@
               <div class="order-lookup">
                 <label class="order-label" for="staffLookupOrder">Look up an order</label>
                 <div class="lp-row">
-                  <input class="staff-field" id="staffLookupOrder" type="text" placeholder="ORV-2026-08-XXXXXX" autocomplete="off" spellcheck="false">
+                  <input class="staff-field" id="staffLookupOrder" type="text" placeholder="O-10001" autocomplete="off" spellcheck="false">
                   <button class="btn-addline" id="staffLookupBtn" type="button">Check</button>
                 </div>
                 <p class="place-hint" id="staffLookupResult" role="status" aria-live="polite"></p>
@@ -316,7 +316,7 @@
         <p class="readaloud-kicker">Read this to the caller</p>
 
         <p class="confirm-ordernum-label">Confirmation number</p>
-        <p class="confirm-ordernum" id="confOrderNum">ORV-0000-00-000000</p>
+        <p class="confirm-ordernum" id="confOrderNum">O-10001</p>
         <p class="confirm-phonetic" id="confPhonetic"></p>
 
         <div class="say-block" id="sayTotal"><span class="say-label">The total</span><span id="sayTotalText"></span></div>
@@ -1448,15 +1448,15 @@
     }).join(' ');
   }
 
+  /* SIMULATED orders only, same rule as the shop: no database here, so it
+     cannot draw the real sequence, and imitating O-##### would eventually
+     collide with a real order. A simulated order announces itself instead. */
   function orderNumber() {
     var d = new Date();
-    var y = d.getFullYear();
-    var mo = String(d.getMonth() + 1);
-    if (mo.length < 2) mo = '0' + mo;
     var ms = ((d.getHours() * 60 + d.getMinutes()) * 60 + d.getSeconds()) * 1000 + d.getMilliseconds();
-    var token = ms.toString(36).toUpperCase();
-    while (token.length < 6) token = '0' + token;
-    return { full: 'ORV-' + y + '-' + mo + '-' + token, token: token };
+    var token = String(ms);
+    while (token.length < 8) token = '0' + token;
+    return { full: 'O-SIM-' + token, token: token };
   }
 
   function placeOrder() {

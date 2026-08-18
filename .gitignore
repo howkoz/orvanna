@@ -13,3 +13,4 @@ MLM-PILOT/deploy/__pycache__/
 # Local Edge Function bundles from deploy troubleshooting.
 MLM-PILOT/functions/.bundle/
 
+~$*.xlsx

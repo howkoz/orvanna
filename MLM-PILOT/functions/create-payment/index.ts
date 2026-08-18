@@ -76,7 +76,8 @@ import { calculateTax, looksLikeTaxId, resolveTaxAddress } from "../_shared/tax.
 
 const DAILY_ORDER_CEILING = 500; // spec 5.1 circuit breaker
 
-const BASE36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+/* BASE36 removed 2026-08-17: its only use was the order number generator that
+   moved into the database (migration 030). */
 
 /* ------------------------------------------------------------
    3-D Secure (3DS) mode. Two named constants, so switching this
@@ -214,26 +215,17 @@ function buildReturnUrl(
   return `${origin.replace(/\/+$/, "")}/${page}?orv=${encodeURIComponent(orderNumber)}`;
 }
 
-/* ORV-YYYY-MM-XXXXXX: four base36 characters from the server
-   clock (seconds since UTC midnight, zero padded) plus two
-   random base36 characters, so two simultaneous strangers
-   cannot collide (spec 1.2 step 4). The order_number column is
-   unique; the insert retries on the astronomically rare clash. */
-function generateOrderNumber(): string {
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const secondsSinceMidnight =
-    now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
-  const clockPart = secondsSinceMidnight
-    .toString(36)
-    .toUpperCase()
-    .padStart(4, "0");
-  const rand = new Uint8Array(2);
-  crypto.getRandomValues(rand);
-  const randomPart = BASE36[rand[0] % 36] + BASE36[rand[1] % 36];
-  return `ORV-${year}-${month}-${clockPart}${randomPart}`;
-}
+/* The order number generator that used to live here is GONE, replaced on
+   2026-08-17 by app.fn_next_order_number() in the database (migration 030).
+   It minted ORV-YYYY-MM-XXXXXX from the server clock plus two random base36
+   characters, and the insert retried five times on the unique-key clash.
+
+   Why it moved rather than being rewritten: three separate places were
+   inventing order numbers (here, the browser's simulated checkout, and the
+   renewal engine, which minted a third shape entirely), and three more were
+   policing the format. A number minted in the database is the only version
+   all of them can share, and a sequence removes the collision the retry loop
+   existed to survive. */
 
 /* ============================================================
    TAX, CALCULATED BY AN ENGINE RATHER THAN ASSUMED
@@ -407,57 +399,54 @@ Deno.serve(async (req: Request): Promise<Response> => {
     order.tax_cents = taxOutcome.tax_cents;
     order.total_cents = taxableCents + taxOutcome.tax_cents;
 
-    /* ---- insert the pending row (idempotency anchor) ---- */
-    let orderNumber = "";
-    let inserted = false;
-    for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
-      orderNumber = generateOrderNumber();
-      try {
-        await client.queryArray(
-          `insert into app.demo_orders
-             (order_number, created_by_channel, member_id,
-              referral_code_entered, items, activation,
-              subtotal_one_cents, subtotal_sub_cents,
-              activation_fee_cents, tax_cents, tax_exempt,
-              total_cents, pv_total, payment_status,
-              tax_source, tax_calculation_id, tax_reason, tax_jurisdiction)
-           values ($1, $2, $3, $4, $5::jsonb, $6,
-                   $7, $8, $9, $10, $11, $12, $13, 'created',
-                   $14, $15, $16, $17)`,
-          [
-            orderNumber,
-            channel,
-            memberId,
-            rawMemberCode === "" ? null : rawMemberCode,
-            JSON.stringify(order.items),
-            activation,
-            order.subtotal_one_cents,
-            order.subtotal_sub_cents,
-            order.activation_fee_cents,
-            order.tax_cents,
-            taxExempt,
-            order.total_cents,
-            order.pv_total,
-            taxOutcome.source,
-            taxOutcome.calculation_id,
-            taxOutcome.reason,
-            taxOutcome.jurisdiction,
-          ],
-        );
-        inserted = true;
-      } catch (err) {
-        /* 23505 = unique_violation on order_number: regenerate. */
-        const message = err instanceof Error ? err.message : String(err);
-        if (!message.includes("23505") && !message.includes("duplicate key")) {
-          throw err;
-        }
-      }
-    }
-    if (!inserted) {
+    /* ---- insert the pending row (idempotency anchor) ----
+       THE ORDER NUMBER IS ASSIGNED BY THE DATABASE, NOT HERE. Migration 030 put
+       app.fn_next_order_number() on the column default, so the shop, the staff
+       console and the renewal engine all draw from one sequence and an order
+       number means the same thing whoever created it (Howard, 2026-08-17:
+       "regardless how the order is placed"). The column is therefore OMITTED
+       from this insert; naming it would defeat the default, which is exactly
+       how the shop kept minting the old format after the rest had moved.
+
+       The five-attempt collision retry this replaced is gone with it: a
+       sequence is atomic, so there is nothing left to collide. */
+    const insertedOrder = await client.queryObject<{ order_number: string }>(
+      `insert into app.demo_orders
+         (created_by_channel, member_id,
+          referral_code_entered, items, activation,
+          subtotal_one_cents, subtotal_sub_cents,
+          activation_fee_cents, tax_cents, tax_exempt,
+          total_cents, pv_total, payment_status,
+          tax_source, tax_calculation_id, tax_reason, tax_jurisdiction)
+       values ($1, $2, $3, $4::jsonb, $5,
+               $6, $7, $8, $9, $10, $11, $12, 'created',
+               $13, $14, $15, $16)
+       returning order_number`,
+      [
+        channel,
+        memberId,
+        rawMemberCode === "" ? null : rawMemberCode,
+        JSON.stringify(order.items),
+        activation,
+        order.subtotal_one_cents,
+        order.subtotal_sub_cents,
+        order.activation_fee_cents,
+        order.tax_cents,
+        taxExempt,
+        order.total_cents,
+        order.pv_total,
+        taxOutcome.source,
+        taxOutcome.calculation_id,
+        taxOutcome.reason,
+        taxOutcome.jurisdiction,
+      ],
+    );
+    const orderNumber = insertedOrder.rows[0]?.order_number ?? "";
+    if (!orderNumber) {
       return errorResponse(
         req,
         500,
-        "order_number_collision",
+        "order_number_not_assigned",
         "Could not assign an order number. Please try again.",
       );
     }

@@ -103,11 +103,26 @@ export function processorReason(code: ReasonCode): string {
   return code === "other" ? "requested_by_customer" : code;
 }
 
-/* Order numbers are ORV-YYYY-MM-XXXXXX (create-payment,
-   generateOrderNumber). Shape-checked before a value reaches a
-   query. Every query is parameterised regardless; this is belt
-   and suspenders and an early, clear refusal. */
-export const ORDER_NUMBER_RE = /^ORV-\d{4}-\d{2}-[0-9A-Z]{6}$/;
+/* Order numbers are O-##### as of 2026-08-17, minted by the
+   database (app.fn_next_order_number, migration 030).
+
+   THREE SHAPES ARE ACCEPTED, AND ALL THREE MUST STAY ACCEPTED.
+   Every order placed before the reformat still carries its old
+   number in legacy_order_number, and the processor's own payment
+   record still names it. Tightening this to the new shape alone
+   would make real, paid, refundable orders fail validation and
+   become unrefundable, which is a worse bug than the one the
+   reformat fixed:
+
+     O-10001              current, all channels
+     ORV-2026-08-158WRU   legacy shop and staff console
+     REN-1822-1-1         legacy renewal engine
+
+   Shape-checked before a value reaches a query. Every query is
+   parameterised regardless; this is belt and suspenders and an
+   early, clear refusal. */
+export const ORDER_NUMBER_RE =
+  /^(?:O-\d{4,}|ORV-\d{4}-\d{2}-[0-9A-Z]{6}|REN-\d+-\d+-\d+)$/;
 
 export function isOrderNumber(value: unknown): boolean {
   return typeof value === "string" && ORDER_NUMBER_RE.test(value.trim().toUpperCase());

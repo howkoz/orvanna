@@ -48,8 +48,11 @@ import {
   preflight,
   retrieveAndApplyPaymentTruth,
 } from "../_shared/edge.ts";
-
-const ORDER_NUMBER_RE = /^ORV-\d{4}-\d{2}-[0-9A-Z]{6}$/;
+/* IMPORTED, not restated. This file used to carry its own copy of the order
+   number pattern, which is how the format came to be defined in six separate
+   places. One definition per side is the rule now: the server's lives in
+   refund-rules.ts, the browser's in payments.js. */
+import { ORDER_NUMBER_RE } from "../_shared/refund-rules.ts";
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
 
 interface DemoOrderRow {
