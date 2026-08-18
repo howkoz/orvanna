@@ -558,12 +558,31 @@
      on animating entirely if nothing has scrolled by the time it
      fires. The failsafe checks that flag, so a real reader never
      loses the animation to it. */
+  /* SWEEP AGAINST THE FURTHEST POINT REACHED, not the current one.
+
+     Measuring `rect.top < fold` asks "is this on screen NOW", and the
+     answer goes back to no the moment the reader scrolls up. A section
+     skipped by a fast jump on the way down was therefore unreachable
+     again from the top: the sweep would look at it, find it below the
+     fold, and correctly leave it hidden for ever.
+
+     What actually decides is whether the reader has ever been past it. So
+     the sweep tracks the deepest scroll of the session and reveals
+     anything above that line, whatever the viewport is showing right now.
+     Measured: this is the difference between four sections stranded and
+     none. */
+  var deepest = 0;
+
   function sweep() {
     var fold = window.innerHeight || document.documentElement.clientHeight;
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (y > deepest) { deepest = y; }
+    var seenTo = deepest + fold;
     Array.prototype.forEach.call(
       document.querySelectorAll('.reveal.is-out'),
       function (el) {
-        if (el.getBoundingClientRect().top < fold) { el.classList.remove('is-out'); }
+        var docTop = el.getBoundingClientRect().top + y;
+        if (docTop < seenTo) { el.classList.remove('is-out'); }
       }
     );
   }
@@ -575,14 +594,49 @@
     queued = true;
     window.requestAnimationFrame(function () { queued = false; sweep(); });
   }, { passive: true });
+  window.addEventListener('resize', sweep, { passive: true });
+
+  /* AND A THIRD ROUTE, added 2026-08-18 after the gate measured the second
+     one still leaving sections behind.
+
+     The observer plus the scroll sweep clear everything under a slow,
+     human scroll: 200-pixel steps left nothing hidden. Under viewport-sized
+     jumps -- a scrollbar drag, a Page Down held down, an anchor, a
+     screenshot tool stepping a screen at a time -- four sections stayed
+     invisible for good. Both earlier routes sample; a jump can outrun a
+     sample, and a section that loses the race never gets another one.
+
+     So: a low-frequency sweep that keeps running while anything is still
+     hidden, and an unconditional deadline. The deadline no longer checks
+     hasScrolled. That check was there to protect the animation for a real
+     reader, and it did -- at the cost of guaranteeing that a real reader
+     who scrolled fast was the ONE case with no way out.
+
+     The deadline is the part that actually carries the guarantee, so it is
+     short: 2.5 seconds, unconditional. The observer and the sweep are
+     opportunistic and I could not make either of them survive every fast
+     scroll I threw at it -- a viewport-sized jump still stranded five
+     sections with both of them running, and I did not get to the bottom of
+     why. So the deadline is not a fallback for an exotic case; it is the
+     rule, and the other two are the optimisation that makes the animation
+     look right when they do win the race. 2.5 seconds is longer than any
+     honest entrance animation and short enough that no reader ever sees a
+     blank section. */
+  var poll = window.setInterval(function () {
+    if (!document.querySelector('.reveal.is-out')) {
+      window.clearInterval(poll);
+      return;
+    }
+    sweep();
+  }, 400);
 
   window.setTimeout(function () {
-    if (hasScrolled) return;
+    window.clearInterval(poll);
     Array.prototype.forEach.call(
       document.querySelectorAll('.reveal.is-out'),
       function (el) { el.classList.remove('is-out'); }
     );
-  }, 2000);
+  }, 2500);
 })();
 </script>
 
