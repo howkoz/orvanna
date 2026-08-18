@@ -53,6 +53,14 @@ import {
    places. One definition per side is the rule now: the server's lives in
    refund-rules.ts, the browser's in payments.js. */
 import { ORDER_NUMBER_RE } from "../_shared/refund-rules.ts";
+
+/* LOOKUPS ACCEPT THE OLD NUMBER TOO, and must keep doing so.
+   The 2026-08-17 reformat renumbered every existing order to O-#####, but the
+   number a customer actually HOLDS is whatever their receipt, their browser's
+   saved state, or the processor's own record says, and for orders placed
+   before the reformat that is the old one. Matching on order_number alone
+   would answer "no order with that number" for a real, paid order. Both
+   queries below therefore match order_number OR legacy_order_number. */
 const TERMINAL_STATUSES = new Set(["succeeded", "failed", "abandoned"]);
 
 interface DemoOrderRow {
@@ -191,7 +199,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
               total_cents, pv_total, payment_reference,
               payment_status, processor_summary
          from app.demo_orders
-        where order_number = $1`,
+        where order_number = $1
+           or legacy_order_number = $1`,
       [orderNumber],
     );
     const row = result.rows[0];
@@ -264,7 +273,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
               total_cents, pv_total, payment_reference,
               payment_status, processor_summary
          from app.demo_orders
-        where order_number = $1`,
+        where order_number = $1
+           or legacy_order_number = $1`,
       [orderNumber],
     );
     return jsonResponse(req, 200, receiptOf(fresh.rows[0]));
