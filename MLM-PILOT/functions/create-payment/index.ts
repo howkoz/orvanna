@@ -140,7 +140,48 @@ const DAILY_ORDER_CEILING = 500; // spec 5.1 circuit breaker
 
    Background: docs/3DS-RESEARCH.md, "Acquirer configuration".
    ------------------------------------------------------------ */
-const AUTHENTICATION_TYPE = "three_ds";
+/* ------------------------------------------------------------
+   AUTHENTICATION_TYPE IS NULL, DELIBERATELY, 2026-08-17.
+   Read this before hardcoding it again.
+
+   It was "three_ds" for every payment, set when Braintree was the
+   only connector on the account. That one line silently encoded
+   "we have exactly one processor" into the checkout, and it broke
+   the moment Howard put Authorize.net first in Smart Routing.
+
+   The reason, read from the source rather than the dashboard,
+   crates/hyperswitch_connectors/src/connectors/authorizedotnet.rs:
+
+       three_ds:    FeatureStatus::NotSupported
+       no_three_ds: FeatureStatus::Supported
+
+   Authorize.net's connector DECLARES that it cannot do 3-D Secure
+   on cards. We were demanding it anyway, before routing had even
+   chosen who would receive the payment, so the attempt reset and
+   the site told the shopper their bank had refused. The bank was
+   never contacted.
+
+   WHY THIS IS NOT SOLVED IN THE 3DS DECISION MANAGER: a decision
+   rule cannot test the connector. Its inputs are payment
+   attributes only (crates/euclid/src/backend/inputs.rs,
+   BackendInput: payment, payment_method, acquirer_data,
+   customer_device_data, issuer_data, mandate). The connector is
+   what ROUTING outputs, never an input a rule can read. That
+   screen is also deprecated in favour of the 3DS Exemption
+   Manager.
+
+   THE CORRECT ORDER IS THE REVERSE: decide authentication first,
+   then route to a processor that can deliver it. authentication_type
+   IS a routing dimension, so a Smart Routing rule can send
+   three_ds payments to a 3DS-capable connector (Braintree, Adyen,
+   Checkout, Cybersource, NMI, Nuvei, Zift, Archipel) while
+   everything else spreads across every connector on the account.
+
+   Omitting the field lets HyperSwitch decide per payment and per
+   connector. To force a challenge again, do it with a ROUTING rule,
+   not by putting a constant back here.
+   ------------------------------------------------------------ */
+const AUTHENTICATION_TYPE: string | null = null;
 const REQUEST_EXTERNAL_THREE_DS = false;
 
 /* ------------------------------------------------------------
@@ -479,10 +520,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
           currency: "USD",
           capture_method: "automatic",
           confirm: false,
-          /* Ask for 3-D Secure deterministically rather than
-             leaving it to the connector's own default, so the
-             flow is exercised the same way every time. */
-          authentication_type: AUTHENTICATION_TYPE,
+          /* OMITTED unless AUTHENTICATION_TYPE is set. Sending the
+             key with a null value is not the same as leaving it
+             out: HyperSwitch would read an explicit null. Spread
+             an empty object instead, so the field is genuinely
+             absent and the decision stays with HyperSwitch and the
+             connector. See the note beside AUTHENTICATION_TYPE. */
+          ...(AUTHENTICATION_TYPE
+            ? { authentication_type: AUTHENTICATION_TYPE }
+            : {}),
           /* Route authentication to the external provider
              (3DSecure.io) rather than to the payment connector's
              own 3DS. Requires the acquirer pair on the connector
