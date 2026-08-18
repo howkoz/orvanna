@@ -985,6 +985,55 @@ async function hsFindByAttemptId(
   }
 }
 
+/* RECORD WHAT THE RAIL ACTUALLY SAID (2026-08-18).
+
+   The engine's verdict door, fn_record_live_verdict, is a gated, specified
+   function and is left alone. But it writes 'rail', 'hyperswitch_braintree'
+   as a LITERAL, dating from when Braintree was the only connector, and it
+   only clears the 'simulated' flag on success. So before this, every live
+   renewal was filed as Braintree even when Authorize.net handled it, and
+   every live DECLINE was still flagged simulated.
+
+   The worker already holds the retrieve, which names the connector and
+   carries the processor's own message. Discarding it meant the only way to
+   learn which processor took a renewal was to export from the vendor
+   dashboard, and the only decline detail we kept was a bare code.
+
+   This writes the presentation truth alongside the engine's verdict:
+   the real connector, the processor's message, and simulated = false on
+   BOTH outcomes. */
+async function recordRailFacts(
+  client: DbClient,
+  attemptId: number,
+  hs: Record<string, unknown>,
+): Promise<void> {
+  const str = (v: unknown, max: number) =>
+    typeof v === "string" && v.trim() !== "" ? v.trim().slice(0, max) : null;
+  try {
+    await client.queryArray(
+      `update app.demo_orders
+          set processor_summary = coalesce(processor_summary, '{}'::jsonb)
+              || jsonb_build_object(
+                   'simulated',     false,
+                   'connector',     $2::text,
+                   'rail',          case when $2::text is not null
+                                         then 'hyperswitch_' || $2::text
+                                         else 'hyperswitch' end,
+                   'error_code',    $3::text,
+                   'error_message', $4::text)
+        where id = (select demo_order_id from app.billing_attempts where id = $1)`,
+      [attemptId, str(hs.connector, 64), str(hs.error_code, 64), str(hs.error_message, 500)],
+    );
+  } catch (err) {
+    /* Never let bookkeeping undo a verdict: the money answer is already
+       written and correct. Log and carry on. */
+    console.error(
+      `billing-console worker: could not record rail facts for attempt ${attemptId}: ` +
+        (err instanceof Error ? err.message : String(err)),
+    );
+  }
+}
+
 /* Apply a retrieved payment's truth to one attempt through the
    engine's verdict door. Returns what happened, for the stats. */
 async function resolveFromPayment(
@@ -1014,6 +1063,7 @@ async function resolveFromPayment(
       `select app.fn_record_live_verdict($1, 'succeeded', null, $2)`,
       [att.attempt_id, paymentId],
     );
+    await recordRailFacts(client, att.attempt_id, hs);
     return "succeeded";
   }
 
@@ -1025,6 +1075,7 @@ async function resolveFromPayment(
       `select app.fn_record_live_verdict($1, 'declined', $2, $3)`,
       [att.attempt_id, declineCode.slice(0, 64), paymentId],
     );
+    await recordRailFacts(client, att.attempt_id, hs);
     return "declined";
   }
 
@@ -1585,6 +1636,8 @@ async function actionRunDetail(
        one come round again" without the reader doing calendar arithmetic.
        Derived, never stored: it is whatever the schedule says now. */
     next_billing_date: Date | null;
+    connector: string | null;
+    processor_message: string | null;
   }>(
     `select ba.id as attempt_id, m.member_code,
             rp.subscription_id, rp.renewal_index,
@@ -1592,7 +1645,9 @@ async function actionRunDetail(
             ba.scheduled_for, o.order_number,
             ba.outcome, ba.decline_code, ba.decline_class,
             ba.member_fault, ba.next_action, ba.next_retry_date,
-            nb.next_billing_date
+            nb.next_billing_date,
+            o.processor_summary->>'connector'     as connector,
+            o.processor_summary->>'error_message' as processor_message
        from app.billing_attempts ba
        join app.renewal_periods rp on rp.id = ba.renewal_period_id
        join app.subscriptions s on s.id = rp.subscription_id
