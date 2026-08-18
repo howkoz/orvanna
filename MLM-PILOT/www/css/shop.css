@@ -419,17 +419,16 @@
 
 .nav-cart svg { width: 18px; height: 18px; }
 
+/* The count is a figure set beside the word Cart, not a badge stuck to an
+   icon. It was a filled accent chip, which spent the page's one accent
+   event on a number that is zero most of the time. */
 .cart-count {
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-  font-size: 0.7rem;
+  display: inline;
+  padding: 0;
+  font-size: inherit;
   font-weight: 700;
-  color: var(--shop-on-accent);
-  background: var(--shop-accent-fill);
+  color: inherit;
+  background: none;
   border-radius: 0;
   box-shadow: none;
   font-variant-numeric: tabular-nums;
@@ -2907,7 +2906,7 @@ body.payment-in-flight .checkout-summary {
    ============================================================ */
 
 .catalog-shell {
-  max-width: 1240px;
+  max-width: var(--maxw, 1180px);
   margin: 0 auto;
   padding: 0 32px 80px;
   display: grid;
@@ -3371,13 +3370,15 @@ body.payment-in-flight .checkout-summary {
 }
 
 @media (max-width: 1080px) {
-  /* the rail stops being a rail and becomes a block above the list */
+  /* The rail stops being a rail and becomes a block UNDER the list, per the
+     build spec. It sat above until 2026-08-18: a reader arriving on a phone
+     met "YOUR MONTH, $0" before the page had said what it sells, and the
+     headline started below the fold. */
   .catalog-shell { grid-template-columns: minmax(0, 1fr); }
   /* stacked: there is no column boundary left to draw */
   .catalog-main::after { display: none; }
   .rail {
     position: static;
-    order: -1;
     border-left: 0;
     border-top: 2px solid var(--shop-strong);
     padding: 22px 0 20px;

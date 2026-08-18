@@ -67,7 +67,7 @@
      now the single source of chrome presentation for all nine
      corporate pages. Rules in this file may still READ them. */
 
-  --maxw:          1100px;
+  --maxw:          1180px;   /* the design canvas, 2026-08-18 */
 }
 
 /* The light theme: a deliberate choice, never a system default. */

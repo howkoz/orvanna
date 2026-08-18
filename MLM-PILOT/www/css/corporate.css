@@ -51,7 +51,7 @@
   --muted-d:    #6B645A;   /* muted on dark */
   --hairline:   rgba(27, 25, 23, 0.18);
   --glass-bg:   #F1EDE6;
-  --maxw:       1100px;
+  --maxw:       1180px;   /* the design canvas, 2026-08-18 */
 
   /* ---- tokens lifted out of hardcoded hex values, dark form ---- */
   --heading:      #1B1917;   /* section, card, feature and profile headings */

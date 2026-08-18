@@ -1,27 +1,39 @@
+<!-- THE CANONICAL NAVIGATION. Single source for the markup; css/site-chrome.css
+     is the single source for its presentation. Changing one without the other
+     is what produced the drift these lints exist to stop: on 2026-08-17 the
+     pages shared navigation markup but not navigation CSS, and the original
+     complaint survived the round meant to fix it.
+
+     Rebuilt 2026-08-18 for the redesign (handoff section 2, screen 6a):
+       - the pinwheel mark replaces the hexagon-and-nodes drawing
+       - seven links, sentence case, 12.5px/0.04em, active carries a 2px accent
+         rule rather than a colour change alone
+       - a real disclosure menu under 900px. Eleven controls used to wrap and
+         centre-pack, which is why the bar's height changed between pages.
+       - the theme control is gone. The new system is mono, so the control was
+         a no-op: it wrote a storage key nothing reads differently any more.
+       - Enroll is gone with it. It was a disabled placeholder, and a control
+         that cannot be pressed is a label, not a control.
+
+     The cart is the only permitted addition, on shop.html and product.html
+     only (contract section 2, rule 3). -->
 <nav class="nav-links" aria-label="Primary">
-  <a class="nav-link" href="index.html">Learn</a>
-  <a class="nav-link" href="shop.html">Shop</a>
-  <a class="nav-link" href="library.html">Library</a>
-  <a class="nav-link" href="comp-plan.html">Plan</a>
-  <a class="nav-link" href="conductor.html">Conductors</a>
-  <a class="nav-link" href="team.html">Team</a>
-  <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
-  <span class="nav-link is-soon" aria-disabled="true">Enroll<span class="soon-pill">soon</span></span>
-  <a class="nav-signin" href="login.html">Sign In</a>
-  <button class="nav-theme" type="button" data-theme-toggle
-          aria-label="Switch to the light theme">
-    <svg class="icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/>
-      <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-        <line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/>
-        <line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/>
-        <line x1="5.4" y1="5.4" x2="7.2" y2="7.2"/><line x1="16.8" y1="16.8" x2="18.6" y2="18.6"/>
-        <line x1="18.6" y1="5.4" x2="16.8" y2="7.2"/><line x1="7.2" y1="16.8" x2="5.4" y2="18.6"/>
-      </g>
-    </svg>
-    <svg class="icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M 19 15.2 A 8.4 8.4 0 0 1 8.8 5 a 8.6 8.6 0 1 0 10.2 10.2 z"
-            fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-    </svg>
+  <button class="nav-disclosure" type="button" data-nav-disclosure
+          aria-expanded="false" aria-controls="nav-menu">
+    <span class="nav-disclosure-mark" aria-hidden="true"></span>
+    <span class="nav-disclosure-label">Menu</span>
   </button>
+  <div class="nav-menu" id="nav-menu">
+    <a class="nav-link" href="index.html">Learn</a>
+    <a class="nav-link" href="shop.html">Shop</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="comp-plan.html">Plan</a>
+    <a class="nav-link" href="conductor.html">Conductors</a>
+    <a class="nav-link" href="team.html">Team</a>
+    <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
+    <span class="nav-tail">
+      <a class="nav-signin" href="login.html">Sign in</a>
+      <a class="nav-cta" href="shop.html">Browse the catalog</a>
+    </span>
+  </div>
 </nav>
