@@ -702,18 +702,6 @@
         <span class="flink">Domain agents</span>
         <span class="flink">Support agents</span>
         <span class="flink">Pricing</span>
-        <div class="footer-col footer-brand">
-        <span class="footer-mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
-            <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
-            <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
-            <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
-          </svg>
-          <span class="footer-word">Orvanna</span>
-        </span>
-        <a class="flink footer-brand-mail" href="mailto:support@orvanna.io">support@orvanna.io</a>
-      </div>
     </div>
       <div class="footer-col">
         <h4 class="footer-head">Learn</h4>
@@ -736,6 +724,18 @@
         <span class="flink">Open roles</span>
         <span class="flink">How we work</span>
         <span class="flink">Internships</span>
+      </div>
+      <div class="footer-col footer-brand">
+        <span class="footer-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+            <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+            <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+            <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+          </svg>
+          <span class="footer-word">Orvanna</span>
+        </span>
+        <a class="flink footer-brand-mail" href="mailto:support@orvanna.io">support@orvanna.io</a>
       </div>
     </div>
 
@@ -1072,13 +1072,6 @@
     renderAll();
   });
 
-  /* The rail's Checkout is the same journey as the drawer's. */
-  document.addEventListener('click', function (e) {
-    var go = e.target.closest ? e.target.closest('#railCheckout') : null;
-    if (!go || go.disabled) return;
-    showView('checkout');
-  });
-
   document.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('[data-add]') : null;
     if (!btn) return;
@@ -1087,15 +1080,23 @@
     /* the drawer opens on add so the PV meter's movement is SEEN */
     openDrawer();
 
+    /* The .add-label-added span belonged to the deleted card grid. The
+       redesigned rows and the promoted pack say "added" with the
+       is-added class and, for a row, by becoming REMOVE, so there is no
+       label to toggle. Left unguarded this threw on EVERY add: the item
+       still landed in the cart because addToCart had already run, but
+       the throw killed the count's bump and anything after it, and it
+       did so on the primary action of the shop page. */
     btn.classList.add('is-added');
-    btn.querySelector('.add-label-added').hidden = false;
+    var addedLabel = btn.querySelector('.add-label-added');
+    if (addedLabel) { addedLabel.hidden = false; }
     if (!reduce.matches) {
       cartCount.classList.add('bump');
       window.setTimeout(function () { cartCount.classList.remove('bump'); }, 220);
     }
     window.setTimeout(function () {
       btn.classList.remove('is-added');
-      btn.querySelector('.add-label-added').hidden = true;
+      if (addedLabel) { addedLabel.hidden = true; }
     }, 1100);
   });
 
@@ -2334,7 +2335,23 @@
     if (typeof liveEnsureCheckout === 'function') liveEnsureCheckout();
   }
 
-  checkoutButton.addEventListener('click', function () {
+  /* ENTERING CHECKOUT IS ONE JOURNEY, NAMED ONCE.
+
+     There are two doors into checkout now: the drawer's button and the
+     catalog rail's, added with the 2026-08-18 rebuild. The rail's did
+     only showView('checkout'), so entering that way skipped every line
+     below: the summary was never rendered, and a cart holding the
+     $200 Ignition Pack arrived at a checkout reading "Order total
+     $0.00, Total PV 0 PV". It also skipped warming the card form,
+     discarding a stale payment, and asking for the tax quote, so the
+     three things this sequence exists to do early all happened late or
+     not at all.
+
+     The build spec's own rule for the rail was that adding and removing
+     must go through the same cart functions as the drawer, so the two
+     can never disagree. Entering checkout is the same kind of thing and
+     now goes through one function for the same reason. */
+  function enterCheckout() {
     if (Object.keys(cart).length === 0) return;
     closeDrawer();
     accountMode = null;
@@ -2362,6 +2379,14 @@
        shopper. */
     if (LIVE_PAYMENTS && serverTaxQuoteAllowed()) liveEnsureQuote();
     if (LIVE_PAYMENTS) liveEnsureCheckout();
+  }
+
+  checkoutButton.addEventListener('click', enterCheckout);
+  /* The rail's Checkout, on the redesigned catalog. Same door. */
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest ? e.target.closest('#railCheckout') : null;
+    if (!go || go.disabled) return;
+    enterCheckout();
   });
 
   document.getElementById('backToShop').addEventListener('click', function () {

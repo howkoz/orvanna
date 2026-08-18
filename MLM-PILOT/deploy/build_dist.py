@@ -829,14 +829,34 @@ def theme_boot_lint() -> None:
 
 CHROME_SELECTORS = (
     "nav", "nav-inner", "nav-brand", "nav-logo", "nav-links", "nav-link",
-    "nav-signin", "nav-theme", "nav-support", "soon-pill", "brand-mark",
-    "brand-word", "footer", "footer-cols", "footer-head", "footer-meta",
-    "footer-contact", "footer-mail", "flink", "socials", "social", "legal",
+    "nav-menu", "nav-tail", "nav-signin", "nav-cta", "nav-cart", "cart-count",
+    "nav-disclosure", "nav-disclosure-mark", "nav-disclosure-label",
+    "nav-support", "brand-mark", "brand-word", "mark-bar", "mark-accent",
+    "footer", "footer-cols", "footer-head", "footer-meta", "footer-contact",
+    "footer-mail", "footer-brand", "footer-brand-mail", "footer-mark",
+    "footer-word", "flink", "socials", "social", "legal",
     "skip-link", "bpFab",
 )
-# The trailing lookahead matters. \b would treat ".nav-cart" as a match for
-# "nav", because a hyphen is a non-word character, and the cart is explicitly
-# NOT owned by the shared sheet. The class name must end here.
+# THE CART JOINED THIS LIST 2026-08-18, and the reason is worth keeping.
+#
+# It was excluded by name, correctly, while it was a shop-only icon button
+# that the shared sheet had no business styling. The redesign changed what it
+# IS: it became one of the two forms of the bar's single primary action,
+# swapping with .nav-cta page by page. Two controls in one slot have to
+# measure the same or the bar changes height between pages, which is the
+# complaint the whole chrome contract exists to answer.
+#
+# While it sat outside, shop.css redeclared it with `font: inherit`, a 1px
+# border and its own padding, and the bar stood 73px on the commerce pages
+# against 69px everywhere else. The lint reported no drift, because it had
+# been told not to look.
+#
+# nav-theme and soon-pill left the list in the same pass: the theme control
+# and the Enroll placeholder no longer exist.
+#
+# The trailing lookahead still matters: \b would treat ".nav-cart" as a match
+# for "nav", because a hyphen is a non-word character. Every class name that
+# must be caught is now listed in full.
 CHROME_SELECTOR_RE = re.compile(
     r"(?m)^[ \t]*((?:a|span|div|button)?\.(?:" + "|".join(CHROME_SELECTORS) +
     r")(?![-\w])[^{;}]*)\{")

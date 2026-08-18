@@ -270,18 +270,37 @@
 }
 .nav-signin:hover { color: var(--chrome-hi); }
 
-/* The one primary action in the bar: solid ink, paper label, zero radius. */
-.nav-cta {
+/* THE BAR'S PRIMARY ACTION: ONE BOX, TWO FILLS.
+
+   .nav-cta and .nav-cart are the two forms of the same slot, and they
+   swap by page. Their box metrics are declared ONCE, together, so the
+   two cannot drift apart: when they were styled separately the cart
+   measured 41px against the button's 37px and the bar stood 73px on the
+   commerce pages against 69px everywhere else. That is the original
+   complaint -- same bar, different height, page to page -- coming back
+   through a new pair of controls, four pixels at a time.
+
+   A lint could have caught it after the fact. Sharing the rule means
+   there is nothing to catch. */
+.nav-cta,
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
   text-decoration: none;
-  color: var(--chrome-bg);
-  background: var(--chrome-hi);
   border: 2px solid var(--chrome-hi);
   padding: 10px 16px;
   white-space: nowrap;
+  border-radius: 0;
+}
+
+/* solid ink, paper label */
+.nav-cta {
+  color: var(--chrome-bg);
+  background: var(--chrome-hi);
 }
 .nav-cta:hover {
   background: var(--chrome-accent);
@@ -294,29 +313,35 @@
 /* Set as a word rather than a drawn trolley, per 9a. The identifiers and
    the behaviour are untouched: #cartButton and #cartCount are what the
    catalog and the drawer read, and renaming either breaks the lookups. */
+/* outlined, ink label -- the box itself is declared with .nav-cta above */
 .nav-cart {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  font: inherit;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: inherit;
   color: var(--chrome-hi);
   background: none;
-  border: 2px solid var(--chrome-hi);
-  border-radius: 0;
-  padding: 9px 14px;
   cursor: pointer;
-  white-space: nowrap;
 }
 .nav-cart:hover { background: var(--chrome-hi); color: var(--chrome-bg); }
+/* the drawn trolley is gone; the control is set as a word */
 .nav-cart svg { display: none; }
 
+/* The count is a figure set beside the word Cart, not a badge stuck to
+   an icon. It was a filled accent chip, which spent the page's one
+   accent event on a number that is zero most of the time. */
 .cart-count {
+  display: inline;
+  padding: 0;
+  background: none;
+  color: inherit;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+.cart-count.bump { transform: scale(1.35); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-count.bump { transform: none; }
 }
 
 /* ---------- support control ---------- */

@@ -396,46 +396,15 @@
    changes nothing, but the smaller number was the wrong method
    and is corrected rather than left standing.) */
 
-.nav-cart {
-  position: relative;
-  font: inherit;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 12px;
-  background: transparent;
-  border: 1px solid rgba(27, 25, 23, 0.35);
-  border-radius: 0;
-  color: var(--chrome-text);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
+/* The cart control moved to css/site-chrome.css on 2026-08-18.
 
-.nav-cart:hover {
-  color: var(--chrome-accent);
-  border-color: rgba(236, 48, 19, 0.55);
-  box-shadow: none;
-}
+   It used to live here because it was a shop-only icon button, and the
+   chrome lint excluded it by name for that reason. The redesign changed
+   what it IS: it is now one of the two forms of the bar's single primary
+   action, swapping with .nav-cta by page, and the two have to measure
+   the same or the bar changes height between pages. That makes it
+   chrome, so it is declared with the chrome and linted with it. */
 
-.nav-cart svg { width: 18px; height: 18px; }
-
-/* The count is a figure set beside the word Cart, not a badge stuck to an
-   icon. It was a filled accent chip, which spent the page's one accent
-   event on a number that is zero most of the time. */
-.cart-count {
-  display: inline;
-  padding: 0;
-  font-size: inherit;
-  font-weight: 700;
-  color: inherit;
-  background: none;
-  border-radius: 0;
-  box-shadow: none;
-  font-variant-numeric: tabular-nums;
-  transition: transform 0.18s ease;
-}
-
-.cart-count.bump { transform: scale(1.35); }
 
 /* ============================================================
    CART DRAWER: glass sheet from the right, per the storefront
@@ -926,7 +895,6 @@
   .cart-drawer { transition: none; }
   .drawer-overlay { transition: none; }
   .pv-fill { transition: none; }
-  .cart-count.bump { transform: none; }
 }
 
 /* ============================================================
