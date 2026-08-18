@@ -169,7 +169,20 @@
   box-shadow: none;
   flex-shrink: 0;
 }
-.brand-mark svg { display: block; width: 100%; height: 100%; }
+.brand-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  transition: transform 0.8s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+/* The mark is still by default. Anything that moves permanently
+   trains people to stop looking at it, so the turn fires on an
+   event -- the working log advancing -- and never on a timer of
+   its own. */
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark svg { transition: none; }
+}
 .brand-mark .mark-bar { fill: currentColor; }
 .brand-mark .mark-accent { fill: var(--chrome-accent); }
 
@@ -387,12 +400,36 @@
   color: var(--chrome-muted);
 }
 
+/* Five columns: four link lists and the brand block, per 6a. The brand
+   block is wider because it carries a lockup and an address rather than a
+   stack of short labels. */
 .footer .footer-cols {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr) 1.25fr;
   gap: 28px;
   margin-bottom: 48px;
 }
+
+.footer .footer-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #EAE4D9;
+  margin-bottom: 16px;
+}
+.footer .footer-mark svg { display: block; width: 22px; height: 22px; }
+/* On ink the structural bars are paper and the accent takes its
+   on-ink form: #EC3013 against #1B1917 is too close to read. */
+.footer .footer-mark .mark-bar { fill: currentColor; }
+.footer .footer-mark .mark-accent { fill: #FF6A4A; }
+.footer .footer-word {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.footer .footer-brand-mail { display: block; }
 
 .footer .footer-head {
   font-size: 0.78rem;
@@ -494,6 +531,7 @@
 
 @media (max-width: 760px) {
   .footer .footer-cols { grid-template-columns: repeat(2, 1fr); }
+  .footer .footer-brand { grid-column: 1 / -1; }
 }
 
 /* THE DISCLOSURE, under 900px.
