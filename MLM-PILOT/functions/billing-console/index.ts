@@ -1581,18 +1581,25 @@ async function actionRunDetail(
     member_fault: boolean | null;
     next_action: string | null;
     next_retry_date: Date | null;
+    /* The ORDINARY next billing date, so a row can answer "when does this
+       one come round again" without the reader doing calendar arithmetic.
+       Derived, never stored: it is whatever the schedule says now. */
+    next_billing_date: Date | null;
   }>(
     `select ba.id as attempt_id, m.member_code,
             rp.subscription_id, rp.renewal_index,
             ba.attempt_no, ba.attempt_kind, ba.ladder_step,
             ba.scheduled_for, o.order_number,
             ba.outcome, ba.decline_code, ba.decline_class,
-            ba.member_fault, ba.next_action, ba.next_retry_date
+            ba.member_fault, ba.next_action, ba.next_retry_date,
+            nb.next_billing_date
        from app.billing_attempts ba
        join app.renewal_periods rp on rp.id = ba.renewal_period_id
        join app.subscriptions s on s.id = rp.subscription_id
        join app.members m on m.id = s.member_id
        left join app.demo_orders o on o.id = ba.demo_order_id
+       left join app.v_subscription_next_billing nb
+              on nb.subscription_id = rp.subscription_id
       where ba.run_id = $1
       order by m.member_code, rp.renewal_index, ba.attempt_no`,
     [runId],
