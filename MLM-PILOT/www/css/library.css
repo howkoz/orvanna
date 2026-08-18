@@ -372,14 +372,14 @@ section { scroll-margin-top: 150px; }
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 26px;
+  gap: 18px;
 }
 
 /* the whole card is the link, so the target is the card, not a word in it */
 .lib-card {
   display: flex;
   flex-direction: column;
-  padding: 26px 24px 22px;
+  padding: 18px 18px 16px;
   color: inherit;            /* never fall back to the browser's link blue */
   text-decoration: none;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -393,10 +393,10 @@ section { scroll-margin-top: 150px; }
 
 .lib-card-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .ico {
@@ -406,26 +406,45 @@ section { scroll-margin-top: 150px; }
   color: var(--icon);
 }
 
+/* THE CARD'S OWN ICON AND BADGE ARE SMALLER THAN THE PAGE'S.
+   .ico and .badge are shared with the agent pages, where they sit
+   alone at full size and should stay that way. Scoping the smaller
+   sizes to .lib-card-top tightens the index grid without touching
+   library-agent.html, which uses the same two class names. */
+.lib-card-top .ico {
+  width: 38px;
+  height: 38px;
+}
+
+.lib-card-top .badge {
+  /* Size held at the sheet's 0.62rem, same reason as the shop's
+     .tier-badge: only the padding and the tracking come down. */
+  letter-spacing: 0.13em;
+  padding: 3px 9px 4px;
+}
+
 .lib-card-name {
-  font-size: 1.02rem;
+  font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.07em;
+  line-height: 1.3;
   color: var(--heading);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .lib-card:hover .lib-card-name { color: var(--accent); }
 
 .lib-card-blurb {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--muted);
   flex-grow: 1;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .lib-card-prices {
-  padding-top: 14px;
+  padding-top: 10px;
   border-top: 1px solid var(--line);
 }
 
@@ -437,14 +456,14 @@ section { scroll-margin-top: 150px; }
 }
 
 .lib-card-amt {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--heading);
   font-variant-numeric: tabular-nums;
 }
 
 .lib-card-amt .per {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -452,9 +471,9 @@ section { scroll-margin-top: 150px; }
 }
 
 .lib-card-pv {
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -462,17 +481,17 @@ section { scroll-margin-top: 150px; }
 }
 
 .lib-card-once {
-  margin-top: 4px;
-  font-size: 0.76rem;
+  margin-top: 3px;
+  font-size: 0.7rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
 .lib-card-go {
-  margin-top: 14px;
-  font-size: 0.7rem;
+  margin-top: 10px;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--accent);
   display: flex;
