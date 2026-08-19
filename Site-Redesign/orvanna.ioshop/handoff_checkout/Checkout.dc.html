@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="_ds/modernist-e2b940f9-a1f0-4f20-80a8-607ff722a337/styles.css"><script src="_ds/modernist-e2b940f9-a1f0-4f20-80a8-607ff722a337/_ds_bundle.js"></script><style>
+body{margin:0;background:#eae4d9;font-family:Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+a{color:#a3220b}a:hover{color:#ec3013}
+button{font-family:Archivo,sans-serif}
+input,select{font-family:Archivo,sans-serif;font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid #ec3013;outline-offset:2px}
+</style></helmet>
+
+<div style="max-width:1180px;margin:0 auto;background:#eae4d9;border-left:2px solid #1b1917;border-right:2px solid #1b1917">
+
+  <div style="display:flex;align-items:center;gap:30px;padding:15px 34px;border-bottom:2px solid #1b1917">
+    <div style="display:flex;align-items:center;gap:11px">
+      <svg viewBox="0 0 64 64" style="width:26px;height:26px;display:block;flex:none"><rect x="32" y="9" width="23" height="11" fill="#ec3013"></rect><rect x="44" y="32" width="11" height="23" fill="#1b1917"></rect><rect x="9" y="44" width="23" height="11" fill="#1b1917"></rect><rect x="9" y="9" width="11" height="23" fill="#1b1917"></rect></svg>
+      <span style="font:800 17px/1 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917">ORVANNA</span>
+    </div>
+    <nav style="display:flex;gap:22px;font:600 12.5px/1 Archivo,sans-serif;letter-spacing:.04em;color:#5f584f"><span>Learn</span><span style="color:#1b1917;padding-bottom:4px;border-bottom:2px solid #ec3013">Shop</span><span>Library</span><span>Plan</span><span>Conductors</span><span>Team</span></nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font:600 12.5px/1 Archivo,sans-serif;letter-spacing:.04em">
+      <span style="color:#5f584f">Sign in</span>
+      <span style="display:flex;align-items:center;gap:9px;padding:8px 13px;border:2px solid #1b1917;font:700 11px/1 Archivo,sans-serif;letter-spacing:.08em;color:#1b1917">CART <span style="padding:2px 6px;background:#ec3013;color:#fff">{{ itemCount }}</span></span>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:26px 34px 22px">
+    <div>
+      <button onClick="{{ noop }}" style="display:flex;align-items:center;gap:8px;padding:0;background:none;border:0;cursor:pointer;font:600 12px/1 Archivo,sans-serif;letter-spacing:.08em;color:#6b645a">&#8592; BACK TO THE CATALOG</button>
+      <h1 style="margin:14px 0 0;font:800 42px/1 Archivo,sans-serif;letter-spacing:-.032em;color:#1b1917">Checkout</h1>
+    </div>
+    <div style="text-align:right">
+      <div style="font:700 10px/1 Archivo,sans-serif;letter-spacing:.18em;color:#a3220b">DEMONSTRATION CHECKOUT</div>
+      <p style="margin:9px 0 0;max-width:34ch;font:400 12.5px/1.45 Archivo,sans-serif;color:#6b645a">Card runs on a sandbox rail and needs a valid test number. No real money moves.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid #1b1917;border-bottom:2px solid #1b1917">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+      <button onClick="{{ s.onGo }}" style="{{ s.tabCss }}">
+        <span style="display:flex;align-items:center;gap:9px">
+          <span style="{{ s.numCss }}">{{ s.num }}</span>
+          <span style="font:700 13.5px/1.2 Archivo,sans-serif;letter-spacing:-.01em">{{ s.name }}</span>
+        </span>
+        <span style="{{ s.valueCss }}">{{ s.value }}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 372px">
+    <div style="border-right:2px solid #1b1917">
+
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:32px 34px 36px">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#a3220b">STEP ONE OF FOUR</div>
+          <h2 style="margin:12px 0 0;font:800 28px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">Who is this order for?</h2>
+          <p style="margin:12px 0 0;max-width:60ch;font:400 15px/1.55 Archivo,sans-serif;color:#4b453d">Signing in credits the order to that member and fills the billing address. As a guest you type the address yourself — nothing else changes.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:24px;border:2px solid #1b1917">
+            <button onClick="{{ onSignin }}" style="display:block;text-align:left;padding:22px 22px 24px;background:#f1ede6;border:0;border-right:1px solid rgba(27,25,23,.25);cursor:pointer">
+              <span style="display:block;font:700 15px/1.2 Archivo,sans-serif;color:#1b1917">Sign in as a member</span>
+              <span style="display:block;margin-top:8px;font:400 13px/1.5 Archivo,sans-serif;color:#4b453d">Saved address, and the order is credited to your member code.</span>
+              <span style="display:inline-block;margin-top:14px;padding:9px 14px;background:#1b1917;font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#eae4d9">SIGN IN</span>
+            </button>
+            <button onClick="{{ onGuest }}" style="display:block;text-align:left;padding:22px 22px 24px;background:transparent;border:0;cursor:pointer">
+              <span style="display:block;font:700 15px/1.2 Archivo,sans-serif;color:#1b1917">Continue as a guest</span>
+              <span style="display:block;margin-top:8px;font:400 13px/1.5 Archivo,sans-serif;color:#4b453d">Type an address. A referring member code stays optional.</span>
+              <span style="display:inline-block;margin-top:14px;padding:9px 14px;border:2px solid #1b1917;font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#1b1917">CONTINUE AS GUEST</span>
+            </button>
+          </div>
+          <div style="margin-top:22px;padding:16px 20px;background:#f1ede6;border-left:5px solid #1b1917">
+            <p style="margin:0;max-width:70ch;font:400 13px/1.55 Archivo,sans-serif;color:#4b453d"><b style="color:#1b1917">Demonstration accounts are public on purpose.</b> Any member code from the roster — for example <b style="color:#1b1917">GW-000014</b> — with the password <b style="color:#1b1917">OrvannaDemo2026</b>. Checked against the database, not this page, so a wrong password is refused and the order is attributed to that actual member.</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:32px 34px 36px">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#a3220b">STEP TWO OF FOUR</div>
+          <h2 style="margin:12px 0 0;font:800 28px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">Billing address</h2>
+          <p style="margin:12px 0 0;max-width:60ch;font:400 15px/1.55 Archivo,sans-serif;color:#4b453d">Nothing ships — your agents are digital. This address sets the tax destination, which is why State and postal code move the amount on the right.</p>
+          <div style="display:grid;gap:18px;margin-top:24px;max-width:620px">
+            <div>
+              <label for="ck-name" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">FULL NAME</label>
+              <input id="ck-name" type="text" value="{{ fName }}" onInput="{{ onName }}" placeholder="Dana Ortiz" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+            </div>
+            <div>
+              <label for="ck-street" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">STREET ADDRESS</label>
+              <input id="ck-street" type="text" placeholder="1400 Halsted Street" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+            </div>
+            <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px">
+              <div>
+                <label for="ck-city" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">CITY</label>
+                <input id="ck-city" type="text" placeholder="Chicago" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+              </div>
+              <div>
+                <label for="ck-state" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">STATE</label>
+                <select id="ck-state" value="{{ fState }}" onChange="{{ onState }}" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+                  <option value="">Select</option>
+                  <option value="IL">IL</option>
+                  <option value="UT">UT</option>
+                  <option value="TX">TX</option>
+                  <option value="NY">NY</option>
+                </select>
+              </div>
+              <div>
+                <label for="ck-zip" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">POSTAL CODE</label>
+                <input id="ck-zip" type="text" value="{{ fZip }}" onInput="{{ onZip }}" placeholder="60642" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+              </div>
+            </div>
+            <div style="padding-top:18px;border-top:1px solid rgba(27,25,23,.25)">
+              <label for="ck-member" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">REFERRING MEMBER CODE <span style="color:#8a8278">· OPTIONAL</span></label>
+              <input id="ck-member" type="text" placeholder="GW-000014" style="display:block;width:260px;max-width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+              <p style="margin:8px 0 0;font:400 12.5px/1.45 Archivo,sans-serif;color:#6b645a">Credits this order to the member who referred you.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:28px">
+            <button onClick="{{ onNext }}" style="padding:14px 22px;background:#1b1917;border:0;cursor:pointer;font:700 11.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#eae4d9">CONTINUE TO ACTIVATION</button>
+            <button onClick="{{ onBack }}" style="padding:14px 22px;background:transparent;border:2px solid #1b1917;cursor:pointer;font:700 11.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#1b1917">BACK</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:32px 34px 36px">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#a3220b">STEP THREE OF FOUR</div>
+          <h2 style="margin:12px 0 0;font:800 28px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">How fast should they come online?</h2>
+          <p style="margin:12px 0 0;max-width:62ch;font:400 15px/1.55 Archivo,sans-serif;color:#4b453d">Both options deliver the same agents. Priority is a service charge, not a product: it carries no Personal Volume and pays no commission to anybody.</p>
+          <div style="margin-top:24px;border:2px solid #1b1917;max-width:620px">
+            <sc-for list="{{ activations }}" as="a" hint-placeholder-count="2">
+              <button onClick="{{ a.onPick }}" style="{{ a.css }}">
+                <span style="{{ a.dotCss }}"></span>
+                <span style="text-align:left">
+                  <span style="display:block;font:700 15px/1.2 Archivo,sans-serif;color:#1b1917">{{ a.name }}</span>
+                  <span style="display:block;margin-top:6px;font:400 13px/1.45 Archivo,sans-serif;color:#4b453d">{{ a.desc }}</span>
+                </span>
+                <span style="{{ a.priceCss }}">{{ a.price }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:28px">
+            <button onClick="{{ onNext }}" style="padding:14px 22px;background:#1b1917;border:0;cursor:pointer;font:700 11.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#eae4d9">CONTINUE TO PAYMENT</button>
+            <button onClick="{{ onBack }}" style="padding:14px 22px;background:transparent;border:2px solid #1b1917;cursor:pointer;font:700 11.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#1b1917">BACK</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStep4 }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:32px 34px 0">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#a3220b">STEP FOUR OF FOUR</div>
+          <h2 style="margin:12px 0 0;font:800 28px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">Payment</h2>
+          <p style="margin:12px 0 0;max-width:62ch;font:400 15px/1.55 Archivo,sans-serif;color:#4b453d">Pick a method. Card is live on the sandbox rail; the wallets show an approval preview before a demo order completes.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);margin-top:22px;border-top:2px solid #1b1917;border-bottom:2px solid #1b1917">
+          <sc-for list="{{ methods }}" as="m" hint-placeholder-count="5">
+            <button onClick="{{ m.onPick }}" style="{{ m.css }}">
+              <span style="height:26px;display:flex;align-items:center"><span dangerouslySetInnerHTML="{{ m.svg }}"></span></span>
+              <span style="{{ m.nameCss }}">{{ m.name }}</span>
+              <span style="{{ m.stateCss }}">{{ m.state }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isCard }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:30px 34px 0">
+            <div style="display:grid;gap:18px;max-width:560px">
+              <div>
+                <label for="ck-cardname" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">NAME ON CARD</label>
+                <input id="ck-cardname" type="text" placeholder="DANA ORTIZ" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;letter-spacing:.04em;color:#1b1917;box-sizing:border-box">
+              </div>
+              <div>
+                <label for="ck-cardnum" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">CARD NUMBER</label>
+                <div style="position:relative;margin-top:8px">
+                  <input id="ck-cardnum" type="text" inputmode="numeric" value="{{ fCard }}" onInput="{{ onCard }}" placeholder="4242 4242 4242 4242" style="display:block;width:100%;padding:12px 92px 12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;letter-spacing:.06em;color:#1b1917;box-sizing:border-box">
+                  <span style="position:absolute;top:50%;right:12px;transform:translateY(-50%);display:flex;align-items:center;gap:7px"><span dangerouslySetInnerHTML="{{ detectedSvg }}"></span></span>
+                </div>
+                <p style="margin:8px 0 0;font:400 12.5px/1.45 Archivo,sans-serif;color:#6b645a">{{ cardHint }}</p>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div>
+                  <label for="ck-exp" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">EXPIRY</label>
+                  <input id="ck-exp" type="text" inputmode="numeric" placeholder="01 / 29" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+                </div>
+                <div>
+                  <label for="ck-cvc" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">SECURITY CODE</label>
+                  <input id="ck-cvc" type="text" inputmode="numeric" placeholder="123" style="display:block;width:100%;margin-top:8px;padding:12px 13px;background:#f6f4f0;border:2px solid #1b1917;font:400 14.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isWallet }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:30px 34px 0">
+            <div style="max-width:560px;padding:22px 24px;background:#f1ede6;border:2px solid #1b1917">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span dangerouslySetInnerHTML="{{ walletSvg }}"></span>
+                <span style="font:700 15px/1.2 Archivo,sans-serif;color:#1b1917">{{ walletTitle }}</span>
+              </div>
+              <p style="margin:12px 0 0;font:400 13.5px/1.55 Archivo,sans-serif;color:#4b453d">{{ walletBody }}</p>
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(27,25,23,.25);display:flex;justify-content:space-between;gap:12px">
+                <span style="font:400 13px/1.4 Archivo,sans-serif;color:#6b645a">Funding source</span>
+                <span style="font:700 13px/1.4 Archivo,sans-serif;color:#1b1917">{{ walletFunding }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="padding:26px 34px 34px">
+          <div style="max-width:560px">
+            <sc-if value="{{ show3ds }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:22px 1fr;gap:13px;padding:15px 18px;background:#f1ede6;border-left:5px solid #1b1917">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;display:block;margin-top:2px"><path d="M12 2 L21 6 V12 C21 17 12 22 12 22 C12 22 3 17 3 12 V6 Z" fill="none" stroke="#1b1917" stroke-width="2"></path><path d="M8 12 L11 15 L16 9" fill="none" stroke="#ec3013" stroke-width="2.2"></path></svg>
+                <div>
+                  <p style="margin:0;font:700 13px/1.4 Archivo,sans-serif;color:#1b1917">Your bank may ask you to approve this payment</p>
+                  <p style="margin:6px 0 0;font:400 12.5px/1.5 Archivo,sans-serif;color:#4b453d">That is 3-D Secure, the card networks' identity check. If it asks, a window from your bank opens right here. Nothing is charged while you are in it.</p>
+                </div>
+              </div>
+            </sc-if>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-top:16px;padding:13px 18px;border:2px dashed rgba(27,25,23,.45)">
+              <span style="font:400 12.5px/1.45 Archivo,sans-serif;color:#4b453d">Order <b style="color:#1b1917">O-10042</b> is open and <b style="color:#1b1917">not yet charged</b>. Keep this number.</span>
+              <button onClick="{{ noop }}" style="padding:0;background:none;border:0;cursor:pointer;font:600 12px/1.4 Archivo,sans-serif;color:#a3220b;white-space:nowrap">Look up an order</button>
+            </div>
+            <button onClick="{{ noop }}" disabled="{{ payBlocked }}" style="{{ payBtnCss }}">
+              <span style="{{ payLabelCss }}">PLACE ORDER</span>
+              <span style="{{ payAmountCss }}">{{ totalLabel }}</span>
+            </button>
+            <sc-if value="{{ payBlocked }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:20px 1fr;gap:12px;margin-top:12px;padding:13px 16px;background:rgba(236,48,19,.09);border-left:5px solid #ec3013">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;display:block;margin-top:2px"><circle cx="12" cy="12" r="9.4" fill="none" stroke="#b52309" stroke-width="2"></circle><rect x="10.8" y="6.6" width="2.4" height="8" fill="#b52309"></rect><rect x="10.8" y="16" width="2.4" height="2.4" fill="#b52309"></rect></svg>
+                <p style="margin:0;font:400 12.5px/1.5 Archivo,sans-serif;color:#4b453d">{{ blockReason }}</p>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:16px">
+              <span style="display:flex;align-items:center;gap:7px;font:400 12px/1.4 Archivo,sans-serif;color:#6b645a"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><rect x="5" y="10" width="14" height="10" fill="none" stroke="#6b645a" stroke-width="2"></rect><path d="M8 10 V7 a4 4 0 0 1 8 0 V10" fill="none" stroke="#6b645a" stroke-width="2"></path></svg>Card fields are hosted by the provider</span>
+              <span style="display:flex;align-items:center;gap:7px;font:400 12px/1.4 Archivo,sans-serif;color:#6b645a"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="9" fill="none" stroke="#6b645a" stroke-width="2"></circle><path d="M8 12.5 L11 15.5 L16.5 9" fill="none" stroke="#6b645a" stroke-width="2"></path></svg>PCI DSS scope stays off this page</span>
+              <span style="display:flex;align-items:center;gap:7px;font:400 12px/1.4 Archivo,sans-serif;color:#6b645a">Sandbox &#183; no real money moves</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:26px">
+            <button onClick="{{ onBack }}" style="padding:14px 22px;background:transparent;border:2px solid #1b1917;cursor:pointer;font:700 11.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:#1b1917">BACK</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="background:#f1ede6">
+      <div style="padding:24px 26px 0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+          <h2 style="margin:0;font:800 17px/1.1 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917">Order summary</h2>
+          <button onClick="{{ noop }}" style="padding:0;background:none;border:0;cursor:pointer;font:600 11.5px/1.3 Archivo,sans-serif;color:#a3220b">Edit cart</button>
+        </div>
+      </div>
+      <div style="margin-top:16px;border-top:2px solid #1b1917">
+        <sc-for list="{{ cart }}" as="c" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 26px;border-bottom:1px solid rgba(27,25,23,.22)">
+            <div>
+              <div style="font:700 13.5px/1.3 Archivo,sans-serif;color:#1b1917">{{ c.name }}</div>
+              <div style="margin-top:5px;display:flex;align-items:center;gap:8px">
+                <span style="{{ c.modeCss }}">{{ c.mode }}</span>
+                <span style="font:400 11.5px/1.3 Archivo,sans-serif;color:#6b645a">{{ c.qty }}</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font:700 13.5px/1.3 Archivo,sans-serif;color:#1b1917">{{ c.amount }}</div>
+              <div style="margin-top:5px;font:400 11.5px/1.3 Archivo,sans-serif;color:#6b645a">{{ c.pv }} PV</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding:6px 26px 0">
+        <sc-for list="{{ totals }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(27,25,23,.18)">
+            <span style="font:400 13px/1.4 Archivo,sans-serif;color:#4b453d">{{ t.label }} <span style="color:#8a8278">{{ t.hint }}</span></span>
+            <span style="{{ t.valCss }}">{{ t.value }}</span>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 0 4px">
+          <span style="font:700 12px/1.3 Archivo,sans-serif;letter-spacing:.1em;color:#1b1917">ORDER TOTAL</span>
+          <span style="font:800 26px/1 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">{{ totalLabel }}</span>
+        </div>
+        <p style="margin:6px 0 0;font:400 12px/1.45 Archivo,sans-serif;color:#6b645a">{{ renewNote }}</p>
+      </div>
+      <div style="margin-top:18px;padding:18px 26px 20px;background:#1b1917">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+          <span style="font:700 10px/1 Archivo,sans-serif;letter-spacing:.16em;color:#ff6a4a">QUALIFIED MONTH</span>
+          <span style="font:700 12.5px/1 Archivo,sans-serif;color:#f8f7f5">{{ pvNow }} / 100 PV</span>
+        </div>
+        <div style="margin-top:11px;height:10px;background:#3a352f">
+          <div style="{{ pvFillCss }}"></div>
+        </div>
+        <p style="margin:11px 0 0;font:400 12px/1.45 Archivo,sans-serif;color:#c9c6c1">{{ pvNote }}</p>
+      </div>
+      <div style="padding:20px 26px 26px;border-top:1px solid rgba(27,25,23,.25)">
+        <label for="ck-cur" style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">CURRENCY</label>
+        <select id="ck-cur" value="{{ fCurrency }}" onChange="{{ onCurrency }}" style="display:block;width:100%;margin-top:8px;padding:11px 12px;background:#eae4d9;border:2px solid #1b1917;font:400 13.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+          <option value="USD">USD, United States dollar</option>
+          <option value="GBP">GBP, British pound</option>
+          <option value="EUR">EUR, euro</option>
+          <option value="CHF">CHF, Swiss franc</option>
+        </select>
+        <sc-if value="{{ notUsd }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;padding:13px 16px;background:rgba(236,48,19,.09);border-left:5px solid #ec3013">
+            <p style="margin:0;font:400 12.5px/1.5 Archivo,sans-serif;color:#4b453d">Card settles in USD only until order records store currency. <b style="color:#1b1917">{{ fCurrency }} shows prices but cannot take a card.</b></p>
+            <button onClick="{{ onUsd }}" style="margin-top:9px;padding:0;background:none;border:0;cursor:pointer;font:600 12.5px/1.3 Archivo,sans-serif;color:#a3220b">Switch back to USD</button>
+          </div>
+        </sc-if>
+        <label for="ck-taxid" style="display:block;margin-top:18px;font:700 10px/1 Archivo,sans-serif;letter-spacing:.14em;color:#6b645a">TAX ID <span style="color:#8a8278">· OPTIONAL</span></label>
+        <input id="ck-taxid" type="text" placeholder="Enter to test an exemption" style="display:block;width:100%;margin-top:8px;padding:11px 12px;background:#eae4d9;border:2px solid #1b1917;font:400 13.5px/1.2 Archivo,sans-serif;color:#1b1917;box-sizing:border-box">
+        <p style="margin:8px 0 0;font:400 11.5px/1.45 Archivo,sans-serif;color:#6b645a">The tax service checks the format, not the register behind it.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:20px 34px 24px;background:#1b1917;color:#8f8981;border-top:2px solid #1b1917;font:400 12px/1.5 Archivo,sans-serif;display:flex;gap:18px;flex-wrap:wrap"><span>Orvanna is a demonstration company &#183; all data synthetic &#183; sandbox payment rail, no real money moves</span><span style="margin-left:auto">Priority activation is a service charge &#183; no PV, no commission</span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1080}}">
+const CART = [
+  ['Payment Agent', 'Subscription', '\u00d7 1', 100, 100],
+  ['Marketing Agent', 'Subscription', '\u00d7 1', 100, 100],
+  ['Secretary Agent', 'One time', '\u00d7 1', 50, 50]
+];
+
+const CARD_MARK = '<svg viewBox="0 0 40 26" width="40" height="26" style="display:block"><rect x="1.2" y="1.2" width="37.6" height="23.6" fill="none" stroke="#1b1917" stroke-width="2.2"></rect><rect x="1.2" y="6.6" width="37.6" height="4.4" fill="#1b1917"></rect><rect x="5.6" y="16" width="7" height="5" fill="#ec3013"></rect><rect x="15" y="18" width="12" height="2.4" fill="#1b1917"></rect></svg>';
+const PHONE_MARK = '<svg viewBox="0 0 40 26" width="40" height="26" style="display:block"><rect x="12" y="1.2" width="16" height="23.6" fill="none" stroke="#1b1917" stroke-width="2.2"></rect><rect x="16.4" y="6" width="7.2" height="7.2" fill="#ec3013"></rect><rect x="16" y="19" width="8" height="2.2" fill="#1b1917"></rect></svg>';
+const WALLET_MARK = '<svg viewBox="0 0 40 26" width="40" height="26" style="display:block"><path d="M2.3 5.3 H31 a1 1 0 0 1 1 1 V19.7 a1 1 0 0 1 -1 1 H2.3 Z" fill="none" stroke="#1b1917" stroke-width="2.2"></path><rect x="24" y="10.6" width="13.5" height="5" fill="#ec3013"></rect><path d="M2.3 5.3 L2.3 20.7" stroke="#1b1917" stroke-width="2.2"></path></svg>';
+const BANK_MARK = '<svg viewBox="0 0 40 26" width="40" height="26" style="display:block"><path d="M4 9.5 L20 2.4 L36 9.5" fill="none" stroke="#1b1917" stroke-width="2.2"></path><rect x="7.4" y="12" width="3.6" height="9" fill="#1b1917"></rect><rect x="14.6" y="12" width="3.6" height="9" fill="#ec3013"></rect><rect x="21.8" y="12" width="3.6" height="9" fill="#1b1917"></rect><rect x="29" y="12" width="3.6" height="9" fill="#1b1917"></rect><rect x="4" y="22.6" width="32" height="2.4" fill="#1b1917"></rect></svg>';
+const LINK_MARK = '<svg viewBox="0 0 40 26" width="40" height="26" style="display:block"><rect x="2.4" y="7" width="16" height="12" rx="0" fill="none" stroke="#1b1917" stroke-width="2.2"></rect><rect x="21.6" y="7" width="16" height="12" fill="none" stroke="#1b1917" stroke-width="2.2"></rect><rect x="15" y="11.6" width="10" height="2.8" fill="#ec3013"></rect></svg>';
+
+/* Detected network is shown as a TYPOGRAPHIC label, never redrawn brand
+   artwork: the networks require their own official SVGs, so implementation
+   drops those into this same 34x22 box. */
+function brandTag(label, muted) {
+  return '<span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1.5px solid ' +
+    (muted ? '#8a8278' : '#1b1917') + ';font:700 9.5px/1 Archivo,sans-serif;letter-spacing:.1em;color:' +
+    (muted ? '#8a8278' : '#1b1917') + '">' + label + '</span>';
+}
+const BRAND_GENERIC = brandTag('CARD', true);
+
+const METHODS = [
+  ['card', 'Card', CARD_MARK, 'Live on sandbox'],
+  ['applepay', 'Apple Pay', PHONE_MARK, 'Approval preview'],
+  ['googlepay', 'Google Pay', WALLET_MARK, 'Approval preview'],
+  ['paypal', 'PayPal', LINK_MARK, 'Approval preview'],
+  ['bank', 'Bank account', BANK_MARK, 'Staged']
+];
+
+const WALLETS = {
+  applepay: {
+    mark: PHONE_MARK,
+    title: 'Apple Pay, sandbox approval preview',
+    body: 'Approving on the device places a demonstration order. No card is charged and no card data reaches this page.',
+    funding: 'Test Debit \u00b7 ending 4445'
+  },
+  googlepay: {
+    mark: WALLET_MARK,
+    title: 'Google Pay, sandbox approval preview',
+    body: 'The wallet sheet opens, you approve, and a demonstration order is placed. No card is charged.',
+    funding: 'Test Debit \u00b7 ending 4445'
+  },
+  paypal: {
+    mark: LINK_MARK,
+    title: 'PayPal, sandbox approval preview',
+    body: 'PayPal opens its sandbox approval window and returns here to place a demonstration order.',
+    funding: 'Sandbox buyer account'
+  },
+  bank: {
+    mark: BANK_MARK,
+    title: 'Bank account, staged',
+    body: 'Bank debit is implemented but switched off until the currency rail stores per-order currency. Pick Card to complete this order today.',
+    funding: 'Not available yet'
+  }
+};
+
+const ACTIVATIONS = [
+  ['priority', 'Priority activation', 'Your agents come online immediately', 25],
+  ['standard', 'Standard activation', 'Access within 48 hours', 0]
+];
+
+const STEP_NAMES = ['Account', 'Billing address', 'Activation', 'Payment'];
+const RATES = {USD: 1, GBP: 0.79, EUR: 0.92, CHF: 0.88};
+const SYMBOLS = {USD: '$', GBP: '\u00a3', EUR: '\u20ac', CHF: 'CHF '};
+
+class Component extends DCLogic {
+  state = {
+    step: 3, account: 'guest', activation: 'standard', method: 'card',
+    currency: 'USD', name: 'Dana Ortiz', st: 'IL', zip: '60642', card: ''
+  };
+
+  money(usd) {
+    const c = this.state.currency;
+    const v = usd * RATES[c];
+    return SYMBOLS[c] + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const sub = CART.reduce((a, c) => a + c[3], 0);
+    const pv = CART.reduce((a, c) => a + c[4], 0);
+    const act = ACTIVATIONS.find(a => a[0] === s.activation)[3];
+    const taxable = sub + act;
+    const tax = s.st ? Math.round(taxable * 0.05 * 100) / 100 : 0;
+    const total = taxable + tax;
+    const digits = s.card.replace(/\D/g, '');
+    let brand = BRAND_GENERIC, brandName = '';
+    if (digits[0] === '4') { brandName = 'Visa'; }
+    else if (digits[0] === '5') { brandName = 'Mastercard'; }
+    else if (digits[0] === '3') { brandName = 'American Express'; }
+    if (brandName) brand = brandTag(brandName === 'American Express' ? 'AMEX' : brandName.toUpperCase(), false);
+
+    const cardBlocked = s.method === 'card' && s.currency !== 'USD';
+    const methodStaged = s.method === 'bank';
+    const payBlocked = cardBlocked || methodStaged;
+    const blockReason = methodStaged
+      ? 'Bank debit is staged, not live. Pick Card to complete this order.'
+      : cardBlocked
+        ? 'Card settles in USD only. Switch the currency back to USD to place this order.'
+        : '';
+
+    const stepValues = [
+      s.account === 'member' ? 'GW-000014' : 'Guest',
+      s.st ? s.name + ', ' + s.st + ' ' + s.zip : 'Not entered',
+      s.activation === 'priority' ? 'Priority, ' + this.money(25) : 'Standard, free',
+      METHODS.find(m => m[0] === s.method)[1]
+    ];
+
+    const w = WALLETS[s.method];
+
+    return {
+      noop: () => {},
+      itemCount: CART.length,
+      isStep1: s.step === 0, isStep2: s.step === 1, isStep3: s.step === 2, isStep4: s.step === 3,
+      onSignin: () => this.setState({account: 'member', step: 1}),
+      onGuest: () => this.setState({account: 'guest', step: 1}),
+      onNext: () => this.setState({step: Math.min(3, s.step + 1)}),
+      onBack: () => this.setState({step: Math.max(0, s.step - 1)}),
+      onName: e => this.setState({name: e.target.value}),
+      onState: e => this.setState({st: e.target.value}),
+      onZip: e => this.setState({zip: e.target.value}),
+      onCard: e => this.setState({card: e.target.value}),
+      onCurrency: e => this.setState({currency: e.target.value}),
+      onUsd: () => this.setState({currency: 'USD'}),
+      fName: s.name, fState: s.st, fZip: s.zip, fCard: s.card, fCurrency: s.currency,
+      notUsd: s.currency !== 'USD',
+
+      steps: STEP_NAMES.map((name, i) => {
+        const done = i < s.step, active = i === s.step;
+        return {
+          num: done ? '\u2713' : String(i + 1), name,
+          value: stepValues[i],
+          onGo: () => this.setState({step: i}),
+          tabCss: 'display:block;width:100%;text-align:left;padding:15px 20px 16px;cursor:pointer;border:0;border-bottom:3px solid ' +
+            (active ? '#ec3013' : 'transparent') + ';' +
+            (i > 0 ? 'border-left:1px solid rgba(27,25,23,.25);' : '') +
+            (active ? 'background:#1b1917;color:#eae4d9' : 'background:transparent;color:#1b1917'),
+          numCss: 'display:grid;place-items:center;width:20px;height:20px;font:700 10.5px/1 Archivo,sans-serif;' +
+            (active ? 'background:#ff4a26;color:#17181a' : done ? 'background:#1b1917;color:#eae4d9' : 'border:1.5px solid #8a8278;color:#8a8278'),
+          valueCss: 'display:block;margin-top:8px;font:400 12px/1.35 Archivo,sans-serif;' +
+            (active ? 'color:#c9c6c1' : done ? 'color:#6b645a' : 'color:#8a8278')
+        };
+      }),
+
+      activations: ACTIVATIONS.map((a, i) => {
+        const on = s.activation === a[0];
+        return {
+          name: a[1], desc: a[2], price: a[3] ? this.money(a[3]) : 'Free',
+          onPick: () => this.setState({activation: a[0]}),
+          css: 'display:grid;grid-template-columns:20px 1fr auto;gap:16px;align-items:center;width:100%;padding:18px 20px;cursor:pointer;border:0;' +
+            (i > 0 ? 'border-top:1px solid rgba(27,25,23,.25);' : '') +
+            (on ? 'background:rgba(236,48,19,.08)' : 'background:transparent'),
+          dotCss: 'width:16px;height:16px;display:block;box-sizing:border-box;border:2px solid #1b1917;' +
+            (on ? 'box-shadow:inset 0 0 0 3px #eae4d9;background:#ec3013' : 'background:transparent'),
+          priceCss: 'font:700 15px/1 Archivo,sans-serif;color:' + (a[3] ? '#1b1917' : '#15803d')
+        };
+      }),
+
+      methods: METHODS.map((m, i) => {
+        const on = s.method === m[0];
+        return {
+          name: m[1], svg: {__html: m[2]}, state: m[3],
+          onPick: () => this.setState({method: m[0]}),
+          css: 'display:flex;flex-direction:column;align-items:flex-start;gap:11px;width:100%;padding:18px 16px 17px;cursor:pointer;border:0;border-bottom:3px solid ' +
+            (on ? '#ec3013' : 'transparent') + ';' +
+            (i > 0 ? 'border-left:1px solid rgba(27,25,23,.25);' : '') +
+            (on ? 'background:#f6f4f0' : 'background:transparent'),
+          nameCss: 'font:700 13px/1.2 Archivo,sans-serif;color:#1b1917',
+          stateCss: 'font:600 9.5px/1.3 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:' + (on ? '#b52309' : '#8a8278')
+        };
+      }),
+
+      isCard: s.method === 'card',
+      isWallet: s.method !== 'card',
+      show3ds: s.method === 'card',
+      payBlocked, blockReason,
+      payBtnCss: 'display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;margin-top:20px;padding:19px 22px;border:0;' +
+        (payBlocked
+          ? 'background:#d9d2c6;cursor:not-allowed'
+          : 'background:#ec3013;cursor:pointer'),
+      payLabelCss: 'font:800 14px/1 Archivo,sans-serif;letter-spacing:.06em;color:' + (payBlocked ? '#8a8278' : '#fff'),
+      payAmountCss: 'font:800 17px/1 Archivo,sans-serif;letter-spacing:-.02em;color:' + (payBlocked ? '#8a8278' : '#fff'),
+      walletSvg: {__html: w ? w.mark : CARD_MARK},
+      walletTitle: w ? w.title : '',
+      walletBody: w ? w.body : '',
+      walletFunding: w ? w.funding : '',
+      detectedSvg: {__html: brand},
+      cardHint: brandName
+        ? brandName + ' detected. Test mode: expiry 01/29, any three-digit security code.'
+        : 'Test mode: 4242 4242 4242 4242, expiry 01/29, any three-digit security code.',
+
+      cart: CART.map(c => ({
+        name: c[0], mode: c[1], qty: c[2], amount: this.money(c[3]), pv: c[4],
+        modeCss: 'padding:3px 7px;font:700 8.5px/1 Archivo,sans-serif;letter-spacing:.1em;text-transform:uppercase;' +
+          (c[1] === 'Subscription' ? 'background:#1b1917;color:#eae4d9' : 'border:1px solid #8a8278;color:#6b645a')
+      })),
+
+      totals: [
+        {label: 'Subtotal', hint: '3 items', value: this.money(sub), valCss: 'font:700 13px/1.4 Archivo,sans-serif;color:#1b1917'},
+        {label: 'Activation', hint: s.activation === 'priority' ? 'priority' : 'standard', value: act ? this.money(act) : 'Free', valCss: 'font:700 13px/1.4 Archivo,sans-serif;color:' + (act ? '#1b1917' : '#15803d')},
+        {label: 'Tax', hint: s.st ? '5 percent, ' + s.st : 'enter State to calculate', value: s.st ? this.money(tax) : '\u2014', valCss: 'font:700 13px/1.4 Archivo,sans-serif;color:' + (s.st ? '#1b1917' : '#8a8278')}
+      ],
+      totalLabel: this.money(total),
+      renewNote: 'Monthly items renew each month until cancelled. Priority activation carries no PV.',
+      pvNow: pv,
+      pvNote: pv >= 100
+        ? 'This order qualifies the month on its own. ' + pv + ' PV against a 100 PV gate.'
+        : 'A qualified month needs 100 PV. This order carries ' + pv + '.',
+      pvFillCss: 'height:10px;background:#ff4a26;width:' + Math.min(100, pv) + '%'
+    };
+  }
+}
+
+</script>
+</body>
+</html>
