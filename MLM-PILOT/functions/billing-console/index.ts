@@ -1080,7 +1080,15 @@ async function resolveFromPayment(
   }
 
   /* Non-terminal on the rail: not this worker's call to make. The
-     attempt stays dispatched and the next sweep asks again. */
+     attempt stays dispatched and the next sweep asks again.
+
+     THE CONNECTOR IS STILL RECORDED (2026-08-18). Until now this branch
+     returned without writing anything, so an unresolved attempt showed
+     "not recorded" in the report, which is precisely backwards: a payment
+     stuck in limbo is the one you MOST need to know the processor for.
+     Every Authorize.net attempt in run 4 sat here, and the report could
+     not say so. */
+  await recordRailFacts(client, att.attempt_id, hs);
   return "pending";
 }
 
