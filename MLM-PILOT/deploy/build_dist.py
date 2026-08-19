@@ -357,6 +357,12 @@ CORPORATE_PAGES = {
     "conductor.html":     "conductor.html",
     "library.html":       "library.html",
     "library-agent.html": "library.html",  # a detail page is inside the library
+    # Signing in is not one of the seven destinations, so this page carries the
+    # bar and marks NOTHING active. None is the explicit way to say that: the
+    # page is linted like every other, it simply has no chapter to mark.
+    # It joined the registry 2026-08-19 when it gained the header; before that
+    # it was excluded by name, which is why it could have drifted unnoticed.
+    "login.html":         None,
 }
 
 # The cart is the ONLY permitted addition to the canonical navigation, and it
@@ -365,7 +371,7 @@ CART_PAGES = {"shop.html", "product.html"}
 
 # The sign-in areas, excluded by name by the owner. They keep their own chrome
 # and no chrome lint applies to them.
-NAV_LINT_EXCLUDED = {"login.html", "staff.html", "staff-operations.html"}
+NAV_LINT_EXCLUDED = {"staff.html", "staff-operations.html"}
 
 # Pages this script itself writes, which have no site chrome by design.
 BUILD_GENERATED_PAGES = {"404.html"}
@@ -726,11 +732,19 @@ def nav_drift_lint() -> None:
         # permitted the active state rather than requiring it, so faq.html
         # shipped with no active item at all and passed.
         active_tags = NAV_ACTIVE_TAG_RE.findall(block)
-        if len(active_tags) != 1:
+        if expected_active is None:
+            # A page that belongs to no section marks nothing, and the lint
+            # holds it to marking nothing: one active item here would be a
+            # claim the page cannot support.
+            if active_tags:
+                problems.append(
+                    f"{name}: {len(active_tags)} active navigation items, expected none "
+                    "(this page belongs to no section)")
+        elif len(active_tags) != 1:
             problems.append(
                 f"{name}: {len(active_tags)} active navigation items, expected exactly 1 "
                 f'(class="nav-link is-active" href="{expected_active}" aria-current="page")')
-        else:
+        elif expected_active is not None:
             tag = active_tags[0]
             href = HREF_RE.search(tag)
             if not href or href.group(1) != expected_active:
