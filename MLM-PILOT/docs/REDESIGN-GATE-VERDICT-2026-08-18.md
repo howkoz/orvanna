@@ -103,3 +103,72 @@ Stated so the pass is not read as wider than it is.
 - **Nothing here touched a payment rail**, so this run does not discharge the
   standing debt from 08-17: five deploys to a live rail with neither gate
   run.
+
+
+---
+
+# Second run, 2026-08-19: the panels, the console, and four unreadable surfaces
+
+Bundle **`sha256 05a1b77f9afa33d9`**. Both gates pass on all fourteen pages.
+
+## What gate one grew
+
+**Design system** (radius, shadow, gradient) — restored after being deleted by
+accident, and widened to every page. See
+[[a-check-removed-while-fixing-another-is-never-missed]].
+
+**Contrast** — new, and it found four surfaces that were shipped unreadable:
+
+| Surface | Was | Ratio |
+| --- | --- | --- |
+| `.btn-addline` — the console's three primary buttons | ink label on an ink fill | **1:1** |
+| The console's member-number and schedule fields | ink text on 70% ink | ~1.2:1 |
+| The 3-D Secure bank approval panel, mid-checkout | `--shop-text` on 70% ink | ~1.3:1 |
+| **Every paragraph of the 35-page plan brochure** | `--body` set to `#F1EDE6` on white | **1.09:1** |
+
+All four are the same fault: a dark inset from the old site whose BACKGROUND
+was remapped to ink while its TEXT stayed ink. The brochure is the sharpest
+case — one hex value meant "body text" in two documents at once, light-on-dark
+on the site and dark-on-light in the brochure, and a global remap cannot tell
+those apart because a colour does not carry which side of the contrast it was
+on. One token restored 35 pages.
+
+No token-level check would have caught any of them: `--indigo` and the label
+were two different NAMES that had become one colour, and a rule comparing names
+sees two. The check resolves both to pixels and divides.
+
+## One accepted exception, named rather than silenced
+
+`#8A8278` on `#EAE4D9` measures **2.99:1**. That is the handoff's own `--faint`
+token — "column headings, kickers, metadata" — on its own `--paper`. It is
+below AA for small text.
+
+It is listed in gate one as an accepted pair with its reason, not hidden by
+moving the threshold. Anything that is not that exact pair still fails.
+
+**This is an open decision for the owner.** The arithmetic: reaching 4.5:1 on
+paper needs a luminance of about 0.134, which lands on `#6B645A` — and that is
+already `--quiet`, the next step down. So the design's three-step ink scale has
+no room between "meets AA" and "distinct from quiet". Fixing it means either
+accepting two steps instead of three, or lightening the paper. Both are design
+calls, and both repaint every kicker, stat label and column head on the site.
+
+## Also in this run
+
+- The member office's panels went from bordered stat-cards to ruled cells,
+  34px numerals, one heading per section instead of two.
+- The operations console became one column ordered by consequence: queue,
+  retry, seven days, run now, history, schedule. The two-up grids paired
+  unrelated panels by height, and on a console whose argument IS an order, a
+  grid shuffles the argument.
+- Two more rounds of old-palette survivors, both in `rgba()` form, which is why
+  the hex-and-triple sweeps missed them: `rgba(2,6,23,…)` and
+  `rgba(148,163,184,…)` in the portal, `rgba(124,138,160,…)` in the console.
+
+## Still not covered
+
+Unchanged from the first run: the member office and the operations console are
+verified against a synthetic fixture with `fetch` stubbed, because both sit
+behind sign-in on a live database. The operations queue's money column and row
+actions still need the server change in `OPERATIONS-QUEUE-SERVER-SPEC.md`,
+which has NOT been applied.
