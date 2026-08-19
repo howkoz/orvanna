@@ -396,47 +396,15 @@
    changes nothing, but the smaller number was the wrong method
    and is corrected rather than left standing.) */
 
-.nav-cart {
-  position: relative;
-  font: inherit;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 12px;
-  background: transparent;
-  border: 1px solid rgba(27, 25, 23, 0.35);
-  border-radius: 0;
-  color: var(--chrome-text);
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
+/* The cart control moved to css/site-chrome.css on 2026-08-18.
 
-.nav-cart:hover {
-  color: var(--chrome-accent);
-  border-color: rgba(236, 48, 19, 0.55);
-  box-shadow: none;
-}
+   It used to live here because it was a shop-only icon button, and the
+   chrome lint excluded it by name for that reason. The redesign changed
+   what it IS: it is now one of the two forms of the bar's single primary
+   action, swapping with .nav-cta by page, and the two have to measure
+   the same or the bar changes height between pages. That makes it
+   chrome, so it is declared with the chrome and linted with it. */
 
-.nav-cart svg { width: 18px; height: 18px; }
-
-.cart-count {
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--shop-on-accent);
-  background: var(--shop-accent-fill);
-  border-radius: 0;
-  box-shadow: none;
-  font-variant-numeric: tabular-nums;
-  transition: transform 0.18s ease;
-}
-
-.cart-count.bump { transform: scale(1.35); }
 
 /* ============================================================
    CART DRAWER: glass sheet from the right, per the storefront
@@ -465,7 +433,8 @@
   width: min(430px, 100%);
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(241, 237, 230, 0.97), rgba(234, 228, 217, 0.97));
+  /* flat paper-raised; the wash was two values of the same paper */
+  background: #F1EDE6;
   border-left: 1px solid rgba(236, 48, 19, 0.28);
   box-shadow: none;
   transform: translateX(102%);
@@ -927,7 +896,6 @@
   .cart-drawer { transition: none; }
   .drawer-overlay { transition: none; }
   .pv-fill { transition: none; }
-  .cart-count.bump { transform: none; }
 }
 
 /* ============================================================
@@ -1687,10 +1655,9 @@ a.back-to-shop { text-decoration: none; }
 
 .pdp-name {
   font-size: clamp(1.32rem, 2.4vw, 1.85rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.065em;
-  line-height: 1.18;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   color: var(--shop-strong);
   margin: 10px 0 6px;
 }
@@ -1934,10 +1901,9 @@ a.back-to-shop { text-decoration: none; }
 
 .prose-title {
   font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  line-height: 1.35;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   color: var(--shop-strong);
   margin-bottom: 10px;
 }
@@ -2372,11 +2338,15 @@ body.payment-in-flight .checkout-summary {
   padding: 14px 16px;
   border: 1px solid rgba(236, 48, 19, 0.24);
   border-radius: 0;
-  background: rgba(27, 25, 23, 0.7);
+  /* Was rgba(27,25,23,0.7). The same dark-inset-remapped-to-ink fault as
+     the console's fields, and this one is the bank approval screen: the
+     copy under each heading is --shop-text, which is dark, so the
+     shopper was reading dark on dark in the middle of paying. */
+  background: #F1EDE6;
 }
 .plaid-grid strong {
   display: block;
-  color: var(--shop-paper);
+  color: #1B1917;
   font-size: 1rem;
 }
 .plaid-copy,
@@ -2907,7 +2877,7 @@ body.payment-in-flight .checkout-summary {
    ============================================================ */
 
 .catalog-shell {
-  max-width: 1240px;
+  max-width: var(--maxw, 1180px);
   margin: 0 auto;
   padding: 0 32px 80px;
   display: grid;
@@ -2916,7 +2886,27 @@ body.payment-in-flight .checkout-summary {
   align-items: start;
 }
 
-.catalog-main { min-width: 0; padding-top: 34px; }
+/* THE COLUMN DIVIDER. The comp shows one continuous 2px ink rule between
+   the list and the rail, running the height of the catalog. It cannot live
+   on .rail: the rail is position:sticky and align-self:start, so its border
+   is only as tall as its own content and stops dead a third of the way down
+   an empty cart. It lives here instead, on the taller column, centred in the
+   34px grid gap. */
+.catalog-main {
+  min-width: 0;
+  padding-top: 34px;
+  position: relative;
+}
+
+.catalog-main::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -18px;
+  width: 2px;
+  background: var(--shop-strong);
+}
 
 .catalog-title {
   font-size: clamp(1.9rem, 3.4vw, 2.6rem);
@@ -3060,7 +3050,7 @@ body.payment-in-flight .checkout-summary {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #8A8278;
+  color: #6B645A;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -3188,7 +3178,6 @@ body.payment-in-flight .checkout-summary {
   position: sticky;
   top: 88px;
   align-self: start;
-  border-left: 2px solid var(--shop-strong);
   padding: 34px 0 26px 24px;
 }
 .rail.is-tall { position: static; }
@@ -3198,7 +3187,7 @@ body.payment-in-flight .checkout-summary {
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #8A8278;
+  color: #6B645A;
   margin-bottom: 8px;
 }
 
@@ -3276,7 +3265,7 @@ body.payment-in-flight .checkout-summary {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #8A8278;
+  color: #6B645A;
   background: none;
   border: 0;
   padding: 0;
@@ -3328,7 +3317,7 @@ body.payment-in-flight .checkout-summary {
 .rail-checkout:hover { background: #A3220B; }
 .rail-checkout[disabled] {
   background: transparent;
-  color: #8A8278;
+  color: #6B645A;
   border: 1px solid rgba(27, 25, 23, 0.25);
   cursor: not-allowed;
 }
@@ -3336,7 +3325,7 @@ body.payment-in-flight .checkout-summary {
 .rail-foot {
   font-size: 0.72rem;
   line-height: 1.5;
-  color: #8A8278;
+  color: #6B645A;
   margin-top: 10px;
 }
 
@@ -3352,11 +3341,15 @@ body.payment-in-flight .checkout-summary {
 }
 
 @media (max-width: 1080px) {
-  /* the rail stops being a rail and becomes a block above the list */
+  /* The rail stops being a rail and becomes a block UNDER the list, per the
+     build spec. It sat above until 2026-08-18: a reader arriving on a phone
+     met "YOUR MONTH, $0" before the page had said what it sells, and the
+     headline started below the fold. */
   .catalog-shell { grid-template-columns: minmax(0, 1fr); }
+  /* stacked: there is no column boundary left to draw */
+  .catalog-main::after { display: none; }
   .rail {
     position: static;
-    order: -1;
     border-left: 0;
     border-top: 2px solid var(--shop-strong);
     padding: 22px 0 20px;
@@ -3389,40 +3382,37 @@ body.payment-in-flight .checkout-summary {
 
 
 /* ---------- catalog delta against the approved design, 2026-08-18 ----------
-   The reading column sits on the ground as a bordered panel rather than
-   floating on the page, and the active filter pill is ink. The accent is
-   reserved for the one primary action, which on this page is Add the pack. */
+   CORRECTED 2026-08-18 (second pass), and the correction is smaller than
+   the thing it corrects.
 
-.catalog-shell {
-  padding-top: 26px;
-  align-items: stretch;
-}
+   The first pass read the comp's ARTBOARD EDGE as a page element and
+   rebuilt the reading column as a bordered panel on a raised ground, then
+   set the rail's border-left to 0 because the new box already looked
+   divided. Neither was in the design. In 9a that border wraps the whole
+   screen, nav included: it is the canvas separating the artboard from its
+   background, the way every design tool draws a frame. Recreating it put a
+   card back on a page whose stated premise is that rules and alignment
+   organise INSTEAD of boxes, and it spent the page's heaviest line to do
+   it. What Howard saw as thin lines was the 2px ink rule between the list
+   and the rail being replaced by a 1px box edge.
 
-.catalog-main {
-  background: #F1EDE6;
-  border: 1px solid rgba(27, 25, 23, 0.28);
-  padding: 30px 30px 34px;
-}
+   It also inverted the two grounds: the column was raised to #F1EDE6 and
+   the promoted pack sunk to #EAE4D9, when the token table gives
+   paper-raised to "a panel that must separate from the ground" and the
+   pack is the only such panel here.
 
-.rail {
-  border-left: 0;
-  border-top: 0;
-  padding: 30px 0 26px 26px;
-}
+   So the base rules above were right all along and this block no longer
+   overrides them. What the first pass got right is kept, and it is only
+   this: the active filter pill is ink, so the accent stays on the one
+   primary action, which on this page is Add the pack. (Whole money and
+   the per-pack marks were markup changes and live in shop.html.)
 
-.promo {
-  background: #EAE4D9;
-  border-left: 1px solid rgba(27, 25, 23, 0.25);
-  border-right: 1px solid rgba(27, 25, 23, 0.25);
-}
+   The lesson, for the pages still to come: an artboard frame is not a
+   border. Read a comp's outermost rectangle as the canvas until something
+   inside it proves otherwise. */
 
 .filter-pill[aria-pressed="true"] {
   background: var(--shop-strong);
   border-color: var(--shop-strong);
   color: #EAE4D9;
-}
-
-@media (max-width: 1080px) {
-  .catalog-main { padding: 22px 20px 26px; }
-  .rail { padding: 22px 0 20px; }
 }

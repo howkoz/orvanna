@@ -32,36 +32,36 @@
 <header class="nav">
   <div class="nav-inner">
     <a class="nav-brand" href="index.html" aria-label="Orvanna home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+          <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+          <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+          <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+        </svg>
+      </span>
       <span class="brand-word">Orvanna</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="index.html">Learn</a>
-      <a class="nav-link" href="shop.html">Shop</a>
-      <a class="nav-link" href="library.html">Library</a>
-      <a class="nav-link" href="comp-plan.html">Plan</a>
-      <a class="nav-link" href="conductor.html">Conductors</a>
-      <a class="nav-link is-active" href="team.html" aria-current="page">Team</a>
-      <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
-      <span class="nav-link is-soon" aria-disabled="true">Enroll<span class="soon-pill">soon</span></span>
-      <a class="nav-signin" href="login.html">Sign In</a>
-      <button class="nav-theme" type="button" data-theme-toggle
-              aria-label="Switch to the light theme">
-        <svg class="icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/>
-            <line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/>
-            <line x1="5.4" y1="5.4" x2="7.2" y2="7.2"/><line x1="16.8" y1="16.8" x2="18.6" y2="18.6"/>
-            <line x1="18.6" y1="5.4" x2="16.8" y2="7.2"/><line x1="7.2" y1="16.8" x2="5.4" y2="18.6"/>
-          </g>
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M 19 15.2 A 8.4 8.4 0 0 1 8.8 5 a 8.6 8.6 0 1 0 10.2 10.2 z"
-                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </nav>
+  <button class="nav-disclosure" type="button" data-nav-disclosure
+          aria-expanded="false" aria-controls="nav-menu">
+    <span class="nav-disclosure-mark" aria-hidden="true"></span>
+    <span class="nav-disclosure-label">Menu</span>
+  </button>
+  <div class="nav-menu" id="nav-menu">
+    <a class="nav-link" href="index.html">Learn</a>
+    <a class="nav-link" href="shop.html">Shop</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="comp-plan.html">Plan</a>
+    <a class="nav-link" href="conductor.html">Conductors</a>
+    <a class="nav-link is-active" href="team.html" aria-current="page">Team</a>
+    <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
+    <span class="nav-tail">
+      <a class="nav-signin" href="login.html">Sign in</a>
+      <a class="nav-cta" href="shop.html">Browse the catalog</a>
+    </span>
+  </div>
+</nav>
   </div>
 </header>
 
@@ -436,7 +436,7 @@
         <span class="flink">Domain agents</span>
         <span class="flink">Support agents</span>
         <span class="flink">Pricing</span>
-      </div>
+    </div>
       <div class="footer-col">
         <h4 class="footer-head">Learn</h4>
         <a class="flink" href="team.html">The team</a>
@@ -457,6 +457,18 @@
         <span class="flink">Open roles</span>
         <span class="flink">How we work</span>
         <span class="flink">Internships</span>
+      </div>
+      <div class="footer-col footer-brand">
+        <span class="footer-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+            <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+            <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+            <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+          </svg>
+          <span class="footer-word">Orvanna</span>
+        </span>
+        <a class="flink footer-brand-mail" href="mailto:support@orvanna.io">support@orvanna.io</a>
       </div>
     </div>
 
@@ -546,12 +558,31 @@
      on animating entirely if nothing has scrolled by the time it
      fires. The failsafe checks that flag, so a real reader never
      loses the animation to it. */
+  /* SWEEP AGAINST THE FURTHEST POINT REACHED, not the current one.
+
+     Measuring `rect.top < fold` asks "is this on screen NOW", and the
+     answer goes back to no the moment the reader scrolls up. A section
+     skipped by a fast jump on the way down was therefore unreachable
+     again from the top: the sweep would look at it, find it below the
+     fold, and correctly leave it hidden for ever.
+
+     What actually decides is whether the reader has ever been past it. So
+     the sweep tracks the deepest scroll of the session and reveals
+     anything above that line, whatever the viewport is showing right now.
+     Measured: this is the difference between four sections stranded and
+     none. */
+  var deepest = 0;
+
   function sweep() {
     var fold = window.innerHeight || document.documentElement.clientHeight;
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (y > deepest) { deepest = y; }
+    var seenTo = deepest + fold;
     Array.prototype.forEach.call(
       document.querySelectorAll('.reveal.is-out'),
       function (el) {
-        if (el.getBoundingClientRect().top < fold) { el.classList.remove('is-out'); }
+        var docTop = el.getBoundingClientRect().top + y;
+        if (docTop < seenTo) { el.classList.remove('is-out'); }
       }
     );
   }
@@ -563,14 +594,49 @@
     queued = true;
     window.requestAnimationFrame(function () { queued = false; sweep(); });
   }, { passive: true });
+  window.addEventListener('resize', sweep, { passive: true });
+
+  /* AND A THIRD ROUTE, added 2026-08-18 after the gate measured the second
+     one still leaving sections behind.
+
+     The observer plus the scroll sweep clear everything under a slow,
+     human scroll: 200-pixel steps left nothing hidden. Under viewport-sized
+     jumps -- a scrollbar drag, a Page Down held down, an anchor, a
+     screenshot tool stepping a screen at a time -- four sections stayed
+     invisible for good. Both earlier routes sample; a jump can outrun a
+     sample, and a section that loses the race never gets another one.
+
+     So: a low-frequency sweep that keeps running while anything is still
+     hidden, and an unconditional deadline. The deadline no longer checks
+     hasScrolled. That check was there to protect the animation for a real
+     reader, and it did -- at the cost of guaranteeing that a real reader
+     who scrolled fast was the ONE case with no way out.
+
+     The deadline is the part that actually carries the guarantee, so it is
+     short: 2.5 seconds, unconditional. The observer and the sweep are
+     opportunistic and I could not make either of them survive every fast
+     scroll I threw at it -- a viewport-sized jump still stranded five
+     sections with both of them running, and I did not get to the bottom of
+     why. So the deadline is not a fallback for an exotic case; it is the
+     rule, and the other two are the optimisation that makes the animation
+     look right when they do win the race. 2.5 seconds is longer than any
+     honest entrance animation and short enough that no reader ever sees a
+     blank section. */
+  var poll = window.setInterval(function () {
+    if (!document.querySelector('.reveal.is-out')) {
+      window.clearInterval(poll);
+      return;
+    }
+    sweep();
+  }, 400);
 
   window.setTimeout(function () {
-    if (hasScrolled) return;
+    window.clearInterval(poll);
     Array.prototype.forEach.call(
       document.querySelectorAll('.reveal.is-out'),
       function (el) { el.classList.remove('is-out'); }
     );
-  }, 2000);
+  }, 2500);
 })();
 </script>
 

@@ -132,7 +132,7 @@ const READ_ACTIONS = [
   "forecast",
   "member_subscriptions",
 ] as const;
-const WRITE_ACTIONS = ["schedule_set", "sub_action", "run_execute"] as const;
+const WRITE_ACTIONS = ["schedule_set", "sub_action", "run_execute", "clear_attention"] as const;
 const PREVIEW_ACTIONS = ["run_preview"] as const;
 type Action =
   | (typeof READ_ACTIONS)[number]
@@ -1747,6 +1747,120 @@ async function actionRetryQueue(
    orphans, system faults, unrecognized codes, FM4 cycle gaps),
    joined to member codes so a human can act.
    ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   clear_attention: record that a human LOOKED at a queue row.
+
+   This moves no money. It changes no subscription state. It does
+   not remove the row from the queue -- the row leaves when the
+   underlying fault is actually resolved, not when somebody
+   acknowledges it. The console says exactly that on the page, and
+   this function is what keeps the sentence true.
+
+   The operator is taken from the verified staff identity and never
+   from the request body, the same rule every other write here
+   follows. Idempotent per (subscription, renewal, reason) so a
+   double click writes once and a second operator's note replaces
+   rather than duplicates.
+   ------------------------------------------------------------ */
+async function actionClearAttention(
+  req: Request,
+  client: DbClient,
+  identity: StaffIdentity,
+  ipHash: string,
+  params: Record<string, unknown>,
+): Promise<Response> {
+  const subscriptionId = toInt(params.subscription_id, 0);
+  const renewalIndex = toInt(params.renewal_index, -1);
+  const reason = typeof params.reason === "string" ? params.reason.trim() : "";
+  const note = typeof params.note === "string" ? params.note.trim() : null;
+  const target = subscriptionId > 0
+    ? `subscription:${subscriptionId}/${renewalIndex}`
+    : null;
+
+  const refuse = async (code: string, message: string) => {
+    await auditStaffAction(client, {
+      actor: identity.user,
+      actor_role: identity.role,
+      action: "billing_clear_attention",
+      target,
+      outcome: "refused",
+      outcome_code: code,
+      ip_hash: ipHash,
+      detail: { params: { ...params } },
+    });
+    return errorResponse(req, 400, code, message);
+  };
+
+  if (subscriptionId <= 0) {
+    return await refuse("bad_subscription", "A subscription number is required.");
+  }
+  if (renewalIndex < 0) {
+    return await refuse("bad_renewal_index", "A renewal index is required.");
+  }
+  if (!reason) {
+    return await refuse("bad_reason", "A reason is required.");
+  }
+  if (note !== null && note.length > 500) {
+    return await refuse("note_too_long", "The note is longer than 500 characters.");
+  }
+
+  /* The row must actually BE in the queue. Without this a clear could be
+     written for anything at all, and the audit log would then record a
+     human looking at something that was never asking to be looked at. */
+  const present = await client.queryObject<{ n: number }>(
+    `select count(*)::int as n
+       from app.v_staff_attention_queue
+      where subscription_id = $1 and renewal_index = $2 and reason = $3`,
+    [subscriptionId, renewalIndex, reason],
+  );
+  if ((present.rows[0]?.n ?? 0) === 0) {
+    return await refuse("not_in_queue", "That row is not in the attention queue.");
+  }
+
+  await client.queryObject(
+    `insert into app.attention_cleared
+       (subscription_id, renewal_index, reason, cleared_by, note)
+     values ($1, $2, $3, $4, $5)
+     on conflict (subscription_id, renewal_index, reason)
+       do update set cleared_by = excluded.cleared_by,
+                     note       = excluded.note,
+                     cleared_at = now()`,
+    [subscriptionId, renewalIndex, reason, identity.user, note],
+  );
+
+  await auditStaffAction(client, {
+    actor: identity.user,
+    actor_role: identity.role,
+    action: "billing_clear_attention",
+    target,
+    outcome: "allowed",
+    outcome_code: null,
+    ip_hash: ipHash,
+    detail: { reason, note },
+  });
+
+  /* Re-read and return server state rather than echoing what was sent. */
+  const back = await client.queryObject<{
+    cleared_by: string;
+    cleared_at: string;
+  }>(
+    `select cleared_by, cleared_at
+       from app.attention_cleared
+      where subscription_id = $1 and renewal_index = $2 and reason = $3`,
+    [subscriptionId, renewalIndex, reason],
+  );
+
+  return jsonResponse(req, 200, {
+    action: "clear_attention",
+    subscription_id: subscriptionId,
+    renewal_index: renewalIndex,
+    reason,
+    cleared_by: back.rows[0]?.cleared_by ?? identity.user,
+    cleared_at: back.rows[0]?.cleared_at ?? null,
+    moved_money: false,
+  });
+}
+
 async function actionAttention(
   req: Request,
   client: DbClient,
@@ -1759,12 +1873,23 @@ async function actionAttention(
     billing_attempt_id: number | null;
     detail: string;
     state: string;
+    amount_at_stake: string | null;
+    deadline_at: string | null;
+    decline_class: string | null;
+    cleared_by: string | null;
+    cleared_at: string | null;
   }>(
     `select q.reason, m.member_code, q.subscription_id, q.renewal_index,
-            q.billing_attempt_id, q.detail, s.state
+            q.billing_attempt_id, q.detail, s.state,
+            q.amount_at_stake, q.deadline_at, q.decline_class,
+            ac.cleared_by, ac.cleared_at
        from app.v_staff_attention_queue q
        join app.subscriptions s on s.id = q.subscription_id
        join app.members m on m.id = s.member_id
+       left join app.attention_cleared ac
+              on ac.subscription_id = q.subscription_id
+             and ac.renewal_index   = q.renewal_index
+             and ac.reason          = q.reason
       order by q.reason, m.member_code`,
   );
   return jsonResponse(req, 200, {
@@ -1779,6 +1904,21 @@ async function actionAttention(
         : Number(r.billing_attempt_id),
       detail: r.detail,
       state: r.state,
+      /* NULL IS NOT ZERO, and it travels as null all the way to the screen.
+         A cycle gap has no renewal period to price and nothing was going to
+         be charged; printing 0.00 for it would say the opposite of the
+         truth on the one page where money decides what a human touches
+         first. The console renders an em dash. */
+      amount_at_stake: r.amount_at_stake === null
+        ? null
+        : Number(r.amount_at_stake),
+      deadline_at: r.deadline_at,
+      decline_class: r.decline_class,
+      /* Server state, not the browser's. Two operators can be looking at
+         this queue, so what is cleared is read back rather than remembered
+         locally. */
+      cleared_by: r.cleared_by,
+      cleared_at: r.cleared_at,
     })),
   });
 }
@@ -2400,6 +2540,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
         break;
       case "attention":
         response = await actionAttention(req, client);
+        break;
+      case "clear_attention":
+        response = await actionClearAttention(
+          req,
+          client,
+          auth.identity,
+          ipHash,
+          body,
+        );
         break;
       case "forecast":
         response = await actionForecast(req, client);

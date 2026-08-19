@@ -482,6 +482,19 @@ NAV_BLOCK_RE = re.compile(r'<nav class="nav-links"[^>]*>.*?</nav>', re.S)
 # page's own existing markup, which the contract says to leave untouched.
 NAV_CART_RE = re.compile(r'<(a|button) class="nav-cart".*?</\1>', re.S)
 NAV_CART_PRESENT_RE = re.compile(r'class="nav-cart"')
+
+# THE BAR'S PRIMARY ACTION, added 2026-08-18 with the redesigned navigation.
+#
+# The design gives the bar one solid primary action, and it is not the same
+# action on every page: the marketing pages send a reader to the catalog, and
+# the two commerce pages show the cart instead. Leaving both on shop.html put
+# a primary button in the bar pointing at the page the reader was already on.
+#
+# So the swap is now a STATED RULE with a lint, rather than either a hole in
+# the drift check or a button that lies. Exactly one of the two is present on
+# every corporate page, and which one is decided by CART_PAGES.
+NAV_CTA_RE = re.compile(r'<a class="nav-cta".*?</a>', re.S)
+NAV_CTA_PRESENT_RE = re.compile(r'class="nav-cta"')
 NAV_COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
 NAV_ACTIVE_CLASS_RE = re.compile(r'class="nav-link is-active"')
 NAV_ARIA_CURRENT_RE = re.compile(r'\s*aria-current="page"')
@@ -642,7 +655,11 @@ def normalize_nav(block: str, allow_cart: bool) -> str:
     """
     block = NAV_COMMENT_RE.sub("", block)
     if allow_cart:
+        # The commerce pages swap the catalog button for the cart, so both
+        # halves of that one swap come out before the comparison. Stripping
+        # the cart alone would report every cart page as drifted.
         block = NAV_CART_RE.sub("", block)
+        block = NAV_CTA_RE.sub("", block)
     block = NAV_ACTIVE_CLASS_RE.sub('class="nav-link"', block)
     block = NAV_ARIA_CURRENT_RE.sub("", block)
     return WHITESPACE_RE.sub(" ", block).strip()
@@ -656,6 +673,10 @@ def nav_drift_lint() -> None:
     if not canonical:
         fail(f'{partial} does not contain a <nav class="nav-links"> block')
     want = normalize_nav(canonical.group(0), allow_cart=False)
+    # The canonical block carries the catalog button, so a commerce page must
+    # be compared against a canonical with the SAME swap applied. Comparing it
+    # against the marketing form would report the intended swap as drift.
+    want_cart = normalize_nav(canonical.group(0), allow_cart=True)
 
     problems = []
     for name in sorted(CORPORATE_PAGES):
@@ -673,6 +694,28 @@ def nav_drift_lint() -> None:
             problems.append(
                 f"{name}: carries a nav-cart element. The cart is permitted on "
                 f"{' and '.join(sorted(CART_PAGES))} only (contract section 2, rule 3).")
+
+        # EXACTLY ONE primary action, and the right one for this page. Both
+        # directions are checked: a commerce page that kept the catalog button
+        # points a reader at the page they are standing on, and a marketing
+        # page that lost it has no primary action in the bar at all.
+        has_cart = bool(NAV_CART_PRESENT_RE.search(block))
+        has_cta = bool(NAV_CTA_PRESENT_RE.search(block))
+        if name in CART_PAGES:
+            if has_cta:
+                problems.append(
+                    f"{name}: carries BOTH the catalog button and the cart. A "
+                    "commerce page swaps one for the other; keeping both puts a "
+                    "primary action in the bar pointing at this very page.")
+            if not has_cart:
+                problems.append(
+                    f"{name}: is a commerce page with no cart in the bar.")
+        else:
+            if not has_cta:
+                problems.append(
+                    f"{name}: has no nav-cta. Every page outside "
+                    f"{' and '.join(sorted(CART_PAGES))} carries the bar's one "
+                    "primary action.")
 
         # The active item: REQUIRED, exactly one, on the right destination,
         # with both halves of the marker.
@@ -700,22 +743,25 @@ def nav_drift_lint() -> None:
                     f"{name}: the active navigation item carries is-active but not "
                     f'aria-current="page"\n      {tag}')
 
-        got = normalize_nav(block, allow_cart=(name in CART_PAGES))
-        if got == want:
+        on_cart_page = name in CART_PAGES
+        got = normalize_nav(block, allow_cart=on_cart_page)
+        expected = want_cart if on_cart_page else want
+        if got == expected:
             continue
-        cut = next((i for i, (a, b) in enumerate(zip(got, want)) if a != b),
-                   min(len(got), len(want)))
+        cut = next((i for i, (a, b) in enumerate(zip(got, expected)) if a != b),
+                   min(len(got), len(expected)))
         problems.append(
             f"{name}: navigation differs from _partials/nav.html at character {cut}\n"
             f"      page:      ...{got[max(0, cut - 40):cut + 60]}\n"
-            f"      canonical: ...{want[max(0, cut - 40):cut + 60]}")
+            f"      canonical: ...{expected[max(0, cut - 40):cut + 60]}")
 
     if problems:
         for p in problems:
             print(f"  nav drift: {p}")
         fail(f"{len(problems)} navigation problem(s) against the canonical block in "
-             "www/_partials/nav.html; only the active item and the cart on "
-             f"{' and '.join(sorted(CART_PAGES))} may differ")
+             "www/_partials/nav.html; only the active item, and the "
+             "catalog-button-for-cart swap on "
+             f"{' and '.join(sorted(CART_PAGES))}, may differ")
     print(f"nav drift lint: {len(CORPORATE_PAGES)} corporate pages match "
           f"_partials/nav.html, each marking its own page active")
 
@@ -783,14 +829,34 @@ def theme_boot_lint() -> None:
 
 CHROME_SELECTORS = (
     "nav", "nav-inner", "nav-brand", "nav-logo", "nav-links", "nav-link",
-    "nav-signin", "nav-theme", "nav-support", "soon-pill", "brand-mark",
-    "brand-word", "footer", "footer-cols", "footer-head", "footer-meta",
-    "footer-contact", "footer-mail", "flink", "socials", "social", "legal",
+    "nav-menu", "nav-tail", "nav-signin", "nav-cta", "nav-cart", "cart-count",
+    "nav-disclosure", "nav-disclosure-mark", "nav-disclosure-label",
+    "nav-support", "brand-mark", "brand-word", "mark-bar", "mark-accent",
+    "footer", "footer-cols", "footer-head", "footer-meta", "footer-contact",
+    "footer-mail", "footer-brand", "footer-brand-mail", "footer-mark",
+    "footer-word", "flink", "socials", "social", "legal",
     "skip-link", "bpFab",
 )
-# The trailing lookahead matters. \b would treat ".nav-cart" as a match for
-# "nav", because a hyphen is a non-word character, and the cart is explicitly
-# NOT owned by the shared sheet. The class name must end here.
+# THE CART JOINED THIS LIST 2026-08-18, and the reason is worth keeping.
+#
+# It was excluded by name, correctly, while it was a shop-only icon button
+# that the shared sheet had no business styling. The redesign changed what it
+# IS: it became one of the two forms of the bar's single primary action,
+# swapping with .nav-cta page by page. Two controls in one slot have to
+# measure the same or the bar changes height between pages, which is the
+# complaint the whole chrome contract exists to answer.
+#
+# While it sat outside, shop.css redeclared it with `font: inherit`, a 1px
+# border and its own padding, and the bar stood 73px on the commerce pages
+# against 69px everywhere else. The lint reported no drift, because it had
+# been told not to look.
+#
+# nav-theme and soon-pill left the list in the same pass: the theme control
+# and the Enroll placeholder no longer exist.
+#
+# The trailing lookahead still matters: \b would treat ".nav-cart" as a match
+# for "nav", because a hyphen is a non-word character. Every class name that
+# must be caught is now listed in full.
 CHROME_SELECTOR_RE = re.compile(
     r"(?m)^[ \t]*((?:a|span|div|button)?\.(?:" + "|".join(CHROME_SELECTORS) +
     r")(?![-\w])[^{;}]*)\{")

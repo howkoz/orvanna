@@ -56,14 +56,14 @@
   --field:        #EAE4D9;
   --field-2:      #F1EDE6;
   --field-3:      #F1EDE6;
-  --panel:        linear-gradient(165deg, rgba(241, 237, 230, 0.62), rgba(241, 237, 230, 0.44));
+  --panel:        #F1EDE6;
   --panel-border: rgba(27, 25, 23, 0.26);
   --panel-lit:    rgba(236, 48, 19, 0.30);
-  --panel-shadow: 0 0 26px rgba(27, 25, 23, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --panel-shadow: none;
   --heading:      #1B1917;
   --body:         #4B453D;
   --muted:        #6B645A;
-  --legal:        #8A8278;
+  --legal:        #6B645A;
   --accent:       #EC3013;
   --accent-soft:  rgba(236, 48, 19, 0.10);
   --indigo:       #1B1917;
@@ -72,9 +72,14 @@
   --hairline:     rgba(27, 25, 23, 0.18);
   --chip-bg:      rgba(27, 25, 23, 0.10);
   --btn-solid-bg: #EC3013;
-  --btn-solid-fg: #05121C;
-  --btn-solid-hv: #67E3F4;
-  --btn-ghost-bg: linear-gradient(180deg, rgba(241, 237, 230, 0.85), rgba(234, 228, 217, 0.85));
+  /* Corrected 2026-08-19. The label was #05121C and the HOVER was #67E3F4,
+     both survivors of the dark site: the palette pass remaps the values it
+     recognises, and a hover state renders nowhere until a pointer is on it,
+     so neither showed up in a static sweep. A solid accent button takes a
+     white label and deepens on hover, the same as .h-btn-solid. */
+  --btn-solid-fg: #FFFFFF;
+  --btn-solid-hv: #A3220B;
+  --btn-ghost-bg: #F1EDE6;
   --btn-ghost-fg: #1B1917;
   --btn-ghost-bd: rgba(27, 25, 23, 0.55);
   --glow-a:       rgba(27, 25, 23, 0.17);
@@ -150,16 +155,13 @@ img, svg { max-width: 100%; display: block; }
 .band + .band { border-top: 1px solid var(--hairline); }
 .band-2 { background: var(--field-2); }
 
-.glow-a::before, .glow-b::before, .glow-c::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  width: 680px; height: 680px;
-  border-radius: 50%;
-}
-.glow-a::before { left: -220px; top: -160px; background: radial-gradient(closest-side, var(--glow-a), transparent 70%); }
-.glow-b::before { right: -240px; top: 8%;    background: radial-gradient(closest-side, var(--glow-b), transparent 70%); }
-.glow-c::before { left: 50%; transform: translateX(-50%); bottom: -320px; background: radial-gradient(closest-side, var(--glow-c), transparent 70%); }
+/* THE GLOWS ARE GONE, 2026-08-19. Three 680px radial washes bleeding
+   behind the bands -- the starfield aesthetic this redesign replaces.
+   Deleted rather than squared off: the border-radius was only a problem
+   because the circle should not have been there at all. The .glow-a/b/c
+   classes stay on the markup and now do nothing, which is deliberate:
+   removing them is a markup change across two files for no visual
+   difference, and the next content round can drop them. */
 
 .band > .wrap { position: relative; z-index: 1; }
 
@@ -172,19 +174,20 @@ img, svg { max-width: 100%; display: block; }
 
 h1.page-title {
   font-size: clamp(1.9rem, 4.6vw, 3.1rem);
-  font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
-  line-height: 1.18; color: var(--heading); margin-bottom: 26px;
+  font-weight: 800; letter-spacing: -0.035em;
+  line-height: 1.02; color: var(--heading); margin-bottom: 26px;
 }
 
 h2.section-title {
   font-size: clamp(1.45rem, 3vw, 2.05rem);
-  font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em;
-  line-height: 1.25; color: var(--heading); margin-bottom: 22px;
+  font-weight: 800; letter-spacing: -0.03em;
+  line-height: 1.05; color: var(--heading); margin-bottom: 22px;
 }
 
 h3.card-title {
-  font-size: 1.02rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.12em; color: var(--heading); margin-bottom: 10px;
+  font-size: 1.15rem; font-weight: 800;
+  letter-spacing: -0.02em; line-height: 1.15;
+  color: var(--heading); margin-bottom: 10px;
 }
 
 h4.mini-title {
@@ -211,7 +214,7 @@ em.q { font-style: normal; color: var(--accent); font-weight: 600; }
 .btn {
   font: inherit; display: inline-block; padding: 12px 26px;
   font-size: 0.86rem; font-weight: 650; text-transform: uppercase;
-  letter-spacing: 0.14em; text-decoration: none; border-radius: 8px;
+  letter-spacing: 0.14em; text-decoration: none; border-radius: 0;
   border: 1.5px solid transparent; background: transparent; color: inherit;
   cursor: pointer;
   transition: transform 0.16s ease, background-color 0.16s ease,
@@ -236,22 +239,24 @@ em.q { font-style: normal; color: var(--accent); font-weight: 600; }
 
 .panel {
   position: relative; background: var(--panel);
-  border: 1px solid var(--panel-border); border-radius: 14px;
+  border: 1px solid var(--panel-border); border-radius: 0;
   box-shadow: var(--panel-shadow);
   padding: 30px 32px;
 }
 .panel-lit { border-color: var(--panel-lit); }
 .accent-bar {
   position: absolute; top: 0; left: 22px; right: 22px; height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--indigo), var(--accent));
+  border-radius: 0;
+  /* was a two-stop gradient; the handoff replaces gradient bars with 2px
+     of ink. One accent event per screen, and on this page it is not here. */
+  background: #1B1917;
 }
 
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
 
 .chip {
-  display: inline-block; padding: 3px 12px 4px; border-radius: 999px;
+  display: inline-block; padding: 3px 12px 4px; border-radius: 0;
   background: var(--chip-bg); border: 1px solid var(--panel-border);
   font-size: 0.66rem; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.18em; color: var(--indigo-soft);
@@ -264,14 +269,14 @@ em.q { font-style: normal; color: var(--accent); font-weight: 600; }
 .step {
   counter-increment: step;
   display: grid; grid-template-columns: 54px 1fr; gap: 20px;
-  padding: 22px 26px; border-radius: 14px;
+  padding: 22px 26px; border-radius: 0;
   background: var(--panel); border: 1px solid var(--panel-border);
   box-shadow: var(--panel-shadow);
 }
 .step::before {
   content: counter(step);
   display: flex; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 999px;
+  width: 44px; height: 44px; border-radius: 0;
   border: 1.5px solid var(--panel-lit); color: var(--accent);
   font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums;
 }
@@ -292,17 +297,17 @@ ul.plain { list-style: none; display: grid; gap: 12px; }
 ul.plain li { position: relative; padding-left: 26px; color: var(--body); }
 ul.plain li::before {
   content: ""; position: absolute; left: 0; top: 11px;
-  width: 9px; height: 9px; border-radius: 2px;
+  width: 9px; height: 9px; border-radius: 0;
   background: var(--accent); transform: rotate(45deg);
 }
 ul.plain.quiet li::before { background: var(--indigo); }
 
 /* the week table */
-.table-scroll { overflow-x: auto; border-radius: 14px; }
+.table-scroll { overflow-x: auto; border-radius: 0; }
 table.week {
   width: 100%; border-collapse: collapse; min-width: 560px;
   background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 14px; box-shadow: var(--panel-shadow);
+  border-radius: 0; box-shadow: var(--panel-shadow);
 }
 table.week th, table.week td {
   text-align: left; padding: 14px 20px;
@@ -321,7 +326,7 @@ table.week tr:last-child td { border-bottom: 0; }
 /* the drawing frames */
 .figure { margin: 0 0 12px; }
 .figure-frame {
-  overflow-x: auto; border-radius: 14px;
+  overflow-x: auto; border-radius: 0;
   border: 1px solid var(--panel-border); background: var(--panel);
   box-shadow: var(--panel-shadow); padding: 18px 20px;
 }
@@ -342,7 +347,7 @@ figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 12px; }
   letter-spacing: 0.22em; color: var(--accent); margin-bottom: 6px;
 }
 .oneliner {
-  margin-top: 30px; padding: 20px 26px; border-radius: 14px;
+  margin-top: 30px; padding: 20px 26px; border-radius: 0;
   border: 1px solid var(--panel-lit); background: var(--accent-soft);
   color: var(--heading); font-size: 1.06rem;
 }
@@ -408,36 +413,36 @@ figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 12px; }
 <header class="nav">
   <div class="nav-inner">
     <a class="nav-brand" href="index.html" aria-label="Orvanna home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+          <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+          <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+          <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+        </svg>
+      </span>
       <span class="brand-word">Orvanna</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="index.html">Learn</a>
-      <a class="nav-link" href="shop.html">Shop</a>
-      <a class="nav-link" href="library.html">Library</a>
-      <a class="nav-link" href="comp-plan.html">Plan</a>
-      <a class="nav-link is-active" href="conductor.html" aria-current="page">Conductors</a>
-      <a class="nav-link" href="team.html">Team</a>
-      <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
-      <span class="nav-link is-soon" aria-disabled="true">Enroll<span class="soon-pill">soon</span></span>
-      <a class="nav-signin" href="login.html">Sign In</a>
-      <button class="nav-theme" type="button" data-theme-toggle
-              aria-label="Switch to the light theme">
-        <svg class="icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/>
-            <line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/>
-            <line x1="5.4" y1="5.4" x2="7.2" y2="7.2"/><line x1="16.8" y1="16.8" x2="18.6" y2="18.6"/>
-            <line x1="18.6" y1="5.4" x2="16.8" y2="7.2"/><line x1="7.2" y1="16.8" x2="5.4" y2="18.6"/>
-          </g>
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M 19 15.2 A 8.4 8.4 0 0 1 8.8 5 a 8.6 8.6 0 1 0 10.2 10.2 z"
-                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </nav>
+  <button class="nav-disclosure" type="button" data-nav-disclosure
+          aria-expanded="false" aria-controls="nav-menu">
+    <span class="nav-disclosure-mark" aria-hidden="true"></span>
+    <span class="nav-disclosure-label">Menu</span>
+  </button>
+  <div class="nav-menu" id="nav-menu">
+    <a class="nav-link" href="index.html">Learn</a>
+    <a class="nav-link" href="shop.html">Shop</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="comp-plan.html">Plan</a>
+    <a class="nav-link is-active" href="conductor.html" aria-current="page">Conductors</a>
+    <a class="nav-link" href="team.html">Team</a>
+    <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
+    <span class="nav-tail">
+      <a class="nav-signin" href="login.html">Sign in</a>
+      <a class="nav-cta" href="shop.html">Browse the catalog</a>
+    </span>
+  </div>
+</nav>
   </div>
 </header>
 
@@ -928,7 +933,7 @@ figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 12px; }
         <a class="flink" href="shop.html">Domain agents</a>
         <a class="flink" href="shop.html">Support agents</a>
         <span class="flink">Pricing</span>
-      </div>
+    </div>
       <div class="footer-col">
         <h4 class="footer-head">Learn</h4>
         <a class="flink" href="conductor.html">What is a Conductor</a>
@@ -948,6 +953,18 @@ figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 12px; }
         <span class="flink">Open roles</span>
         <span class="flink">How we work</span>
         <span class="flink">Internships</span>
+      </div>
+      <div class="footer-col footer-brand">
+        <span class="footer-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+            <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+            <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+            <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+          </svg>
+          <span class="footer-word">Orvanna</span>
+        </span>
+        <a class="flink footer-brand-mail" href="mailto:support@orvanna.io">support@orvanna.io</a>
       </div>
     </div>
 

@@ -18,7 +18,14 @@
 <header class="console-top">
   <div class="console-wrap console-top-inner">
     <a class="console-brand" href="index.html" aria-label="Orvanna home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+          <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+          <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+          <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+        </svg>
+      </span>
       <span class="brand-word">Orvanna</span>
     </a>
     <span class="console-title">Operations</span>
@@ -59,41 +66,85 @@
 
       <div id="billingNotes"></div>
 
-      <div class="ops-stats" id="billingStats"></div>
+      <!-- ============ 01 ATTENTION QUEUE ============
+           The page, not panel six of twelve. Handoff screen 8a: the rows
+           that demand an action come first and everything that is merely
+           true drops below them as evidence.
 
-      <div class="ops-grid-2">
+           Ranked by CONSEQUENCE. The server returns the queue ordered by
+           reason alphabetically, so "cycle gap" outranked "system fault"
+           on the strength of the letter c. Severity is applied here from
+           the policy map in the script below, because which classes of
+           fault demand a human TODAY is a policy decision about reason
+           classes, not a fact hiding in the data. -->
+      <section class="console-panel console-queue" id="attentionQueue" aria-label="Attention queue">
+        <h2 class="panel-title"><span class="panel-num">01</span>Attention queue
+          <span class="title-chip">Ranked by consequence, not by arrival</span></h2>
+        <p class="queue-count" id="attentionCount">Loading the queue&hellip;</p>
+        <p class="ops-status-line" id="attentionStatus"></p>
+        <div class="ops-table-wrap"><table class="ops-table queue-table" id="attentionTable" hidden>
+          <thead><tr>
+            <th class="q-when">When</th>
+            <th>What happened</th>
+            <th class="q-stake ops-num">At stake</th>
+            <th class="q-ref">Reference</th>
+          </tr></thead>
+          <tbody id="attentionBody"></tbody>
+        </table></div>
+        <p class="queue-note">Every action on this page is server enforced and
+          written to the audit log against the operator&#39;s member number.
+          Clearing a row records that a human looked; it does not move money
+          and does not resolve the fault.</p>
+        <!-- WHAT IS NOT HERE, AND WHY. The design gives each row a money
+             figure and one action button. Neither is built, because neither
+             exists yet: app.v_staff_attention_queue returns reason,
+             member_code, subscription_id, renewal_index, billing_attempt_id,
+             detail and state, and no amount, deadline or decline class. A
+             money column filled in by the browser would be a fabricated
+             figure on the one page where money decides what a human does
+             first, and a Clear button with no audit endpoint behind it would
+             record nothing while looking like it had. Both are specified in
+             docs/OPERATIONS-QUEUE-SERVER-SPEC.md. -->
+        <!-- Shown ONLY while the server is still returning the old seven
+             columns. The migration that adds them is applied; the Edge
+             Function that returns them may not be deployed yet, and the page
+             must be truthful in both states without a second release. -->
+        <p class="queue-gap" id="queueGap" hidden>Money at stake is not being
+          returned by the billing console service yet, so every amount reads as
+          a dash. The queue view exposes it; the service has not been
+          redeployed. Read the dashes as "not reported", never as "nothing
+          owed".</p>
+      </section>
 
-        <!-- Schedule control -->
-        <section class="console-panel" aria-label="Daily run schedule">
-          <h2 class="panel-title">Daily run schedule <span class="title-chip">Stored server side</span></h2>
-          <p class="ops-status-line">The renewal engine runs automatically each day at this time, when enabled and once the scheduler is installed. When disabled or no time is set, the engine runs manually only.</p>
-          <div class="ops-form-row">
-            <label class="ops-check"><input type="checkbox" id="schedEnabled"> Enabled</label>
-            <div class="ops-field">
-              <label class="order-label" for="schedTime">Run at (24 hour)</label>
-              <input id="schedTime" type="time" step="60">
-            </div>
-            <div class="ops-field">
-              <label class="order-label" for="schedTz">Timezone</label>
-              <input id="schedTz" type="text" list="tzList" placeholder="America/New_York" spellcheck="false">
-              <datalist id="tzList">
-                <option value="America/New_York"></option>
-                <option value="America/Chicago"></option>
-                <option value="UTC"></option>
-                <option value="America/Denver"></option>
-                <option value="America/Los_Angeles"></option>
-                <option value="Europe/Berlin"></option>
-                <option value="Asia/Seoul"></option>
-              </datalist>
-            </div>
-            <button class="btn-addline" id="schedSaveBtn" type="button">Save schedule</button>
-          </div>
-          <p class="ops-status-line" id="schedStatus"></p>
+      <!-- ============ THE EVIDENCE, BELOW THE QUEUE ============
+           Handoff 8a: "everything that is merely true drops below it as
+           evidence." Ordered by whether it demands an action rather than
+           by when it was built. Retry queue first, because it is the only
+           block down here still describing money in motion. The schedule
+           last, because it is a setting, and a setting is the least
+           urgent true thing on a console.
+
+           These were spread across two-up grids that paired unrelated
+           panels by height. They are one column now: the order IS the
+           argument, and a grid shuffles it. -->
+
+        <section class="console-panel" aria-label="Retry queue">
+          <h2 class="panel-title"><span class="panel-num">02</span>Retry queue <span class="title-chip">By decline class</span></h2>
+          <p class="ops-status-line" id="retryStatus"></p>
+          <div class="ops-table-wrap"><table class="ops-table" id="retryTable" hidden>
+            <thead><tr><th>Member</th><th>Sub</th><th>Class</th><th>Code</th><th>Next retry</th><th class="ops-num">Step</th><th class="ops-num">Amount</th></tr></thead>
+            <tbody id="retryBody"></tbody>
+          </table></div>
         </section>
 
-        <!-- Run now -->
+      <section class="console-panel" aria-label="Seven day forecast">
+        <h2 class="panel-title"><span class="panel-num">03</span>Next seven days <span class="title-chip">Derived from the same schedule arithmetic the engine runs</span></h2>
+        <p class="ops-status-line" id="forecastStatus"></p>
+        <div id="forecastBody"></div>
+      </section>
+
         <section class="console-panel" aria-label="Run now">
-          <h2 class="panel-title">Run now <span class="title-chip">Preview first, always</span></h2>
+          <h2 class="panel-title"><span class="panel-num">04</span>Run now <span class="title-chip">Preview first, always</span></h2>
           <p class="ops-status-line">The preview is the same gather and price read the real run performs, and it creates nothing. Execution is a separate confirm step.</p>
           <div class="ops-form-row">
             <div class="ops-field">
@@ -131,18 +182,9 @@
           <div id="previewBody"></div>
           <div id="executeBody"></div>
         </section>
-      </div>
 
-      <!-- Seven day forecast -->
-      <section class="console-panel" aria-label="Seven day forecast">
-        <h2 class="panel-title">Next seven days <span class="title-chip">Derived from the same schedule arithmetic the engine runs</span></h2>
-        <p class="ops-status-line" id="forecastStatus"></p>
-        <div id="forecastBody"></div>
-      </section>
-
-      <!-- Run history -->
       <section class="console-panel" aria-label="Run history">
-        <h2 class="panel-title">Run history <span class="title-chip">Member fault and system fault reported separately</span></h2>
+        <h2 class="panel-title"><span class="panel-num">05</span>Run history <span class="title-chip">Member fault and system fault reported separately</span></h2>
         <p class="ops-status-line" id="runHistStatus"></p>
         <div class="ops-table-wrap"><table class="ops-table" id="runHistTable" hidden>
           <thead><tr><th>Run</th><th>Tick date</th><th>Status</th><th>Clock</th><th class="ops-num">Due</th><th class="ops-num">Attempts</th><th class="ops-num">Succeeded</th><th class="ops-num">Declined</th><th class="ops-num">Member fault</th><th class="ops-num">System fault</th><th>Limit</th><th>Finished</th></tr></thead>
@@ -151,27 +193,35 @@
         <div id="runDetailBody"></div>
       </section>
 
-      <div class="ops-grid-2">
-        <!-- Retry queue -->
-        <section class="console-panel" aria-label="Retry queue">
-          <h2 class="panel-title">Retry queue <span class="title-chip">By decline class</span></h2>
-          <p class="ops-status-line" id="retryStatus"></p>
-          <div class="ops-table-wrap"><table class="ops-table" id="retryTable" hidden>
-            <thead><tr><th>Member</th><th>Sub</th><th>Class</th><th>Code</th><th>Next retry</th><th class="ops-num">Step</th><th class="ops-num">Amount</th></tr></thead>
-            <tbody id="retryBody"></tbody>
-          </table></div>
+        <section class="console-panel" aria-label="Daily run schedule">
+          <h2 class="panel-title"><span class="panel-num">06</span>Daily run schedule <span class="title-chip">Stored server side</span></h2>
+          <p class="ops-status-line">The renewal engine runs automatically each day at this time, when enabled and once the scheduler is installed. When disabled or no time is set, the engine runs manually only.</p>
+          <div class="ops-form-row">
+            <label class="ops-check"><input type="checkbox" id="schedEnabled"> Enabled</label>
+            <div class="ops-field">
+              <label class="order-label" for="schedTime">Run at (24 hour)</label>
+              <input id="schedTime" type="time" step="60">
+            </div>
+            <div class="ops-field">
+              <label class="order-label" for="schedTz">Timezone</label>
+              <input id="schedTz" type="text" list="tzList" placeholder="America/New_York" spellcheck="false">
+              <datalist id="tzList">
+                <option value="America/New_York"></option>
+                <option value="America/Chicago"></option>
+                <option value="UTC"></option>
+                <option value="America/Denver"></option>
+                <option value="America/Los_Angeles"></option>
+                <option value="Europe/Berlin"></option>
+                <option value="Asia/Seoul"></option>
+              </datalist>
+            </div>
+            <button class="btn-addline" id="schedSaveBtn" type="button">Save schedule</button>
+          </div>
+          <p class="ops-status-line" id="schedStatus"></p>
         </section>
 
-        <!-- Attention queue -->
-        <section class="console-panel" aria-label="Attention queue">
-          <h2 class="panel-title">Attention queue <span class="title-chip">The rows a human must see</span></h2>
-          <p class="ops-status-line" id="attentionStatus"></p>
-          <div class="ops-table-wrap"><table class="ops-table" id="attentionTable" hidden>
-            <thead><tr><th>Reason</th><th>Member</th><th>Sub</th><th>Detail</th></tr></thead>
-            <tbody id="attentionBody"></tbody>
-          </table></div>
-        </section>
-      </div>
+
+      <div class="ops-stats" id="billingStats"></div>
 
       <!-- Subscription management -->
       <section class="console-panel" aria-label="Subscription management">
@@ -396,6 +446,16 @@
     return td;
   }
   function clearNode(node) { while (node.firstChild) { node.removeChild(node.firstChild); } }
+
+  /* Money, whole dollars and cents, tabular. There was no formatter on this
+     page because nothing on it printed an amount until the attention queue
+     started reporting one. */
+  function fmtMoney(n) {
+    return '$' + Number(n).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
 
   function fmtDate(v) {
     if (!v) { return 'none'; }
@@ -961,26 +1021,169 @@
     }).catch(function () { status.textContent = serviceUnavailable('billing console'); });
   }
 
-  /* ---------- attention queue ---------- */
+  /* ---------- attention queue ----------
+
+     RANKED BY CONSEQUENCE. The server orders this queue by reason
+     alphabetically (`order by q.reason, m.member_code`), which is an
+     ordering with no opinion: it put a cycle gap above a system fault on
+     the strength of the letter c. The rows a human must act on TODAY have
+     to come first, so severity is applied here.
+
+     Doing it in the browser is deliberate and is not the same as inventing
+     data. Which CLASSES of fault demand a human today is a policy call
+     about reason classes -- ours to make, ours to change, and readable in
+     one table. The per-row facts a policy cannot supply (how much money is
+     riding on it, what the deadline is, which decline class it was) are
+     the ones the server would have to answer, and those are left visibly
+     absent rather than guessed at. See
+     docs/OPERATIONS-QUEUE-SERVER-SPEC.md.
+
+     An unrecognised reason sorts into DECIDE rather than falling to the
+     bottom: a fault class nobody has classified yet is exactly the kind
+     that should be looked at, not the kind to bury. */
+
+  var SEVERITY = [
+    { key: 'act',    label: 'Act now',      rank: 0 },
+    { key: 'decide', label: 'Decide',       rank: 1 },
+    { key: 'before', label: 'Before close', rank: 2 }
+  ];
+
+  /* THE FOUR REASONS THE VIEW ACTUALLY EMITS.
+
+     Corrected 2026-08-19 against app.v_staff_attention_queue in migration
+     026, which is the source of truth. The first version of this map was
+     written from the design's illustrative rows and got one key wrong and
+     four keys that do not exist: it said 'orphan_attempt' where the view
+     says 'orphaned_attempt', so every real orphaned attempt -- a payment
+     dispatched with no recorded answer, which is the most urgent class
+     here -- fell through to DECIDE instead of ACT NOW. A default that is
+     merely reasonable hides a typo perfectly.
+
+     Unknown reasons still land in DECIDE on purpose: the view will grow,
+     and a class nobody has classified yet is one to look at rather than
+     bury. But the four that exist today are named exactly. */
+  var REASON_SEVERITY = {
+    /* money moved, or moved and we do not know what happened to it */
+    'orphaned_attempt':    'act',
+    'system_fault':        'act',
+    'unrecognized_code':   'act',
+    /* an integrity violation to judge, not a payment in flight */
+    'cycle_gap':           'decide'
+  };
+
+  function severityFor(reason) {
+    var key = String(reason || '').toLowerCase().replace(/[\s-]+/g, '_');
+    return REASON_SEVERITY[key] || 'decide';
+  }
+  function severityRank(reason) {
+    var k = severityFor(reason);
+    for (var i = 0; i < SEVERITY.length; i++) { if (SEVERITY[i].key === k) return SEVERITY[i].rank; }
+    return 1;
+  }
+  function severityLabel(reason) {
+    var k = severityFor(reason);
+    for (var i = 0; i < SEVERITY.length; i++) { if (SEVERITY[i].key === k) return SEVERITY[i].label; }
+    return 'Decide';
+  }
+
   function loadAttention() {
     var status = byId('attentionStatus');
+    var count = byId('attentionCount');
     status.textContent = 'Loading...';
     opsCall('billing-console', { action: 'attention' }).then(function (result) {
-      if (result.status !== 200) { status.textContent = serverMessage(result, 'Could not load the attention queue.'); return; }
-      var rows = result.data.rows || [];
+      if (result.status !== 200) {
+        status.textContent = serverMessage(result, 'Could not load the attention queue.');
+        count.textContent = 'The queue could not be read.';
+        return;
+      }
+      var rows = (result.data.rows || []).slice();
+
+      /* stable within a severity: the server's own order is kept, so two
+         runs of the same queue read the same way */
+      rows.sort(function (a, b) { return severityRank(a.reason) - severityRank(b.reason); });
+
+      /* DOES THE SERVICE REPORT MONEY YET?
+
+         The migration that adds amount_at_stake is applied, but the Edge
+         Function that returns it is a separate deploy. Rather than assume
+         either state, ask the payload: if not one row carries the property
+         at all, the service is still on the old shape and the page says so.
+
+         The test is `'amount_at_stake' in row`, NOT a truthiness check. A
+         cycle gap legitimately carries null -- there is no renewal period to
+         price and nothing was going to be charged -- and null must read as
+         "none", not as "the service is behind". */
+      var reportsMoney = rows.some(function (r) {
+        return r && Object.prototype.hasOwnProperty.call(r, 'amount_at_stake');
+      });
+      byId('queueGap').hidden = reportsMoney || rows.length === 0;
+
       var tbody = byId('attentionBody');
       clearNode(tbody);
       byId('attentionTable').hidden = rows.length === 0;
-      status.textContent = rows.length === 0 ? 'Nothing needs a human right now.' : rows.length + ' row(s) need a human.';
+      status.textContent = '';
+
+      var open = rows.filter(function (r) { return !r.cleared_at; });
+      var owed = 0, owedKnown = false;
+      open.forEach(function (r) {
+        if (typeof r.amount_at_stake === 'number') { owed += r.amount_at_stake; owedKnown = true; }
+      });
+
+      count.textContent = open.length === 0
+        ? (rows.length === 0 ? 'Nothing needs a human today.'
+                             : 'Everything here has been looked at.')
+        : open.length + (open.length === 1 ? ' thing needs' : ' things need') + ' a human today'
+          + (owedKnown ? ', holding ' + fmtMoney(owed) : '') + '.';
+
       rows.forEach(function (r) {
         var tr = el('tr');
-        cell(tr, r.reason);
-        cell(tr, r.member_code, 'ops-mono');
-        cell(tr, subCode(r.subscription_id), 'ops-code');
-        cell(tr, r.detail);
+        tr.className = 'q-row q-' + severityFor(r.reason);
+
+        var when = el('td');
+        when.className = 'q-when';
+        var badge = el('span');
+        badge.className = 'q-badge q-badge-' + severityFor(r.reason);
+        badge.textContent = severityLabel(r.reason);
+        when.appendChild(badge);
+        tr.appendChild(when);
+
+        var what = el('td');
+        var title = el('b');
+        title.className = 'q-what';
+        title.textContent = r.reason;
+        var detail = el('span');
+        detail.className = 'q-detail';
+        detail.textContent = r.detail || '';
+        what.appendChild(title);
+        what.appendChild(detail);
+        tr.appendChild(what);
+
+        /* AT STAKE. An em dash means "no amount reported for this row", and
+           that is a different statement from 0.00 -- which would say money
+           was on it and the money was nothing. The dash is used for both the
+           service being behind and a row that genuinely has none; the note
+           under the table distinguishes them. */
+        var stake = el('td');
+        stake.className = 'q-stake ops-num';
+        stake.textContent = typeof r.amount_at_stake === 'number'
+          ? fmtMoney(r.amount_at_stake)
+          : '\u2014';
+        tr.appendChild(stake);
+
+        cell(tr, r.member_code + ' \u00b7 ' + subCode(r.subscription_id), 'q-ref ops-mono');
+
+        /* Cleared rows stay visible and drop back, per 8a: the queue is a
+           record of what was looked at, not a list that empties itself. */
+        if (r.cleared_at) {
+          tr.classList.add('q-cleared');
+          title.title = 'Looked at by ' + (r.cleared_by || 'an operator');
+        }
         tbody.appendChild(tr);
       });
-    }).catch(function () { status.textContent = serviceUnavailable('billing console'); });
+    }).catch(function () {
+      status.textContent = serviceUnavailable('billing console');
+      count.textContent = 'The queue could not be read.';
+    });
   }
 
   /* ---------- subscription management ---------- */

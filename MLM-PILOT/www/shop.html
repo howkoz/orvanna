@@ -41,47 +41,42 @@
 <header class="nav">
   <div class="nav-inner">
     <a class="nav-brand" href="index.html" aria-label="Orvanna home">
-      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+          <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+          <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+          <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+        </svg>
+      </span>
       <span class="brand-word">Orvanna</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a class="nav-link" href="index.html">Learn</a>
-      <a class="nav-link is-active" href="shop.html" aria-current="page">Shop</a>
-      <a class="nav-link" href="library.html">Library</a>
-      <a class="nav-link" href="comp-plan.html">Plan</a>
-      <a class="nav-link" href="conductor.html">Conductors</a>
-      <a class="nav-link" href="team.html">Team</a>
-      <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
-      <span class="nav-link is-soon" aria-disabled="true">Enroll<span class="soon-pill">soon</span></span>
-      <a class="nav-signin" href="login.html">Sign In</a>
-      <button class="nav-theme" type="button" data-theme-toggle
-              aria-label="Switch to the light theme">
-        <svg class="icon-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/>
-          <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/>
-            <line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/>
-            <line x1="5.4" y1="5.4" x2="7.2" y2="7.2"/><line x1="16.8" y1="16.8" x2="18.6" y2="18.6"/>
-            <line x1="18.6" y1="5.4" x2="16.8" y2="7.2"/><line x1="7.2" y1="16.8" x2="5.4" y2="18.6"/>
-          </g>
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M 19 15.2 A 8.4 8.4 0 0 1 8.8 5 a 8.6 8.6 0 1 0 10.2 10.2 z"
-                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <!-- The cart is the one permitted addition to the canonical navigation
-           (contract section 2, rule 3) and it sits immediately after the theme
-           button. Markup, identifiers and behaviour are unchanged. -->
+  <button class="nav-disclosure" type="button" data-nav-disclosure
+          aria-expanded="false" aria-controls="nav-menu">
+    <span class="nav-disclosure-mark" aria-hidden="true"></span>
+    <span class="nav-disclosure-label">Menu</span>
+  </button>
+  <div class="nav-menu" id="nav-menu">
+    <a class="nav-link" href="index.html">Learn</a>
+    <a class="nav-link is-active" href="shop.html" aria-current="page">Shop</a>
+    <a class="nav-link" href="library.html">Library</a>
+    <a class="nav-link" href="comp-plan.html">Plan</a>
+    <a class="nav-link" href="conductor.html">Conductors</a>
+    <a class="nav-link" href="team.html">Team</a>
+    <button class="nav-link nav-support" type="button" data-orvanna-support>Support</button>
+    <span class="nav-tail">
+      <a class="nav-signin" href="login.html">Sign in</a>
+    </span>
+      <!-- The cart, permitted on shop.html and product.html only
+           (contract section 2, rule 3). Identifiers and behaviour are
+           unchanged; only its presentation is now a set word. -->
       <button class="nav-cart" id="cartButton" type="button" aria-label="Open cart">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M 4 6 h 2.4 l 2 10.2 h 9.4 l 2.2 -7.6 h -12.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
-          <circle cx="9.6" cy="19.4" r="1.4" fill="currentColor"/>
-          <circle cx="16.6" cy="19.4" r="1.4" fill="currentColor"/>
-        </svg>
+        <span>Cart</span>
         <span class="cart-count" id="cartCount">0</span>
       </button>
-    </nav>
+  </div>
+</nav>
   </div>
 </header>
 
@@ -707,7 +702,7 @@
         <span class="flink">Domain agents</span>
         <span class="flink">Support agents</span>
         <span class="flink">Pricing</span>
-      </div>
+    </div>
       <div class="footer-col">
         <h4 class="footer-head">Learn</h4>
         <a class="flink" href="team.html">The team</a>
@@ -729,6 +724,18 @@
         <span class="flink">Open roles</span>
         <span class="flink">How we work</span>
         <span class="flink">Internships</span>
+      </div>
+      <div class="footer-col footer-brand">
+        <span class="footer-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect class="mark-accent" x="32" y="10" width="22" height="10"/>
+            <rect class="mark-bar" x="44" y="32" width="10" height="22"/>
+            <rect class="mark-bar" x="10" y="44" width="22" height="10"/>
+            <rect class="mark-bar" x="10" y="10" width="10" height="22"/>
+          </svg>
+          <span class="footer-word">Orvanna</span>
+        </span>
+        <a class="flink footer-brand-mail" href="mailto:support@orvanna.io">support@orvanna.io</a>
       </div>
     </div>
 
@@ -1065,13 +1072,6 @@
     renderAll();
   });
 
-  /* The rail's Checkout is the same journey as the drawer's. */
-  document.addEventListener('click', function (e) {
-    var go = e.target.closest ? e.target.closest('#railCheckout') : null;
-    if (!go || go.disabled) return;
-    showView('checkout');
-  });
-
   document.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('[data-add]') : null;
     if (!btn) return;
@@ -1080,15 +1080,23 @@
     /* the drawer opens on add so the PV meter's movement is SEEN */
     openDrawer();
 
+    /* The .add-label-added span belonged to the deleted card grid. The
+       redesigned rows and the promoted pack say "added" with the
+       is-added class and, for a row, by becoming REMOVE, so there is no
+       label to toggle. Left unguarded this threw on EVERY add: the item
+       still landed in the cart because addToCart had already run, but
+       the throw killed the count's bump and anything after it, and it
+       did so on the primary action of the shop page. */
     btn.classList.add('is-added');
-    btn.querySelector('.add-label-added').hidden = false;
+    var addedLabel = btn.querySelector('.add-label-added');
+    if (addedLabel) { addedLabel.hidden = false; }
     if (!reduce.matches) {
       cartCount.classList.add('bump');
       window.setTimeout(function () { cartCount.classList.remove('bump'); }, 220);
     }
     window.setTimeout(function () {
       btn.classList.remove('is-added');
-      btn.querySelector('.add-label-added').hidden = true;
+      if (addedLabel) { addedLabel.hidden = true; }
     }, 1100);
   });
 
@@ -2327,7 +2335,23 @@
     if (typeof liveEnsureCheckout === 'function') liveEnsureCheckout();
   }
 
-  checkoutButton.addEventListener('click', function () {
+  /* ENTERING CHECKOUT IS ONE JOURNEY, NAMED ONCE.
+
+     There are two doors into checkout now: the drawer's button and the
+     catalog rail's, added with the 2026-08-18 rebuild. The rail's did
+     only showView('checkout'), so entering that way skipped every line
+     below: the summary was never rendered, and a cart holding the
+     $200 Ignition Pack arrived at a checkout reading "Order total
+     $0.00, Total PV 0 PV". It also skipped warming the card form,
+     discarding a stale payment, and asking for the tax quote, so the
+     three things this sequence exists to do early all happened late or
+     not at all.
+
+     The build spec's own rule for the rail was that adding and removing
+     must go through the same cart functions as the drawer, so the two
+     can never disagree. Entering checkout is the same kind of thing and
+     now goes through one function for the same reason. */
+  function enterCheckout() {
     if (Object.keys(cart).length === 0) return;
     closeDrawer();
     accountMode = null;
@@ -2355,6 +2379,14 @@
        shopper. */
     if (LIVE_PAYMENTS && serverTaxQuoteAllowed()) liveEnsureQuote();
     if (LIVE_PAYMENTS) liveEnsureCheckout();
+  }
+
+  checkoutButton.addEventListener('click', enterCheckout);
+  /* The rail's Checkout, on the redesigned catalog. Same door. */
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest ? e.target.closest('#railCheckout') : null;
+    if (!go || go.disabled) return;
+    enterCheckout();
   });
 
   document.getElementById('backToShop').addEventListener('click', function () {
