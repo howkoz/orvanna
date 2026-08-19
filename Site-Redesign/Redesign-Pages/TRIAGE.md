@@ -15,6 +15,9 @@ Answering the question directly. Mapped to files in `howkoz/orvanna.io@main`. Ef
 | 5 | Order summary is a scroll region nested inside the page scroll | `css/shop.css` | S |
 | 6 | Catalog rail renders once per group (four times) instead of once, with copy fragments orphaned between repeats | `shop.html`, `js/catalog.js` | S |
 | 7 | Rank thresholds: section eleven of `comp-plan.html` is the source of truth — Leader is TV 2,500.00 + 3 active legs, Executive is TV 40,000.00 + 2 legs containing a Leader. Check any other surface that states them | site-wide | S |
+| 8 | Agent count: **twelve**. The library index shows sixteen tiles because it includes packs. Any page saying "sixteen agents" is wrong — `conductor.html` gets this right today, so check the others against it | site-wide | S |
+| 9 | `team.html`'s scroll-reveal script is the worst instance of bug 3: ~120 lines whose own comments admit the observer and the sweep both lose to a fast scroll, with an unconditional 2.5s deadline doing the real work. Author the reveals visible and delete the whole block | `team.html` | S |
+| 10 | `orvanna-designer`'s bio names "the glow design system", which does not survive the token pass. Also drop the `.glow-a/b/c` classes — they already do nothing | `team.html`, `css/corporate.css` | S |
 
 None of these are design decisions. Fix them before anyone argues about colour.
 
@@ -64,6 +67,10 @@ Every one of these is a value swap in an existing stylesheet. This is where most
 | **Operations: twelve panels → one ranked queue** | Reordering is cheap; *ranking* is not. Each attention row needs a severity, a money-at-stake figure and exactly one action, which means the server has to expose consequence (deadline, amount, decline class) rather than just row type. Clearing a row needs an audit write. | `staff-operations.html`, its JS, server functions | L |
 | **Shop catalog: 13 cards → promoted pack + dense list + sticky PV rail** | `js/catalog.js` renders a card grid; this is a different render and a different scroll relationship (rail must stick and stay in sync with the cart, rendered ONCE outside the group loop). Worth doing — the current page gives a visitor no place to start. See `9a` and `CORRECTIONS-01`. | `shop.html`, `js/catalog.js`, `css/shop.css` | M–L |
 | **Compensation plan: 24 sections → one interactive page** | The teaching order changes, not the rules. Needs a rank picker and a qualification toggle driving a live level table — derived state, not copy. The long brochure stays as reference; this becomes what the nav points at. See `Comp Plan Explainer.dc.html`. | new `comp-plan.html`, small JS | M |
+| **Library: chooser promoted to the top** | The ten situations already exist as static markup at the foot of `library.html`. Turning them into a chooser means one selected-state render driven by `ORVANNA.get(sku)` — the recommendation, the price, the PV and the qualification line all derive from the catalog that page already loads. The sixteen cards become an index grid. No new data. See `Library.dc.html`. | `library.html`, `css/library.css`, its inline JS | M |
+| **Library marks: drop the hexagon frame** | Cheap but do it deliberately: `js/library-icons.js` wraps every glyph in one shared `HEX` polygon. Removing that constant lets the glyphs do the telling-apart. One line in that file, plus the cell styling that replaces the frame. | `js/library-icons.js`, `css/library.css` | S |
+| **Conductor page: prose → three interactions** | The copy is all reusable; the structure is not. Needs three small pieces of state — a two-way switch, a seven-key checklist driving a phase label and a progress bar, and an hours slider that marks activities as fitting or not against a fixed minute budget. All derived in the page; no server, no new data. See `Conductor.dc.html`. | `conductor.html`, its inline style block, new inline JS | M |
+| **Team page: proof first, roster second** | Reordering the sections is markup. The rebuild is the four-stop gate stepper (one index of state) and the nine-row expandable roster replacing the card grid. The nine marks are new SVG — lift them from `Team.dc.html` verbatim and delete the hexagon versions. See `Team.dc.html`. | `team.html`, `css/corporate.css`, new inline JS | M |
 | **Printable full plan** | Drop-in, not a rebuild: save the document as `comp-plan-print.html` and register it in `DOCUMENT_PAGES`. It owns its own print geometry. See `CORRECTIONS-02`. | new file + `deploy/build_dist.py` | S |
 | **Checkout in the new palette with the summary un-nested** | Palette is section 1, but the un-nesting plus the step-3 restoration touches the flow's markup and its status handling. | `shop.html`, `css/shop.css` | M |
 
@@ -79,7 +86,10 @@ Every one of these is a value swap in an existing stylesheet. This is where most
 6. Shop + checkout in the new palette (`9a`, then `CORRECTIONS-01`).
 7. The printable plan — a drop-in file, do it any time.
 8. The interactive comp plan.
-9. The working log last — it needs a real feed, and it is the one thing that is better absent than faked.
+9. The library chooser.
+10. The conductor page.
+11. The team page.
+12. The working log last — it needs a real feed, and it is the one thing that is better absent than faked.
 
 ## Two things not to do
 

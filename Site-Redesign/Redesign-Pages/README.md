@@ -2,7 +2,7 @@
 
 ## Overview
 
-A redesign of orvanna.io covering seven surfaces:
+A redesign of orvanna.io covering nine surfaces:
 
 1. **Marketing home page** — restructured, with a live "working now" log in the hero.
 2. **Member office** (`portal/`) — five tabs collapsed into one page organised around the three questions a member signs in with.
@@ -11,6 +11,8 @@ A redesign of orvanna.io covering seven surfaces:
 5. **Compensation plan, on screen** (`comp-plan.html`) — twenty-four numbered sections become one interactive page where the reader operates the two gates.
 6. **Compensation plan, in print** — the full twenty-four sections as a print-owning document that exports to PDF with no further work.
 7. **Conductor library** (`library.html`) — the "how to choose" section promoted from ten flat quote boxes at the foot of the page to a live chooser at the top.
+8. **Conductor page** (`conductor.html`) — nine equal prose bands become an operable page: an ensemble/team switch, the ninety days as a checkable plan with a live phase headline, and an hours-a-week slider against the honest week.
+9. **Team page** (`team.html`) — the proof and the two gates promoted above the roster; nine specialists become an expandable table with nine newly drawn marks.
 
 It also replaces the logo mark and sets a single visual system (colour, type, rules, motion) for all of them.
 
@@ -297,6 +299,8 @@ No icon set is required by these three screens: every symbol is a rectangle, a s
 | `Comp Plan Explainer.dc.html` | The compensation plan as one interactive page: pick a rank and the unreachable levels dim while the payout falls; switch qualification off and all five levels fail at once. |
 | `Compensation Plan PDF.dc.html` | The full plan, all twenty-four sections, print-ready. Save into the repo as `comp-plan-print.html` — see `CORRECTIONS-02`. |
 | `Library.dc.html` | The Conductor library rebuilt around the question a customer asked. Ten situations drive a live recommendation with real price, PV and qualification arithmetic; the sixteen agents become a scannable index. All product data and all sixteen marks are taken verbatim from `js/catalog.js` and `js/library-icons.js` — with one deliberate change: the shared hexagon frame is dropped, since sixteen identical hexagons is what stopped the set being scannable by shape. The glyphs are untouched. |
+| `Conductor.dc.html` | The Conductor page as something you operate. Three interactions replace prose that was only prose: the ensemble/team switch (one frame, opposite content — which a side-by-side diagram cannot do), the seven-step ninety-day plan where ticking a step moves a phase headline from "Not started" to "Conducting", and an hours-a-week slider that dims the honest-week activities as they stop fitting. "What this is not" moved up into the closing ink band — it is the most credible thing on the page and it was buried at the bottom. Agent count is **twelve** throughout (sixteen is the library index: twelve agents plus packs). |
+| `Team.dc.html` | The team page with its order inverted. The proof band leads (2 days, 2 gates, 1,000 members, 24,000 orders, 6 months matched to the cent), then the two gates as a four-step walk — builder → verifier → QA → phase closed, each stop naming who owns it, what it may **not** do, and what happens on FAIL. The gate panel's left column ends in a bottom-anchored ink strip carrying the loop (BUILDER \u2192 VERIFIER \u2192 QA \u2192 CLOSED, current step lit) plus the FAIL-returns-a-defect-list line \u2014 it fills the grid row against the taller phase rail with content rather than padding, and keeps the reader oriented in the cycle. Nine specialists become one expandable table. **Nine marks redrawn from scratch** as distinct silhouettes (nested squares, stacked layers, percent, brackets, crosshair, text lines, bare check, checklist, speech box) — the shared hexagon frame is gone, so an agent is findable by shape without reading the name. Two copy fixes: the roster reconciles its own count (founder pulled out of the agent tally — 1 + 8 + 1 = ten agents), and `orvanna-designer`'s bio no longer references "the glow design system". |
 | `doc-page.js`, `support.js` | Runtime files the two design documents load. Keep them beside the `.dc.html` files if you want to open those in a browser; neither belongs in orvanna.io. |
 | `assets/` | The three existing assets used by the mocks. |
 | `screenshots/` | Target images at 2× — `6a-home-page.png`, `7a-member-office.png`, `8a-operations-console.png`, and `4e-mark-in-place-and-sizes.png` (the mark in both bars plus its 64/32/16px drawings). Check the token pass against these. |

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="_ds/modernist-e2b940f9-a1f0-4f20-80a8-607ff722a337/styles.css"><script src="_ds/modernist-e2b940f9-a1f0-4f20-80a8-607ff722a337/_ds_bundle.js"></script><style>
+body{margin:0;background:#eae4d9;font-family:Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+a{color:#a3220b}a:hover{color:#ec3013}
+button{font-family:Archivo,sans-serif}
+input[type=range]{accent-color:#ec3013}
+</style></helmet>
+
+<div style="max-width:1180px;margin:0 auto;background:#eae4d9;border-left:2px solid #1b1917;border-right:2px solid #1b1917">
+
+  <div style="display:flex;align-items:center;gap:30px;padding:15px 34px;border-bottom:2px solid #1b1917">
+    <div style="display:flex;align-items:center;gap:11px">
+      <svg viewBox="0 0 64 64" style="width:26px;height:26px;display:block;flex:none"><rect x="32" y="9" width="23" height="11" fill="#ec3013"></rect><rect x="44" y="32" width="11" height="23" fill="#1b1917"></rect><rect x="9" y="44" width="23" height="11" fill="#1b1917"></rect><rect x="9" y="9" width="11" height="23" fill="#1b1917"></rect></svg>
+      <span style="font:800 17px/1 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917">ORVANNA</span>
+    </div>
+    <nav style="display:flex;gap:22px;font:600 12.5px/1 Archivo,sans-serif;letter-spacing:.04em;color:#5f584f"><span>Learn</span><span>Shop</span><span>Library</span><span>Plan</span><span style="color:#1b1917;padding-bottom:4px;border-bottom:2px solid #ec3013">Conductors</span><span>Team</span></nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:16px;font:600 12.5px/1 Archivo,sans-serif;letter-spacing:.04em"><span style="color:#5f584f">Sign in</span><span style="padding:9px 14px;background:#1b1917;font:700 11px/1 Archivo,sans-serif;letter-spacing:.1em;color:#eae4d9">BROWSE THE CATALOG</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 0.7fr;border-bottom:2px solid #1b1917">
+    <div style="padding:52px 34px 44px">
+      <div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.22em;color:#a3220b">THE OPPORTUNITY</div>
+      <h1 style="margin:20px 0 0;font:800 58px/0.98 Archivo,sans-serif;letter-spacing:-.035em;color:#1b1917;max-width:15ch;text-wrap:balance">A conductor does not play the instruments</h1>
+      <p style="margin:22px 0 0;max-width:56ch;font:400 17px/1.55 Archivo,sans-serif;color:#4b453d">You find the businesses around you drowning in work nobody enjoys, work out which agents take that work off them, and stay on as the human who knows their setup. You decide which instruments the piece needs, get them started together, and keep them in time when the tempo changes.</p>
+      <div style="display:flex;gap:12px;margin-top:30px">
+        <span style="padding:15px 22px;background:#ec3013;color:#fff;font:700 12.5px/1 Archivo,sans-serif;letter-spacing:.1em">SEE WHAT A CONDUCTOR SELLS</span>
+        <a href="comp-plan.html" style="padding:15px 22px;border:2px solid #1b1917;color:#1b1917;font:700 12.5px/1 Archivo,sans-serif;letter-spacing:.1em;text-decoration:none">READ THE COMPENSATION PLAN</a>
+      </div>
+      <p style="margin:22px 0 0;max-width:60ch;font:400 13px/1.5 Archivo,sans-serif;color:#6b645a">Enrollment opens soon. This page describes how the program works, so you can decide before it does.</p>
+    </div>
+    <div style="padding:52px 30px 44px;background:#f1ede6;border-left:1px solid rgba(27,25,23,.25)">
+      <div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.22em;color:#a3220b">THE JOB IN FIVE PARTS</div>
+      <div style="margin-top:16px;border-top:2px solid #1b1917">
+        <sc-for list="{{ jobParts }}" as="j" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid rgba(27,25,23,.22)">
+            <span style="font:700 12px/1.4 Archivo,sans-serif;color:#a3220b">{{ j.n }}</span>
+            <span style="font:600 13.5px/1.4 Archivo,sans-serif;color:#1b1917">{{ j.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:16px 0 0;font:400 12.5px/1.5 Archivo,sans-serif;color:#6b645a">There is no sixth. Everything a working Conductor does in a week is one of these five.</p>
+      <div style="margin-top:20px;padding:14px;border:2px solid #b52309">
+        <div style="font:700 10px/1 Archivo,sans-serif;letter-spacing:.16em;color:#b52309">NO INCOME CLAIM</div>
+        <p style="margin:8px 0 0;font:400 12.5px/1.5 Archivo,sans-serif;color:#4b453d">Demonstration company, synthetic data. No earnings figures appear anywhere on this page, and the compensation plan governs.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:34px 34px 12px">
+    <div style="display:flex;align-items:baseline;gap:16px"><div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8a8278">01</div><h2 style="margin:0;font:800 30px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">Two words that must never be confused</h2></div>
+    <p style="margin:12px 0 0;max-width:74ch;font:400 15.5px/1.55 Archivo,sans-serif;color:#4b453d">Conductors use both constantly and they mean completely different things. Mixing them up in front of a business owner is the fastest way to sound like you do not understand what you are selling. Switch between them — the two panels are the same shape holding opposite content.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:252px 1fr;border-top:1px solid rgba(27,25,23,.25);border-bottom:2px solid #1b1917;margin-top:20px">
+    <div style="padding:26px 24px 30px;background:#f1ede6;border-right:1px solid rgba(27,25,23,.25)">
+      <div style="display:grid;gap:1px;background:rgba(27,25,23,.25);border:2px solid #1b1917">
+        <sc-for list="{{ vocabTabs }}" as="v" hint-placeholder-count="2">
+          <button onClick="{{ v.onPick }}" style="{{ v.css }}">
+            <span style="display:block;font:700 14px/1 Archivo,sans-serif;letter-spacing:.02em">{{ v.name }}</span>
+            <span style="display:block;margin-top:5px;font:400 12.5px/1.3 Archivo,sans-serif">{{ v.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <p style="margin:22px 0 0;font:700 15px/1.4 Archivo,sans-serif;letter-spacing:-.01em;color:#1b1917">An ensemble plays, a team sells.</p>
+      <p style="margin:10px 0 0;font:400 12.5px/1.5 Archivo,sans-serif;color:#6b645a">Say it once and it stays straight.</p>
+    </div>
+    <div>
+      <div style="display:grid;grid-template-columns:1.1fr 1fr;background:#1b1917;color:#eae4d9">
+        <div style="padding:26px 30px 28px">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8f8981">{{ vocabKicker }}</div>
+          <div style="margin-top:12px;font:800 34px/1.02 Archivo,sans-serif;letter-spacing:-.03em;color:#f8f7f5">{{ vocabTitle }}</div>
+          <p style="margin:12px 0 0;max-width:44ch;font:400 14.5px/1.55 Archivo,sans-serif;color:#c9c6c1">{{ vocabBody }}</p>
+        </div>
+        <div style="padding:26px 30px 28px;border-left:1px solid #4a453f;background:#232019">
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#ff6a4a">MADE OF</div>
+          <div style="margin-top:12px;font:800 34px/1 Archivo,sans-serif;letter-spacing:-.035em;color:#f8f7f5">{{ vocabMadeOf }}</div>
+          <p style="margin:10px 0 0;font:400 13px/1.45 Archivo,sans-serif;color:#c9c6c1">{{ vocabNote }}</p>
+        </div>
+      </div>
+      <div style="padding:24px 30px 10px">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+          <sc-for list="{{ vocabNodes }}" as="n" hint-placeholder-count="5">
+            <div style="{{ n.css }}">
+              <span style="display:block;font:700 11px/1.2 Archivo,sans-serif;letter-spacing:.1em;color:#8a8278">{{ n.tier }}</span>
+              <span style="display:block;margin-top:8px;font:700 14px/1.25 Archivo,sans-serif;color:#1b1917">{{ n.name }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:16px 0 24px;max-width:76ch;font:400 12.5px/1.55 Archivo,sans-serif;color:#6b645a">{{ vocabFoot }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:34px 34px 12px">
+    <div style="display:flex;align-items:baseline;gap:16px"><div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8a8278">02</div><h2 style="margin:0;font:800 30px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">You are not selling software</h2></div>
+    <p style="margin:12px 0 0;max-width:74ch;font:400 15.5px/1.55 Archivo,sans-serif;color:#4b453d">Nobody wakes up wanting to buy software. What people want is for a specific, hated, recurring job to stop being theirs. A Conductor who understands that outsells one who has memorised the catalog.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1.15fr 1fr;border-top:1px solid rgba(27,25,23,.25);border-bottom:2px solid #1b1917;margin-top:20px">
+    <div style="padding:26px 30px 32px;border-right:1px solid rgba(27,25,23,.25)">
+      <span style="display:inline-block;padding:5px 9px;border:1px solid rgba(27,25,23,.35);font:600 10px/1 Archivo,sans-serif;letter-spacing:.12em;color:#4b453d">AN ILLUSTRATION, NOT A CUSTOMER STORY</span>
+      <h3 style="margin:14px 0 0;font:800 22px/1.15 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917">A plumbing company with two vans</h3>
+      <p style="margin:12px 0 0;max-width:56ch;font:400 15px/1.55 Archivo,sans-serif;color:#4b453d">The owner quotes all day and invoices at night. Three invoices a month go unpaid until the bank balance makes it urgent. Every quarter the tax return happens in a panic across a weekend, from a shoebox of receipts.</p>
+      <div style="margin-top:20px;border-top:2px solid #1b1917">
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid rgba(27,25,23,.22)">
+          <span style="font:700 10.5px/1.3 Archivo,sans-serif;letter-spacing:.12em;color:#8a8278">WEAK</span>
+          <span style="font:400 14px/1.5 Archivo,sans-serif;color:#4b453d">Opens the catalog and starts at Payment Agent.</span>
+        </div>
+        <div style="display:grid;grid-template-columns:88px 1fr;gap:14px;padding:14px 0;border-bottom:2px solid #ec3013;background:rgba(236,48,19,.06)">
+          <span style="font:700 10.5px/1.3 Archivo,sans-serif;letter-spacing:.12em;color:#b52309">GOOD</span>
+          <span style="font:400 14px/1.5 Archivo,sans-serif;color:#4b453d">Asks which of those three things they would pay to never think about again — and listens. If the answer is the quarterly weekend, the answer is the Tax Agent, on its own, and nothing else this month.</span>
+        </div>
+      </div>
+      <p style="margin:14px 0 0;max-width:60ch;font:400 14px/1.55 Archivo,sans-serif;color:#4b453d">One agent. Set up in an afternoon. That is the whole sale — the second and third come later, after the owner has watched the first one work and starts naming the next thing they hate.</p>
+    </div>
+    <div style="padding:26px 30px 32px;background:#f1ede6">
+      <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.18em;color:#a3220b">THREE RULES THAT DO THE WORK</div>
+      <div style="margin-top:16px;border-top:2px solid #1b1917">
+        <sc-for list="{{ sellRules }}" as="r" hint-placeholder-count="3">
+          <div style="padding:15px 0;border-bottom:1px solid rgba(27,25,23,.22)">
+            <div style="font:700 13.5px/1.3 Archivo,sans-serif;letter-spacing:.02em;color:#1b1917">{{ r.title }}</div>
+            <p style="margin:7px 0 0;font:400 13.5px/1.5 Archivo,sans-serif;color:#4b453d">{{ r.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:34px 34px 12px">
+    <div style="display:flex;align-items:baseline;gap:16px"><div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8a8278">03</div><h2 style="margin:0;font:800 30px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">The first ninety days, as a plan you operate</h2></div>
+    <p style="margin:12px 0 0;max-width:74ch;font:400 15.5px/1.55 Archivo,sans-serif;color:#4b453d">In order. Skipping ahead is the most common mistake, and the most expensive one is skipping the first step — you cannot fit an ensemble you have never run. Tick a step when its <em>done when</em> line is true; the bar and the phase above it move with you.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 300px;border-top:1px solid rgba(27,25,23,.25);border-bottom:2px solid #1b1917;margin-top:20px">
+    <div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;padding:22px 30px 24px;background:#1b1917;color:#eae4d9">
+        <div>
+          <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8f8981">WHERE YOU ARE</div>
+          <div style="margin-top:11px;font:800 30px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#f8f7f5">{{ phaseTitle }}</div>
+          <p style="margin:9px 0 0;max-width:52ch;font:400 13.5px/1.5 Archivo,sans-serif;color:#c9c6c1">{{ phaseNote }}</p>
+        </div>
+        <div style="text-align:right">
+          <div style="font:800 44px/1 Archivo,sans-serif;letter-spacing:-.035em;color:#f8f7f5">{{ doneCount }}</div>
+          <div style="margin-top:6px;font:600 10px/1.3 Archivo,sans-serif;letter-spacing:.14em;color:#8f8981">OF SEVEN DONE</div>
+        </div>
+      </div>
+      <div style="height:8px;background:#3a352f"><div style="{{ progressCss }}"></div></div>
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="7">
+        <div style="{{ s.rowCss }}">
+          <button onClick="{{ s.onToggle }}" style="{{ s.boxCss }}">{{ s.boxMark }}</button>
+          <div>
+            <div style="font:600 10px/1 Archivo,sans-serif;letter-spacing:.16em;color:#8a8278">{{ s.when }}</div>
+            <div style="{{ s.titleCss }}">{{ s.title }}</div>
+            <p style="margin:8px 0 0;max-width:66ch;font:400 14px/1.55 Archivo,sans-serif;color:#4b453d">{{ s.body }}</p>
+            <div style="margin-top:10px;padding-top:9px;border-top:1px solid rgba(27,25,23,.22);display:grid;grid-template-columns:82px 1fr;gap:12px">
+              <span style="font:700 9.5px/1.4 Archivo,sans-serif;letter-spacing:.12em;color:#b52309">DONE WHEN</span>
+              <span style="font:400 13px/1.45 Archivo,sans-serif;color:#4b453d">{{ s.doneWhen }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:26px 26px 32px;background:#f1ede6;border-left:1px solid rgba(27,25,23,.25)">
+      <div style="font:700 10.5px/1 Archivo,sans-serif;letter-spacing:.18em;color:#a3220b">HOW MANY HOURS A WEEK</div>
+      <div style="margin-top:14px;display:flex;align-items:baseline;gap:8px"><span style="font:800 40px/1 Archivo,sans-serif;letter-spacing:-.035em;color:#1b1917">{{ hours }}</span><span style="font:600 12px/1 Archivo,sans-serif;letter-spacing:.1em;color:#6b645a">{{ hoursLabel }}</span></div>
+      <input type="range" min="1" max="14" step="1" value="{{ hours }}" onInput="{{ onHours }}" style="width:100%;margin-top:14px">
+      <p style="margin:12px 0 0;font:400 13px/1.5 Archivo,sans-serif;color:#4b453d">{{ hoursVerdict }}</p>
+      <div style="margin-top:20px;border-top:2px solid #1b1917">
+        <sc-for list="{{ weekRows }}" as="w" hint-placeholder-count="5">
+          <div style="{{ w.rowCss }}">
+            <div>
+              <div style="font:700 12.5px/1.3 Archivo,sans-serif;color:#1b1917">{{ w.what }}</div>
+              <div style="margin-top:3px;font:400 11.5px/1.35 Archivo,sans-serif;color:#6b645a">{{ w.when }}</div>
+            </div>
+            <span style="{{ w.costCss }}">{{ w.cost }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:14px 0 0;font:400 12px/1.5 Archivo,sans-serif;color:#6b645a">Honest hours, not aspirational ones. A few a week keeps a Conductor's business alive; building one faster takes more, and no amount of hours is a promise of anything.</p>
+    </div>
+  </div>
+
+  <div style="padding:34px 34px 12px">
+    <div style="display:flex;align-items:baseline;gap:16px"><div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.2em;color:#8a8278">04</div><h2 style="margin:0;font:800 30px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#1b1917">How a Conductor is paid</h2></div>
+    <p style="margin:12px 0 0;max-width:74ch;font:400 15.5px/1.55 Archivo,sans-serif;color:#4b453d">The mechanisms, in plain English. No figures appear here on purpose — the compensation plan is the source of truth, and a second copy of a number is just a chance for the two to disagree.</p>
+  </div>
+  <div style="border-top:1px solid rgba(27,25,23,.25);border-bottom:2px solid #1b1917;margin-top:20px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr)">
+      <sc-for list="{{ mechanisms }}" as="m" hint-placeholder-count="4">
+        <div style="{{ m.cellCss }}">
+          <span style="{{ m.chipCss }}">{{ m.chip }}</span>
+          <h3 style="margin:14px 0 0;font:800 19px/1.15 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917">{{ m.title }}</h3>
+          <p style="margin:11px 0 0;font:400 14px/1.55 Archivo,sans-serif;color:#4b453d">{{ m.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="padding:28px 34px 10px">
+    <h3 style="margin:0;font:800 18px/1.2 Archivo,sans-serif;letter-spacing:-.015em;color:#1b1917">The month, in four stops</h3>
+    <p style="margin:10px 0 0;max-width:74ch;font:400 14px/1.55 Archivo,sans-serif;color:#4b453d">There is no running balance to refresh during the month. Volume accumulates, the month closes, one run computes every statement, and those statements are then fixed.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);margin:16px 34px 0;border-top:2px solid #1b1917;border-bottom:2px solid #1b1917">
+    <sc-for list="{{ timeline }}" as="t" hint-placeholder-count="4">
+      <div style="{{ t.cellCss }}">
+        <div style="{{ t.dotCss }}"></div>
+        <div style="margin-top:14px;font:700 14px/1.2 Archivo,sans-serif;letter-spacing:.01em;color:#1b1917">{{ t.title }}</div>
+        <p style="margin:8px 0 0;font:400 13px/1.5 Archivo,sans-serif;color:#4b453d">{{ t.body }}</p>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 0.85fr;background:#1b1917;color:#c9c6c1;margin-top:34px;border-top:2px solid #1b1917">
+    <div style="padding:38px 34px 40px">
+      <div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.22em;color:#ff6a4a">BEFORE YOU DECIDE</div>
+      <h2 style="margin:16px 0 0;font:800 34px/1.05 Archivo,sans-serif;letter-spacing:-.03em;color:#f8f7f5;max-width:20ch">What this is not</h2>
+      <p style="margin:14px 0 0;max-width:52ch;font:400 14.5px/1.6 Archivo,sans-serif;color:#c9c6c1">Anyone who has sat through a direct-selling presentation before is waiting for this section, and most decks do not have one. Here is ours.</p>
+      <div style="margin-top:24px;border-top:2px solid #4a453f">
+        <sc-for list="{{ limits }}" as="l" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:16px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid #4a453f">
+            <span style="width:11px;height:11px;background:#ff6a4a;display:block;margin-top:5px"></span>
+            <div><b style="font:700 14px/1.4 Archivo,sans-serif;color:#f8f7f5">{{ l.head }}</b><span style="display:block;margin-top:4px;font:400 13.5px/1.55 Archivo,sans-serif;color:#c9c6c1">{{ l.body }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding:38px 34px 40px;border-left:1px solid #4a453f;background:#232019">
+      <div style="font:700 11px/1 Archivo,sans-serif;letter-spacing:.22em;color:#8f8981">WHY CONDUCTOR, NOT DISTRIBUTOR</div>
+      <p style="margin:16px 0 0;font:400 14.5px/1.6 Archivo,sans-serif;color:#c9c6c1">Most direct-selling companies borrow their word from a warehouse: distributor, dealer, representative. Those words fit when the thing being moved is a box. Orvanna does not ship boxes — its products go to work inside somebody else's business, and the person who sold them is still needed the day after the sale.</p>
+      <div style="margin-top:22px;display:grid;gap:12px">
+        <div style="padding-bottom:12px;border-bottom:1px solid #4a453f"><b style="font:700 13.5px/1.3 Archivo,sans-serif;color:#f8f7f5">You do not play</b><span style="display:block;margin-top:5px;font:400 13px/1.5 Archivo,sans-serif;color:#c9c6c1">The agents do the bookkeeping and chase the declined cards. Your hands stay off the instruments, which is what makes the work scale past your own hours.</span></div>
+        <div style="padding-bottom:12px;border-bottom:1px solid #4a453f"><b style="font:700 13.5px/1.3 Archivo,sans-serif;color:#f8f7f5">You choose the score</b><span style="display:block;margin-top:5px;font:400 13px/1.5 Archivo,sans-serif;color:#c9c6c1">A florist and a freight broker do not need the same agents. Picking the right two or three, in the right order, is the part software cannot do for itself.</span></div>
+        <div><b style="font:700 13.5px/1.3 Archivo,sans-serif;color:#f8f7f5">You keep time</b><span style="display:block;margin-top:5px;font:400 13px/1.5 Archivo,sans-serif;color:#c9c6c1">The ensemble that fit a shop in March is short a player by September, when it starts selling into a second country and has filings it has never done before.</span></div>
+      </div>
+      <a href="comp-plan.html" style="display:block;margin-top:26px;padding:14px 18px;background:#ec3013;text-decoration:none">
+        <span style="display:block;font:700 10px/1 Archivo,sans-serif;letter-spacing:.16em;color:rgba(255,255,255,.85)">THE ONLY DOCUMENT THAT GOVERNS</span>
+        <span style="display:block;margin-top:7px;font:700 15px/1.25 Archivo,sans-serif;letter-spacing:-.01em;color:#fff">Read the compensation plan</span>
+      </a>
+    </div>
+  </div>
+
+  <div style="padding:20px 34px 24px;background:#1b1917;color:#8f8981;border-top:1px solid #4a453f;font:400 12px/1.5 Archivo,sans-serif;display:flex;gap:18px;flex-wrap:wrap"><span>Orvanna is a demonstration company · all data synthetic · nothing here is an income claim</span><span style="margin-left:auto">If any sentence here disagrees with the compensation plan, the plan wins.</span></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1000}}">
+const STEPS = [
+  ['Week 1','Run one agent yourself','Pick the agent that fixes your own worst recurring hour, subscribe to it, and use it properly. Not a demonstration account — the real thing, on your own work, with your own approval boundaries set.','you have read one of its outputs and changed something you actually do because of it.'],
+  ['Weeks 1 to 2','Learn three agents properly','Three, not twelve. Read each product page end to end, including the day-to-day section and where its authority stops. Describing three agents precisely beats listing all twelve.','you can explain each of the three, out loud, without the page in front of you.'],
+  ['Week 2','Write your list of twenty','Twenty businesses you already have a reason to speak to: people you buy from, people you have worked with, people you know socially who run something. Next to each name, write the one job you suspect eats their week.','the list exists in writing and every name carries a guess.'],
+  ['Weeks 2 to 6','Have ten conversations','Work the list. The conversation is about their week, and your job is to find out whether your guess was right. Do not present the catalog. Expect most of the ten to go nowhere, and keep notes on all of them — a no this quarter is often a yes after their next busy season.','ten conversations have happened and at least one person has asked what it costs.'],
+  ['Weeks 4 to 8','Do your first setup, and stay through the first week','One agent for one business. Get it connected, agree what it may do alone and what it must bring to the owner, and check in on days two, four and seven. This week is the entire difference between a customer who renews and one who forgets they subscribed.','the owner has approved something the agent proposed, without you in the room.'],
+  ['Every calendar month','Reach a qualified month','One hundred Personal Volume booked to your account inside one calendar month makes that month qualified, and qualification is what makes you eligible to be paid at all. Volume comes from your own subscriptions or from customers who buy through you, in any combination. It resets on the first.','your account shows 100 PV or more before the month ends.'],
+  ['Weeks 8 to 12','Sponsor your first Conductor','Usually somebody who watched you do the setup and wanted the same thing. Teach by repetition, not by talking: do one setup beside them, then attend their next one silently. Then send them back to step one, because the sequence works for them for the same reason it worked for you.','they have run a setup you did not speak during.']
+];
+const PHASES = [
+  ['Not started','Step one is the one nobody should skip. You cannot fit an ensemble you have never run.'],
+  ['Learning the product','You are running an agent on your own work. That is the only product knowledge that survives a real conversation.'],
+  ['Learning the product','Three agents described precisely. Next comes the part most people avoid: writing names down.'],
+  ['Building the list','Twenty names, each with a guess about their week. The guesses are the point — they are what you go and test.'],
+  ['In the conversations','Most of these go nowhere and that is the normal result, not a failure. Keep notes on all of them.'],
+  ['First customer live','A setup is running and the owner has approved something without you there. This is the hard part, done.'],
+  ['Qualified and selling','A qualified month is the gate. Everything the compensation plan pays runs through it.'],
+  ['Conducting','Seven of seven. You are running your own ensemble, you have a live customer, and somebody you sponsored has run a setup unaided.']
+];
+const WEEK = [
+  ['Read what your own agents filed','Monday morning', 20],
+  ['A conversation about their week','Two or three times a week', 90],
+  ['Sitting with a new owner','When a setup lands, over the first week', 120],
+  ['A check-in with someone you sponsored','Weekly, per person', 10],
+  ['Check your PV, then read the statements','Month end', 15]
+];
+const VOCAB = {
+  ensemble: {
+    kicker:'ENSEMBLE · THE AGENTS',
+    title:'The agents you run',
+    body:'The set of Orvanna agents running on an account, yours or a customer\u2019s. An ensemble is software: it is bought, it is priced in dollars, and every item carries Personal Volume \u2014 the number that decides whether a month counts as qualified.',
+    madeOf:'Software',
+    note:'Priced in dollars. Carries Personal Volume. Bought.',
+    nodes:[['RUNS FOR YOU','Payment'],['RUNS FOR YOU','Customer Care'],['RUNS FOR YOU','Secretary'],['RUNS FOR YOU','Accounting'],['RUNS FOR YOU','Tax']],
+    foot:'Agents around one person. Add one and your own volume rises; nothing about your team changes.'
+  },
+  team: {
+    kicker:'TEAM · THE PEOPLE',
+    title:'The people you sponsored',
+    body:'Also called your organization: the people you sponsored, the people they sponsored, and so on down. A team is people. Nobody in it is bought, nobody in it carries Personal Volume, and nothing is ever paid for adding a name to it.',
+    madeOf:'People',
+    note:'Nobody is bought. Nobody carries Personal Volume.',
+    nodes:[['YOU SPONSORED','Frontline'],['YOU SPONSORED','Frontline'],['YOU SPONSORED','Frontline'],['THEY SPONSORED','Level 2'],['THEY SPONSORED','Level 2']],
+    foot:'People under one person. Their buying is what the compensation plan pays you on \u2014 never their signatures.'
+  }
+};
+const MECHANISMS = [
+  ['MECHANISM ONE','Volume pays, not signatures','Nothing is ever paid for enrolling a person. What pays is what people buy: your own customers, the Conductors you sponsored, and the people they sponsored. Every product carries volume, a share of it is commissionable, and that share is what percentages apply to.',false],
+  ['MECHANISM TWO','Rank buys reach, not rate','Advancing does not increase what you earn on the people you sponsored directly. It opens levels further down that you were not paid on before. Worth understanding early: rank is about helping the people under you stay active, never about buying your way up.',false],
+  ['MECHANISM THREE','Customers count toward your month','Someone can buy agents through you without joining Orvanna at all. That order books to your account, so its volume counts toward your qualified month. Your qualification can rest on what you sold, not only on what you bought.',false],
+  ['COMING · NOT BUILT','Instant Payout','An immediate payment on a first order rather than waiting for the month to close. The terms are not finalised and no rate has been set. Until they are published in the compensation plan, no Conductor should describe it as available or attach a number to it.',true]
+];
+const TIMELINE = [
+  ['Through the month','Subscriptions bill, customers buy, and volume books to accounts as it happens.',false],
+  ['The month ends','The calendar closes it. Nothing enters a closed month afterward.',false],
+  ['One run','Commissions are calculated once, from that month\u2019s volume and that month\u2019s ranks.',false],
+  ['Statements lock','Your statement is fixed, and traceable to the run number behind it.',true]
+];
+const LIMITS = [
+  ['No income is promised, implied, or described as typical.','This page explains mechanisms. It contains no earnings figures, and you should be suspicious of any Conductor who quotes you one.'],
+  ['Buying more agents than you use is not a strategy.','Your own purchases make your month qualified and they pay the people above you. They do not pay you. If an ensemble is not doing work you would otherwise pay a person to do, do not buy it.'],
+  ['Rank does not carry over.','Every rank is recomputed from scratch each month. There is no highest-ever title and no grace period.'],
+  ['An unqualified month pays nothing.','Not reduced, not deferred, and no catch-up payment later. However large your organization is, missing your own qualification means no commission for that month.'],
+  ['Some problems are not agent problems.','Part of the job is telling an owner that what they need is a bookkeeper, a second van, or a hard conversation with a supplier. Say it. It is the reason they will call you next year.'],
+  ['The compensation plan governs.','If any sentence on this page disagrees with it, this page is the one that is wrong.']
+];
+const JOB_PARTS = [
+  'Listen for the bottleneck',
+  'Fit the ensemble',
+  'Set it up and stay a week',
+  'Check in when things change',
+  'Sponsor people who want the same'
+];
+const SELL_RULES = [
+  ['Lead with their week','The opening question is what ate the most time last week, not which tier they want. If you cannot name the hour you are giving back, you do not have a sale yet.'],
+  ['Sell one thing first','A business with one loud problem does not need twelve agents. Overselling the first order is the most common way a Conductor loses the second one.'],
+  ['Be honest about the boundary','Agents propose and the owner approves. Nothing is filed, paid, published or ordered without a human yes. Cautious owners buy because of that line — never blur it to sound impressive.']
+];
+
+class Component extends DCLogic {
+  state = {vocab:'ensemble', done:{}, hours:5};
+
+  toggleStep(i){ this.setState(s => { const done = Object.assign({}, s.done); done[i] = !done[i]; return {done}; }); }
+
+  renderVals() {
+    const {vocab, done, hours} = this.state;
+    const v = VOCAB[vocab];
+    const doneCount = STEPS.reduce((t,_,i) => t + (done[i] ? 1 : 0), 0);
+    const firstOpen = STEPS.findIndex((_,i) => !done[i]);
+    const phase = PHASES[doneCount];
+
+    const minutes = hours * 60;
+    let spent = 0;
+    const weekRows = WEEK.map(w => {
+      const fits = spent + w[2] <= minutes;
+      if (fits) spent += w[2];
+      const mins = w[2];
+      return {
+        what:w[0], when:w[1],
+        cost: mins >= 60 ? (mins / 60) + ' hr' : mins + ' min',
+        rowCss:'display:grid;grid-template-columns:1fr auto;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid rgba(27,25,23,.22);' + (fits ? '' : 'opacity:.4'),
+        costCss:'font:700 12.5px/1 Archivo,sans-serif;color:' + (fits ? '#1b1917' : '#8a8278')
+      };
+    });
+    const fitCount = weekRows.filter(r => r.costCss.indexOf('#1b1917') > -1).length;
+    const verdict = hours <= 2
+      ? 'Enough to run your own agent and read its output. Not enough to hold conversations, so nothing new arrives.'
+      : hours <= 4
+      ? 'Enough for your own ensemble and a couple of real conversations a week. A business that grows slowly, on purpose.'
+      : hours <= 8
+      ? 'Everything in the honest week fits, including a live setup and check-ins with people you sponsored.'
+      : 'More than the honest week needs. The extra goes into conversations — which is the only input that reliably changes the outcome.';
+
+    return {
+      jobParts: JOB_PARTS.map((label,i) => ({n: String(i+1).padStart(2,'0'), label})),
+      sellRules: SELL_RULES.map(r => ({title:r[0], body:r[1]})),
+      vocabTabs: ['ensemble','team'].map(k => ({
+        name: k === 'ensemble' ? 'Ensemble' : 'Team',
+        sub: k === 'ensemble' ? 'the agents you run' : 'the people you sponsored',
+        onPick:() => this.setState({vocab:k}),
+        css:'display:block;width:100%;text-align:left;padding:15px 14px;border:0;cursor:pointer;' +
+          (vocab === k ? 'background:#1b1917;color:#eae4d9' : 'background:#f1ede6;color:#4b453d')
+      })),
+      vocabKicker:v.kicker, vocabTitle:v.title, vocabBody:v.body,
+      vocabMadeOf:v.madeOf, vocabNote:v.note, vocabFoot:v.foot,
+      vocabNodes: v.nodes.map((n,i) => ({
+        tier:n[0], name:n[1],
+        css:'padding:14px 12px 16px;border:2px solid ' + (i < 3 ? '#1b1917' : 'rgba(27,25,23,.35)') + ';' +
+          (i < 3 ? 'background:#f1ede6' : 'background:transparent')
+      })),
+      steps: STEPS.map((s,i) => {
+        const isDone = !!done[i];
+        const isNext = i === firstOpen;
+        return {
+          when:s[0], title:s[1], body:s[2], doneWhen:s[3],
+          onToggle:() => this.toggleStep(i),
+          boxMark: isDone ? '\u2713' : String(i + 1),
+          boxCss:'width:38px;height:38px;display:grid;place-items:center;cursor:pointer;font:700 15px/1 Archivo,sans-serif;' +
+            (isDone ? 'border:2px solid #1b1917;background:#1b1917;color:#eae4d9' : 'border:2px solid #1b1917;background:transparent;color:#1b1917'),
+          rowCss:'display:grid;grid-template-columns:38px 1fr;gap:18px;padding:20px 30px 22px;border-bottom:1px solid rgba(27,25,23,.22);' +
+            (isDone ? 'opacity:.5' : isNext ? 'background:rgba(236,48,19,.06)' : ''),
+          titleCss:'margin-top:9px;font:800 20px/1.15 Archivo,sans-serif;letter-spacing:-.02em;color:#1b1917;' + (isDone ? 'text-decoration:line-through' : '')
+        };
+      }),
+      doneCount: String(doneCount),
+      phaseTitle: phase[0],
+      phaseNote: phase[1],
+      progressCss:'height:8px;width:' + Math.round(doneCount / STEPS.length * 100) + '%;background:' + (doneCount === STEPS.length ? '#eae4d9' : '#ec3013') + ';transition:width .35s ease',
+      hours: String(hours),
+      onHours: e => this.setState({hours: Number(e.target.value)}),
+      hoursLabel: hours === 1 ? 'HOUR' : 'HOURS',
+      hoursVerdict: verdict + ' ' + fitCount + ' of 5 activities below fit in ' + hours + (hours === 1 ? ' hour.' : ' hours.'),
+      weekRows,
+      mechanisms: MECHANISMS.map((m,i) => ({
+        chip:m[0], title:m[1], body:m[2],
+        cellCss:'padding:26px 26px 30px;' + (i > 0 ? 'border-left:1px solid rgba(27,25,23,.25);' : '') + (m[3] ? 'background:#f1ede6' : ''),
+        chipCss:'display:inline-block;padding:5px 9px;font:700 9.5px/1 Archivo,sans-serif;letter-spacing:.14em;' +
+          (m[3] ? 'border:1px solid #b52309;color:#b52309' : 'border:1px solid rgba(27,25,23,.35);color:#4b453d')
+      })),
+      timeline: TIMELINE.map((t,i) => ({
+        title:t[0], body:t[1],
+        cellCss:'padding:22px 22px 26px;' + (i > 0 ? 'border-left:1px solid rgba(27,25,23,.25)' : ''),
+        dotCss:'width:14px;height:14px;' + (t[2] ? 'background:#ec3013' : 'border:2px solid #1b1917')
+      })),
+      limits: LIMITS.map(l => ({head:l[0], body:l[1]}))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
