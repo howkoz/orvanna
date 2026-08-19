@@ -1,7 +1,11 @@
 # Redesign gates, 2026-08-18
 
 Both gates run against the built artifact in `deploy/dist`, not the source.
-Bundle **`sha256 5b4bfe891b253eb0`**.
+Bundle **`sha256 60c3971ef1f6150f`** — the bundle that is live. Both gates
+were also run, and passed identically, on `5b4bfe891b253eb0`, the bundle
+published first; the only difference between them is the home page's meta
+description, corrected after the deploy because it still carried the retired
+headline. Re-gated rather than waved through: a new bundle is a new artifact.
 
 > **Correction, 2026-08-19.** This document first recorded the bundle as
 > `9c3abe96cb48b2e0`. That was wrong, and the way it was wrong is worth
