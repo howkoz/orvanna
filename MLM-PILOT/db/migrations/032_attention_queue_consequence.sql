@@ -1,9 +1,18 @@
 -- =============================================================================
 -- 032  Attention queue: expose consequence
 -- =============================================================================
--- STAGED, NOT APPLIED. Written 2026-08-19. See
--- docs/OPERATIONS-QUEUE-SERVER-SPEC.md for why, and BEFORE THIS RUNS at the
--- foot of this file for what to check first.
+-- APPLIED 2026-08-19 to project oiyibdczkokegaxkwulv (mlm-pilot).
+--
+-- Verified against the LIVE schema before applying, not just the repo:
+-- app.billing_attempts has no amount column (confirmed), the money is
+-- app.renewal_periods.amount_cents (integer, confirmed), and the cycle-gap
+-- source is app.v_cycle_audit with expected_date and accounted (confirmed).
+-- The view's SELECT was dry-run on its own first.
+--
+-- Membership unchanged, which was the thing to prove: 33 rows before and 33
+-- after, 26 orphaned_attempt and 7 unrecognized_code. What changed is that
+-- those 33 now carry $3,300.00 of money at stake that the console could not
+-- previously see. See docs/OPERATIONS-QUEUE-SERVER-SPEC.md.
 --
 -- WHAT THIS IS FOR
 -- The operations console ranks its attention queue by consequence, and can
@@ -131,27 +140,19 @@ create index if not exists attention_cleared_at_idx
 
 
 -- =============================================================================
--- BEFORE THIS RUNS
+-- AFTER THIS RAN
 -- =============================================================================
--- 1. The column names here were read from migrations 024 and 026 in this
---    repository, not from the live database. Run the view's SELECT on its own
---    first. If a name has drifted, `create or replace view` fails at create
---    time rather than silently returning something wrong, which is the good
---    failure.
+-- 1. functions/billing-console/index.ts now selects and returns the three new
+--    columns, and gains a clear_attention action. That change is committed but
+--    NOT yet deployed: deploying it needs the Supabase CLI with an access
+--    token, which the build container does not have. Until it ships, the
+--    console shows an em dash for every amount and says why on the page.
 --
--- 2. BOTH GATES. This touches a live payment rail. See BRAIN decision
---    2026-08-16-both-gates-before-deploy, and the standing debt of five
---    ungated deploys on 08-17 night -- which is the reason to be careful, not
---    a precedent for skipping.
+-- 2. The console reads whichever shape it is given. It does not assume the new
+--    columns exist, so this migration was safe to apply ahead of the function
+--    and the front end, and is safe to leave applied if either is delayed.
 --
--- 3. THE FUNCTION GOES WITH IT. functions/billing-console/index.ts must select
---    and return the three new columns from actionAttention before the console
---    can show anything, and gain the clear_attention action before a Clear
---    button is built. A view that exposes consequence while the function still
---    returns seven columns changes nothing on screen.
---
--- 4. THE CONSOLE KEEPS WORKING EITHER WAY. It reads the seven columns it
---    always read and ignores extras, so this migration is safe to apply ahead
---    of the function and the front end, and safe to leave applied if the rest
---    is deferred.
+-- 3. Nothing here moves money. The view is a read, and app.attention_cleared
+--    records that a human looked -- it does not resolve the underlying fault
+--    and does not remove the row from the queue.
 -- =============================================================================

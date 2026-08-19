@@ -172,3 +172,74 @@ verified against a synthetic fixture with `fetch` stubbed, because both sit
 behind sign-in on a live database. The operations queue's money column and row
 actions still need the server change in `OPERATIONS-QUEUE-SERVER-SPEC.md`,
 which has NOT been applied.
+
+
+---
+
+# Third run, 2026-08-19: the last two items closed
+
+Bundle **`sha256 a032e0544e325708`**. Both gates pass on all fourteen pages,
+and gate one now has **no accepted-exception list at all**.
+
+## The contrast decision was made, not tolerated
+
+`#8A8278` on `#EAE4D9` was 2.99:1. It is now `#6B645A` at **4.62:1**.
+
+The arithmetic is why there was no third option: 4.5:1 on this paper needs a
+luminance at or below `0.1344`, and `--quiet` at `#6B645A` is already
+`0.1298`. The entire headroom between "passes AA" and "is already --quiet" is
+**0.0046 of luminance** — invisible. So the three-step ink scale is two steps
+now, deliberately.
+
+Nothing was lost that was doing work. A kicker was never separated from a
+caption by colour alone: 10.5px / 700 / 0.2em / uppercase against 12.5px /
+400 / untracked. The colour step was redundant differentiation bought at the
+price of readability.
+
+**Not changed:** `--shop-disabled-bg`, the same hex used as a *background*
+with `#1B1917` on it at 5.10:1. Darkening a disabled button's fill would push
+its own label the wrong way.
+
+**The exception was deleted from gate one**, not left behind. An exception
+list is for decisions somebody made on purpose; leaving one after the decision
+went the other way turns it into a blind spot with a comment attached.
+
+## The migration is applied
+
+Migration 032 ran against the live database, verified first against the live
+schema rather than the repo. Membership unchanged — **33 rows before and 33
+after** — which was the thing to prove. What changed is that those 33 now
+carry **$3,300.00** of money the console could not previously see: 26 orphaned
+attempts at $2,600 and 7 unmapped decline codes at $700.
+
+Both drafting errors caught earlier were real: `app.billing_attempts` has no
+`amount` column (confirmed live), and the cycle-gap branch reads
+`app.v_cycle_audit`.
+
+## The console is truthful in both server states
+
+The Edge Function change is committed but **not deployed** — that needs the
+Supabase CLI with an access token, which the build container does not have.
+So the console asks the payload rather than assuming:
+
+| Server shape | Headline | Amounts | Note |
+| --- | --- | --- | --- |
+| old (7 columns) | "2 things need a human today." | `—` | shown, explains why |
+| new (10 columns) | "2 things need a human today, holding $100.00." | `$100.00` | hidden |
+
+The test is `hasOwnProperty('amount_at_stake')`, not truthiness: a cycle gap
+legitimately carries null, and null must read as "none" rather than "the
+service is behind". Verified in both states with no page errors.
+
+## Still not done
+
+`functions/billing-console/index.ts` needs deploying. One command, from a
+machine with the CLI logged in:
+
+```
+git pull origin main
+supabase functions deploy billing-console --project-ref oiyibdczkokegaxkwulv
+```
+
+It typechecks clean under Deno 2.9.5. Until it ships the console shows dashes
+and says why, which is the honest state rather than a broken one.
