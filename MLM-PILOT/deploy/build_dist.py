@@ -948,6 +948,26 @@ def currency_mirror_check() -> None:
              "shop.html CURRENCIES and tax.ts TAX_CURRENCY_RATES must match")
 
 
+def price_mirror_check() -> None:
+    """Fail the build if catalog.js and pricing.ts disagree on any price
+    or on which items may carry a subscription.
+
+    The lockstep contract at the top of pricing.ts has always said the two
+    files stay fact for fact identical; until 2026-08-19 only the currency
+    rates had a machine keeping them so. A SKU that is one-time only on the
+    site but subscribable on the server can be subscribed by anything that
+    is not the site, at a tenth of its price.
+    """
+    import subprocess
+    checker = ROOT / "functions" / "_shared" / "check_price_mirror.py"
+    result = subprocess.run(
+        [sys.executable, str(checker)], capture_output=True, text=True)
+    for line in (result.stdout or "").strip().splitlines():
+        print(f"price mirror: {line}")
+    if result.returncode != 0:
+        fail("catalog.js and pricing.ts drifted (see lines above)")
+
+
 def main() -> None:
     www, site = ROOT / "www", ROOT / "site"
     for required in (www, site):
@@ -1010,6 +1030,7 @@ def main() -> None:
     chrome_sheet_link_lint()
     chrome_css_lint()
     currency_mirror_check()
+    price_mirror_check()
 
     files = sorted(p for p in DIST.rglob("*") if p.is_file() and ".git" not in p.parts)
     total = sum(p.stat().st_size for p in files)

@@ -14,7 +14,15 @@
    (section 1.3, canonical price source).
 
    House pricing rules mirrored here:
-   - Subscription ("sub") is the default mode on every item.
+   - Subscription ("sub") is the default mode on every item
+     that can carry one.
+   - ONLY THE TWELVE AGENTS SUBSCRIBE (ruled 2026-08-19). The
+     Manager bundle and the three packs are one-time purchases.
+     A "sub" line naming one of them is REFUSED here rather
+     than quietly repriced, because a silent reprice would
+     charge a shopper a figure no page ever showed them. The
+     site cannot construct such a line; this is the check for
+     everything that is not the site.
    - One-time ("one") uses the 10x rule: monthly price times
      ten, Personal Volume (PV) equal to dollars in both modes.
    - Priority activation costs $25.00; standard is free.
@@ -74,6 +82,20 @@ export const CATALOG: Record<string, PriceEntry> = {
    factor in www/shop.html. */
 export const ACTIVATION_FEE_DOLLARS = 25; // $25.00 priority activation
 export const TAX_RATE_PERCENT = 5;        // 5 percent
+
+/* The four one-time-only SKUs. Named, not derived from tier, so this
+   file and www/js/catalog.js state the rule the same way and the
+   mirror check can compare them literally. */
+export const ONE_TIME_ONLY: ReadonlySet<string> = new Set([
+  "manager",
+  "ignition",
+  "momentum",
+  "constellation",
+]);
+
+export function isSubscribable(sku: string): boolean {
+  return sku in CATALOG && !ONE_TIME_ONLY.has(sku);
+}
 
 /* Cart caps, Phase 6 spec section 5.2 (server enforced). */
 export const MAX_UNITS_PER_LINE = 99;
@@ -152,6 +174,12 @@ export function priceCart(
     }
     if (mode !== "sub" && mode !== "one") {
       return { ok: false, message: "Each line's mode must be sub or one." };
+    }
+    if (mode === "sub" && !isSubscribable(sku)) {
+      return {
+        ok: false,
+        message: "That item is a one-time purchase and cannot be subscribed to.",
+      };
     }
     if (
       typeof quantity !== "number" ||

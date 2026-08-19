@@ -129,7 +129,7 @@
           <p class="detail-blurb" id="agentBlurb"></p>
 
           <div class="price">
-            <div>
+            <div id="priceSubCard">
               <span class="price-label">Subscription</span>
               <span class="price-amt" id="priceSub"></span>
               <span class="price-pv" id="pvSub"></span>
@@ -607,6 +607,12 @@
 
   /* ---------- prices, every figure straight from catalog.js ---------- */
 
+  /* A pack has no subscription, so its subscription card is removed rather
+     than filled with a figure it is not sold at. The one-time card beside
+     it then carries the whole answer. */
+  var canSub = O.subscribable(product);
+  document.getElementById('priceSubCard').hidden = !canSub;
+
   document.getElementById('priceSub').innerHTML =
     O.fmtMoney(product.sub.price) + ' <span class="per">/ month</span>';
   /* The price cards render ABOVE the expansion sentence beneath them,
@@ -626,16 +632,21 @@
   if (product.includes && product.includes.length) {
     document.getElementById('insideSection').hidden = false;
 
+    /* The comparison runs in the mode this item is SOLD in, so a one-time
+       bundle is measured against what its agents cost outright rather than
+       against a monthly figure it does not have. */
+    var h = O.headline(product);
+    var per = h.mode === 'sub' ? ' a month' : ' bought outright';
     var partsSum = product.includes.reduce(function (total, childSku) {
       var child = O.get(childSku);
-      return total + (child ? child.sub.price : 0);
+      return total + (child ? O.priceOf(child, h.mode) : 0);
     }, 0);
 
     /* Stated as a comparison, computed here rather than typed, so the
        sentence cannot disagree with the prices above it. */
-    var relation = partsSum === product.sub.price
-      ? 'Bought separately those come to ' + O.fmtMoney(partsSum) + ' a month, which is exactly what this item costs. You are buying the selection, not a discount.'
-      : 'Bought separately those come to ' + O.fmtMoney(partsSum) + ' a month, and this item is ' + O.fmtMoney(product.sub.price) + ' a month. The difference buys the coordination layer, which is the product.';
+    var relation = partsSum === h.price
+      ? 'Bought separately those come to ' + O.fmtMoney(partsSum) + per + ', which is exactly what this item costs. You are buying the selection, not a discount.'
+      : 'Bought separately those come to ' + O.fmtMoney(partsSum) + per + ', and this item is ' + O.fmtMoney(h.price) + (h.mode === 'sub' ? ' a month' : ' once') + '. The difference buys the coordination layer, which is the product.';
 
     document.getElementById('insideLead').textContent =
       product.includes.length + ' items. ' + relation;
