@@ -354,6 +354,11 @@ CORPORATE_PAGES = {
     "team.html":          "team.html",
     "faq.html":           "index.html",    # the footer files the questions under Learn
     "comp-plan.html":     "comp-plan.html",
+    # The 24-section illustrated document. It moved off comp-plan.html on
+    # 2026-08-19 when the interactive explainer took that URL, and it marks
+    # Plan active rather than itself: it is a page inside the Plan section,
+    # the way a chapter marks the contents entry it belongs to.
+    "comp-plan-full.html": "comp-plan.html",
     "conductor.html":     "conductor.html",
     "library.html":       "library.html",
     "library-agent.html": "library.html",  # a detail page is inside the library
@@ -391,7 +396,7 @@ BUILD_GENERATED_PAGES = {"404.html"}
 # stylesheet would still print and still serve, but would break silently the
 # moment somebody saved it and opened it offline, which is one of the three
 # uses it exists for.
-DOCUMENT_PAGES = {"plan-brochure.html"}
+DOCUMENT_PAGES = {"plan-brochure.html", "comp-plan-print.html"}
 
 # What a self-contained page may never reference. Anything here means the file
 # stops working the moment it leaves the server.
