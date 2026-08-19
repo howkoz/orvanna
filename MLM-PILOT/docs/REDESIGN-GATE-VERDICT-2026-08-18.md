@@ -1,7 +1,20 @@
 # Redesign gates, 2026-08-18
 
 Both gates run against the built artifact in `deploy/dist`, not the source.
-Bundle `sha256 9c3abe96cb48b2e0` at the time of the run.
+Bundle **`sha256 5b4bfe891b253eb0`**.
+
+> **Correction, 2026-08-19.** This document first recorded the bundle as
+> `9c3abe96cb48b2e0`. That was wrong, and the way it was wrong is worth
+> keeping: it was a real hash from a real build, taken two edits before the
+> gates actually ran. The gates ran after the deepest-scroll sweep and the
+> 2.5-second deadline went in, so they tested a bundle this file did not
+> name. Caught at publish time by rebuilding and finding the hash did not
+> match. A hash copied from an earlier build reads exactly like a hash from
+> the gated one, which is what makes it worth catching: it is a claim of
+> provenance that looks identical whether or not it is true. Both gates were
+> re-run against `5b4bfe891b253eb0` before anything was published, and the
+> results below are that run. The build is deterministic: two clean builds
+> from a clean tree produced the same hash.
 
 ## Gate one — the verifier
 
