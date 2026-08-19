@@ -62,8 +62,13 @@
   --indigo:      #1B1917;
   --indigo-soft: #6B645A;
   --violet:      #1B1917;
-  --accent:      #EC3013;
-  --link:        #EC3013;   /* link ink; see the light block for why it is a token */
+  /* THE ACCENT AS TEXT, NOT AS A FILL. Both of these are read as text on
+     this page -- kickers, part rules and every inline link -- and at
+     #EC3013 they measured 2.91:1 to 3.60:1 against its several paper
+     grounds. The deep form of the same accent is 5.95:1 on paper. The
+     fills below keep the bright accent, which is what it is for. */
+  --accent:      #A3220B;
+  --link:        #A3220B;   /* link ink; see the light block for why it is a token */
   --accent-bg:   rgba(236, 48, 19, 0.10);
   --accent-line: rgba(236, 48, 19, 0.38);
   --good:        #15803D;
@@ -179,7 +184,9 @@ img, svg { max-width: 100%; display: block; }
 .cover-mark { display: flex; align-items: center; gap: 20px; margin-bottom: 34px; }
 .cover-kicker {
   font-size: 0.78rem; font-weight: 600; letter-spacing: 0.34em;
-  text-transform: uppercase; color: var(--chrome-lit); margin-bottom: 16px;
+  /* --chrome-lit is the bright accent the nav underlines itself with;
+     as a 12.5px kicker on paper it is 3.32:1. The deep form here. */
+  text-transform: uppercase; color: #A3220B; margin-bottom: 16px;
 }
 .cover h1 {
   font-size: clamp(1.9rem, 4.6vw, 3.1rem);
@@ -226,7 +233,7 @@ ul, ol { margin: 12px 0 12px 24px; max-width: 46em; }
 li { margin: 7px 0; }
 strong { color: var(--ink); font-weight: 700; }
 a { color: var(--link); }
-.small { font-size: 0.86rem; color: var(--muted); }
+.small { font-size: 0.86rem; color: #4B453D; }
 .num, .money { font-variant-numeric: tabular-nums; white-space: nowrap; }
 code, .mono {
   font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
@@ -273,9 +280,9 @@ code, .mono {
   border-radius: 0; padding: 3px 12px; white-space: nowrap;
   border: 1px solid currentColor;
 }
-.chip.ok    { color: var(--good); background: var(--good-bg); }
+.chip.ok    { color: #146131; background: var(--good-bg); }
 .chip.no    { color: var(--bad);  background: var(--bad-bg); }
-.chip.soon  { color: var(--amber); background: var(--amber-bg); }
+.chip.soon  { color: #6B4A15; background: var(--amber-bg); }
 .chip.info  { color: var(--indigo); background: var(--surface-2); }
 
 /* ---------------------------------------------------------------- tables */

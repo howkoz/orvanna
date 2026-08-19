@@ -68,7 +68,15 @@
   --shop-pill-ink-hover: #1B1917;   /* filter pill, hover */
   /* accents */
   --shop-accent-fill:    #EC3013;
-  --shop-accent-ink:     #EC3013;
+/* THE ACCENT IS A FILL, NOT A TEXT COLOUR ON PAPER. The handoff's own
+   token table says so: "--accent is used for fills, large numerals and
+   interface chrome, never for paragraph text on paper -- use
+   --accent-deep there." Measured on the built pages, accent text on the
+   paper grounds lands between 2.91:1 and 3.60:1 -- above gate one's 3:1
+   floor on most of them, and under AA on all of them. The deep form is
+   5.95:1 on paper and 6.36:1 on the raised panel. Swept 2026-08-19 after
+   the owner reported text "blending too close to the page". */
+  --shop-accent-ink:     #A3220B;
   --shop-on-accent:      #FFFFFF;   /* ink on any cyan fill */
   --shop-indigo-ink:     #6B645A;
   --shop-violet-ink:     #1B1917;
@@ -513,7 +521,7 @@
 /* Same change as the library's .ico, same reason: the marks lost their
    shared hexagon on 2026-08-19 so the sixteen could be told apart by
    shape, and the cell gives back the containment the frame provided. The
-   two surfaces show the same sixteen agents and a customer moves straight
+   two surfaces show the same sixteen catalog items and a customer moves straight
    between them, so they get the same treatment. */
 .line-icon {
   width: 40px;
@@ -3211,6 +3219,75 @@ body.payment-in-flight .checkout-summary {
   color: var(--shop-strong);
   font-variant-numeric: tabular-nums;
   margin-bottom: 14px;
+}
+
+/* ============================================================
+   THE BILLING SWITCH, 2026-08-19.
+
+   The same control in three places now: the product page, the shop
+   rail (one setting for the whole order) and each subscribable line
+   in the cart (so an order can mix). .switch and .switch-knob above
+   are the drawing; these rules only place it.
+
+   Subscription is the selected state everywhere, on every arrival.
+   ============================================================ */
+
+.rail-second {
+  font-size: 0.82rem;
+  color: var(--shop-muted);
+  margin: -8px 0 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail-billing {
+  padding: 12px 0 14px;
+  border-top: 1px solid rgba(27, 25, 23, 0.14);
+  margin-bottom: 4px;
+}
+.rail-billing-head {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6B645A;
+  margin-bottom: 10px;
+}
+/* The product page's .mode-toggle carries a bottom rule and padding that
+   belong to the price box it sits in; in the rail the block above owns
+   both, so they come off rather than doubling up. */
+.mode-toggle.rail-toggle { padding-bottom: 0; border-bottom: 0; }
+.rail-billing-fixed {
+  margin-top: 10px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: #6B645A;
+}
+
+/* The cart line: the switch and the word it sets, on one baseline. */
+.line-billing {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.line-billing .switch {
+  width: 38px;
+  height: 21px;
+  margin-top: 0;
+}
+.line-billing .switch-knob {
+  width: 15px;
+  height: 15px;
+  top: 2px;
+  left: 2px;
+}
+.line-billing .switch[aria-checked="true"] .switch-knob { transform: translateX(17px); }
+
+.line-alt {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #6B645A;
+  font-variant-numeric: tabular-nums;
 }
 
 .rail-qual {
