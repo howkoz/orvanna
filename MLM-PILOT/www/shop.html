@@ -3694,8 +3694,23 @@
     if (engine.isValidationError(sdkError)) {
       liveState.busy = false;
       releasePayButton();
-      liveStatus('The card form says: ' + sdkError.message +
-        '. Fix the card details and press the button again. Nothing was charged.');
+      /* THE SECOND DOORWAY. The rule that a processor's own words must
+         not reach a shopper was written on 2026-08-18 and applied to the
+         SERVER receipt path, where the message arrives as
+         receipt.processor.error_message. This line is the other door: the
+         card form's own error, printed raw, with no filter between it and
+         the screen. On 2026-08-19 it put "Missing required param:
+         payment_method_token" in front of a shopper.
+
+         A lesson fixed in one place is not fixed. Both doors now run the
+         same filter, and when it drops the text the sentence still tells
+         the shopper the two things that are true and that matter: nothing
+         was charged, and the details need another look. */
+      var saidToShopper = engine.shopperSafeProcessorMessage(sdkError.message);
+      liveStatus(saidToShopper
+        ? 'The card form says: ' + saidToShopper +
+          '. Fix the card details and press the button again. Nothing was charged.'
+        : 'The card form could not accept those details. Check the number, expiry and security code, then press the button again. Nothing was charged.');
       return;
     }
     /* The card has been handed over and the only question left is what

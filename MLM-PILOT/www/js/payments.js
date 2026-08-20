@@ -555,9 +555,41 @@
 
     /* a pure form-validation problem never left the browser: keep the
        form up for editing rather than treating it as an outcome */
+    /* AN INTEGRATION FAULT IS NOT A CARD-VALIDATION FAULT, and telling
+       them apart matters more than it looks. Found live 2026-08-19 on
+
+         "Missing required param: payment_method_token"
+
+       which contains the word "required" and was therefore classified as
+       the shopper mistyping their card. Two things followed, and the
+       second is the serious one:
+
+         1. The shopper was told to fix card details that were perfect,
+            so the only advice on screen was to do the failing thing again.
+         2. The caller RETURNS EARLY on a validation verdict, by design,
+            because a form-validation problem never left the browser. So
+            our server was never asked what happened, and the order was
+            left open with nobody resolving it. The rule this file states
+            everywhere, that our server is always asked for the truth, was
+            switched off by a word match.
+
+       So the integration test runs FIRST and wins. A message naming a
+       request parameter, a token, a key or a secret is about our
+       integration, never about what somebody typed into the card form,
+       and it must fall through to the server-truth path. Erring this way
+       round is deliberate: mistaking a typo for an integration fault
+       costs one extra server round trip, while mistaking an integration
+       fault for a typo abandons a live order. */
+    function looksLikeIntegrationFault(message) {
+      var msg = (message || '').replace(/[_-]+/g, ' ');
+      return /\b(param|params|parameter|parameters|token|tokens|api|sdk|client secret|publishable key|merchant|connector|endpoint|credential|configuration)\b/i.test(msg);
+    }
+
     function isValidationError(sdkError) {
-      return !!(sdkError &&
-        /incomplete|invalid|required|expir|number|cvc|cvv|blank|empty/i.test(sdkError.message || ''));
+      var message = (sdkError && sdkError.message) || '';
+      if (!message) return false;
+      if (looksLikeIntegrationFault(message)) return false;
+      return /incomplete|invalid|required|expir|number|cvc|cvv|blank|empty/i.test(message);
     }
 
     /* ============================================================
@@ -1044,8 +1076,27 @@
        cart is intact. The full text is never lost: it stays in
        processor_summary for staff and for us. */
     var PROCESSOR_MSG_MAX = 120;
+    /* THE WORD BOUNDARY WAS THE HOLE, found 2026-08-19 by attacking this
+       filter with a message it had just let through:
+
+         "Missing required param: payment_method_token"
+
+       44 characters, no web address, and NOT caught, because "_" is a word
+       character in a regular expression, so \btoken\b finds no boundary
+       inside payment_method_token. The filter was written to stop exactly
+       this class of string and it passed this one straight to a shopper.
+
+       Two changes. The identifier test now runs against a copy with "_"
+       turned into a space, so an underscore-joined parameter name is read
+       as the words it is made of. And "param", "parameter", "missing
+       required" and "payment_method" join the list, because a message
+       naming a request field is an engineer's message by definition.
+
+       Attacked before being trusted, per the rule this project already
+       carries: the ways to violate a rule are open-ended, so a filter that
+       has never been fired at is a guess. */
     var INTEGRATION_JARGON =
-      /\b(api|apis|token|tokens|sdk|endpoint|integration|documentation|docs|support|enable|enabling|test mode|raw card|dashboard|merchant account|configuration|not configured|unsupported|credential)\b/i;
+      /\b(api|apis|token|tokens|sdk|endpoint|integration|documentation|docs|support|enable|enabling|test mode|raw card|dashboard|merchant account|configuration|not configured|unsupported|credential|param|params|parameter|parameters|payment method token|client secret|publishable key)\b/i;
     var LOOKS_LIKE_URL = /(https?:\/\/|www\.|\.com|\.io|\.net\b)/i;
 
     function shopperSafeProcessorMessage(raw) {
@@ -1053,7 +1104,9 @@
       if (!msg) return '';
       if (msg.length > PROCESSOR_MSG_MAX) return '';
       if (LOOKS_LIKE_URL.test(msg)) return '';
-      if (INTEGRATION_JARGON.test(msg)) return '';
+      /* Read snake_case and kebab-case identifiers as the words they are
+         built from, so a boundary character cannot hide a banned word. */
+      if (INTEGRATION_JARGON.test(msg.replace(/[_-]+/g, ' '))) return '';
       return msg;
     }
 
@@ -1255,6 +1308,8 @@
       mountWidget: mountWidget,
       confirmPayment: confirmPayment,
       isValidationError: isValidationError,
+      looksLikeIntegrationFault: looksLikeIntegrationFault,
+      shopperSafeProcessorMessage: shopperSafeProcessorMessage,
       setFinishing: setFinishing,
       setCardSkeleton: setCardSkeleton,
       setInert: setInert,
