@@ -181,7 +181,85 @@ const DAILY_ORDER_CEILING = 500; // spec 5.1 circuit breaker
    connector. To force a challenge again, do it with a ROUTING rule,
    not by putting a constant back here.
    ------------------------------------------------------------ */
-const AUTHENTICATION_TYPE: string | null = null;
+/* ------------------------------------------------------------
+   AUTHENTICATION_TYPE IS NOW A SETTING, NOT A CONSTANT, 2026-08-19.
+
+   WHY THIS CHANGED. Both constants this replaces were wrong, and
+   the project spent two days discovering that it only ever got to
+   pick WHICH thing was broken:
+
+     "three_ds" hardcoded  every payment demanded authentication,
+       (until 08-17)       including ones routed to Authorize.net,
+                           whose connector declares three_ds
+                           NotSupported. The attempt reset and the
+                           site blamed the shopper's bank for a
+                           payment the bank never saw.
+
+     null hardcoded        no payment asks for authentication, so
+       (08-17 to now)      nothing ever challenges. The card that
+                           proved 3-D Secure on 2026-08-15,
+                           4000 0000 0000 2503, stopped raising a
+                           screen, and the note above already said
+                           why: "Sending nothing, which is what we
+                           used to do, is why behaviour looked
+                           arbitrary and why nothing ever
+                           challenged." Found by the owner on the
+                           live rail on 2026-08-19.
+
+   The 08-17 note promised the replacement would be a ROUTING rule
+   rather than a constant put back. That is still right and still
+   required, and it is HALF the answer: routing decides WHO
+   receives a three_ds payment, but something still has to ASK for
+   three_ds, and no rule in the dashboard can ask on behalf of a
+   request that never carries the field.
+
+   So this is the other half, and it is the shape docs/3DS-RESEARCH.md
+   line 780 asked for on 2026-08-14: "Consider making it configurable
+   by an environment variable so the demo can be flipped back."
+
+   HOW TO USE IT.
+
+     unset, or "auto"   the field is OMITTED. HyperSwitch and the
+                        connector decide. This is today's behaviour
+                        and it stays the default, so deploying this
+                        change alone changes nothing.
+     "three_ds"         authentication is requested deterministically.
+                        A challenge-capable card on a challenge-capable
+                        connector raises a real bank screen.
+     "no_three_ds"      authentication is explicitly declined.
+
+   BEFORE SETTING "three_ds", PIN THE ROUTING. With Stripe disabled
+   the account routes across Braintree and Authorize.net, and only
+   Braintree can honour it. Give Braintree top priority in Smart
+   Router first, or this reintroduces the exact August fault: a
+   payment that demands authentication reaching a connector that has
+   declared it cannot do it.
+
+   AN UNRECOGNISED VALUE FALLS BACK TO auto, DELIBERATELY. A typo in
+   a dashboard field must not be able to change what a payment asks
+   of a bank. Silence is the safe direction here: omitting the field
+   is what the rail does today, so an unreadable setting lands on
+   known behaviour rather than on a guess. The fallback is reported
+   in the response's diagnostics so a misspelling is visible rather
+   than merely survived.
+   ------------------------------------------------------------ */
+const THREE_DS_MODES = ["three_ds", "no_three_ds"] as const;
+
+function readAuthenticationType(): {
+  value: string | null;
+  ignored: string | null;
+} {
+  const raw = (Deno.env.get("ORVANNA_3DS_MODE") ?? "").trim().toLowerCase();
+  if (!raw || raw === "auto") return { value: null, ignored: null };
+  if ((THREE_DS_MODES as readonly string[]).includes(raw)) {
+    return { value: raw, ignored: null };
+  }
+  return { value: null, ignored: raw.slice(0, 40) };
+}
+
+const AUTH_SETTING = readAuthenticationType();
+const AUTHENTICATION_TYPE: string | null = AUTH_SETTING.value;
+const AUTHENTICATION_TYPE_IGNORED: string | null = AUTH_SETTING.ignored;
 const REQUEST_EXTERNAL_THREE_DS = false;
 
 /* ------------------------------------------------------------
@@ -609,6 +687,25 @@ Deno.serve(async (req: Request): Promise<Response> => {
       order_number: orderNumber,
       client_secret: hsBody.client_secret,
       publishable_key: publishableKey,
+      /* WHAT THIS PAYMENT ASKED OF THE BANK, said out loud.
+
+         "auto" means the field was omitted and HyperSwitch decided.
+         Anything else is what we sent. It is here because the 3-D
+         Secure behaviour of this rail has now been misdiagnosed twice
+         from the outside, and both times the missing fact was simply
+         what the create call asked for. Reading it off a response
+         beats reading it off a constant in a file that may not be the
+         one deployed.
+
+         three_ds_setting_ignored appears ONLY when the environment
+         held a value this function does not recognise. It carries the
+         unrecognised text, truncated, so a misspelling in a dashboard
+         field is visible rather than silently absorbed into "auto".
+         Neither field names a secret or a connector. */
+      three_ds_mode: AUTHENTICATION_TYPE ?? "auto",
+      ...(AUTHENTICATION_TYPE_IGNORED
+        ? { three_ds_setting_ignored: AUTHENTICATION_TYPE_IGNORED }
+        : {}),
       /* THE TOTALS THE SERVER ACTUALLY OPENED THE PAYMENT FOR.
          The page used to compute tax itself and agree with this function only
          because both applied the same flat guess. A real engine ends that: the
