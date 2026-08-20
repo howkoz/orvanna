@@ -3515,6 +3515,13 @@
       }
       liveState.orderNumber = result.data.order_number;
       liveState.clientSecret = result.data.client_secret;
+      /* WHAT THIS PAYMENT ASKED OF THE BANK, kept where the page can
+         answer for it. create-payment reports three_ds_mode so the
+         checkout never has to infer whether a challenge was requested;
+         it defaults to 'auto' so a function deployed before that field
+         existed still reads as the honest unknown rather than as a
+         promise. */
+      liveState.threeDsMode = result.data.three_ds_mode || 'auto';
       applyServerTotals(result.data.totals);
       /* written the moment the order number exists, so it is on
          screen and in storage before anything can go wrong */
@@ -3584,10 +3591,19 @@
          4000 1111 1111 1115  approval screen, then the card declines
        Expiry month 01, year = current + 3. Full matrix:
        docs/TEST-CARDS.html. See also ROADMAP.md. */
+    /* THE TEST-CARD NOTE HAS TO MATCH THE RAIL IT IS DESCRIBING.
+       2503 only opens an approval screen when the request actually asked
+       for authentication. In auto mode the same card approves
+       frictionlessly with no passcode, and a note promising a screen
+       that never arrives is how a working rail gets read as broken,
+       which is exactly what happened on 2026-08-19. */
+    var challengeHint = liveState.threeDsMode === 'three_ds'
+      ? '4000 0000 0000 2503 opens the approval screen from your bank; enter the passcode 1234 it shows you and the payment approves. '
+      : '4000 0000 0000 2503 is the challenge test card when the backend is forcing 3DS; in auto mode it may approve frictionlessly with no OTP. ';
     setLivePayNote(payMethod === 'paypal'
       ? PAY_LABELS[payMethod] + ' is enabled on the Braintree connector. Choose it inside the secure HyperSwitch form if it is available in this browser. Nothing is ever charged.'
       : 'Test mode, expiry 01/29, any three digit security code. ' +
-        '4000 0000 0000 2503 opens the approval screen from your bank; enter the passcode 1234 it shows you and the payment approves. ' +
+        challengeHint +
         '4000 0000 0000 2370 opens it, and the approval fails. ' +
         '4000 0000 0000 2701 approves with no passcode at all. ' +
         'Nothing is ever charged.');
