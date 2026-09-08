@@ -1,0 +1,257 @@
+<title>Patch Launch Cheat Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap');
+  :root {
+    --paper: #F7F5F0; --tile: #FFFFFF; --ink: #14212B; --ink2: #4A5560; --rule: #D9D4CA;
+    --accent: #0B6E4F; --accent-soft: #E3F0EA; --flag: #B8461B; --flag-soft: #F8E7DF;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --paper: #14181C; --tile: #1C2228; --ink: #EDE8DF; --ink2: #B0AA9F; --rule: #343C45;
+    --accent: #5FC29B; --accent-soft: #1E3A30; --flag: #E8825A; --flag-soft: #3E2419;
+  } }
+  :root[data-theme="dark"] {
+    --paper: #14181C; --tile: #1C2228; --ink: #EDE8DF; --ink2: #B0AA9F; --rule: #343C45;
+    --accent: #5FC29B; --accent-soft: #1E3A30; --flag: #E8825A; --flag-soft: #3E2419;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 22px 18px 60px; }
+  h1 { font-family: 'Bricolage Grotesque', 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.05; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink2); font-size: 14px; margin: 0 0 20px; }
+  .card { background: var(--tile); border: 1px solid var(--rule); padding: 14px 16px 15px; margin-top: 12px; }
+  .card h2 { font-family: 'Bricolage Grotesque', 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 8px; display: flex; gap: 10px; align-items: baseline; }
+  .card h2 .n { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 500; }
+  .card p { margin: 6px 0 0; }
+  .say { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 8px 12px; margin: 8px 0 4px; font-size: 14.5px; }
+  .say.warn { border-left-color: var(--flag); background: var(--flag-soft); }
+  .k { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; }
+  .warn .k { color: var(--flag); }
+  ul { margin: 6px 0 0; padding: 0; list-style: none; }
+  li { position: relative; padding-left: 16px; margin-top: 4px; font-size: 14.5px; }
+  li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+  li.f::before { background: var(--flag); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .flow span { border: 1px solid var(--rule); background: var(--paper); padding: 6px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .flow span b { display: block; font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; font-size: 11px; color: var(--ink2); }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); font-weight: 500; }
+  .twrap { overflow-x: auto; }
+  .big { font-family: 'Bricolage Grotesque', 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 22px; color: var(--accent); }
+  .foot { color: var(--ink2); font-size: 13px; margin-top: 18px; }
+  @media print { body { background: #fff; color: #000; } .card { break-inside: avoid; } }
+</style>
+
+<div class="wrap">
+  <h1>Patch Launch Cheat Sheet</h1>
+  <p class="sub">The twelve sections of the playbook, one card each. Read the green box aloud if you need words; the bullets are the argument.</p>
+
+  <div class="card">
+    <h2><span class="n">00</span>Open the room</h2>
+    <div class="say"><span class="k">Say</span>"A direct-selling company is two things in a corporate wrapper: a product people reorder without being pushed, and a comp plan that pays distributors for creating that reordering. Everything else serves those two. But your product is nicotine, and nicotine is regulated three ways before you sell your first patch. Get that right and the rest is a known playbook."</div>
+    <ul>
+      <li><strong>Ask first:</strong> Is the patch for quitting? Do you have or are you buying an FDA-approved product? Who is your regulatory counsel?</li>
+      <li><strong>Frame:</strong> this is an order of operations, not a menu. Skipping a step moves the cost later and makes it bigger.</li>
+      <li><strong>Not today:</strong> not writing the plan, not naming ranks, not picking software. Today is the map; the build is the engagement.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">01</span>The two things that matter</h2>
+    <ul>
+      <li><strong>Product:</strong> consumed monthly, margin to fund the plan, a story a distributor repeats in thirty seconds, claims the company can defend.</li>
+      <li><strong>Plan:</strong> pays retail first, building second, leadership third. Never pays more on an order than budgeted.</li>
+      <li class="f"><strong>What is not fixable later:</strong> a product whose margin cannot carry a plan. You find out at month eighteen when payout is 48 percent of revenue.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">02</span>Nicotine is regulated three ways</h2>
+    <div class="say warn"><span class="k">Say plainly</span>"A patch sold to help people quit is a medicine. A patch sold for anything else is a tobacco product. There is no third category, and a supplement is not one of the options."</div>
+    <ul>
+      <li><strong>FDA, cessation:</strong> over-the-counter drug, generic application against approved patches, claims locked to the label. Slower to market, ordinary company afterward.</li>
+      <li><strong>FDA, anything else:</strong> tobacco product, premarket application few small companies have completed, age 21, PACT Act on online sales, no Postal Service, adult signature at delivery, state excise and licenses. A distributor network cannot realistically run that shipping regime.</li>
+      <li><strong>FTC:</strong> income claims and health claims. A nicotine product in a distributor's hands invites both. Monitoring the field is the first line of defense.</li>
+      <li class="f"><strong>Experience:</strong> the product is almost never what shuts a company down. The field's claims are. Claim book, training, monitoring before the first distributor signs.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">03</span>Does a patch fit the model?</h2>
+    <ul>
+      <li><strong>Strong:</strong> consumed monthly, daily use, autoship-native. Cessation story is the best sales tool in the category.</li>
+      <li><strong>Depends:</strong> margin. Landed cost must sit near 15 to 25 percent of retail. Generic patches are a commodity; margin comes from the brand and program.</li>
+      <li><strong>Constrained:</strong> claims fixed by the label. Mixed on social comfort: quitting is admirable, nicotine use is not. Positioning decides.</li>
+    </ul>
+    <div class="flow">
+      <span>$14<b>landed cost</b></span><span>$60<b>distributor price</b></span><span>$75<b>retail</b></span><span>60 PV<b>Personal Volume</b></span><span>48 CV<b>Commissionable Volume, 80% of PV</b></span>
+    </div>
+    <p><strong>Commissions are percentages of CV, not price.</strong> CV below price is the single most important financial control in the company. Ask for landed cost before anything else; if they cannot say it, no plan math exists yet.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">04</span>Compensation plan</h2>
+    <div class="say"><span class="k">Say</span>"A comp plan has three jobs in order: pay for selling to customers, pay for building a team that sells to customers, pay leaders for developing leaders. Every plan type is a way of splitting one budget across those three. The budget is the decision. The plan type is the packaging."</div>
+    <div class="twrap"><table>
+      <thead><tr><th>Type</th><th>Pays</th><th>Watch out</th></tr></thead>
+      <tbody>
+        <tr><td><b>Unilevel</b></td><td>Percent of volume across fixed levels</td><td>Easiest to explain and audit; upside feels capped</td></tr>
+        <tr><td><b>Binary</b></td><td>Weaker of two legs</td><td>Feels fast; hard to explain, easy to game, flushing disputes</td></tr>
+        <tr><td><b>Matrix</b></td><td>Fixed grid, spillover</td><td>Rewards position over effort; regulators dislike it</td></tr>
+        <tr><td><b>Stairstep breakaway</b></td><td>Ranks on group volume, overrides upward</td><td>Built for big leaders; complex; breakaway month cuts income</td></tr>
+        <tr><td><b>Hybrid</b></td><td>Unilevel plus matching, generational, pools</td><td>Most modern plans; without a ceiling payout drifts past budget</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><strong>Budget:</strong> <span class="big">35 to 45%</span> of CV, roughly 28 to 36 percent of money in. Hard ceiling on any single order.</li>
+      <li><strong>Regulator tests:</strong> retail to real customers (track from day one), no inventory loading, 90 percent buy-back for twelve months, income disclosure (median, includes zeros, net of costs), one simple monthly gate (100 PV).</li>
+      <li class="f"><strong>Experience:</strong> plans fail in year three when stacked bonuses hit 47 percent. Model a mature tree before launch; the engine must prove what it paid to the cent.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">04b</span>Whose decision the plan is</h2>
+    <div class="say"><span class="k">Say when they ask you to pick</span>"I'm not going to pick your plan for you, and you shouldn't want me to. The plan is the promise you make to your field, and you're the ones who'll stand behind it. I'll teach you the five shapes, tell you which one I'd start with and why, and once you've chosen, I'll model it against your real costs so you know what it does before anyone signs. Your job is the choice. Mine is making sure it's an informed one, and then proving the math."</div>
+    <div class="row">
+      <div>
+        <strong>They decide</strong>
+        <ul>
+          <li>Who gets paid most in year one: seller, builder, or leader</li>
+          <li>Payout budget as a share of every dollar in</li>
+          <li>How simple it must be for their field</li>
+          <li>Exciting versus durable (binary versus unilevel)</li>
+          <li>Ranks and titles people chase</li>
+          <li>The launch shape, from the table</li>
+        </ul>
+      </div>
+      <div>
+        <strong>You provide</strong>
+        <ul>
+          <li>The five shapes, plainly, with where each fails</li>
+          <li>A starting recommendation with reasons</li>
+          <li>Guardrails: budget, ceiling, retail proof, buy-back, disclosure</li>
+          <li>A data model of each candidate on their real inputs</li>
+          <li>The mature-tree payout report before launch</li>
+          <li>An engine that proves what it paid</li>
+        </ul>
+      </div>
+    </div>
+    <p><strong>Mechanism:</strong> a two-to-three-hour plan design workshop. They leave with one or two candidates on a page each. Modeling starts only then, because it needs their landed cost, pricing, customer-to-distributor mix, and retention. <strong>If pressed for a start:</strong> unilevel, or a lean unilevel hybrid with a hard per-order ceiling.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">05</span>Legal and compliance</h2>
+    <ul>
+      <li><strong>Month 0:</strong> entity and founder agreements; regulatory counsel with FDA and FTC filings behind them.</li>
+      <li><strong>Months 2 to 4:</strong> distributor agreement, policies and procedures, the plain-English plan document matched line for line to the engine.</li>
+      <li><strong>Months 4 to 5:</strong> state MLM registrations: Georgia, Louisiana, Maryland, Massachusetts, Montana, Wyoming.</li>
+      <li><strong>Before launch:</strong> income disclosure statement; a compliance function that warns and terminates, documented and applied to small people first.</li>
+      <li><strong>Month 6 plus:</strong> Direct Selling Association membership.</li>
+      <li class="f"><strong>Experience:</strong> write the policies for the day a top leader makes a health claim on video. That day comes.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">06</span>Operations and technology</h2>
+    <div class="say"><span class="k">Say</span>"This is an e-commerce business with two things bolted on: a family tree of who enrolled whom, and a monthly calculation that turns the tree and the orders into thousands of payouts. Buy the tree and the calculation. Build nothing you can buy."</div>
+    <ul>
+      <li><strong>Buy:</strong> back office and genealogy (Exigo, DirectScale, ByDesign, InfoTrax), commission engine with the platform, storefront and autoship, third-party fulfillment (age-verified delivery if non-cessation).</li>
+      <li><strong>Own:</strong> the plan model, tested against a simulated mature tree. Small in-house support that understands the plan.</li>
+      <li><strong>Payments:</strong> processors treat direct selling as elevated risk; nicotine raises it a notch. Expect reserves and underwriting. Have a second processor before you need one. An orchestration layer lets you swap processors without rebuilding checkout.</li>
+      <li><strong>Autoship:</strong> card-on-file decays. Account updater and retry schedule are worth more than most marketing.</li>
+      <li><strong>Payouts:</strong> a disbursement platform (Hyperwallet, PayQuicker, Paysafe) from day one, never checks.</li>
+      <li class="f"><strong>Experience:</strong> every payment mess came from a processor pulling the account, a retry charging cancelled people, or a run paying on refunded orders. All are pre-launch design decisions, usually made by nobody.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">07</span>Building the field</h2>
+    <div class="say"><span class="k">Say</span>"You do not launch to the public. You launch to twenty to fifty experienced leaders who already know how to build, and give them a product, a plan and tools they can defend. Everyone else is enrolled by them."</div>
+    <ul>
+      <li><strong>Founders:</strong> recruited personally months before launch; early access, input on the plan, a founders' recognition.</li>
+      <li><strong>Pre-launch:</strong> starter kit, replicated site, getting-started training, claim book; real orders test the system.</li>
+      <li><strong>First 90 days:</strong> weekly leader calls, recognition cadence, fast plan answers, visible compliance. The pattern set here lasts forever.</li>
+      <li><strong>Steady state:</strong> run, pay, recognize, train. Incentive trips tied to customer volume, not recruiting.</li>
+      <li class="f"><strong>Experience:</strong> recognition is the cheapest, most effective thing the company does, and founders underspend on it every time.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">08</span>Money</h2>
+    <div class="twrap"><table>
+      <thead><tr><th>Each retail dollar</th><th>Share</th></tr></thead>
+      <tbody>
+        <tr><td>Product cost, delivered</td><td>18%</td></tr>
+        <tr><td>Commissions and bonuses</td><td>32% (40 percent of CV)</td></tr>
+        <tr><td>Fulfillment, payments, chargebacks</td><td>9%</td></tr>
+        <tr><td>Operations, staff, software, events</td><td>20%</td></tr>
+        <tr><td>Regulatory, compliance, legal</td><td>6%</td></tr>
+        <tr><td>Retained, before tax</td><td>15%</td></tr>
+      </tbody>
+    </table></div>
+    <ul>
+      <li><strong>No total today:</strong> it depends on the regulatory path. Cessation with a licensed approved product: a lean launch is low seven figures. Without one, add approval cost and time.</li>
+      <li><strong>Capital buckets:</strong> regulatory path, launch inventory, platform and implementation, founding team salaries for 12 to 18 months, launch event.</li>
+      <li><strong>The lever:</strong> payout percentage. Set it conservatively; let the plan feel generous through recognition and simplicity.</li>
+      <li><strong>Model retention</strong> at 70, 80 and 90 percent monthly before anything else. Three different businesses.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">09</span>Roadmap, 0 to 18 months</h2>
+    <div class="twrap"><table>
+      <thead><tr><th>Months</th><th>Phase</th><th>Gate</th></tr></thead>
+      <tbody>
+        <tr><td>0 to 2</td><td>Decide what you are selling: path, supply, entity, payout budget</td><td>Which product, legally, at what cost</td></tr>
+        <tr><td>2 to 5</td><td>Design: plan on a simulated tree, policies, platform, processors</td><td>Payout under ceiling in every scenario</td></tr>
+        <tr><td>5 to 8</td><td>Build and recruit founders; fulfillment; state filings</td><td>A test order pays a test commission correctly</td></tr>
+        <tr><td>8 to 10</td><td>Pre-launch: founders enrolling, compliance running, disclosure drafted</td><td>First live run reconciles to the cent</td></tr>
+        <tr><td>10 to 18</td><td>Launch and prove: run, pay, recognize, real retention numbers</td><td>Most volume is retail customers, payout inside budget</td></tr>
+      </tbody>
+    </table></div>
+    <p>If the regulatory path is not settled early, every phase after the first waits on it.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">10</span>Deal-breakers, said before they ask</h2>
+    <div class="say warn"><span class="k">Say</span>"None of these are reasons not to do it. All of them are reasons to do it in the right order."</div>
+    <ul>
+      <li class="f">No approved product and no path to one.</li>
+      <li class="f">Positioning as anything but cessation.</li>
+      <li class="f">A plan that pays for recruiting: enrollment bonuses, packs that unlock rank, qualification by buying.</li>
+      <li class="f">Landed cost above a quarter of retail. Arithmetic, not opinion.</li>
+      <li class="f">Launching without compliance already running.</li>
+      <li class="f">Founders who want to be the top distributor. Owners stay out of the tree.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">11</span>Close</h2>
+    <div class="row">
+      <div>
+        <strong>What I need from you</strong>
+        <ul>
+          <li>Regulatory status of the patch, in writing</li>
+          <li>Landed cost and supply terms</li>
+          <li>Your first twenty distributors, and whether they exist</li>
+          <li>Capital for 18 months, as a range</li>
+          <li>The compliance-minded person in the group</li>
+        </ul>
+      </div>
+      <div>
+        <strong>What I would do next</strong>
+        <ul>
+          <li>Two hours with your regulatory counsel</li>
+          <li>Pricing and payout-budget workbook</li>
+          <li>Plan design workshop, then the brief on a simulated tree</li>
+          <li>Platform shortlist with payments drawn out</li>
+          <li>The 18-month plan with dates and owners</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">PV: Personal Volume, the qualification number. CV: Commissionable Volume, what commissions are paid on. FDA: Food and Drug Administration. FTC: Federal Trade Commission. PACT Act: the federal law governing remote sales and shipping of tobacco products. Full playbook: the Patch Launch Playbook, twelve sections.</p>
+</div>
