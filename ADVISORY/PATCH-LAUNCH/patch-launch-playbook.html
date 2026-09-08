@@ -1,0 +1,527 @@
+<title>Patch Launch Playbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #F7F5F0;
+    --paper-2: #EFEBE3;
+    --ink: #14212B;
+    --ink-2: #3A4750;
+    --muted: #5C6670;
+    --rule: #D8D3CA;
+    --rule-strong: #14212B;
+    --accent: #0B6E4F;
+    --accent-soft: #E1F0EA;
+    --flag: #B8461B;
+    --flag-soft: #F6E6DD;
+    --tile: #FFFFFF;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --display: "Bricolage Grotesque", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #101820; --paper-2: #16212B; --ink: #E9E5DD; --ink-2: #C9C4BA;
+      --muted: #9AA3AB; --rule: #2A3742; --rule-strong: #E9E5DD;
+      --accent: #3FB18A; --accent-soft: #14312A; --flag: #E27A4C; --flag-soft: #3A2419;
+      --tile: #182330;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #101820; --paper-2: #16212B; --ink: #E9E5DD; --ink-2: #C9C4BA;
+    --muted: #9AA3AB; --rule: #2A3742; --rule-strong: #E9E5DD;
+    --accent: #3FB18A; --accent-soft: #14312A; --flag: #E27A4C; --flag-soft: #3A2419;
+    --tile: #182330;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 400 16px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(34px, 5vw, 52px); font-weight: 800; line-height: 1.02; letter-spacing: -0.025em; }
+  h2 { font-size: 26px; font-weight: 700; line-height: 1.15; }
+  h3 { font-size: 17px; font-weight: 700; line-height: 1.3; }
+  p { margin: 0; max-width: 68ch; }
+  p + p { margin-top: 10px; }
+  strong { font-weight: 600; }
+
+  .frame { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding: 40px 28px 80px; }
+  @media (max-width: 900px) { .frame { grid-template-columns: 1fr; gap: 24px; padding: 24px 18px 60px; } }
+
+  /* ---- sticky contents ---- */
+  .toc { position: sticky; top: 24px; align-self: start; }
+  @media (max-width: 900px) { .toc { position: static; } }
+  .toc-label { font: 500 11px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .toc a { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 6px 8px; color: var(--ink-2); text-decoration: none; font-size: 13.5px; line-height: 1.3; border-left: 2px solid transparent; }
+  .toc a:hover, .toc a:focus-visible { border-left-color: var(--accent); color: var(--ink); outline: none; background: var(--paper-2); }
+  .toc a span:first-child { font: 500 11px/1.6 var(--mono); color: var(--muted); }
+  .toc a.flagged span:first-child { color: var(--flag); }
+  @media (max-width: 900px) { .toc ol { grid-template-columns: 1fr 1fr; } }
+
+  /* ---- masthead ---- */
+  .mast { border-top: 3px solid var(--rule-strong); padding-top: 18px; margin-bottom: 44px; }
+  .eyebrow { font: 500 11.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+  .mast p.lede { font-size: 18.5px; line-height: 1.5; color: var(--ink-2); margin-top: 18px; max-width: 62ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 22px; font: 400 12.5px/1.5 var(--mono); color: var(--muted); }
+  .meta b { color: var(--ink); font-weight: 500; }
+
+  /* ---- sections ---- */
+  section { padding: 34px 0; border-top: 1px solid var(--rule); scroll-margin-top: 20px; }
+  section:first-of-type { border-top: 0; padding-top: 0; }
+  .sec-head { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: baseline; margin-bottom: 16px; }
+  .sec-num { font: 500 13px/1 var(--mono); color: var(--muted); padding-top: 8px; }
+  .sec-num.flag { color: var(--flag); }
+  .say { margin: 16px 0 22px; padding: 16px 20px; background: var(--accent-soft); border-left: 4px solid var(--accent); max-width: none; }
+  .say .k { font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 8px; }
+  .say p { max-width: 74ch; color: var(--ink); }
+  .exp { margin-top: 22px; padding: 14px 18px; border: 1px solid var(--rule); background: var(--tile); max-width: none; }
+  .exp .k { font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
+  .exp p { max-width: 74ch; font-size: 15px; color: var(--ink-2); }
+  .warn { border-left-color: var(--flag); background: var(--flag-soft); }
+  .warn .k { color: var(--flag); }
+
+  ul.points { margin: 14px 0 0; padding-left: 0; list-style: none; display: grid; gap: 9px; max-width: 74ch; }
+  ul.points li { position: relative; padding-left: 24px; font-size: 15.5px; line-height: 1.5; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; background: var(--accent); }
+  ul.points li.f::before { background: var(--flag); }
+
+  /* ---- tables ---- */
+  .twrap { overflow-x: auto; margin-top: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; line-height: 1.45; }
+  thead th { text-align: left; font: 500 10.5px/1.3 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 0 12px 10px 0; border-bottom: 2px solid var(--rule-strong); vertical-align: bottom; }
+  tbody td { padding: 11px 12px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 2px solid var(--rule-strong); }
+  td.n, th.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td b { font-weight: 600; }
+  .ok { color: var(--accent); font-weight: 600; }
+  .bad { color: var(--flag); font-weight: 600; }
+  .mid { color: var(--muted); font-weight: 600; }
+  .small { font-size: 13px; color: var(--muted); }
+
+  /* ---- three-way regulation diagram ---- */
+  .tri { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; margin-top: 18px; border: 2px solid var(--rule-strong); }
+  .tri > div { padding: 16px 18px 18px; }
+  .tri > div + div { border-left: 1px solid var(--rule); }
+  .tri .who { font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--flag); margin-bottom: 8px; }
+  .tri h3 { margin-bottom: 8px; }
+  .tri p { font-size: 14px; color: var(--ink-2); }
+  @media (max-width: 760px) { .tri { grid-template-columns: 1fr; } .tri > div + div { border-left: 0; border-top: 1px solid var(--rule); } }
+
+  /* ---- money flow ---- */
+  .flow { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 0; margin-top: 18px; border-top: 2px solid var(--rule-strong); border-bottom: 2px solid var(--rule-strong); }
+  .flow > div { padding: 14px 14px 16px; position: relative; }
+  .flow > div + div { border-left: 1px solid var(--rule); }
+  .flow .lbl { font: 500 10.5px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .flow .val { font: 700 24px/1.1 var(--display); margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .flow .sub { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .flow .val.a { color: var(--accent); }
+  @media (max-width: 760px) { .flow { grid-template-columns: 1fr 1fr; } .flow > div + div { border-left: 0; } .flow > div:nth-child(2n) { border-left: 1px solid var(--rule); } .flow > div:nth-child(n+3) { border-top: 1px solid var(--rule); } }
+
+  /* ---- timeline ---- */
+  .tl { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); margin-top: 18px; border-top: 2px solid var(--rule-strong); }
+  .tl > div { padding: 14px 14px 18px; border-bottom: 2px solid var(--rule-strong); }
+  .tl > div + div { border-left: 1px solid var(--rule); }
+  .tl .when { font: 500 11px/1 var(--mono); letter-spacing: 0.1em; color: var(--accent); }
+  .tl h3 { margin: 8px 0 8px; font-size: 15.5px; }
+  .tl ul { margin: 0; padding-left: 16px; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
+  .tl li + li { margin-top: 4px; }
+  .tl .gate { margin-top: 10px; font: 500 11px/1.4 var(--mono); color: var(--flag); }
+  @media (max-width: 900px) { .tl { grid-template-columns: 1fr; } .tl > div + div { border-left: 0; } }
+
+  /* ---- closing ---- */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 18px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .two > div { border: 1px solid var(--rule); background: var(--tile); padding: 16px 18px 18px; }
+  .two h3 { margin-bottom: 10px; }
+  .two ol { margin: 0; padding-left: 18px; font-size: 14.5px; line-height: 1.5; }
+  .two li + li { margin-top: 6px; }
+
+  .foot { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font: 400 12.5px/1.6 var(--mono); color: var(--muted); max-width: none; }
+
+  @media print {
+    .toc { display: none; } .frame { grid-template-columns: 1fr; padding: 0; }
+    section { break-inside: avoid-page; } body { font-size: 12.5px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="frame">
+  <nav class="toc" aria-label="Sections">
+    <div class="toc-label">Talking order</div>
+    <ol>
+      <li><a href="#open"><span>00</span><span>How to open</span></a></li>
+      <li><a href="#two"><span>01</span><span>The two things that matter</span></a></li>
+      <li><a href="#reg" class="flagged"><span>02</span><span>Reality check: nicotine is regulated three ways</span></a></li>
+      <li><a href="#product"><span>03</span><span>Product</span></a></li>
+      <li><a href="#comp"><span>04</span><span>Compensation plan</span></a></li>
+      <li><a href="#legal"><span>05</span><span>Legal and compliance</span></a></li>
+      <li><a href="#ops"><span>06</span><span>Operations and technology</span></a></li>
+      <li><a href="#field"><span>07</span><span>Building the field</span></a></li>
+      <li><a href="#money"><span>08</span><span>Money</span></a></li>
+      <li><a href="#road"><span>09</span><span>Roadmap, 0 to 18 months</span></a></li>
+      <li><a href="#risk" class="flagged"><span>10</span><span>Deal-breakers</span></a></li>
+      <li><a href="#close"><span>11</span><span>Closing the conversation</span></a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="mast">
+      <div class="eyebrow">Direct selling · United States · advisory brief</div>
+      <h1>Building a direct-selling company around a nicotine patch, start to finish</h1>
+      <p class="lede">A high-level plan for a founding group that has a product and wants to sell it through independent distributors. Written to be talked through in under an hour: what has to be true, in what order, and where companies in this category get hurt.</p>
+      <div class="meta">
+        <span>Prepared by <b>Howard Koziara</b></span>
+        <span><b>20 years</b> in direct-selling operations, payments and compensation</span>
+        <span>Regulatory points are for orientation; confirm with counsel before acting</span>
+      </div>
+    </header>
+
+    <!-- 00 -->
+    <section id="open">
+      <div class="sec-head"><div class="sec-num">00</div><h2>How to open the room</h2></div>
+      <div class="say"><span class="k">Say this first</span>
+        <p>"A direct-selling company is two things wearing a corporate wrapper: a product people reorder without being pushed, and a compensation plan that pays distributors for creating that reordering. Everything else, the software, the legal, the events, exists to serve those two. I want to spend most of our time on them, but I have to start somewhere less comfortable, because your product is nicotine, and nicotine is regulated in this country three separate ways before you sell your first patch. If we get that part right, the rest is a known playbook. If we get it wrong, nothing else matters."</p>
+      </div>
+      <ul class="points">
+        <li>Ask them three questions before you present anything, because the answers decide which plan you are actually describing: <strong>Is the patch for quitting smoking, or for something else? Do you have, or are you buying, an FDA-approved product? Who is your regulatory counsel?</strong></li>
+        <li>Set the frame: this is the order of operations, not a menu. Skipping a step here does not save time, it moves the cost later and makes it bigger.</li>
+        <li>Tell them what you are not doing today: not writing their plan, not naming their ranks, not picking their software. Today is the map. The build is the engagement.</li>
+      </ul>
+    </section>
+
+    <!-- 01 -->
+    <section id="two">
+      <div class="sec-head"><div class="sec-num">01</div><h2>The two things that matter</h2></div>
+      <p>Every direct-selling company that has lasted did two things well and the rest adequately. The company sells a <strong>consumable product</strong> that a real customer buys again next month because they want it, and it runs a <strong>compensation plan</strong> that pays distributors for building a base of those customers rather than for recruiting each other. The product creates the demand. The plan aims the field at it.</p>
+      <div class="twrap"><table>
+        <thead><tr><th>Half</th><th>What it has to do</th><th>What kills it</th></tr></thead>
+        <tbody>
+          <tr><td><b>Product</b></td><td>Be consumed monthly, carry enough margin to fund the plan, tell a story a distributor can repeat in thirty seconds, and be sold with claims the company can defend</td><td>Thin margin, one-time purchase, claims the regulator will not allow, a product the distributor is embarrassed to mention</td></tr>
+          <tr><td><b>Compensation plan</b></td><td>Reward retail sales first, reward building second, reward leadership third, and never pay more on an order than the company budgeted</td><td>Paying for recruitment, stacking bonuses until payout drifts past budget, qualification rules that force distributors to buy inventory</td></tr>
+        </tbody>
+      </table></div>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>Founders almost always arrive with the product finished and the plan as an afterthought, or with a plan copied from a company they admired. Both are fixable. What is not fixable is a product whose margin cannot carry a plan: you find out eighteen months in, when the payout is 48 percent of revenue and every lever to fix it breaks a promise to the field.</p>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section id="reg">
+      <div class="sec-head"><div class="sec-num flag">02</div><h2>Reality check first: nicotine is regulated three ways</h2></div>
+      <div class="say warn"><span class="k">Say this plainly</span>
+        <p>"Before we talk about distributors, I need to know which product you are legally selling, because there are only two answers and they lead to completely different companies. A nicotine patch sold to help people quit is a medicine. A nicotine patch sold for anything else is a tobacco product. There is no third category, and a supplement is not one of the options."</p>
+      </div>
+      <div class="tri">
+        <div>
+          <div class="who">FDA · which product is this</div>
+          <h3>Medicine or tobacco product</h3>
+          <p><strong>For quitting smoking</strong>: an over-the-counter drug. It needs FDA approval, usually a generic application against the existing approved patches, and every claim is locked to the approved label. <strong>For anything else</strong> (focus, energy, "clean nicotine"): a tobacco product under the Center for Tobacco Products, needing a premarket application that few small companies have ever completed. Nicotine cannot be sold as a dietary supplement; FDA has said so directly.</p>
+        </div>
+        <div>
+          <div class="who">Federal and state · who may buy, how it ships</div>
+          <h3>Age and delivery rules</h3>
+          <p>Non-cessation nicotine is a tobacco product: minimum age 21 nationally, the PACT Act applies to online sales, the Postal Service will not carry it, private carriers require adult signature at the door, and many states levy an excise tax and require a license. An approved cessation drug is exempt from most of this. <strong>This decides whether your distributors can ship product at all.</strong></p>
+        </div>
+        <div>
+          <div class="who">FTC · how it is sold</div>
+          <h3>Two kinds of claims</h3>
+          <p>The FTC polices direct selling on <strong>income claims</strong> (what a distributor may say about earnings; the 2024 staff review of income disclosures set the tone) and <strong>health claims</strong> (what anyone may say the product does). A nicotine product in a distributor's hands invites both at once. Compliance monitoring of the field is not optional here; it is the company's first line of defense.</p>
+        </div>
+      </div>
+      <ul class="points" style="margin-top:18px">
+        <li class="f"><strong>The fork in the road:</strong> the cessation path is slower to reach market but the company is ordinary once it does. The non-cessation path reaches market faster on paper and then meets shipping, age, tax and premarket rules that direct selling is badly shaped to handle, because your sales force is thousands of individuals mailing packages.</li>
+        <li class="f">If they already hold an approved product or a licensed supply agreement, say so and move on: the rest of this plan applies cleanly. If they do not, the regulatory path is the critical path and the launch date is downstream of it.</li>
+        <li>Either way, the company needs regulatory counsel who has filed with FDA before, and a compliance function from day one rather than after the first warning letter.</li>
+      </ul>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>Twenty years of watching companies in regulated categories, weight loss, CBD, supplements with drug-like claims, teaches one pattern: the product is almost never what shuts them down. The field's claims are. A distributor with a phone will say what sells, and the company is liable for it. Build the claim book, the training and the monitoring before the first distributor signs, not after.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="product">
+      <div class="sec-head"><div class="sec-num">03</div><h2>Product: does a patch fit the model?</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"Direct selling has a checklist for products, and I want to score yours against it honestly. A patch scores well on the things that matter most and badly on two things you can plan around."</p>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Criterion</th><th>Why it matters</th><th>Nicotine patch</th></tr></thead>
+        <tbody>
+          <tr><td><b>Consumed monthly</b></td><td>Autoship is the engine of the whole model; a one-time product cannot fund a plan</td><td class="ok">Strong. Patches are used daily and replaced on a schedule</td></tr>
+          <tr><td><b>Margin to fund the plan</b></td><td>Landed cost must sit at roughly 15 to 25 percent of retail to leave room for payout, operations and profit</td><td class="mid">Depends on the supply deal. Approved generic patches are a commodity; margin comes from the brand and the program around them</td></tr>
+          <tr><td><b>A story a distributor can repeat</b></td><td>The product has to sell in a sentence, from one person to another</td><td class="ok">Strong if it is cessation: a personal quitting story is the best sales tool in the category. Weak if it is anything else, because the claims are not allowed</td></tr>
+          <tr><td><b>Defensible claims</b></td><td>Every claim in the field is the company's liability</td><td class="bad">Constrained. Cessation claims are fixed by the approved label; non-cessation claims are largely prohibited</td></tr>
+          <tr><td><b>Comfortable to share socially</b></td><td>Distributors sell in their own circles; a stigmatized product limits reach</td><td class="mid">Mixed. Quitting is admirable and public; nicotine use is not. Positioning decides which one the product is</td></tr>
+          <tr><td><b>Simple to ship and store</b></td><td>The field and the warehouse both touch it</td><td class="mid">Physically easy, legally hard on the non-cessation path (age verification at delivery, carrier restrictions)</td></tr>
+        </tbody>
+      </table></div>
+      <h3 style="margin-top:26px">Pricing architecture, the part founders skip</h3>
+      <p style="margin-top:8px">The plan is paid on a volume figure, not on revenue, and the gap between the two is how the company protects itself. Every product carries a <strong>Personal Volume</strong> (PV) number and a <strong>Commissionable Volume</strong> (CV) number; commissions are percentages of CV. Setting CV below the sale price is the single most important financial control in the company.</p>
+      <div class="flow">
+        <div><div class="lbl">Landed cost</div><div class="val">$14</div><div class="sub">manufacturing, packaging, inbound freight</div></div>
+        <div><div class="lbl">Distributor price</div><div class="val">$60</div><div class="sub">what the field pays, and autoship</div></div>
+        <div><div class="lbl">Retail price</div><div class="val">$75</div><div class="sub">the customer price; the $15 gap is retail profit</div></div>
+        <div><div class="lbl">Personal Volume</div><div class="val">60 PV</div><div class="sub">the qualification number</div></div>
+        <div><div class="lbl">Commissionable Volume</div><div class="val a">48 CV</div><div class="sub">80% of PV; all percentages apply here</div></div>
+      </div>
+      <p class="small" style="margin-top:10px">Illustrative figures for a one-month supply. The shape is what matters: cost under a quarter of retail, CV discounted from price, retail profit real enough that a distributor can sell without recruiting.</p>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>Ask for the landed cost before you ask for anything else. If a founder cannot tell you the cost of one unit delivered to the warehouse, nobody has done the plan math yet, and every number they have shown you for distributor earnings is a guess.</p>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section id="comp">
+      <div class="sec-head"><div class="sec-num">04</div><h2>Compensation plan: paying the field for the right thing</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"A comp plan has three jobs, in this order: pay people for selling product to customers, pay them for building a team that sells product to customers, and pay leaders for developing other leaders. Every plan type is a different way of splitting one budget across those three jobs. The budget is the decision. The plan type is the packaging."</p>
+      </div>
+      <h3>The budget comes first</h3>
+      <p style="margin-top:8px">Total payout across all mechanisms typically lands between <strong>35 and 45 percent of CV</strong>, which on the pricing above is roughly 28 to 36 percent of the money in the door. Set it, publish it internally, and design every bonus to fit inside it. The most disciplined plans go further and put a <strong>hard ceiling on any single order</strong>, so that no combination of bonuses can ever pay more than the budgeted percentage of that order, no matter how the tree is shaped above it.</p>
+      <div class="twrap"><table>
+        <thead><tr><th>Plan type</th><th>How it pays</th><th>Strength</th><th>Weakness</th></tr></thead>
+        <tbody>
+          <tr><td><b>Unilevel</b></td><td>Percentages on volume across a fixed number of levels below you</td><td>Easiest to explain and to audit; rewards breadth</td><td>Leaders can feel the upside runs out at the last level</td></tr>
+          <tr><td><b>Binary</b></td><td>Two legs; paid on the volume of the weaker leg</td><td>Feels fast; encourages teamwork</td><td>Hard to explain, easy to game, carryover and flushing rules create disputes</td></tr>
+          <tr><td><b>Matrix</b></td><td>Fixed width and depth, spillover fills the grid</td><td>Sounds attractive to recruits</td><td>Rewards position over effort; regulators dislike the recruiting emphasis</td></tr>
+          <tr><td><b>Stairstep breakaway</b></td><td>Ranks earned on group volume; groups that hit a rank break away and pay overrides upward</td><td>Built for large leaders; the classic long-life structure</td><td>Complex; breakaway can cut a leader's income on the month they succeed</td></tr>
+          <tr><td><b>Hybrid</b></td><td>Unilevel base plus matching, generational and pool bonuses</td><td>Flexible; most modern plans</td><td>Every added layer raises payout a little; without a ceiling the total drifts past budget</td></tr>
+        </tbody>
+      </table></div>
+      <h3 style="margin-top:26px">What the regulator tests, and what to build in from the start</h3>
+      <ul class="points">
+        <li><strong>Retail to real customers.</strong> The company must be able to show that most volume is bought by people who are not distributors, or by distributors for their own use in reasonable amounts. Build customer tracking on day one; you cannot retrofit proof.</li>
+        <li><strong>No inventory loading.</strong> Qualification should never require buying more than a person can use or sell in a month. Autoship of one month's supply is defensible; "buy the founder pack to unlock rank" is the pattern that gets companies sued.</li>
+        <li><strong>Buy-back.</strong> Industry standard is repurchasing unsold, resalable product at 90 percent for twelve months. Put it in the policies; it is also the proof that inventory loading is not the business model.</li>
+        <li><strong>Income disclosure.</strong> Publish what distributors actually earn, in a form the FTC's 2024 review would not criticize: median, not average; include the people who earned nothing; net of costs.</li>
+        <li><strong>Simple qualification.</strong> One monthly personal-volume gate (100 PV is the common figure) beats a matrix of legs, autoship flags and rank maintenance rules. Simple gates produce fewer disputes and fewer regulatory questions.</li>
+      </ul>
+
+      <h3 style="margin-top:30px">Whose decision the plan is</h3>
+      <p style="margin-top:8px">The plan is the promise the company makes to its field, and the founders are the ones who will stand behind it for years. That makes the choice theirs, not the consultant's. The consultant's job is to make it a decision they can actually make, and then to prove the math on whatever they choose.</p>
+      <div class="say"><span class="k">Say this when they ask you to pick the plan</span>
+        <p>"I'm not going to pick your plan for you, and you shouldn't want me to. The plan is the promise you make to your field, and you're the ones who'll stand behind it. What I'll do is make it a decision you can actually make: I'll teach you the five shapes and what each one pays for, I'll tell you which one I'd start with and why, and once you've chosen, I'll model it against your real costs so you know what it does before anyone signs. Your job is the choice. Mine is making sure it's an informed one, and then proving the math."</p>
+      </div>
+      <div class="two">
+        <div>
+          <h3>They decide</h3>
+          <ol>
+            <li>Who gets paid the most in year one: the customer-seller, the team-builder, or the leader</li>
+            <li>The payout budget, as a share of every dollar that comes in</li>
+            <li>How simple the plan has to be for the field they intend to recruit</li>
+            <li>Exciting versus durable: a binary feels fast and breaks in disputes, a unilevel is slower and lasts</li>
+            <li>The ranks and titles they want people to chase, and what each one should mean</li>
+            <li>The shape they want to launch with, chosen from the table above</li>
+          </ol>
+        </div>
+        <div>
+          <h3>You provide</h3>
+          <ol>
+            <li>The five shapes, plainly explained, with what each one rewards and where each one fails</li>
+            <li>A starting recommendation with the reasoning behind it</li>
+            <li>The guardrails no plan can skip: budget, ceiling, retail proof, buy-back, income disclosure</li>
+            <li>A data model of each candidate plan against their real costs, pricing and retention</li>
+            <li>The payout report a mature tree would produce, before the first person signs</li>
+            <li>The commission engine that can prove what it paid, to the cent</li>
+          </ol>
+        </div>
+      </div>
+      <h3 style="margin-top:26px">The plan design workshop</h3>
+      <p style="margin-top:8px">The mechanism is a working session of two to three hours. They answer the six questions on the left. They leave with one or two candidate plans, each described in a page. Modeling starts only then, because a model needs inputs only they can supply: <strong>landed cost per unit, the retail and distributor prices, the expected mix of customers to distributors, and the retention they believe in</strong>. A model built on guessed inputs is a guess with decimal places.</p>
+      <p style="margin-top:10px">If asked for a starting point: a <strong>unilevel, or a lean unilevel hybrid with a hard per-order ceiling</strong>. It is the easiest shape to explain to a recruit, the easiest to audit for a regulator, and the hardest to accidentally overpay. Everything more exciting can be added later; nothing can be taken away without a plan change, and a plan change is the one thing a field never forgives.</p>
+
+      <div class="exp"><span class="k">The experience line</span>
+        <p>The plans that hurt companies are rarely wrong on paper. They are wrong in year three, when the tree has matured, bonuses that each looked small are stacking on the same orders, and the payout report says 47 percent. The fix at that point is a plan change, and a plan change is the one thing a field never forgives. Set the ceiling in the design, model a mature tree before launch, and build the commission engine so it can prove what it paid to the cent. I have watched a company find phantom volume in its commission run because a simulated transaction leaked into the real ledger; the engine has to make that impossible, not unlikely.</p>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section id="legal">
+      <div class="sec-head"><div class="sec-num">05</div><h2>Legal, corporate and compliance</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"There is a standard document set for a direct-selling company, and it is not long. What matters is that the documents, the plan and the software all say the same thing, because the field will find every place they disagree."</p>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Item</th><th>What it is</th><th>When</th></tr></thead>
+        <tbody>
+          <tr><td><b>Entity and ownership</b></td><td>Usually a corporation or LLC with clear founder agreements; investors will ask about product IP and supply rights first</td><td class="n">Month 0</td></tr>
+          <tr><td><b>Regulatory counsel</b></td><td>FDA and FTC experience specifically; general business counsel is not enough for this product</td><td class="n">Month 0</td></tr>
+          <tr><td><b>Distributor agreement</b></td><td>The contract every distributor signs; independent contractor status, territory, termination, arbitration</td><td class="n">Month 2 to 3</td></tr>
+          <tr><td><b>Policies and procedures</b></td><td>The rulebook: claims, social media, cross-sponsoring, refunds, buy-back, discipline</td><td class="n">Month 2 to 3</td></tr>
+          <tr><td><b>Compensation plan document</b></td><td>The plain-English version the field reads, matched line for line to what the engine pays</td><td class="n">Month 3 to 4</td></tr>
+          <tr><td><b>Income disclosure statement</b></td><td>Required in practice, published annually, referenced in every earnings conversation</td><td class="n">Before launch, then yearly</td></tr>
+          <tr><td><b>State registrations</b></td><td>Six states register multi-level companies directly: Georgia, Louisiana, Maryland, Massachusetts, Montana, Wyoming. Business-opportunity laws in others may apply depending on the starter kit</td><td class="n">Month 4 to 5</td></tr>
+          <tr><td><b>Direct Selling Association</b></td><td>Membership signals legitimacy and binds the company to a code of ethics that regulators recognize</td><td class="n">Month 6 plus</td></tr>
+          <tr><td><b>Compliance function</b></td><td>A person and a process that monitors the field's claims, warns, and terminates. Documented, consistent, unemotional</td><td class="n">Before the first distributor</td></tr>
+        </tbody>
+      </table></div>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>The document that matters most is the one nobody reads until there is a dispute: the policies and procedures. Write them for the day a top leader is caught making a health claim on video, because that day comes, and the company's response has to be already written down and already applied to smaller people, or it will not survive the argument.</p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="ops">
+      <div class="sec-head"><div class="sec-num">06</div><h2>Operations and technology</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"A direct-selling company is an e-commerce business with two things bolted on: a family tree of who enrolled whom, and a monthly calculation that turns that tree and the month's orders into thousands of payouts. Buy the tree and the calculation. Build nothing you can buy. Spend your own effort on the product and the field."</p>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Function</th><th>What it does</th><th>Build or buy</th></tr></thead>
+        <tbody>
+          <tr><td><b>Back office and genealogy</b></td><td>Enrollment, the sponsor tree, distributor accounts, rank tracking, replicated websites</td><td>Buy. Direct-selling platforms (Exigo and DirectScale, ByDesign, InfoTrax and others) exist for this and nothing else</td></tr>
+          <tr><td><b>Commission engine</b></td><td>The monthly run that computes every payout from the tree and the orders, and can prove it</td><td>Buy with the platform, but own the plan model and test it against a simulated mature tree before launch</td></tr>
+          <tr><td><b>E-commerce and autoship</b></td><td>Customer and distributor storefronts, recurring monthly orders, stored cards</td><td>Comes with the platform; the autoship retry logic decides your churn</td></tr>
+          <tr><td><b>Payments</b></td><td>Accepting cards, handling chargebacks, and paying distributors out</td><td>Careful. See below; this is where new companies get surprised</td></tr>
+          <tr><td><b>Fulfillment</b></td><td>Warehouse, pick and pack, returns; a third-party logistics partner at this size</td><td>Buy. On the non-cessation path the partner must do age verification at delivery, which narrows the list sharply</td></tr>
+          <tr><td><b>Customer and distributor support</b></td><td>Order questions, plan questions, disputes</td><td>Build small and in-house at first; the plan questions need people who understand the plan</td></tr>
+        </tbody>
+      </table></div>
+      <h3 style="margin-top:26px">Payments, said from experience</h3>
+      <ul class="points">
+        <li><strong>Card processors classify direct selling as elevated risk.</strong> Recurring billing plus a distributor sales force means higher chargeback exposure. Expect reserves, expect underwriting questions, and have a second processor relationship before you need one. A nicotine product raises every one of those conversations a notch.</li>
+        <li><strong>Autoship is card-on-file, and card-on-file decays.</strong> Cards expire and get reissued; the account-updater service and the retry schedule are worth more to retention than most marketing spend.</li>
+        <li><strong>Paying distributors out is its own system.</strong> Thousands of small payments monthly, tax reporting on each, and distributors who want it fast. Disbursement platforms built for this (the category includes Hyperwallet, PayQuicker and Paysafe's payout products) beat paying by check or bank file from day one.</li>
+        <li><strong>Route around single points of failure.</strong> A payment orchestration layer between the storefront and the processors lets you add or drop a processor without rebuilding checkout. Small companies skip this and pay for it the first time a processor drops them.</li>
+      </ul>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>Every payment problem I have cleaned up in this industry came from one of three places: a processor that did not understand the model and pulled the account, an autoship retry that charged people who had cancelled, or a commission run that paid on orders that were later refunded and never clawed the money back. All three are design decisions made before launch, usually by nobody.</p>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section id="field">
+      <div class="sec-head"><div class="sec-num">07</div><h2>Building the field</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"You do not launch to the public. You launch to a founding group of experienced distributors who already know how to build, and you give them a product, a plan and tools they can defend. Everyone else is enrolled by them."</p>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Stage</th><th>What happens</th><th>What the company provides</th></tr></thead>
+        <tbody>
+          <tr><td><b>Founders</b></td><td>Twenty to fifty experienced leaders recruited personally, months before launch</td><td>Early access, input on the plan, a founders' recognition that costs the company nothing and means everything</td></tr>
+          <tr><td><b>Pre-launch</b></td><td>Founders enroll their first lines; the system is tested with real orders</td><td>The starter kit, the replicated site, the getting-started training, the claim book</td></tr>
+          <tr><td><b>Launch</b></td><td>An event, physical or virtual, that the field can point to as day one</td><td>The plan explained by the person who designed it; the product story told by someone who used it</td></tr>
+          <tr><td><b>First 90 days</b></td><td>The pattern the company will live with forever is set here</td><td>Weekly leader calls, a recognition cadence, fast answers on plan questions, visible compliance</td></tr>
+          <tr><td><b>Steady state</b></td><td>Monthly rhythm: run, pay, recognize, train</td><td>An annual convention, regional events, a leadership track, incentive trips tied to customer volume not recruiting</td></tr>
+        </tbody>
+      </table></div>
+      <div class="exp"><span class="k">The experience line</span>
+        <p>Recognition is the cheapest and most effective thing a direct-selling company does, and new founders underspend on it every time. A rank pin, a name read from a stage, a leader call where the top earner says a new distributor's name: these build companies. The product gets people in; being seen keeps them.</p>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section id="money">
+      <div class="sec-head"><div class="sec-num">08</div><h2>Money: what it costs and where it goes</h2></div>
+      <div class="say"><span class="k">Say this</span>
+        <p>"I am not going to give you a number for the whole company today, because it depends on the regulatory path more than anything else. What I can give you is the shape: where the money goes, and which lever actually decides whether the company makes a profit."</p>
+      </div>
+      <div class="twrap"><table>
+        <thead><tr><th>Where each retail dollar goes</th><th class="n">Illustrative share</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Product cost, delivered</td><td class="n">18%</td><td>The supply deal sets this; renegotiate at volume</td></tr>
+          <tr><td>Commissions and bonuses</td><td class="n">32%</td><td>40% of CV on the pricing above; the ceiling holds it here</td></tr>
+          <tr><td>Fulfillment, payments, chargebacks</td><td class="n">9%</td><td>Higher on the tobacco-product path because of age-verified delivery</td></tr>
+          <tr><td>Operations, staff, software, events</td><td class="n">20%</td><td>Front-loaded; falls as a share with scale</td></tr>
+          <tr><td>Regulatory, compliance, legal</td><td class="n">6%</td><td>Front-loaded and category-specific; higher in year one</td></tr>
+          <tr><td>Retained</td><td class="n">15%</td><td>Before tax; realistic only after the field is self-sustaining</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="points" style="margin-top:18px">
+        <li><strong>Capital buckets before revenue:</strong> the regulatory path (the biggest unknown), inventory for launch, the platform and its implementation, the founding team's salaries for twelve to eighteen months, and the launch event. On the cessation path with a licensed approved product, a lean launch is a low-seven-figure exercise; without an approved product, add the approval cost and the time.</li>
+        <li><strong>The lever is payout percentage.</strong> Every other line is ordinary operating cost. The commission line is a promise to the field, and once made it cannot be reduced without a plan change. Set it conservatively and let the plan feel generous through recognition and simplicity rather than through percentage.</li>
+        <li><strong>Autoship retention decides the year.</strong> Model the company at 70 percent, 80 percent and 90 percent monthly retention of autoship customers before you model anything else; the three scenarios describe three different businesses.</li>
+      </ul>
+    </section>
+
+    <!-- 09 -->
+    <section id="road">
+      <div class="sec-head"><div class="sec-num">09</div><h2>Roadmap, 0 to 18 months</h2></div>
+      <p>Phased on the assumption the regulatory path is settled early. If it is not, every phase after the first waits on it.</p>
+      <div class="tl">
+        <div>
+          <div class="when">MONTHS 0 TO 2</div>
+          <h3>Decide what you are selling</h3>
+          <ul><li>Regulatory path confirmed with counsel</li><li>Supply agreement and landed cost</li><li>Entity, founders' terms</li><li>Payout budget set</li></ul>
+          <div class="gate">GATE: which product, legally, and at what cost</div>
+        </div>
+        <div>
+          <div class="when">MONTHS 2 TO 5</div>
+          <h3>Design</h3>
+          <ul><li>Compensation plan modeled on a simulated mature tree</li><li>Policies, distributor agreement, claim book</li><li>Platform selected and contracted</li><li>Processor and payout relationships opened</li></ul>
+          <div class="gate">GATE: plan payout under ceiling in every scenario</div>
+        </div>
+        <div>
+          <div class="when">MONTHS 5 TO 8</div>
+          <h3>Build and recruit founders</h3>
+          <ul><li>Platform configured, plan coded, engine tested against the model</li><li>Fulfillment partner live, age verification if required</li><li>Founding leaders recruited</li><li>State registrations filed</li></ul>
+          <div class="gate">GATE: a test order pays a test commission correctly</div>
+        </div>
+        <div>
+          <div class="when">MONTHS 8 TO 10</div>
+          <h3>Pre-launch</h3>
+          <ul><li>Founders enrolling, real orders flowing</li><li>Compliance monitoring running</li><li>Training and recognition cadence started</li><li>Income disclosure drafted</li></ul>
+          <div class="gate">GATE: first live commission run reconciles to the cent</div>
+        </div>
+        <div>
+          <div class="when">MONTHS 10 TO 18</div>
+          <h3>Launch and prove the model</h3>
+          <ul><li>Launch event</li><li>Monthly run, pay, recognize, train</li><li>Customer-to-distributor ratio tracked and published internally</li><li>Retention scenarios replaced with real numbers</li></ul>
+          <div class="gate">GATE: most volume is retail customers, payout inside budget</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="risk">
+      <div class="sec-head"><div class="sec-num flag">10</div><h2>Deal-breakers, said before they ask</h2></div>
+      <div class="say warn"><span class="k">Say this</span>
+        <p>"I would rather tell you the things that could end this now than have you discover them with money spent. None of these are reasons not to do it. All of them are reasons to do it in the right order."</p>
+      </div>
+      <ul class="points">
+        <li class="f"><strong>No approved product and no path to one.</strong> If the patch is not FDA-approved for cessation and the group is not prepared to license one or file, there is no legal product to build a company around. Everything else waits on this.</li>
+        <li class="f"><strong>Positioning it as anything but cessation.</strong> The moment the product is "for focus" or "for energy," it is a tobacco product with a premarket requirement, age-21 sales, and a shipping regime that a distributor network cannot realistically run. Say this once, clearly, and let them decide.</li>
+        <li class="f"><strong>A plan that pays for recruiting.</strong> Enrollment bonuses, pack purchases that unlock rank, and qualification tied to buying rather than selling are the three things the FTC looks for first. Design them out before the first draft, not in response to a letter.</li>
+        <li class="f"><strong>Margin that cannot carry the payout.</strong> If landed cost is above a quarter of retail, the plan will either underpay the field or bankrupt the company. This is arithmetic, not opinion, and it is knowable before a dollar is spent.</li>
+        <li class="f"><strong>Launching without compliance.</strong> A nicotine product sold by independent people with phones will produce prohibited claims within the first week. A company without monitoring, a warning process and a termination process already running will own every one of them.</li>
+        <li><strong>Founders who want to be the top distributor.</strong> Common, and corrosive. The people who own the company should not also be in the tree. It confuses every incentive in the building.</li>
+      </ul>
+    </section>
+
+    <!-- 11 -->
+    <section id="close">
+      <div class="sec-head"><div class="sec-num">11</div><h2>Closing the conversation</h2></div>
+      <div class="two">
+        <div>
+          <h3>What I need from them to go further</h3>
+          <ol>
+            <li>The regulatory status of the patch, in writing, from whoever knows it</li>
+            <li>Landed cost per unit and the terms of the supply agreement</li>
+            <li>Who they imagine as their first twenty distributors, and whether those people exist yet</li>
+            <li>Capital available for the first eighteen months, in a range</li>
+            <li>Who the compliance-minded person in the founding group is, because there has to be one</li>
+          </ol>
+        </div>
+        <div>
+          <h3>What I would do next, in order</h3>
+          <ol>
+            <li>A two-hour session with their regulatory counsel to settle the product question</li>
+            <li>A pricing and payout-budget workbook: cost, CV, ceiling, three retention scenarios</li>
+            <li>A plan design brief: type, ranks, qualification, and the ceiling, modeled on a simulated tree</li>
+            <li>A platform shortlist with the payment and payout architecture drawn out</li>
+            <li>The eighteen-month plan above, with dates and owners against every gate</li>
+          </ol>
+        </div>
+      </div>
+      <div class="say" style="margin-top:22px"><span class="k">Last thing to say</span>
+        <p>"The companies that make it in this industry are not the ones with the cleverest plan. They are the ones that sold a product people wanted, paid the field honestly for selling it, and never had to change the rules on them. That is what I would build with you, and this is the order I would build it in."</p>
+      </div>
+    </section>
+
+    <p class="foot">Regulatory references for orientation: FDA Center for Drug Evaluation and Research (over-the-counter nicotine replacement), FDA Center for Tobacco Products (premarket tobacco product applications; synthetic nicotine covered since 2022), the federal Tobacco 21 law (2019), the PACT Act as amended (2021), FTC Business Guidance Concerning Multi-Level Marketing, and the FTC staff review of 70 income disclosure statements (2024). All points to be confirmed with counsel before reliance.</p>
+  </main>
+</div>

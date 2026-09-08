@@ -50,10 +50,18 @@
 | `..\PLATFORM\ROADMAP.md` | Flagship phase tracker (paused before Phase C) |
 | `..\PLATFORM\00-CHARTER.md` + 14 model documents | The full system design library of the flagship |
 
+## Advisory (canonical home: ..\ADVISORY\)
+
+| Document | What it is |
+|---|---|
+| `..\ADVISORY\PATCH-LAUNCH\patch-launch-playbook.html` | Speaking guide for a two-hour founder briefing on launching a US nicotine patch MLM: regulation, pricing, comp plan ownership, payments, timeline (2026-09-08) |
+| `..\ADVISORY\PATCH-LAUNCH\README.md` | What the playbook is, section map, the stance on who chooses the comp plan |
+
 ## Filing rules for new documents
 
 1. Company-wide (profiles, policies, brand statements): create in `LIBRARY\company\`, add a row here.
 2. Project build material (specs, decisions, verdicts): create in that project's `docs\`, add a row here.
 3. Member-facing pilot documents: `MLM-PILOT\docs\`, versioned in the document itself, row here.
-4. Never duplicate a document into two homes; link to the canonical path instead.
-5. Superseded documents get renamed with a `SUPERSEDED-` prefix, never deleted.
+4. Advisory work for outside founders (Howard consulting, not building): `ADVISORY\<engagement>\`, one folder per engagement with its own README, row here.
+5. Never duplicate a document into two homes; link to the canonical path instead.
+6. Superseded documents get renamed with a `SUPERSEDED-` prefix, never deleted.
