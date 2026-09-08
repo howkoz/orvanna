@@ -55,6 +55,7 @@
 | Document | What it is |
 |---|---|
 | `..\ADVISORY\PATCH-LAUNCH\patch-launch-playbook.html` | Speaking guide for a two-hour founder briefing on launching a US nicotine patch MLM: regulation, pricing, comp plan ownership, payments, timeline (2026-09-08) |
+| `..\ADVISORY\PATCH-LAUNCH\patch-launch-cheat-sheet.html` | The playbook as one card per section: the line to say, the argument, the numbers, for use in the room |
 | `..\ADVISORY\PATCH-LAUNCH\README.md` | What the playbook is, section map, the stance on who chooses the comp plan |
 
 ## Filing rules for new documents

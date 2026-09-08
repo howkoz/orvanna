@@ -36,6 +36,13 @@ two-to-three-hour plan design workshop where they answer six questions, and then
 models the one or two candidates they leave with against their real costs. The
 decision is theirs because the plan is the promise they make to their field.
 
+## The cheat sheet
+
+`patch-launch-cheat-sheet.html`: the same twelve sections as one card each, for the
+room. Each card carries the line to say, the argument in bullets, and the numbers.
+Use it when there is no time to get through the whole playbook. Published as a private
+artifact too: https://claude.ai/code/artifact/de47b5d5-e484-452a-a213-6274c884d4fa
+
 ## Also published
 
 The same file is published as a private Claude artifact for phone or tablet reading:
