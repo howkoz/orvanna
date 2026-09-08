@@ -18,7 +18,9 @@ Not the Orvanna site, not the payment orchestrator, not anything from the job wo
 ## Hard rules that apply here (Howard's, not negotiable)
 
 1. **No em dashes, no en dashes.** Commas, colons, ASCII hyphens only. Check every file
-   before it leaves your hands: `grep -n -e '—' -e '–' <file>` must return nothing.
+   before it leaves your hands by searching it for Unicode U+2014 and U+2013; the search
+   must return nothing. (This file deliberately does not contain the characters, so it
+   cannot show you them.)
 2. **Spell out every acronym the first time**, or add an acronym key. PV is Personal
    Volume, CV is Commissionable Volume, FDA, FTC, PACT Act, DSA all get expanded.
 3. **Never delete.** Supersede with a `SUPERSEDED-` prefix, or move with a pointer note.
